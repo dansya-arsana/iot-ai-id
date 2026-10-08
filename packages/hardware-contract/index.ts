@@ -1,0 +1,13 @@
+import { z } from 'zod';
+export const ProtocolSchema = z.enum(['i2c','digital','analog','spi','uart']);
+export const PinSchema = z.object({ name:z.string(), capabilities:z.array(z.enum(['input','output','analog','i2c','spi','uart'])), reserved:z.boolean().default(false), strapping:z.boolean().default(false) });
+export const BoardSchema = z.object({id:z.string(),name:z.string(),mcu:z.string(),logicVoltage:z.number(),powerRails:z.record(z.string(),z.number()),maxPeripheralCurrentMa:z.number(),pins:z.array(PinSchema),sources:z.array(z.string())});
+export const AssemblySchema = z.object({parts:z.array(z.object({ref:z.string().min(1),kind:z.string().min(1),value:z.string().min(1)})).min(1),nets:z.array(z.object({name:z.string().min(1),terminals:z.array(z.string().min(1)).min(2)})).min(1)}).strict();
+export const ComponentSchema = z.object({id:z.string(),name:z.string(),voltage:z.tuple([z.number(),z.number()]),logicVoltage:z.number(),currentMa:z.number(),protocol:ProtocolSchema,pins:z.array(z.object({name:z.string(),role:z.enum(['power','ground','sda','scl','input','output','analog','spi','uart']),required:z.boolean().default(true)})),addresses:z.array(z.number()).default([]),libraries:z.array(z.string()),quirks:z.array(z.string()),sources:z.array(z.string()),support:z.enum(['golden','planning_only']),reviewStatus:z.literal('specification_only'),assembly:AssemblySchema.optional()});
+export const CHECKS = ['board_detected','compiled','flashed','device_addresses','sensor_readings','oled_initialized','button_input','output_commanded','behavior_sequence'] as const;
+export const RecipeReferenceSchema = z.object({id:z.string().min(1),version:z.number().int().positive()}).strict();
+export const HardwareContractSchema = z.object({recipe:RecipeReferenceSchema.optional(),schemaVersion:z.literal(1),id:z.string(),version:z.number().int().positive(),goal:z.string(),board:BoardSchema,components:z.array(z.object({instanceId:z.string(),manifest:ComponentSchema,address:z.number().optional()})),connections:z.array(z.object({componentId:z.string(),pin:z.string(),boardPin:z.string(),role:z.string(),protocol:ProtocolSchema.optional()})),expected:z.object({devices:z.array(z.object({componentId:z.string(),address:z.number()})),valueRanges:z.record(z.string(),z.tuple([z.number(),z.number()])),serialMarkers:z.array(z.string())}),verification:z.object({checks:z.array(z.enum(CHECKS))}),firmware:z.object({framework:z.literal('arduino'),fqbn:z.string(),libraries:z.array(z.string()),generator:z.string()})});
+export type HardwareContract=z.infer<typeof HardwareContractSchema>;
+export type BoardManifest=z.infer<typeof BoardSchema>;
+export type ComponentManifest=z.infer<typeof ComponentSchema>;
+export type CheckName=typeof CHECKS[number];

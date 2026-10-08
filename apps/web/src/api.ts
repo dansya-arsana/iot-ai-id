@@ -1,0 +1,4 @@
+let token:Promise<string>|undefined;
+async function session(){token??=fetch('/api/session').then(async response=>{if(!response.ok)throw new Error('Local session unavailable');const data=await response.json();return data.token as string;}).catch(error=>{token=undefined;throw error;});return token;}
+export async function api<T=any>(path:string,options:RequestInit={},renew=true):Promise<T>{const response=await fetch('/api'+path,{...options,headers:{'Content-Type':'application/json','X-IOT-Session':await session(),...options.headers}});const data=await response.json();if(response.status===403&&renew&&data.error==='Local session authorization required'){token=undefined;return api<T>(path,options,false);}if(!response.ok)throw new Error(data.error??'Request failed');return data;}
+export const post=(path:string,data:unknown)=>api(path,{method:'POST',body:JSON.stringify(data)});

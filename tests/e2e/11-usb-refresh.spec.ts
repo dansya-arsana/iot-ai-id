@@ -1,0 +1,21 @@
+import {test,expect} from '@playwright/test';
+test('USB rescan discovers hot plug, clears disconnected authorization and recovers scan errors',async({page,request})=>{
+ const session=await(await request.get('/api/session')).json();const headers={'X-IOT-Session':session.token};
+ const project=await(await request.post('/api/projects',{headers,data:{goal:'Build an ESP32 button LED using GPIO27 and GPIO26.'}})).json();
+ await expect.poll(async()=> (await(await request.get('/api/projects/'+project.id,{headers})).json()).status).toBe('ready');
+ let connected=false,failed=false,scans=0,physicalRuns=0;
+ await page.route('**/api/status',route=>{scans++;return failed?route.fulfill({status:503,json:{error:'USB probe unavailable'}}):route.fulfill({json:{runtime:{available:true,toolchain:true,devices:connected?[{port:'/dev/cu.test-esp32',candidate:true}]:[]}}});});
+ await page.route('**/api/runtime/trust',route=>route.fulfill({json:{trusted:true}}));
+ await page.route('**/api/projects/*/run',route=>{physicalRuns++;return route.fulfill({json:{accepted:true}});});
+ await page.goto('/project/'+project.id);await page.getByRole('button',{name:'Runtime & bukti'}).click();
+ const beforeMode=scans;await page.getByRole('button',{name:'USB lokal',exact:true}).click();await expect.poll(()=>scans).toBeGreaterThan(beforeMode);
+ await expect(page.getByText('Belum ada kandidat USB.',{exact:false})).toBeVisible();
+ connected=true;await page.getByRole('button',{name:'Deteksi ulang USB',exact:true}).click();await expect(page.locator('#school-port option')).toHaveCount(2);
+ await page.locator('#school-port').selectOption('/dev/cu.test-esp32');await page.getByRole('button',{name:'Izinkan perangkat ini',exact:true}).click();
+ await expect(page.getByRole('button',{name:/Kompilasi, unggah & uji/})).toBeEnabled();
+ connected=false;await page.getByRole('button',{name:'Deteksi ulang USB',exact:true}).click();await expect(page.locator('#school-port')).toHaveValue('');
+ await expect(page.getByRole('button',{name:/Kompilasi, unggah & uji/})).toBeDisabled();
+ failed=true;await page.getByRole('button',{name:'Deteksi ulang USB',exact:true}).click();await expect(page.getByRole('alert')).toContainText('USB probe unavailable');
+ failed=false;connected=true;await page.getByRole('button',{name:'Deteksi ulang USB',exact:true}).click();await expect(page.locator('#school-port option')).toHaveCount(2);await expect(page.getByRole('alert')).toHaveCount(0);
+ expect(physicalRuns).toBe(0);
+});

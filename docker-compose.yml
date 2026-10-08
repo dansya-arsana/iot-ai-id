@@ -1,0 +1,57 @@
+name: iot-ai-id
+
+# Loopback-only development stack. Ports are published to 127.0.0.1, never 0.0.0.0.
+# Dev tokens below are insecure placeholders for local runs; replace them before any real use.
+# Compile/flash/serial stay on the host (USB): run `npm run node:connect` on this machine,
+# not in a container.
+
+services:
+  api:
+    build: .
+    command: npx tsx services/api/server.ts
+    environment:
+      API_BIND: 0.0.0.0
+      API_PORT: 8787
+      IOT_DB_PATH: /data/iot.sqlite
+      # Stock image supports fixture only; jev requires an explicitly provisioned custom image.
+      IOT_AGENT_PROVIDER: ${IOT_AGENT_PROVIDER:-fixture}
+      OPENVIKING_URL: http://openviking:1933
+      IOT_COORDINATOR_URL: http://coordinator:8790
+      IOT_COORDINATOR_OWNER_TOKEN: ${IOT_COORDINATOR_OWNER_TOKEN:-dev-owner-token-change-me-0123456789}
+    ports:
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - iot_data:/data
+    depends_on:
+      - coordinator
+
+  coordinator:
+    build: .
+    command: npx tsx services/coordinator/server.ts
+    environment:
+      IOT_COORDINATOR_HOST: 0.0.0.0
+      IOT_COORDINATOR_PORT: 8790
+      IOT_COORDINATOR_DB: /data/coordinator.sqlite
+      IOT_COORDINATOR_NODES: '[{"id":"node-a","owner":"local","token":"dev-node-token-change-me-0123456789","projects":[]}]'
+      IOT_COORDINATOR_OWNERS: '[{"owner":"local","token":"dev-owner-token-change-me-0123456789"}]'
+    ports:
+      - "127.0.0.1:8790:8790"
+    volumes:
+      - coordinator_data:/data
+
+  # Optional knowledge service: docker compose --profile knowledge up
+  openviking:
+    image: python:3.10-slim
+    profiles: ["knowledge"]
+    command: sh -c "pip install --no-cache-dir 'openviking[local-embed]==0.4.23' && python -m openviking.server.bootstrap --config /ov.conf.example --host 0.0.0.0 --port 1933"
+    working_dir: /conf
+    volumes:
+      - ./services/knowledge/ov.conf.example:/ov.conf.example:ro
+      - openviking_data:/root/.openviking
+    ports:
+      - "127.0.0.1:1933:1933"
+
+volumes:
+  iot_data:
+  coordinator_data:
+  openviking_data:

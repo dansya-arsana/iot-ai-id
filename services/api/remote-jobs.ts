@@ -1,0 +1,15 @@
+import {LocalRemoteJobSchema,type JobSummary} from '../../packages/job-protocol/index.js';
+import type {Engine} from './engine.js';
+import {canonicalJson} from '../../packages/evidence/index.js';
+export function receiveRemoteJob(engine:Engine,value:unknown){const input=LocalRemoteJobSchema.parse(value),existing=engine.store.get('remote_jobs',input.id);if(existing){if(canonicalJson(existing.input)!==canonicalJson(input))throw new Error('Remote job identity mismatch');return existing;}
+ if(input.expiresAt<=Date.now()||input.expiresAt>Date.now()+31000)throw new Error('Remote approval window expired or invalid');
+ const project=engine.assertExecutable(input.projectId),contract=project.contracts.find((c:any)=>c.id===project.contractId);
+ if(contract?.id!==input.contractId||contract?.hash!==input.contractHash)throw new Error('Remote contract version mismatch');
+ const record={id:input.id,input,status:'awaiting_approval',createdAt:new Date().toISOString()};engine.store.insert('remote_jobs',input.projectId,record);return record;
+}
+export async function approveRemoteJob(engine:Engine,id:string,port?:string){const job=engine.store.get('remote_jobs',id);if(!job)throw new Error('Remote job not found');if(job.input.expiresAt<=Date.now())throw new Error('Remote approval window expired');if(job.status!=='awaiting_approval')throw new Error('Remote job already handled; not replayed');const project=engine.assertExecutable(job.input.projectId),contract=project.contracts.find((c:any)=>c.id===project.contractId);if(contract?.id!==job.input.contractId||contract?.hash!==job.input.contractHash)throw new Error('Remote contract version mismatch');if(job.input.operation==='physical'&&port!==job.input.deviceId)throw new Error('Selected USB device differs from remote request');
+ engine.store.update('remote_jobs',{...job,status:'running'});
+ try{const result=await engine.run(job.input.projectId,job.input.operation==='physical'?'physical':'simulation','none',port);const full=engine.project(job.input.projectId),summary:JobSummary={status:'completed',experimentId:result.experimentId,source:job.input.operation==='physical'?'physical':'simulation',verification:result.status,checks:full.observations.filter((o:any)=>o.evidence.experimentId===result.experimentId).map((o:any)=>({check:o.evidence.check,passed:o.evidence.passed})),artifactHashes:full.observations.filter((o:any)=>o.evidence.experimentId===result.experimentId).map((o:any)=>o.evidence.artifactHash)};const complete={...job,status:'completed',summary};engine.store.update('remote_jobs',complete);return complete;
+ }catch{const failed={...job,status:'failed',summary:{status:'failed',message:'Local execution failed; inspect private local logs'}};engine.store.update('remote_jobs',failed);return failed;}
+}
+export function reconcileRemoteJobs(engine:Engine){for(const job of engine.store.list('remote_jobs'))if(job.status==='running')engine.store.update('remote_jobs',{...job,status:'failed',summary:{status:'failed',message:'Local runtime restarted; operation is not replayed'}});}

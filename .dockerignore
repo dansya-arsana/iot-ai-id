@@ -1,0 +1,15 @@
+node_modules
+.git
+.data
+.runtime
+.graphify
+graphify-out
+test-results
+dist
+docs
+research
+adrs
+.video_agent
+playwright-report
+*.md
+.env

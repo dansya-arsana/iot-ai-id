@@ -1,0 +1,21 @@
+import {test, expect} from '@playwright/test';
+const GOAL = 'Build an ESP32 room monitor with temperature, humidity and an OLED.';
+test('golden path: prompt, simulated verification, deliberate SDA failure, repair, retry', async ({page}) => {
+  await page.goto('/build');
+  await page.fill('#hero-goal', GOAL);
+  await page.getByRole('button', {name: /Build it/}).click();
+  await page.waitForURL(/\/project\//);
+  await expect(page.locator('.school-status')).toContainText('Siap belajar', {timeout: 45000});
+  await expect(page.locator('.react-flow__nodes')).toContainText('BME280');
+  await page.getByRole('button', {name: /Jalankan latihan/}).click();
+  await expect(page.getByText('Pemeriksaan eksperimen ini lolos')).toBeVisible({timeout: 45000});
+  await page.getByRole('button',{name:'Runtime & bukti'}).click();
+  await expect(page.getByText('Model · tanpa bukti fisik').first()).toBeVisible();
+  await page.getByRole('button',{name:'Tutup runtime'}).click();
+  await page.getByRole('button', {name: /Coba kegagalan SDA pada model/}).click();
+  await expect(page.getByText('Mari periksa hasilnya')).toBeVisible({timeout: 45000});
+  await expect(page.locator('.school-repair')).toContainText('Periksa & pulihkan');
+  await page.getByLabel(/Saya mengonfirmasi penerapan perbaikan/).check();
+  await page.getByRole('button', {name: /Perbaiki & uji ulang/}).click();
+  await expect(page.getByText('Pemeriksaan eksperimen ini lolos')).toBeVisible({timeout: 45000});
+});

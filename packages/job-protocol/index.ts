@@ -1,0 +1,10 @@
+import {z} from 'zod';
+const identifier=z.string().regex(/^[a-zA-Z0-9_-]{1,128}$/);
+export const JobInputSchema=z.object({nodeId:identifier,projectId:z.string().uuid(),operation:z.enum(['detect','simulate','physical']),contractId:z.string().uuid().nullable(),contractHash:z.string().regex(/^[a-f0-9]{64}$/).nullable(),deviceId:z.string().max(200).nullable(),idempotencyKey:identifier}).strict().superRefine((v,c)=>{if(v.operation!=='detect'&&(!v.contractId||!v.contractHash))c.addIssue({code:'custom',message:'Contract identity required'});if(v.operation==='physical'&&!v.deviceId)c.addIssue({code:'custom',message:'Selected device identity required'});});
+export const NodeConfigSchema=z.array(z.object({id:identifier,owner:identifier,token:z.string().min(32),projects:z.array(z.string().uuid()).max(1000)}).strict()).min(1).max(1000);
+export const JobSummarySchema=z.object({status:z.enum(['awaiting_approval','completed','failed']),experimentId:z.string().uuid().optional(),source:z.enum(['physical','simulation']).optional(),verification:z.enum(['VERIFIED','SIMULATED_VERIFIED','FAILED','ERROR']).optional(),checks:z.array(z.object({check:z.string().max(60),passed:z.boolean()}).strict()).max(6).optional(),artifactHashes:z.array(z.string().regex(/^[a-f0-9]{64}$/)).max(12).optional(),message:z.string().max(300).optional()}).strict();
+export const LeaseResultSchema=z.object({jobId:z.string().uuid(),leaseId:z.string().uuid(),summary:JobSummarySchema}).strict();
+export const LocalRemoteJobSchema=z.object({leaseId:z.string().uuid(),expiresAt:z.number().int().positive(),id:z.string().uuid(),operation:z.enum(['simulate','physical']),projectId:z.string().uuid(),contractId:z.string().uuid(),contractHash:z.string().regex(/^[a-f0-9]{64}$/),deviceId:z.string().max(200).nullable()}).strict();
+export type JobInput=z.infer<typeof JobInputSchema>;
+export type JobSummary=z.infer<typeof JobSummarySchema>;
+export type NodeConfig=z.infer<typeof NodeConfigSchema>[number];

@@ -1,0 +1,13 @@
+import {z} from 'zod';
+const identifier=z.string().uuid();
+const name=z.string().trim().min(1).max(100);
+export const PositionSchema=z.object({x:z.number().finite().min(-10000).max(10000),y:z.number().finite().min(-10000).max(10000)}).strict();
+export const AreaSchema=z.object({id:identifier,name,icon:z.enum(['field','greenhouse','building','tank']),position:PositionSchema}).strict();
+export const DeviceSchema=z.object({id:identifier,name,kind:z.enum(['environment','soil','waterlevel','irrigation','custom']),areaId:identifier,required:z.boolean(),projectId:identifier.nullable(),position:PositionSchema}).strict();
+export const LogicalLinkSchema=z.object({id:identifier,source:identifier,target:identifier,kind:z.enum(['wifi','mqtt','ethernet','lora']),status:z.literal('declared_unverified')}).strict();
+export const SiteSnapshotSchema=z.object({name,areas:z.array(AreaSchema).max(100),devices:z.array(DeviceSchema).max(500),links:z.array(LogicalLinkSchema).max(1000)}).strict();
+export const SiteUpdateSchema=z.object({expectedRevision:z.number().int().nonnegative(),snapshot:SiteSnapshotSchema}).strict();
+export type SiteSnapshot=z.infer<typeof SiteSnapshotSchema>;
+export type Site=SiteSnapshot&{id:string;revision:number;createdAt:string;updatedAt:string};
+export type DeviceStatus='planning'|'ready'|'blocked'|'unverified'|'failed'|'running'|'simulated_verified'|'physical_verified';
+export type SiteView=Site&{deviceStatuses:Record<string,DeviceStatus>;areaStatuses:Record<string,'unverified'|'physical_verified'>;status:'unverified'|'physical_verified'};

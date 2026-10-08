@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+.data/
+.runtime/
+playwright-report/
+test-results/
+graphify-out/.graphify_cache/
+
+# Local orchestration traces and Graphify machine-specific/cache state
+.jev/
+graphify-out/
+.DS_Store
+
+# Tooling artifacts
+.video_agent/
+version/
