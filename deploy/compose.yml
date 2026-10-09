@@ -5,7 +5,9 @@ services:
       context: ../
       dockerfile: deploy/Dockerfile
     restart: unless-stopped
-    env_file: /opt/iot-ai-id/secrets/provider.env
+    env_file:
+      - /opt/iot-ai-id/secrets/provider.env
+      - /opt/iot-ai-id/secrets/coordinator.env
     environment:
       API_BIND: 0.0.0.0
       API_PORT: 8787
@@ -14,13 +16,14 @@ services:
       IOT_RUNTIME_BUILDS_PATH: /data/builds
       IOT_AGENT_PROVIDER: jev
       JEV_CODEX_BIN: /work/jev/jev-codex
-      OPENVIKING_URL: http://127.0.0.1:1
+      OPENVIKING_URL: http://knowledge:1933
       IOT_COORDINATOR_URL: http://coordinator:8790
     volumes:
       - iot_data:/data
     networks:
       gateway:
         aliases: [iot-ai-api]
+      knowledge: {}
   coordinator:
     build:
       context: ../
@@ -37,10 +40,21 @@ services:
     networks:
       gateway:
         aliases: [iot-ai-coordinator]
+  knowledge:
+    build:
+      context: ../
+      dockerfile: deploy/Dockerfile.knowledge
+    restart: unless-stopped
+    volumes:
+      - knowledge_data:/data
+    networks: [knowledge]
+
 networks:
   gateway:
     external: true
     name: prod-client_default
+  knowledge: {}
 volumes:
   iot_data:
   coordinator_data:
+  knowledge_data:

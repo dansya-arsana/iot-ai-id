@@ -27,7 +27,7 @@ cd /opt/iot-ai-id/current
 docker compose -f deploy/compose.yml up -d --no-deps --force-recreate api
 ```
 
-The bundled Jev decision scripts use TypeSafe; the frontier provider uses OpenAI Responses. Missing or rejected credentials produce an explicit unavailable-provider error, never a fixture fallback. OpenViking is optional and is not provisioned in this release. Catalog specifications remain local and deterministic.
+The bundled Jev decision scripts use TypeSafe; the frontier provider uses OpenAI Responses. Missing or rejected credentials produce an explicit unavailable-provider error, never a fixture fallback. OpenViking runs as a separate internal service with local CPU embeddings and vectors-only ingestion. Its knowledge network publishes no host port. Confirm health and actual catalog retrieval before claiming knowledge is live; catalog specifications and validation remain deterministic.
 
 ## Edge scopes and USB
 
@@ -37,4 +37,4 @@ The initial test-laptop node has an empty project allowlist. Before enabling it,
 
 Check anonymous /api/session returns 401, authenticated static pages return 200, hostile Origin returns 403, coordinator /v1/jobs without a bearer token returns 403, and existing applications remain healthy. Inspect provider readiness and a fresh planning request before claiming live AI. Software simulation never establishes physical hardware verification.
 
-For rollback, restore nginx-before.conf to the iot vhost, run nginx -t, then reload the gateway. Preserve the data volumes. Do not run compose down -v. Certificate renewal uses the existing certbot webroot deployment; ensure the gateway reloads after renewal.
+For rollback, restore nginx-before.conf to the iot vhost, run nginx -t, then reload the gateway. Preserve the data volumes. Do not run compose down -v. Certificate renewal runs twice daily through `/etc/cron.d/iot-ai-id-cert`, using the existing certbot container and a project-specific lock. `deploy/renew-certificate.sh` renews only this project certificate, validates nginx and reloads the gateway.

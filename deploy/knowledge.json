@@ -1,0 +1,30 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 1933,
+    "auth_mode": "dev"
+  },
+  "storage": {
+    "workspace": "/data/workspace",
+    "agfs": {
+      "backend": "local"
+    },
+    "vectordb": {
+      "backend": "local",
+      "name": "context"
+    }
+  },
+  "embedding": {
+    "dense": {
+      "provider": "local",
+      "model": "bge-small-zh-v1.5-f16",
+      "dimension": 512
+    }
+  },
+  "vlm": {
+    "provider": "openai-codex",
+    "model": "gpt-6.1-sol",
+    "api_base": "https://chatgpt.com/backend-api/codex",
+    "reasoning_effort": "low"
+  }
+}

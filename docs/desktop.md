@@ -1,6 +1,6 @@
 # Local desktop installers
 
-Build with `npm run desktop:package`. Native macOS builds produce a DMG in `dist/desktop/installers/`. Native Windows x64 builds produce an NSIS `.exe` installer there. The current Mac architecture is packaged in `dist/desktop/IOT AI ID-darwin-arm64/IOT AI ID.app` (or `darwin-x64` on Intel). Open the app normally. The app is a local prototype, unsigned and not notarized; it is not a public distribution release.
+Build with `npm run desktop:package`. Native macOS builds produce a DMG in `dist/desktop/installers/`. Native Windows x64 builds produce an NSIS `.exe` installer there. The current Mac architecture is packaged in `dist/desktop/IOT AI ID-darwin-arm64/IOT AI ID.app` (or `darwin-x64` on Intel). Open the app normally. The app is a local prototype, unsigned and not notarized; it is a testing release, not a signed production distribution.
 
 The bundle includes Electron, a standalone Node runtime, Arduino CLI, production web assets, backend sources and runtime dependencies. It does not require the development server or a separately installed Node runtime. Packaging rejects Node or Arduino CLI binaries that depend on non-system macOS libraries. Build on the target architecture. Windows downloads official binaries and verifies their SHA256 against release checksum manifests before extraction. Mac packaging currently requires Node v24.13.1 and Arduino CLI 1.5.1 so the bundled license notices match the binaries.
 
@@ -29,3 +29,16 @@ Run the `Native desktop installers` GitHub Actions workflow, or `npm ci && npm r
 Windows production AI requires host Jev and Codex installations configured via `JEV_CODEX_BIN` and `CODEX_BIN` (or `OPENAI_API_KEY` plus Jev). ESP32 core and recipe libraries remain host requirements. No silent fixture fallback is enabled in installed apps. Windows PATH uses the OS delimiter, bundled executables use `.exe`, and shutdown/timeout uses the Windows process-tree terminator. Writable state lives in the Electron user-data directory.
 
 Both installers are unsigned testing artifacts. macOS is not notarized; Windows does not have an Authenticode signature. Native Windows workflow execution is required before claiming the Windows installer verified; generating workflow configuration alone does not verify installation or launch.
+
+### Windows ESP32 toolchain setup
+
+After installing, locate `resources/bin/arduino-cli.exe` inside the application installation directory. In PowerShell, replace the path below with that real file:
+
+```powershell
+$cli = 'C:\path\to\IOT AI ID\resources\bin\arduino-cli.exe'
+& $cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+& $cli core install esp32:esp32@3.3.7 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+& $cli lib install 'Adafruit BME280 Library@2.3.0' 'Adafruit SSD1306@2.5.16' 'Adafruit GFX Library@1.12.4' 'Adafruit Unified Sensor@1.1.15' 'Adafruit BusIO@1.17.4'
+```
+
+Check each command succeeds before starting a physical experiment. These commands install the host toolchain; the application never silently installs it during a run. For AI, configure a real executable `JEV_CODEX_BIN` and its TypeSafe credentials, together with `OPENAI_API_KEY` or an authenticated executable `CODEX_BIN`, before launching the desktop process. A shell alias is not an executable path. Start the app from that configured shell so it inherits the environment.
