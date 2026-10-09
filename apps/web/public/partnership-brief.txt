@@ -1,0 +1,24 @@
+iot.ai.id — Indonesia hardware partnership brief
+
+Purpose
+Connect useful IoT and robotics hardware with builders, schools, makers, and engineers in Indonesia through documented experiments and practical learning.
+
+Partnership topics
+- Evaluation samples and exact board/module variants.
+- Pin maps, electrical ratings, datasheets, SDKs, and example firmware.
+- Pilot testing with explicit acceptance criteria and recorded failures.
+- Repair documentation and reproducible retesting.
+- Distribution discussions after commercial and authorization terms are agreed.
+
+Current product
+An AI-assisted hardware workspace with a hardware catalog, visual wiring canvas, structured hardware contracts, deterministic validation, and a local desktop bridge for supported ESP32 experiments.
+
+Current limits
+The public website is an introduction and documentation surface. Hardware availability, official distribution rights, active tester numbers, and verified robotics results are not asserted. The humanoid visual is a concept illustration. Raspberry Pi and robotics catalog entries do not imply full runtime support. Physical verification requires connected hardware and captured evidence.
+
+Public source and desktop preview
+https://github.com/dansya-arsana/iot-ai-id
+https://github.com/dansya-arsana/iot-ai-id/releases/tag/v0.1.0-preview.1
+
+Next discussion
+Agree on the product, electrical requirements, evaluation protocol, documentation, sample terms, and distribution scope. Business contact details will be published separately when available.

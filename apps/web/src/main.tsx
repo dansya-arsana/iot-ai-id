@@ -1,7 +1,7 @@
 import React,{useEffect,useState,useRef,lazy,Suspense} from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter,Link,NavLink,Route,Routes,useLocation,useNavigate,useParams} from 'react-router-dom';
-import {CaretDownIcon,ArrowUpRightIcon,ArrowRightIcon,PlusIcon,CpuIcon,TerminalIcon,LightningIcon,ArrowLeftIcon,CircuitryIcon} from '@phosphor-icons/react';
+import {CaretDownIcon,ArrowUpRightIcon,ArrowRightIcon,PlusIcon,ArrowLeftIcon,CircuitryIcon} from '@phosphor-icons/react';
 import '@fontsource/archivo/400.css';
 import '@fontsource/archivo/500.css';
 import '@fontsource/archivo/600.css';
@@ -14,7 +14,7 @@ import {SchoolWorkbench} from './school-workbench';
 import {HardwareLibraryBrowser} from './hardware-library';
 import './styles.css';
 import './experience.css';
-import './landing.css';
+import {Landing} from './landing-new';
 import './shell.css';
 import {BoardDrawing} from '../../../packages/ui-hardware/index';
 import {LearnContent,EpisodeContent} from './experience';
@@ -24,7 +24,6 @@ const LazySiteWorkbench=lazy(()=>import('./site-workbench').then(m=>({default:m.
 function Sites(){return <Suspense fallback={<p>Memuat lokasi…</p>}><LazySites/></Suspense>;}
 function SiteWorkbench(){return <Suspense fallback={<p>Memuat canvas…</p>}><LazySiteWorkbench/></Suspense>;}
 const GOLDEN='Build an ESP32 room monitor with temperature/humidity and an OLED.';
-const stages=['Plan','Wire','Code','Flash','Observe','Verify','Debug'];
 function Logo(){return <Link className="brand" to="/" aria-label="iot.ai.id home"><span className="brand-mark"><CircuitryIcon size={22} weight="bold"/></span><span>iot<span className="accent">.</span>ai<span className="accent">.</span>id</span></Link>;}
 const primaryLinks=[['Build','/build'],['Sites','/sites'],['Learn','/learn']];
 const resourceGroups=[
@@ -46,47 +45,8 @@ function Header(){
 function Footer(){return <footer className="site-footer"><div><Logo/><p>Physical experience. Structured evidence.</p></div><span>Indonesia · Built for the bench.</span><nav aria-label="Footer navigation"><Link to="/docs">Docs</Link><Link to="/research">Research</Link></nav></footer>;}
 function PromptBox({compact=false}:{compact?:boolean}){const[goal,setGoal]=useState(''),[loading,setLoading]=useState(false),[error,setError]=useState('');const navigate=useNavigate();async function submit(event:React.FormEvent){event.preventDefault();setLoading(true);setError('');try{const p=await post('/projects',{goal:goal.trim()||GOLDEN,entryPoint:'build'});navigate('/project/'+p.id);}catch(e){setError(String((e as Error).message));setLoading(false);}}return <form className={'prompt-box'+(compact?' compact':'')} onSubmit={submit}><div className="prompt-head"><span className="mono">DESCRIBE YOUR BUILD</span><span className="mono subtle">ESP32 / V1</span></div><label className="sr-only" htmlFor={compact?'workspace-goal':'hero-goal'}>Hardware goal</label><textarea id={compact?'workspace-goal':'hero-goal'} value={goal} onChange={e=>setGoal(e.target.value)} placeholder="Build an ESP32 room monitor with temperature, humidity and an OLED…" maxLength={2000} rows={compact?3:2}/><div className="prompt-bottom"><button type="button" className="text-button example" onClick={()=>setGoal(GOLDEN)}><PlusIcon size={14}/> Use room monitor example</button><button className="button red" disabled={loading}>{loading?'Starting…':'Build it'} <ArrowUpRightIcon size={18}/></button></div><p className="prompt-disclosure">AI assistance processes the build goal and machine evidence. Keep personal data out. Research reuse is separate and excluded by default.</p>{error&&<p className="error" role="alert">{error}</p>}</form>;}
 
-function Home() {
- const [broken, setBroken] = useState(false);
- return <div className="landing-page"><Header/><main>
-  <section className="hero">
-   <div className="hero-copy">
-    <h1>Give AI <span className="accent">hands.</span></h1>
-    <p className="hero-subtitle">Build, flash, observe and debug real hardware with an AI agent. Keep the evidence from every experiment.</p>
-    <div className="home-prompt"><PromptBox/></div>
-    <div className="entrance-grid">
-     <Link to="/build"><strong>Build with AI</strong><p>Plan, wire, flash and debug.</p><ArrowUpRightIcon/></Link>
-     <Link to="/learn"><strong>Learn &amp; Verify</strong><p>Take a challenge. Keep the episode.</p><ArrowUpRightIcon/></Link>
-    </div>
-   </div>
-   <div className="hero-hardware">
-    <div className="spec-heading"><strong>Room monitor</strong><span>Reference build</span></div>
-    <BoardDrawing/>
-    <div className="hardware-spec"><div><small>Controller</small><strong>ESP32 DevKit</strong></div><div><small>Peripherals</small><strong>BME280 + OLED</strong></div><div><small>Protocol</small><strong>I2C · 3.3V</strong></div></div>
-    <Link to="/build" className="reference-link">Open this build <ArrowRightIcon size={19}/></Link>
-   </div>
-  </section>
-  <section className="process-section">
-   <div className="section-heading"><h2>Code meets the real world.</h2><p>A working sketch is a beginning. A working circuit needs evidence.</p></div>
-   <div className="loop-strip" aria-label="Hardware experiment workflow">{stages.map((stage,i)=><div key={stage}><strong>{stage}</strong>{i<6&&<ArrowRightIcon/>}</div>)}</div>
-   <div className="principles">
-    <article><h3>A contract before code.</h3><p>Components, pin mapping, voltage and expected behavior become one inspectable Hardware Contract.</p></article>
-    <article><h3>Rules before confidence.</h3><p>GPIO capability, bus conflicts and power constraints are checked deterministically before a run.</p></article>
-    <article><h3>Evidence after execution.</h3><p>Board, flash, I2C addresses and readings each need a named check. Compilation alone proves no circuit.</p></article>
-   </div>
-  </section>
-  <section className="break-section">
-   <div><h2>Now break it.</h2><p>Remove SDA. The code still compiles. The physical state no longer matches.</p><button className={'button '+(broken?'dark':'red')} onClick={()=>setBroken(!broken)} aria-pressed={broken}>{broken?'Reconnect SDA':'Disconnect SDA'} <LightningIcon/></button><p className="demo-disclosure">Interactive illustration. No hardware control.</p></div>
-   <div className="demo-terminal"><div className="terminal-top"><TerminalIcon/> Expected vs observed <span>Demo</span></div><div className="terminal-lines" aria-live="polite"><p><span className="subtle">EXPECTED</span> BME280 @ 0x76</p><p><span className="subtle">OBSERVED</span> {broken?'No I2C device':'BME280 @ 0x76'}</p><hr/>{broken?<><p className="accent">! Sensor / wiring mismatch</p><p>Check: GPIO21 ↔ SDA</p><p>Power off before changing wiring.</p><span className="terminal-result failed">MISMATCH DETECTED</span></>:<><p>Device detected</p><p>Readings within contract ranges</p><span className="terminal-result">DEMO CHECKS PASS</span></>}</div><Link to="/build" className="terminal-link">Run a persistent experiment <ArrowUpRightIcon/></Link></div>
-  </section>
-  <section className="knowledge-section">
-   <div className="section-heading"><h2>Know the part. Keep the evidence.</h2><p>A small, inspectable catalog. Specifications are not physical verification.</p></div>
-   <div className="knowledge-links"><Link to="/hardware"><CpuIcon size={28}/><div><h3>Hardware library</h3><p>ESP32 and component manifests</p></div><ArrowUpRightIcon/></Link><Link to="/bench"><CircuitryIcon size={28}/><div><h3>PhysicalBench</h3><p>Methodology first. Rankings when proven.</p></div><ArrowUpRightIcon/></Link><Link to="/arena"><LightningIcon size={28}/><div><h3>Hardware Arena</h3><p>One reproducible challenge. Real criteria.</p></div><ArrowUpRightIcon/></Link></div>
-  </section>
-  <section className="indonesia-section"><h2>Built at the bench. Grounded in Indonesia.</h2><div><p>Jakarta and Jabodetabek are the planned first proving ground. Java is a future expansion corridor.</p><p>The Indonesia Lab and Hardware Fellows program are proposed. No active labs or fellow profiles are claimed yet.</p></div><Link to="/learn" className="text-button">Explore Learn &amp; Verify <ArrowUpRightIcon/></Link></section>
-  <section className="closing"><h2>AI can write code.<br/>Now let’s teach it reality.</h2><Link to="/build" className="button red">Start building <ArrowUpRightIcon/></Link><Link to="/research" className="text-button">Research &amp; open source <ArrowUpRightIcon/></Link></section>
- </main><Footer/></div>;
-}
+function Home(){return <Landing/>;}
+
 function Build(){const[projects,setProjects]=useState<any[]>([]);const[error,setError]=useState('');useEffect(()=>{api('/projects').then(r=>setProjects(r.projects)).catch(e=>setError(e.message));},[]);return <div className="app-shell"><Header/><main className="build-start"><h1>What will<br/>you build?</h1><p>Describe a device. Inspect the plan. Test what’s real.</p><PromptBox/>{error&&<p className="error">{error}</p>}<section className="project-list"><div className="section-heading"><h2>Workbench</h2><span className="mono">{projects.length} PROJECTS</span></div>{projects.length?projects.map(p=><Link key={p.id} to={'/project/'+p.id}><div><strong>{p.title}</strong><p>{p.goal}</p></div><span className="badge">{p.status.replaceAll('_',' ')}</span><ArrowUpRightIcon/></Link>):<p className="empty-state">Your first experiment starts with a prompt.</p>}</section></main><Footer/></div>;}
 function Hardware(){return <Page kicker="HARDWARE / KNOWLEDGE LIBRARY" title="Know your hardware." subtitle="Board, sensor dan modul dengan spesifikasi, sumber, dan batas penggunaan."><HardwareLibraryBrowser/></Page>;}
 function HardwareDetail(){const{slug}=useParams();return <Page kicker="HARDWARE / REFERENCE" title="Detail perangkat" subtitle="Periksa varian board dan breakout sebelum merangkai."><Link to="/hardware" className="text-button"><ArrowLeftIcon/> Hardware library</Link><HardwareLibraryBrowser key={slug} initialId={slug}/></Page>;}
