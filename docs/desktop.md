@@ -42,3 +42,7 @@ $cli = 'C:\path\to\IOT AI ID\resources\bin\arduino-cli.exe'
 ```
 
 Check each command succeeds before starting a physical experiment. These commands install the host toolchain; the application never silently installs it during a run. For AI, configure a real executable `JEV_CODEX_BIN` and its TypeSafe credentials, together with `OPENAI_API_KEY` or an authenticated executable `CODEX_BIN`, before launching the desktop process. A shell alias is not an executable path. Start the app from that configured shell so it inherits the environment.
+
+## AI settings in current source
+
+Current source includes an owner AI settings panel at `/backoffice#bo-ai`, with encrypted OpenAI and TypeSafe keys in the local workspace. It does not remove the Jev executable requirement. The first `v0.1.0-preview.1` installers were built before this panel; they retain environment-based setup and authenticated host Codex. Cloud admin settings are deployed independently of that installer version. No multi-user cloud BYOK or ChatGPT sign-in is implemented.

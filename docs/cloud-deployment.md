@@ -14,20 +14,23 @@ The API remains strict about loopback Host and Origin. The trusted gateway check
 ## Files on the server
 
 - /opt/iot-ai-id/current: deployment source.
-- /opt/iot-ai-id/secrets/provider.env: OPENAI_API_KEY and TYPESAFE_API_KEY, mode 600.
+- /opt/iot-ai-id/secrets/provider.env: optional bootstrap provider environment, mode 600.
+- /opt/iot-ai-id/secrets/knowledge.json: internal OpenViking server configuration and root management key, mode 600.
+- /opt/iot-ai-id/secrets/knowledge.env: tenant-bound OpenViking data key for API service, mode 600.
 - /opt/iot-ai-id/secrets/access.txt: generated testing workspace login, mode 600.
 - /opt/iot-ai-id/secrets/coordinator.env: generated owner and node scopes, mode 600.
 - /opt/iot-ai-id/releases/nginx-before.conf: previous iot nginx configuration for rollback.
 - Docker volumes: iot-ai-release_iot_data and iot-ai-release_coordinator_data.
 
-Edit secrets directly over SSH. Never commit them, mount a user's home directory, or copy desktop credentials into an image. After editing provider.env, recreate the API container:
+## AI settings
 
-```bash
-cd /opt/iot-ai-id/current
-docker compose -f deploy/compose.yml up -d --no-deps --force-recreate api
-```
+Open `/backoffice#bo-ai` on the admin host. Save the OpenAI API key and TypeSafe/Jev key in the owner settings, then use each connection test. The form clears the submitted key; later reads return only a fingerprint and test metadata. OpenAI connection testing verifies authentication, not entitlement to GPT-6.1 Sol inference. Keys are encrypted with AES-256-GCM in `/data/secrets/credentials.json`; the separate mode-600 master key is `/data/secrets/master.key`. Both remain in the private API data volume and are excluded from project exports and installers. Preserve the master key when backing up the vault; losing it makes saved keys unreadable.
 
-The bundled Jev decision scripts use TypeSafe; the frontier provider uses OpenAI Responses. Missing or rejected credentials produce an explicit unavailable-provider error, never a fixture fallback. OpenViking runs as a separate internal service with local CPU embeddings and vectors-only ingestion. Its knowledge network publishes no host port. Confirm health and actual catalog retrieval before claiming knowledge is live; catalog specifications and validation remain deterministic.
+Saved keys take precedence for new AI operations without restarting the server. Deletion removes the saved key; an optional bootstrap environment or authenticated local Codex may still apply. Running operations retain their credential snapshot until completion. This shared owner workspace does not provide isolated cloud BYOK accounts. Desktop instances use their own local workspace vault. Per-user cloud BYOK requires application accounts and project ownership before accepting unrelated users.
+
+Bootstrap environment is optional. Never commit secrets, mount a user's home directory, or copy desktop credentials into an image. No secrets are required in the renderer or browser storage. Sign in with ChatGPT is not implemented in this preview.
+
+The bundled Jev decision scripts use TypeSafe; the frontier provider uses OpenAI Responses. Missing or rejected credentials produce an explicit unavailable-provider error, never a fixture fallback. OpenViking runs as a separate internal service with local CPU embeddings and vectors-only ingestion. VLM is unconfigured, so semantic generation is unavailable. Network authentication uses a dedicated tenant-bound data key; the root key is reserved for account provisioning. Its knowledge network publishes no host port. Deployment verification indexed all 56 catalog records and returned live ESP32/BME280 search results. Catalog specifications and validation remain deterministic.
 
 ## Edge scopes and USB
 

@@ -8,6 +8,7 @@ services:
     env_file:
       - /opt/iot-ai-id/secrets/provider.env
       - /opt/iot-ai-id/secrets/coordinator.env
+      - /opt/iot-ai-id/secrets/knowledge.env
     environment:
       API_BIND: 0.0.0.0
       API_PORT: 8787
@@ -47,6 +48,7 @@ services:
     restart: unless-stopped
     volumes:
       - knowledge_data:/data
+      - /opt/iot-ai-id/secrets/knowledge.json:/conf/knowledge.json:ro
     networks: [knowledge]
 
 networks:

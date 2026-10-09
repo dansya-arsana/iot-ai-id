@@ -1,0 +1,23 @@
+import {test,expect} from '@playwright/test';
+test('owner AI settings clear secret input, survive reload and delete without browser storage',async({page})=>{
+ await page.goto('/backoffice#bo-ai');
+ const panel=page.getByRole('region',{name:'Pengaturan AI'});
+ await expect(panel).toContainText('belum ada BYOK terpisah per pengguna');
+ const form=panel.locator('form').filter({has:page.getByRole('heading',{name:'OpenAI',exact:true})});
+ const secret='browser-test-private-sentinel';
+ await form.getByLabel('API key baru').fill(secret);
+ await form.getByRole('button',{name:'Simpan',exact:true}).click();
+ await expect(form.getByLabel('API key baru')).toHaveValue('');
+ await expect(form).toContainText('Tersimpan');
+ expect(await page.evaluate(()=>JSON.stringify({local:{...localStorage},session:{...sessionStorage}}))).not.toContain(secret);
+ expect(await page.locator('body').innerText()).not.toContain(secret);
+ await page.reload();
+ await expect(form).toContainText('Tersimpan');
+ await form.getByRole('button',{name:'Hapus key',exact:true}).click();
+ await expect(form).toContainText('Belum ada key dashboard');
+ await page.setViewportSize({width:390,height:844});
+ await expect(form.getByLabel('API key baru')).toBeVisible();
+ const width=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:window.innerWidth}));
+ const overflow=await page.evaluate(()=>[...document.querySelectorAll('*')].filter(element=>element.getBoundingClientRect().right>window.innerWidth).slice(0,12).map(element=>({tag:element.tagName,cls:element.className,width:element.getBoundingClientRect().width})));
+ expect(width.scroll,JSON.stringify(overflow)).toBeLessThanOrEqual(width.viewport);
+});

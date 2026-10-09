@@ -1,3 +1,4 @@
+import {CredentialVault,ProviderName,SecretInput,testCredential} from './credentials.js';
 import {hardwareLibrary,HardwareLibraryFilterSchema,hardwareKnowledgeDocument} from '../../packages/hardware-library/index.js';
 import {receiveRemoteJob,approveRemoteJob,reconcileRemoteJobs} from './remote-jobs.js';
 import {ChatInputSchema,ComponentChangeSchema,WiringChangeSchema} from '../../packages/agent-tools/index.js';
@@ -5,7 +6,7 @@ import {createServer,type IncomingMessage,type ServerResponse} from 'node:http';
 import {randomBytes} from 'node:crypto';
 import {readFile,stat} from 'node:fs/promises';
 import {existsSync} from 'node:fs';
-import {resolve,extname} from 'node:path';
+import {resolve,extname,dirname} from 'node:path';
 import {z} from 'zod';
 import {Store} from './store.js';
 import {SiteEngine,RevisionConflict} from './site-engine.js';
@@ -21,10 +22,12 @@ const port=Number(process.env.API_PORT??8787),webPort=Number(process.env.WEB_POR
 async function coordinatorView(){const url=process.env.IOT_COORDINATOR_URL,token=process.env.IOT_COORDINATOR_OWNER_TOKEN;if(!url||!token)return{status:'unconfigured' as const};try{const get=async(path:string)=>{const response=await fetch(url+path,{headers:{Authorization:'Bearer '+token},redirect:'error',signal:AbortSignal.timeout(8000)});if(!response.ok)throw new Error('Coordinator HTTP '+response.status);return response.json() as Promise<any>;};const [projects,jobs,evidence]=await Promise.all([get('/v1/projects'),get('/v1/jobs'),get('/v1/evidence')]);return{status:'online' as const,url,projects:projects.projects??[],jobs:jobs.jobs??[],evidence:evidence.evidence??[]};}catch(error){return{status:'unreachable' as const,url,error:safeError(error)};}}
 const session=randomBytes(32).toString('hex');
 const store=new Store(process.env.IOT_DB_PATH??resolve('.data/iot.sqlite'));
+const credentialVault=new CredentialVault(process.env.IOT_SECRETS_PATH??resolve(dirname(process.env.IOT_DB_PATH??resolve('.data/iot.sqlite')),'secrets'));
+const agent=new JevProvider(()=>credentialVault.snapshot());
 const catalogSeed=store.seedHardwareLibrary(hardwareLibrary);
 const fixture=process.env.IOT_AGENT_PROVIDER==='fixture';
-async function providerAvailability(){if(fixture)return{status:'fixture' as const,available:true};try{await new JevProvider().preflight();return{status:'configured' as const,available:true};}catch(error){return{status:'unavailable' as const,available:false,error:safeError(error)};}}
-const engine=new Engine(store,fixture?new FixtureAgent():undefined);
+async function providerAvailability(){if(fixture)return{status:'fixture' as const,available:true};try{await agent.preflight();return{status:'configured' as const,available:true};}catch(error){return{status:'unavailable' as const,available:false,error:safeError(error)};}}
+const engine=new Engine(store,fixture?new FixtureAgent():agent);
 reconcileRemoteJobs(engine);
 const sites=new SiteEngine(store);
 const trusted=new Map<string,number>();
@@ -44,6 +47,14 @@ const server=createServer(async(req,res)=>{try{
  if(path==='/api'&&req.method==='GET'){json(res,200,{name:'iot.ai.id local API',version:'v1',auth:'GET /api/session then X-IOT-Session header; loopback Host/Origin only',endpoints:{'GET /api':'this directory','GET /api/session':'local session token','GET /api/status':'runtime, simulators, knowledge, counts','GET /api/backoffice':'operator dashboard aggregate (coordinator proxy)','GET /api/comparisons':'agent vs human challenge attempts','GET /api/hardware':'board + component manifests','GET /api/challenges':'challenge catalog with scenarios','GET /api/remote-jobs':'active remote jobs','POST /api/remote-jobs':'enqueue local remote job (node use)','POST /api/remote-jobs/:id/approve':'human approval (physical requires trusted port)','POST /api/remote-jobs/:id/renew':'extend approval window','GET /api/sites':'locations and farm planning profiles','POST /api/sites':'create site snapshot','GET /api/sites/:id':'site and derived evidence status','PUT /api/sites/:id':'CAS {expectedRevision,snapshot}','GET /api/projects/:id/sites':'validated site memberships','GET /api/projects':'list projects','POST /api/projects':'create {goal, entryPoint?, actor?, challengeId?, challengeVersion?}','GET /api/projects/:id/challenge':'challenge scenario verdicts judged from evidence','GET /api/projects/:id':'full project state','GET /api/projects/:id/events?after=':'ordered event replay','GET /api/projects/:id/episode?purpose=':'episode export','POST /api/projects/:id/chat':'design/debug chat revision','POST /api/projects/:id/components':'catalog add/remove draft','POST /api/projects/:id/wiring':'strict external wiring snapshot revision','POST /api/projects/:id/run':'simulation or physical run','POST /api/projects/:id/retry':'repair retest','POST /api/projects/:id/replan':'regenerate plan','POST /api/projects/:id/actions':'human action record','POST /api/projects/:id/environment':'environment record','POST /api/projects/:id/rights':'rights attestation','POST /api/runtime/trust':'authorize a USB port for 20 minutes'},agent:{mcp:'npm run api:mcp (MCP stdio server over this API)',docs:'/api route in the web app'}});return;}
  if(path.startsWith('/api/')){
  authorize(req);
+ if(path==='/api/ai-settings'&&req.method==='GET'){json(res,200,credentialVault.metadata());return;}
+ const aiSetting=path.match(/^\/api\/ai-settings\/(openai|typesafe)(?:\/(test))?$/);
+ if(aiSetting){const provider=ProviderName.parse(aiSetting[1]);
+  if(!aiSetting[2]&&req.method==='PUT'){const input=SecretInput.parse(await body(req));credentialVault.save(provider,input.key);json(res,200,credentialVault.metadata());return;}
+  if(!aiSetting[2]&&req.method==='DELETE'){credentialVault.remove(provider);json(res,200,credentialVault.metadata());return;}
+  if(aiSetting[2]==='test'&&req.method==='POST'){z.object({}).strict().parse(await body(req));const key=credentialVault.snapshot()[provider];if(!key){json(res,400,{error:'Simpan API key sebelum menguji koneksi.'});return;}const fingerprint=credentialVault.metadata().providers[provider].fingerprint!;const result=await testCredential(provider,key);credentialVault.recordTest(provider,fingerprint,result.connected);json(res,200,{...result,settings:credentialVault.metadata()});return;}
+ }
+
  if(path==='/api/sites'&&req.method==='GET'){json(res,200,{sites:sites.list(),profiles:farmProfiles});return;}
  if(path==='/api/sites'&&req.method==='POST'){json(res,201,sites.create(await body(req)));return;}
  const siteMatch=path.match(/^\/api\/sites\/([\w-]+)$/);
@@ -51,7 +62,7 @@ const server=createServer(async(req,res)=>{try{
  if(siteMatch&&req.method==='PUT'){json(res,200,sites.update(siteMatch[1],await body(req)));return;}
  const membershipMatch=path.match(/^\/api\/projects\/([\w-]+)\/sites$/);
  if(membershipMatch&&req.method==='GET'){json(res,200,{memberships:sites.memberships(membershipMatch[1])});return;}
- if(path==='/api/status'&&req.method==='GET'){const runtime=await engine.runtime.detect();json(res,200,{runtime,simulators:await engine.simulationCapabilities(),knowledge:{url:engine.knowledge.url},counts:{projects:store.list('projects').length,components:components.length,physicalVerified:store.list('verifications').filter(v=>v.physical===true&&v.status==='VERIFIED').length,simulatedVerified:store.list('verifications').filter(v=>v.status==='SIMULATED_VERIFIED').length},providers:{...await providerAvailability(),default:fixture?'FixtureAgent (deterministic verification mode)':'JevProvider',frontier:'gpt-6.1-sol',reasoning:'low'}});return;}
+ if(path==='/api/status'&&req.method==='GET'){const runtime=await engine.runtime.detect();json(res,200,{runtime,simulators:await engine.simulationCapabilities(),knowledge:{url:engine.knowledge.url},counts:{projects:store.list('projects').length,components:components.length,physicalVerified:store.list('verifications').filter(v=>v.physical===true&&v.status==='VERIFIED').length,simulatedVerified:store.list('verifications').filter(v=>v.status==='SIMULATED_VERIFIED').length},providers:{...await providerAvailability(),credentials:credentialVault.metadata(),default:fixture?'FixtureAgent (deterministic verification mode)':'JevProvider',frontier:'gpt-6.1-sol',reasoning:'low'}});return;}
  if(path==='/api/comparisons'&&req.method==='GET'){
   const grouped=new Map<string,any[]>();
   for(const project of store.list('projects')){if(!project.challengeId)continue;const key=`${project.challengeId}@${project.challengeVersion??1}`;grouped.set(key,[...(grouped.get(key)??[]),project]);}
@@ -102,7 +113,7 @@ const server=createServer(async(req,res)=>{try{
  try{if(!(await stat(file)).isFile())file=resolve(root,'index.html');}catch{file=resolve(root,'index.html');}
  if(!existsSync(file)){json(res,404,{error:'Use npm run dev for development, or npm run build first.'});return;}
  const types:Record<string,string>={'.html':'text/html','.js':'text/javascript','.css':'text/css','.woff2':'font/woff2','.svg':'image/svg+xml','.json':'application/json'};res.writeHead(200,{'Content-Type':types[extname(file)]??'application/octet-stream','X-Content-Type-Options':'nosniff'});res.end(await readFile(file));
- }catch(error){const text=safeError(error);json(res,error instanceof RevisionConflict?409:/authorization|Untrusted/.test(text)?403:/not found/.test(text)?404:400,{error:text});}});
+ }catch(error){const errorStatus=error instanceof RevisionConflict?409:/authorization|Untrusted/.test(safeError(error))?403:/not found/.test(safeError(error))?404:400;const text=error instanceof Error&&error.message==='Local session authorization required'?'Local session authorization required':(req.url??'').startsWith('/api/ai-settings')?'Pengaturan AI gagal. Periksa format key atau integritas penyimpanan.':safeError(error);json(res,errorStatus,{error:text});}});
 server.listen(port,bindHost,()=>console.log(`IOT AI ID API: http://${bindHost==='0.0.0.0'?'127.0.0.1':bindHost}:${port}`));
 for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{terminateActiveProcesses();server.close(()=>{store.close();process.exit(0);});});
 // A first-entry probe prevents fan-out when the knowledge backend is unavailable.

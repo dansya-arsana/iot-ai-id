@@ -845,6 +845,7 @@
   }
 
   .bo-projects .bo-th {
+    min-width: 0;
     position: absolute;
     width: 1px;
     height: 1px;
@@ -907,3 +908,5 @@
   padding: 7px 13px;
   margin: -10px 0 18px;
 }
+
+.bo-ai-settings{margin:24px 0;scroll-margin-top:100px}.bo-ai-settings form{padding:20px 0;border-top:1px solid var(--bo-line,#333)}.bo-ai-settings label{display:grid;gap:8px;max-width:600px}.bo-ai-settings input{padding:12px;background:transparent;color:inherit;border:1px solid #666;border-radius:6px;font:inherit}.bo-ai-settings form div{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}.bo-ai-settings button{padding:10px 16px;cursor:pointer}.bo-ai-settings button:disabled{opacity:.45;cursor:default}

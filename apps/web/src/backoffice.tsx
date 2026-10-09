@@ -1,3 +1,4 @@
+import {AiSettings} from './ai-settings';
 import {useEffect, useState, useCallback, useRef} from 'react';
 import {Link} from 'react-router-dom';
 import {CircuitryIcon, FlaskIcon, SealCheckIcon, WifiHighIcon, ArrowUpRightIcon} from '@phosphor-icons/react';
@@ -24,7 +25,7 @@ function experimentBuckets(experiments: any[], span: 'week' | 'year' | 'quarter'
 export function Backoffice() {
   const [hash,setHash]=useState(()=>window.location.hash);
   useEffect(()=>{const sync=()=>setHash(window.location.hash);window.addEventListener('hashchange',sync);window.addEventListener('popstate',sync);return()=>{window.removeEventListener('hashchange',sync);window.removeEventListener('popstate',sync);};},[]);
-  const activeSection=['#bo-ringkasan','#bo-eksperimen','#bo-proyek','#bo-runtime'].includes(hash)?hash:'#bo-ringkasan';
+  const activeSection=['#bo-ringkasan','#bo-eksperimen','#bo-proyek','#bo-runtime','#bo-ai'].includes(hash)?hash:'#bo-ringkasan';
   const [data, setData] = useState<any>();
   const [status, setStatus] = useState<any>();
   const [comparisons, setComparisons] = useState<any>();
@@ -90,6 +91,7 @@ export function Backoffice() {
         <a href="#bo-eksperimen" aria-current={activeSection === '#bo-eksperimen' ? 'location' : undefined}>Eksperimen</a>
         <a href="#bo-proyek" aria-current={activeSection === '#bo-proyek' ? 'location' : undefined}>Proyek</a>
         <a href="#bo-runtime" aria-current={activeSection === '#bo-runtime' ? 'location' : undefined}>Runtime</a>
+        <a href="#bo-ai" aria-current={activeSection === '#bo-ai' ? 'location' : undefined}>AI keys</a>
       </nav>
       <label className="bo-search"><span className="sr-only">Cari proyek</span><input placeholder="Cari proyek, tujuan, ID…" value={query} onChange={e => setQuery(e.target.value)}/></label><span className="bo-header-note" title={data.generatedAt}>{counts.projects} proyek · data lokal</span>
     </header>
@@ -160,6 +162,7 @@ export function Backoffice() {
           {coordinator.status === 'unreachable' && <p className="bo-warn" role="alert">Koordinator tidak merespons: {coordinator.error}</p>}
         </article>
       </section>
+      <AiSettings/>
       <p className="bo-foot">Backoffice operator lokal. Angka dihitung dari artefak SQLite yang sama dengan workspace; verifikasi fisik hanya dihitung dari bukti fisik.</p>
     </main>
   </div>;
