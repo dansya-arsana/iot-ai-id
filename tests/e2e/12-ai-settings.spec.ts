@@ -3,6 +3,7 @@ test('owner AI settings clear secret input, survive reload and delete without br
  await page.goto('/backoffice#bo-ai');
  const panel=page.getByRole('region',{name:'Pengaturan AI'});
  await expect(panel).toContainText('belum ada BYOK terpisah per pengguna');
+ await expect(panel).toBeInViewport();
  const form=panel.locator('form').filter({has:page.getByRole('heading',{name:'OpenAI',exact:true})});
  const secret='browser-test-private-sentinel';
  await form.getByLabel('API key baru').fill(secret);
