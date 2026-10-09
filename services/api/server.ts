@@ -23,7 +23,7 @@ const session=randomBytes(32).toString('hex');
 const store=new Store(process.env.IOT_DB_PATH??resolve('.data/iot.sqlite'));
 const catalogSeed=store.seedHardwareLibrary(hardwareLibrary);
 const fixture=process.env.IOT_AGENT_PROVIDER==='fixture';
-if(!fixture)await new JevProvider().preflight();
+async function providerAvailability(){if(fixture)return{status:'fixture' as const,available:true};try{await new JevProvider().preflight();return{status:'configured' as const,available:true};}catch(error){return{status:'unavailable' as const,available:false,error:safeError(error)};}}
 const engine=new Engine(store,fixture?new FixtureAgent():undefined);
 reconcileRemoteJobs(engine);
 const sites=new SiteEngine(store);
@@ -51,7 +51,7 @@ const server=createServer(async(req,res)=>{try{
  if(siteMatch&&req.method==='PUT'){json(res,200,sites.update(siteMatch[1],await body(req)));return;}
  const membershipMatch=path.match(/^\/api\/projects\/([\w-]+)\/sites$/);
  if(membershipMatch&&req.method==='GET'){json(res,200,{memberships:sites.memberships(membershipMatch[1])});return;}
- if(path==='/api/status'&&req.method==='GET'){const runtime=await engine.runtime.detect();json(res,200,{runtime,simulators:await engine.simulationCapabilities(),knowledge:{url:engine.knowledge.url},counts:{projects:store.list('projects').length,components:components.length,physicalVerified:store.list('verifications').filter(v=>v.physical===true&&v.status==='VERIFIED').length,simulatedVerified:store.list('verifications').filter(v=>v.status==='SIMULATED_VERIFIED').length},providers:{default:fixture?'FixtureAgent (deterministic verification mode)':'JevProvider',frontier:'gpt-6.1-sol',reasoning:'low'}});return;}
+ if(path==='/api/status'&&req.method==='GET'){const runtime=await engine.runtime.detect();json(res,200,{runtime,simulators:await engine.simulationCapabilities(),knowledge:{url:engine.knowledge.url},counts:{projects:store.list('projects').length,components:components.length,physicalVerified:store.list('verifications').filter(v=>v.physical===true&&v.status==='VERIFIED').length,simulatedVerified:store.list('verifications').filter(v=>v.status==='SIMULATED_VERIFIED').length},providers:{...await providerAvailability(),default:fixture?'FixtureAgent (deterministic verification mode)':'JevProvider',frontier:'gpt-6.1-sol',reasoning:'low'}});return;}
  if(path==='/api/comparisons'&&req.method==='GET'){
   const grouped=new Map<string,any[]>();
   for(const project of store.list('projects')){if(!project.challengeId)continue;const key=`${project.challengeId}@${project.challengeVersion??1}`;grouped.set(key,[...(grouped.get(key)??[]),project]);}

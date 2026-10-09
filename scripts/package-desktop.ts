@@ -12,7 +12,7 @@ const shell=join(stage,'shell'),runtime=join(stage,'runtime'),bin=join(stage,'bi
 await mkdir(shell);await mkdir(runtime);await mkdir(bin);
 await cp(join(root,'apps/desktop'),shell,{recursive:true});
 const manifest=JSON.parse(await readFile(join(root,'package.json'),'utf8'));
-await writeFile(join(shell,'package.json'),JSON.stringify({name:'iot-ai-id-desktop',version:manifest.version,productName:'IOT AI ID',main:'main.cjs'},null,2));
+await writeFile(join(shell,'package.json'),JSON.stringify({name:'iot-ai-id-desktop',version:manifest.version,productName:'IOT AI ID',author:'IOT AI ID contributors',description:'Local AI hardware engineering workbench',main:'main.cjs'},null,2));
 for(const folder of ['services','packages','runtime'])await cp(join(root,folder),join(runtime,folder),{recursive:true});
 await cp(join(root,'dist/web'),join(runtime,'dist/web'),{recursive:true});
 await writeFile(join(runtime,'package.json'),JSON.stringify({name:'iot-ai-id-runtime',version:manifest.version,private:true,type:'module',dependencies:{...manifest.dependencies,tsx:manifest.devDependencies.tsx}},null,2));
@@ -32,7 +32,7 @@ await copyStandalone(arduino,'arduino-cli');}else{
 }
 if(execFileSync(join(bin,process.platform==='win32'?'node.exe':'node'),['--version'],{encoding:'utf8'}).trim()!=='v24.13.1'||!execFileSync(join(bin,process.platform==='win32'?'arduino-cli.exe':'arduino-cli'),['version'],{encoding:'utf8'}).includes('Version: 1.5.1'))throw new Error('Bundled binary versions differ from checked-in license notices; update notices before packaging');
 await writeFile(join(runtime,'docs/licenses/bundled-binaries.txt'),'Node.js v24.13.1: https://github.com/nodejs/node/tree/v24.13.1\nLicense: node-v24.13.1-LICENSE.txt\nArduino CLI 1.5.1: https://github.com/arduino/arduino-cli/tree/v1.5.1\nLicense: arduino-cli-1.5.1-LICENSE.txt\nElectron 44.6.0: https://github.com/electron/electron/tree/v44.6.0\nElectron and Chromium notices are included in the application bundle.\n');
-const paths=await packager({dir:shell,out:output,name:'IOT AI ID',appBundleId:'id.iot.ai.desktop',appVersion:manifest.version,platform:process.platform as 'darwin'|'win32',arch:process.arch as 'arm64'|'x64',electronVersion:'44.6.0',asar:false,overwrite:true,prune:true,extraResource:[runtime,bin]});
+const paths=await packager({dir:shell,out:output,name:'IOT AI ID',appBundleId:'id.iot.ai.desktop',appVersion:manifest.version,win32metadata:{CompanyName:'IOT AI ID contributors',FileDescription:'IOT AI ID local hardware workbench',ProductName:'IOT AI ID',InternalName:'IOT AI ID'},platform:process.platform as 'darwin'|'win32',arch:process.arch as 'arm64'|'x64',electronVersion:'44.6.0',asar:false,overwrite:true,prune:true,extraResource:[runtime,bin]});
 await build({prepackaged:paths[0],targets:process.platform==='darwin'?Platform.MAC.createTarget('dmg'):Platform.WINDOWS.createTarget('nsis'),config:{appId:'id.iot.ai.desktop',productName:'IOT AI ID',artifactName:'IOT-AI-ID-${version}-${os}-${arch}.${ext}',directories:{output:join(output,'installers')},mac:{identity:null,category:'public.app-category.developer-tools'},win:{signAndEditExecutable:false},nsis:{oneClick:false,perMachine:false,allowToChangeInstallationDirectory:true},publish:null}});
 await rm(stage,{recursive:true,force:true});
 console.log('Desktop app: '+join(paths[0],'IOT AI ID.app'));

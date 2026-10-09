@@ -10,7 +10,7 @@ SQLite, firmware compilation output and logs live in `~/Library/Application Supp
 
 ## Host requirements
 
-AI planning uses the host Jev installation at `~/.local/bin/jev-codex` and authenticated Codex at `/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex`. Overrides `JEV_CODEX_BIN` and `CODEX_BIN` are supported by the backend. An explicitly configured `OPENAI_API_KEY` can replace authenticated Codex, but Jev remains required. No credentials, home configuration or API keys are bundled. There is no silent fixture fallback.
+AI planning uses the host Jev installation at `~/.local/bin/jev-codex` and authenticated Codex at `/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex`. Overrides `JEV_CODEX_BIN` and `CODEX_BIN` are supported by the backend. An explicitly configured `OPENAI_API_KEY` can replace authenticated Codex, but Jev remains required. No credentials, home configuration or API keys are bundled. The app opens even when AI is unavailable, and the workbench reports the missing provider configuration. Catalogs and existing project evidence remain readable; new AI planning/chat fail explicitly until configured. There is no silent fixture fallback.
 
 Arduino CLI is bundled. ESP32 core and recipe libraries still use the host Arduino installation, normally `~/Library/Arduino15` and `~/Documents/Arduino`. Install the `esp32:esp32` core and the BME280/SSD1306 recipe libraries before a physical run. Existing `ARDUINO_DIRECTORIES_DATA`, `ARDUINO_DIRECTORIES_DOWNLOADS` and `ARDUINO_DIRECTORIES_USER` environment overrides remain supported. Finder PATH includes Homebrew, `/usr/local/bin` and `~/.local/bin`.
 

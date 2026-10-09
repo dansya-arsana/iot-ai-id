@@ -1,0 +1,40 @@
+# Protected testing deployment
+
+This deployment uses an owner-only testing workspace, not public multi-tenant accounts. The HTTPS gateway requires HTTP Basic authentication for the web, admin and local API proxy. The coordinator uses its own bearer scopes. Database contents are shared by the test owner; do not invite unrelated users until project ownership and production account authorization exist.
+
+| Host | Purpose | Authentication |
+|---|---|---|
+| iot.ai.id | Web builder and canvas | Testing workspace login |
+| admin.iot.ai.id | Backoffice entry at /backoffice | Testing workspace login |
+| api.iot.ai.id | Local API proxy at /api/* | Testing workspace login plus X-IOT-Session |
+| edge.iot.ai.id | Coordinator at /v1/* | Scoped node/owner bearer token |
+
+The API remains strict about loopback Host and Origin. The trusted gateway checks incoming browser Origins before rewriting upstream Host and Origin. It never exposes /api/session anonymously. The API service publishes no host ports. HTTPS terminates in the existing nginx gateway; each of the four names is explicitly covered by the origin certificate.
+
+## Files on the server
+
+- /opt/iot-ai-id/current: deployment source.
+- /opt/iot-ai-id/secrets/provider.env: OPENAI_API_KEY and TYPESAFE_API_KEY, mode 600.
+- /opt/iot-ai-id/secrets/access.txt: generated testing workspace login, mode 600.
+- /opt/iot-ai-id/secrets/coordinator.env: generated owner and node scopes, mode 600.
+- /opt/iot-ai-id/releases/nginx-before.conf: previous iot nginx configuration for rollback.
+- Docker volumes: iot-ai-release_iot_data and iot-ai-release_coordinator_data.
+
+Edit secrets directly over SSH. Never commit them, mount a user's home directory, or copy desktop credentials into an image. After editing provider.env, recreate the API container:
+
+```bash
+cd /opt/iot-ai-id/current
+docker compose -f deploy/compose.yml up -d --no-deps --force-recreate api
+```
+
+The bundled Jev decision scripts use TypeSafe; the frontier provider uses OpenAI Responses. Missing or rejected credentials produce an explicit unavailable-provider error, never a fixture fallback. OpenViking is optional and is not provisioned in this release. Catalog specifications remain local and deterministic.
+
+## Edge scopes and USB
+
+The initial test-laptop node has an empty project allowlist. Before enabling it, add only the required local project UUIDs to its server configuration and the matching local node environment. Start the local API/desktop and outbound node with explicit synchronization authorization. The cloud cannot access laptop USB. Flashing remains authorized on the local machine for a detected port, with an expiring approval window. A cloud project is not automatically synchronized into desktop storage in this release.
+
+## Verification and rollback
+
+Check anonymous /api/session returns 401, authenticated static pages return 200, hostile Origin returns 403, coordinator /v1/jobs without a bearer token returns 403, and existing applications remain healthy. Inspect provider readiness and a fresh planning request before claiming live AI. Software simulation never establishes physical hardware verification.
+
+For rollback, restore nginx-before.conf to the iot vhost, run nginx -t, then reload the gateway. Preserve the data volumes. Do not run compose down -v. Certificate renewal uses the existing certbot webroot deployment; ensure the gateway reloads after renewal.
