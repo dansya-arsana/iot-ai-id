@@ -1,0 +1,5 @@
+#!/bin/sh
+export JEV_HOST=codex
+export JEV_CONFIG=/work/jev/agents.json
+export JEV_LOG_DIR=/data/jev
+exec python3 /work/jev/jev.py "$@"

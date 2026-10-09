@@ -1,0 +1,54 @@
+name: Native desktop installers
+on:
+  workflow_dispatch:
+  push:
+    tags: ['desktop-v*']
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.1
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx tsx --test tests/desktop-lifecycle.test.ts
+      - run: npm run desktop:package
+      - name: Smoke test bundled Windows runtime
+        shell: pwsh
+        run: |
+          $resources = Resolve-Path 'dist/desktop/IOT AI ID-win32-x64/resources'
+          & "$resources/bin/node.exe" --version
+          if ($LASTEXITCODE -ne 0) { throw 'Node failed' }
+          & "$resources/bin/arduino-cli.exe" version
+          if ($LASTEXITCODE -ne 0) { throw 'Arduino failed' }
+          $env:IOT_AGENT_PROVIDER = 'fixture'
+          $env:API_PORT = '8788'
+          $env:WEB_PORT = '8788'
+          $env:API_BIND = '127.0.0.1'
+          $env:IOT_DB_PATH = "$env:RUNNER_TEMP/smoke.sqlite"
+          $server = Start-Process -FilePath "$resources/bin/node.exe" -ArgumentList '--import','tsx','services/api/server.ts' -WorkingDirectory "$resources/runtime" -PassThru
+          try {
+            $ready = $false
+            for ($attempt = 0; $attempt -lt 60; $attempt++) {
+              if ($server.HasExited) { throw 'Bundled server stopped' }
+              try {
+                $session = Invoke-RestMethod 'http://127.0.0.1:8788/api/session'
+                if ($session.local -eq $true) { $ready = $true; break }
+              } catch { Start-Sleep -Milliseconds 500 }
+            }
+            if (-not $ready) { throw 'Bundled server failed readiness' }
+            $status = Invoke-RestMethod 'http://127.0.0.1:8788/api/status' -Headers @{'X-IOT-Session'=$session.token}
+            if (-not $status) { throw 'Status missing' }
+          } finally { taskkill /PID $server.Id /T /F }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IOT-AI-ID-Windows-x64-unsigned
+          path: dist/desktop/installers/*.exe
+          if-no-files-found: error

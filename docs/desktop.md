@@ -1,8 +1,8 @@
-# Local macOS desktop application
+# Local desktop installers
 
-Build with `npm run desktop:package`. The current Mac architecture is packaged in `dist/desktop/IOT AI ID-darwin-arm64/IOT AI ID.app` (or `darwin-x64` on Intel). Open the app normally. The app is a local prototype, unsigned and not notarized; it is not a public distribution release.
+Build with `npm run desktop:package`. Native macOS builds produce a DMG in `dist/desktop/installers/`. Native Windows x64 builds produce an NSIS `.exe` installer there. The current Mac architecture is packaged in `dist/desktop/IOT AI ID-darwin-arm64/IOT AI ID.app` (or `darwin-x64` on Intel). Open the app normally. The app is a local prototype, unsigned and not notarized; it is not a public distribution release.
 
-The bundle includes Electron, a standalone Node runtime, Arduino CLI, production web assets, backend sources and runtime dependencies. It does not require the development server or a separately installed Node runtime. Packaging rejects Node or Arduino CLI binaries that depend on non-system macOS libraries. Build on the target architecture. Packaging currently requires Node v24.13.1 and Arduino CLI 1.5.1 so the bundled license notices match the binaries.
+The bundle includes Electron, a standalone Node runtime, Arduino CLI, production web assets, backend sources and runtime dependencies. It does not require the development server or a separately installed Node runtime. Packaging rejects Node or Arduino CLI binaries that depend on non-system macOS libraries. Build on the target architecture. Windows downloads official binaries and verifies their SHA256 against release checksum manifests before extraction. Mac packaging currently requires Node v24.13.1 and Arduino CLI 1.5.1 so the bundled license notices match the binaries.
 
 The app owns a loopback backend at `http://127.0.0.1:8788`. A second launch focuses the existing window. A port conflict or backend startup failure stops launch and displays an error. Closing the window quits the app and stops backend/runtime/compiler processes. External navigation, popups, renderer Node access and browser permission requests are disabled.
 
@@ -21,3 +21,11 @@ Optional OpenViking, coordinator and Wokwi services are not bundled. Their unava
 ## Verification
 
 Run `npm run check` and `npm run desktop:package`. Launch the packaged app, verify API status and USB inventory, create a project, quit, then reopen to verify persistence. A physical flash test requires connected supported hardware and explicit port authorization. Packaging or USB discovery alone does not verify a physical run.
+
+## Windows release
+
+Run the `Native desktop installers` GitHub Actions workflow, or `npm ci && npm run desktop:package` on Windows x64 with Node 24.13.1. The workflow builds an unsigned NSIS installer, tests descendant shutdown, and starts the bundled backend with an explicit fixture provider for readiness/status verification. That fixture smoke test does not establish AI or physical hardware readiness. Download the workflow artifact after successful completion. The installer is per-user; selecting an installation directory is supported.
+
+Windows production AI requires host Jev and Codex installations configured via `JEV_CODEX_BIN` and `CODEX_BIN` (or `OPENAI_API_KEY` plus Jev). ESP32 core and recipe libraries remain host requirements. No silent fixture fallback is enabled in installed apps. Windows PATH uses the OS delimiter, bundled executables use `.exe`, and shutdown/timeout uses the Windows process-tree terminator. Writable state lives in the Electron user-data directory.
+
+Both installers are unsigned testing artifacts. macOS is not notarized; Windows does not have an Authenticode signature. Native Windows workflow execution is required before claiming the Windows installer verified; generating workflow configuration alone does not verify installation or launch.

@@ -1,0 +1,46 @@
+name: iot-ai-release
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    env_file: /opt/iot-ai-id/secrets/provider.env
+    environment:
+      API_BIND: 0.0.0.0
+      API_PORT: 8787
+      WEB_PORT: 8787
+      IOT_DB_PATH: /data/iot.sqlite
+      IOT_RUNTIME_BUILDS_PATH: /data/builds
+      IOT_AGENT_PROVIDER: jev
+      JEV_CODEX_BIN: /work/jev/jev-codex
+      OPENVIKING_URL: http://127.0.0.1:1
+      IOT_COORDINATOR_URL: http://coordinator:8790
+    volumes:
+      - iot_data:/data
+    networks:
+      gateway:
+        aliases: [iot-ai-api]
+  coordinator:
+    build:
+      context: ../
+      dockerfile: deploy/Dockerfile
+    command: node --import tsx services/coordinator/server.ts
+    restart: unless-stopped
+    env_file: /opt/iot-ai-id/secrets/coordinator.env
+    environment:
+      IOT_COORDINATOR_HOST: 0.0.0.0
+      IOT_COORDINATOR_PORT: 8790
+      IOT_COORDINATOR_DB: /data/coordinator.sqlite
+    volumes:
+      - coordinator_data:/data
+    networks:
+      gateway:
+        aliases: [iot-ai-coordinator]
+networks:
+  gateway:
+    external: true
+    name: prod-client_default
+volumes:
+  iot_data:
+  coordinator_data:

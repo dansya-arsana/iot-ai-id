@@ -1,17 +1,17 @@
 const {spawn} = require('node:child_process');
-const {join} = require('node:path');
+const {join, delimiter} = require('node:path');
 const {homedir} = require('node:os');
 const PORT = 8788;
-function backendEnvironment(resources, userData, inherited = process.env) {
+function backendEnvironment(resources, userData, inherited = process.env, platform = process.platform) {
   return {...inherited, API_PORT: String(PORT), API_BIND: '127.0.0.1', WEB_PORT: String(PORT),
     IOT_DB_PATH: join(userData, 'iot.sqlite'), IOT_RUNTIME_BUILDS_PATH: join(userData, 'runtime', 'builds'),
-    ARDUINO_CLI_PATH: join(resources, 'bin', 'arduino-cli'),
-    PATH: [join(resources, 'bin'), '/opt/homebrew/bin', '/usr/local/bin', join(homedir(), '.local/bin'), inherited.PATH || '/usr/bin:/bin:/usr/sbin:/sbin'].join(':')};
+    ARDUINO_CLI_PATH: join(resources, 'bin', platform === 'win32' ? 'arduino-cli.exe' : 'arduino-cli'),
+    PATH: [join(resources, 'bin'), ...(platform === 'win32' ? [] : ['/opt/homebrew/bin', '/usr/local/bin']), join(homedir(), '.local/bin'), inherited.PATH || ''].join(platform === 'win32' ? ';' : delimiter)};
 }
 function startBackend(resources, userData, log) {
-  const child = spawn(join(resources, 'bin', 'node'), ['--import', 'tsx', 'services/api/server.ts'], {
+  const child = spawn(join(resources, 'bin', process.platform === 'win32' ? 'node.exe' : 'node'), ['--import', 'tsx', 'services/api/server.ts'], {
     cwd: join(resources, 'runtime'), env: backendEnvironment(resources, userData),
-    detached: true, stdio: ['ignore', 'pipe', 'pipe']});
+    detached: process.platform !== 'win32', stdio: ['ignore', 'pipe', 'pipe']});
   child.stdout.on('data', data => log.write(data));
   child.stderr.on('data', data => log.write(data));
   return child;
@@ -39,11 +39,11 @@ async function waitReady(child, timeout = 30000) {
 }
 async function stopBackend(child) {
   if (!child || !child.pid || child.exitCode !== null || child.signalCode !== null) return;
-  const kill = signal => {try {process.kill(-child.pid, signal);} catch { /* Already exited. */ }};
+  const kill = signal => {try {if (process.platform === 'win32') {const killer = spawn(join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'taskkill.exe'), ['/PID', String(child.pid), '/T', '/F'], {windowsHide: true, stdio: 'ignore'}); killer.on('error', () => child.kill());} else process.kill(-child.pid, signal);} catch { /* Already exited. */ }};
   const closed = new Promise(resolve => child.once('close', resolve));
   kill('SIGTERM');
   const timer = setTimeout(() => kill('SIGKILL'), 2500);
-  await closed;
+  await Promise.race([closed, new Promise(resolve => setTimeout(resolve, 5000))]);
   clearTimeout(timer);
 }
 module.exports = {PORT, backendEnvironment, startBackend, waitReady, stopBackend};
