@@ -1,15 +1,17 @@
-# Protected testing deployment
+# Public website and protected owner workspace
 
-This deployment uses an owner-only testing workspace, not public multi-tenant accounts. The HTTPS gateway requires HTTP Basic authentication for the web, admin and local API proxy. The coordinator uses its own bearer scopes. Database contents are shared by the test owner; do not invite unrelated users until project ownership and production account authorization exist.
+The main website serves landing pages, documentation, downloads and static assets without a login. Interactive cloud workspaces remain owner-only; public multi-tenant accounts are not implemented. The HTTPS gateway requires HTTP Basic authentication for the admin website and API subdomain. The coordinator uses its own bearer scopes. Database contents are shared by the test owner; do not invite unrelated users until project ownership and production account authorization exist.
 
 | Host | Purpose | Authentication |
 |---|---|---|
-| iot.ai.id | Web builder and canvas | Testing workspace login |
+| iot.ai.id | Public landing, documentation, downloads and static pages | None; /api/* returns JSON 403 without a login challenge |
 | admin.iot.ai.id | Backoffice entry at /backoffice | Testing workspace login |
 | api.iot.ai.id | Local API proxy at /api/* | Testing workspace login plus X-IOT-Session |
 | edge.iot.ai.id | Coordinator at /v1/* | Scoped node/owner bearer token |
 
-The API remains strict about loopback Host and Origin. The trusted gateway checks incoming browser Origins before rewriting upstream Host and Origin. It never exposes /api/session anonymously. The API service publishes no host ports. HTTPS terminates in the existing nginx gateway; each of the four names is explicitly covered by the origin certificate.
+The main website does not proxy the shared owner API. Build, hardware and other API-dependent pages show an unavailable-workspace message when requesting data; use the desktop app or an authorized admin workspace for interactive work. The `/api` page remains public API documentation; `/api/` requests are blocked.
+
+The API remains strict about loopback Host and Origin. The authenticated admin and API gateways check incoming browser Origins before rewriting upstream Host and Origin. They never expose /api/session anonymously. The API service publishes no host ports. HTTPS terminates in the existing nginx gateway; each of the four names is explicitly covered by the origin certificate.
 
 ## Files on the server
 
@@ -38,6 +40,6 @@ The initial test-laptop node has an empty project allowlist. Before enabling it,
 
 ## Verification and rollback
 
-Check anonymous /api/session returns 401, authenticated static pages return 200, hostile Origin returns 403, coordinator /v1/jobs without a bearer token returns 403, and existing applications remain healthy. Inspect provider readiness and a fresh planning request before claiming live AI. Software simulation never establishes physical hardware verification.
+Check anonymous main-site landing, documentation, downloads and assets return 200 without `WWW-Authenticate`. Main-site /api/session, /api/projects and /api/ai-settings must return JSON 403 without `WWW-Authenticate` or owner data. Anonymous admin and API subdomain requests must return 401 with the owner login challenge. Check API-dependent public pages show a clear message without a password popup, hostile Origin returns 403, coordinator /v1/jobs without a bearer token returns 403, and existing applications remain healthy. Inspect provider readiness and a fresh planning request before claiming live AI. Software simulation never establishes physical hardware verification.
 
 For rollback, restore nginx-before.conf to the iot vhost, run nginx -t, then reload the gateway. Preserve the data volumes. Do not run compose down -v. Certificate renewal runs twice daily through `/etc/cron.d/iot-ai-id-cert`, using the existing certbot container and a project-specific lock. `deploy/renew-certificate.sh` renews only this project certificate, validates nginx and reloads the gateway.
