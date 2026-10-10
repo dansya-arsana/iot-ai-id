@@ -1,0 +1,25 @@
+{
+ "id": "sim.hand",
+ "version": "0.1.0",
+ "protocolVersion": 1,
+ "role": "dut",
+ "vendor": "iot.ai.id (simulated)",
+ "devices": [{"model": "SimHand-6", "firmware": "1.x"}],
+ "transports": ["serial"],
+ "probe": {"usb": [{"vid": 1027, "pid": 24577}], "baudRates": [115200], "timeoutMs": 500},
+ "runtime": {"kind": "node", "entrypoint": "adapter.ts"},
+ "sdk": {"name": "none", "version": "0", "license": "MIT", "distribution": "none"},
+ "channels": [
+  {"id": "thumb.flex", "kind": "actuator", "quantity": "angle", "unit": "deg", "range": [0, 90], "maxRateHz": 100, "control": "position"},
+  {"id": "index.flex", "kind": "actuator", "quantity": "angle", "unit": "deg", "range": [0, 90], "maxRateHz": 100, "control": "position"},
+  {"id": "grip.force", "kind": "sensor", "quantity": "force", "unit": "N", "range": [0, 50], "maxRateHz": 200},
+  {"id": "motor.temperature", "kind": "sensor", "quantity": "temperature", "unit": "degC", "range": [-20, 120], "maxRateHz": 10},
+  {"id": "palm.taxels", "kind": "sensor", "quantity": "taxel_array", "unit": "kPa", "shape": [4, 4], "maxRateHz": 100}
+ ],
+ "safety": {
+  "stopLatencyMs": 50,
+  "heartbeatTimeoutMs": 300,
+  "requiresHardwareStop": true,
+  "vendorLimits": [{"channel": "thumb.flex", "min": 0, "max": 85}, {"channel": "index.flex", "min": 0, "max": 85}]
+ }
+}
