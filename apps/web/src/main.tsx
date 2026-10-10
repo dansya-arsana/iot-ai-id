@@ -11,12 +11,11 @@ import '@fontsource/ibm-plex-mono/500.css';
 import './design/tokens.css';
 import './styles.css';
 import './experience.css';
-import './shell.css';
-import './theme.css';
 import {SchoolWorkbench} from './school-workbench';
 import {Landing} from './landing-new';
 import {Backoffice} from './backoffice';
-import {LangProvider} from './i18n';
+import {LangProvider,useLang} from './i18n';
+import {Spinner} from './ui';
 import {Build} from './pages/build-page';
 import {Hardware,HardwareDetail} from './pages/hardware-pages';
 import {Bench,Arena,ArenaDetail,Builders,Research,Docs,Learn,EpisodePage,NotFound} from './pages/content-pages';
@@ -24,8 +23,9 @@ const LazyDesignSystem=lazy(()=>import('./design-page').then(m=>({default:m.Desi
 function DesignSystem(){return <Suspense fallback={null}><LazyDesignSystem/></Suspense>;}
 const LazySites=lazy(()=>import('./site-workbench').then(m=>({default:m.Sites})));
 const LazySiteWorkbench=lazy(()=>import('./site-workbench').then(m=>({default:m.SiteWorkbench})));
-function Sites(){return <Suspense fallback={<p>Memuat lokasi…</p>}><LazySites/></Suspense>;}
-function SiteWorkbench(){return <Suspense fallback={<p>Memuat canvas…</p>}><LazySiteWorkbench/></Suspense>;}
+function RouteLoading({en,id}:{en:string;id:string}){const{tr}=useLang();return <div className="route-loading"><Spinner label={tr(en,id)}/><span>{tr(en,id)}</span></div>;}
+function Sites(){return <Suspense fallback={<RouteLoading en="Loading sites…" id="Memuat lokasi…"/>}><LazySites/></Suspense>;}
+function SiteWorkbench(){return <Suspense fallback={<RouteLoading en="Loading canvas…" id="Memuat canvas…"/>}><LazySiteWorkbench/></Suspense>;}
 function Home(){return <Landing/>;}
 const SITE_TITLE='iot.ai.id';
 const routeTitles:[RegExp,string][]=[[/^\/$/,'iot.ai.id — Testing robots and sensors where the world is messy.'],[/^\/hardware\/?$/,'Hardware library'],[/^\/learn\/?$/,'Learn'],[/^\/docs\/?$/,'Documentation'],[/^\/api\/?$/,'API'],[/^\/research\/?$/,'Research'],[/^\/bench\/?$/,'PhysicalBench'],[/^\/arena\/?$/,'Hardware Arena'],[/^\/arena\/[^/]+/,'Arena challenge'],[/^\/builders\/?$/,'Builders'],[/^\/build\/?$/,'Build'],[/^\/sites\/?$/,'Sites'],[/^\/site\//,'Site workbench'],[/^\/project\/[^/]+\/episode/,'Episode'],[/^\/project\//,'Project'],[/^\/backoffice/,'Backoffice'],[/^\/design\/?$/,'Design system']];

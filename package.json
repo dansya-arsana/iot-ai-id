@@ -14,14 +14,15 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "tsx --test tests/*.test.ts",
-    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "check": "npm run typecheck && npm run lint && npm run check:tokens && npm test && npm run build",
     "test:e2e": "playwright test",
     "coordinator": "tsx services/coordinator/server.ts",
     "node:connect": "tsx runtime/local-bridge/node-client.ts",
     "coordinator:mcp": "tsx services/coordinator/mcp.ts",
     "api:mcp": "tsx services/api/mcp.ts",
     "agent:run": "tsx scripts/agent-runner.ts",
-    "desktop:package": "npm run build && tsx scripts/package-desktop.ts"
+    "desktop:package": "npm run build && tsx scripts/package-desktop.ts",
+    "check:tokens": "tsx scripts/check-design-tokens.ts"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",

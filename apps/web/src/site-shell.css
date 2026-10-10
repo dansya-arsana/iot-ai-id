@@ -42,3 +42,4 @@
  .ds-footer{grid-template-columns:1fr}.ds-footer nav{grid-template-columns:1fr 1fr}
 }
 @media(max-width:520px){.ds-footer nav{grid-template-columns:1fr}.ds-footer-bottom{flex-direction:column}}
+.route-loading{min-height:60vh;display:flex;align-items:center;justify-content:center;gap:var(--ds-3);font-size:var(--ds-text-small);color:var(--ds-ink-2);background:var(--ds-ground)}

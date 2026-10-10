@@ -21,11 +21,11 @@ test('simulate remote job shows approval banner, then completes after approval',
   const accepted = await request.post('/api/remote-jobs', {headers, data: jobInput});
   expect(accepted.status()).toBe(201);
   await page.goto('/project/' + project.id);
-  await expect(page.getByRole('region', {name: /Permintaan jarak jauh/})).toBeVisible();
-  await expect(page.getByRole('region', {name: /Permintaan jarak jauh/})).toContainText('latihan model');
-  await page.getByRole('button', {name: /Setujui & jalankan/}).click();
-  await expect(page.getByRole('region', {name: /Permintaan jarak jauh/})).toBeHidden({timeout: 30000});
-  await expect(page.locator('.school-status')).toContainText('Latihan lolos', {timeout: 45000});
+  await expect(page.getByRole('region', {name: /Remote request/})).toBeVisible();
+  await expect(page.getByRole('region', {name: /Remote request/})).toContainText('model practice');
+  await page.getByRole('button', {name: /Approve & run/}).click();
+  await expect(page.getByRole('region', {name: /Remote request/})).toBeHidden({timeout: 30000});
+  await expect(page.locator('.school-status')).toContainText('Practice passed', {timeout: 45000});
 });
 test('physical remote job waits for trusted USB device', async ({page, request}) => {
   const headers = await sessionHeaders(request);
@@ -35,11 +35,11 @@ test('physical remote job waits for trusted USB device', async ({page, request})
   const accepted = await request.post('/api/remote-jobs', {headers, data: jobInput});
   expect(accepted.status()).toBe(201);
   await page.goto('/project/' + project.id);
-  await expect(page.getByRole('region', {name: /Permintaan jarak jauh/})).toBeVisible();
-  await expect(page.getByRole('region', {name: /Permintaan jarak jauh/})).toContainText('eksperimen perangkat fisik');
-  await expect(page.getByRole('region', {name: /Permintaan jarak jauh/})).toContainText('/dev/cu.e2e-fixture');
-  await expect(page.getByRole('button', {name: /Setujui & jalankan/})).toBeDisabled();
-  await expect(page.getByRole('region', {name: /Permintaan jarak jauh/})).toContainText('Pilih dan izinkan perangkat USB');
+  await expect(page.getByRole('region', {name: /Remote request/})).toBeVisible();
+  await expect(page.getByRole('region', {name: /Remote request/})).toContainText('physical device experiment');
+  await expect(page.getByRole('region', {name: /Remote request/})).toContainText('/dev/cu.e2e-fixture');
+  await expect(page.getByRole('button', {name: /Approve & run/})).toBeDisabled();
+  await expect(page.getByRole('region', {name: /Remote request/})).toContainText('Select and authorize the requested USB device');
 });
 
 test('approval disappears at expiry even when polling fails',async({page,request})=>{
@@ -50,6 +50,6 @@ test('approval disappears at expiry even when polling fails',async({page,request
   return route.fulfill({json:{jobs:[{id:crypto.randomUUID(),status:'awaiting_approval',input:{projectId:project.id,operation:'simulate',expiresAt:Date.now()+3000}}]}});
  });
  await page.goto('/project/'+project.id);
- await expect(page.getByRole('button',{name:/Setujui & jalankan/})).toBeEnabled();
- await expect(page.getByRole('button',{name:/Setujui & jalankan/})).toHaveCount(0,{timeout:8000});
+ await expect(page.getByRole('button',{name:/Approve & run/})).toBeEnabled();
+ await expect(page.getByRole('button',{name:/Approve & run/})).toHaveCount(0,{timeout:8000});
 });

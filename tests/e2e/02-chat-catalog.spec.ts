@@ -5,32 +5,32 @@ async function readyProject(page: import('@playwright/test').Page) {
   await page.fill('#hero-goal', GOAL);
   await page.getByRole('button', {name: /Build it/}).click();
   await page.waitForURL(/\/project\//);
-  await expect(page.locator('.school-status')).toContainText('Siap belajar', {timeout: 45000});
+  await expect(page.locator('.school-status')).toContainText('Ready to learn', {timeout: 45000});
 }
 test('chat pin revision creates immutable contract revision', async ({page}) => {
   await readyProject(page);
-  await page.getByRole('button',{name:'Buka chat',exact:true}).click();
+  await page.getByRole('button',{name:'Open chat',exact:true}).click();
   await page.fill('#hardware-message', 'Pindahkan SDA ke GPIO18.');
-  await page.getByRole('button', {name: /Kirim pesan/}).click();
+  await page.getByRole('button', {name: /Send message/}).click();
   await expect(page.locator('.chat-message.assistant').last()).toBeVisible({timeout: 45000});
-  await expect(page.locator('.school-tabbar')).toContainText('Revisi 2', {timeout: 30000});
+  await expect(page.locator('.school-tabbar')).toContainText('Revision 2', {timeout: 30000});
   await page.locator('[data-id="bme280"]').click();
-  await expect(page.getByLabel('Sambungan bme280 SDA')).toHaveValue('18');
+  await expect(page.getByLabel('Connection bme280 SDA')).toHaveValue('18');
 });
 test('catalog LED add creates planning-only draft and blocks execution', async ({page}) => {
   await readyProject(page);
   await page.getByRole('button',{name:'＋ Parts'}).click();
   const ledItem = page.locator('.catalog-item', {hasText: 'LED with 330Ω resistor'});
-  await ledItem.getByRole('button', {name: 'Tambah'}).click();
-  await expect(page.locator('.design-draft')).toContainText('belum executable', {timeout: 30000});
+  await ledItem.getByRole('button', {name: 'Add'}).click();
+  await expect(page.locator('.design-draft')).toContainText('not executable yet', {timeout: 30000});
   await expect(page.locator('.catalog-drop')).toContainText('LED with 330Ω resistor');
-  await expect(page.getByRole('button', {name: /Jalankan latihan|Kompilasi, unggah & uji/})).toBeDisabled();
+  await expect(page.getByRole('button', {name: /Run practice|Compile, flash & test/})).toBeDisabled();
 });
 test('unsupported chat goal stays planning-only', async ({page}) => {
   await readyProject(page);
-  await page.getByRole('button',{name:'Buka chat',exact:true}).click();
+  await page.getByRole('button',{name:'Open chat',exact:true}).click();
   await page.fill('#hardware-message', 'Tambahkan alarm jarak ultrasonic HC-SR04.');
-  await page.getByRole('button', {name: /Kirim pesan/}).click();
-  await expect(page.locator('.design-draft')).toContainText('belum executable', {timeout: 45000});
-  await expect(page.getByRole('button', {name: /Jalankan latihan|Kompilasi, unggah & uji/})).toBeDisabled();
+  await page.getByRole('button', {name: /Send message/}).click();
+  await expect(page.locator('.design-draft')).toContainText('not executable yet', {timeout: 45000});
+  await expect(page.getByRole('button', {name: /Run practice|Compile, flash & test/})).toBeDisabled();
 });
