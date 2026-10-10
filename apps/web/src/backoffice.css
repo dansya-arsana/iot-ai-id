@@ -11,7 +11,7 @@
 .bo-topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:var(--ds-4);min-height:68px;padding:var(--ds-3) var(--ds-gutter);background:var(--ds-ground);border-bottom:1px solid var(--ds-line)}
 .bo-topbar-brand{display:flex;align-items:center;gap:var(--ds-4);min-width:0}
 .bo-topbar .ds-brand{font-size:18px}
-.bo-topbar .ds-brand-mark{width:40px;height:40px}
+.bo-topbar .ds-brand-mark{width:72px}
 .bo-topbar-label{padding-left:var(--ds-4);border-left:1px solid var(--ds-line);color:var(--ds-ink-2)}
 .bo-topbar-actions{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:var(--ds-3)}
 .bo-topbar-actions .ds-button{gap:6px}

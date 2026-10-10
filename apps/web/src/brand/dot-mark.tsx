@@ -10,7 +10,7 @@ const LIVE=[8,7] as const;
 const SCAN_START=120,SCAN_MS=900,COLS=25;
 
 export function DotMark({animated=false,className,label='iot.ai.id'}:{animated?:boolean;className?:string;label?:string}){
- return <svg className={['dm',animated&&'dm--animated',className].filter(Boolean).join(' ')} viewBox="0 0.2 25.6 9.4" role="img" aria-label={label}>
+ return <svg className={['dm',animated&&'dm--animated',className].filter(Boolean).join(' ')} viewBox="0 0.2 25.6 9.4" {...(label?{role:'img','aria-label':label}:{'aria-hidden':true})}>
   {animated&&<rect className="dm-scan" x="0" y="0.3" width="0.08" height="9.2"/>}
   <g className="dm-dots">{DOTS.filter(([c,r])=>c!==LIVE[0]||r!==LIVE[1]).map(([c,r])=><circle key={`${c}-${r}`} cx={c+.5} cy={r+.5} r=".34" style={{'--d':`${Math.round(SCAN_START+(c/COLS)*SCAN_MS-230+r*6)}ms`} as CSSProperties}/>)}</g>
   <g className="dm-live" transform={`translate(${LIVE[0]+.5} ${LIVE[1]+.5})`}>

@@ -1,8 +1,9 @@
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {Link,NavLink,useLocation} from 'react-router-dom';
-import {ArrowUpRightIcon,CaretDownIcon,CircuitryIcon,ListIcon,XIcon} from '@phosphor-icons/react';
+import {ArrowUpRightIcon,CaretDownIcon,ListIcon,XIcon} from '@phosphor-icons/react';
 import {useLang} from './i18n';
 import {AnchorButton,LangToggle,PageHeader} from './ui';
+import {DotMark} from './brand/dot-mark';
 import './site-shell.css';
 
 export const PARTNERSHIP_BRIEF='/partnership-brief.txt';
@@ -22,7 +23,7 @@ const groups:{en:string;id:string;items:NavItem[]}[]=[
 ];
 
 export function Brand({wordmark=true}:{wordmark?:boolean}){
- return <Link to="/" className="ds-brand" aria-label="iot.ai.id home"><span className="ds-brand-mark"><CircuitryIcon size={20} weight="bold"/></span>{wordmark&&<span>iot.ai.id</span>}</Link>;
+ return <Link to="/" className="ds-brand" aria-label="iot.ai.id home"><DotMark className="ds-brand-mark" label=""/>{wordmark&&<span>iot.ai.id</span>}</Link>;
 }
 function Item({item,onNavigate}:{item:NavItem;onNavigate?:()=>void}){
  const{tr}=useLang();
@@ -36,6 +37,7 @@ export function SiteHeader({overlay,className,...rest}:{overlay?:boolean;classNa
  const ref=useRef<HTMLElement>(null);const[menu,setMenu]=useState(false);const[resources,setResources]=useState(false);
  const resourcesActive=groups.some(g=>g.items.some(i=>pathname===i.to||pathname.startsWith(i.to+'/')));
 
+ useEffect(()=>{const el=ref.current;if(!el)return;const onScroll=()=>el.toggleAttribute('data-scrolled',window.scrollY>8);onScroll();window.addEventListener('scroll',onScroll,{passive:true});return()=>window.removeEventListener('scroll',onScroll);},[]);
  useEffect(()=>{
   const outside=(e:PointerEvent)=>{if(e.target instanceof Node&&!ref.current?.contains(e.target)){setMenu(false);setResources(false);}};
   const escape=(e:KeyboardEvent)=>{if(e.key==='Escape'){setMenu(false);setResources(false);}};

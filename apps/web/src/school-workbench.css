@@ -11,7 +11,7 @@
 /* Top bar */
 .wb-bar{flex:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:var(--ds-6);padding:var(--ds-3) var(--ds-6);background:var(--ds-surface);border-bottom:1px solid var(--ds-line)}
 .wb-bar-brand{display:flex;align-items:center;gap:var(--ds-5);padding-right:var(--ds-6);border-right:1px solid var(--ds-line);align-self:stretch}
-.wb-bar .ds-brand-mark{width:36px;height:36px}
+.wb-bar .ds-brand-mark{width:64px}
 .wb-bar-nav{display:flex;gap:var(--ds-4)}
 .wb-bar-nav a{font-size:var(--ds-text-small);font-weight:500;color:var(--ds-ink-2);text-decoration:none;transition:color var(--ds-fast) var(--ds-ease)}
 .wb-bar-nav a:hover{color:var(--ds-ink)}
@@ -199,7 +199,7 @@
 @media(max-width:767px){
  .wb-bar{grid-template-columns:auto minmax(0,1fr);gap:var(--ds-2) var(--ds-3);padding:var(--ds-2) var(--ds-4)}
  .wb-bar-brand{padding-right:var(--ds-3)}
- .wb-bar .ds-brand-mark{width:32px;height:32px}
+ .wb-bar .ds-brand-mark{width:56px}
  .wb-bar-heading h1{font-size:1rem}
  .wb-bar-actions{grid-column:1/-1;flex-wrap:wrap}
  .wb-lang{margin-left:auto}
