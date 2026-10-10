@@ -29,3 +29,19 @@ The hero now positions iot.ai.id as real-world hardware verification in Indonesi
 - `card-tactile.png`: job `4fb40e78-6d3d-4d70-9208-35a357de44a7`
 
 The hero makes no claim about scenario counts, verified deployments, or partner relationships.
+
+## Section upgrade with GetLayers compositions (2026-10-10)
+
+The page keeps its own monochrome token set (#f0efed ground, ink #0a0a0a); GetLayers supplied section skeletons, not a Style:
+- Gap: `negantropy-refusal` (corner-loaded split with bracketed metrics). Metrics are typical Indonesian conditions, labelled as not test results.
+- Scenario Atlas: `vexon-showcase` (label-left statement-right over bracketed tall cards), as a horizontal scroll rail.
+- Stats: `lumora-stats` (inset inverted panel, count-up numerals). 56 = hardware reference records in `packages/hardware-library` (status `specification_only`, so labelled "catalogued").
+- Verification: `creative-director-features` (heading over divider, lead/spec split, asymmetric card row) with a typing record.
+- Network: `vexon-about` (bordered ledger grid) holding a halftone Indonesia map with a pointer crosshair. Bekasi, Bandung and Yogyakarta are labelled planned.
+- Partner: `artist-cta`. Final: `negantropy-persist`.
+
+New assets, all Higgsfield `gpt_image_2_5` concept renders:
+- `sc-01.jpg` … `sc-06.jpg`: jobs a06eb791, 4eb00574, e5133601, 6765ed46, 1fc82d36, d1e71841.
+- `partner-hand.jpg`: job 7ad3f769.
+
+Map dots are generated from Natural Earth 1:50m admin-0 countries (public domain), sampled on a 0.42° grid, in `apps/web/src/indonesia-dots.ts`.
