@@ -4,6 +4,8 @@ import {dirname,join} from 'node:path';
 import {hardwareLibrary,type HardwareReference} from '../packages/hardware-library/index.js';
 
 const SITE='https://iot.ai.id';
+/** nginx serves route directories, so non-root routes resolve with a trailing slash. */
+const slash=(path:string)=>path==='/'?'/':`${path}/`;
 const OUT='dist/web';
 const today=new Date().toISOString().slice(0,10);
 const template=readFileSync(join(OUT,'index.html'),'utf8');
@@ -36,7 +38,7 @@ const faq:[string,string][]=[
 
 type Page={path:string,title:string,description:string,body:string,jsonld?:object};
 function render(p:Page){
- const url=SITE+p.path;
+ const url=SITE+slash(p.path);
  let html=template
   .replace(/<title>[^<]*<\/title>/,`<title>${esc(p.title)}</title>`)
   .replace(/(<meta name="description" content=")[^"]*/,`$1${esc(p.description)}`)
@@ -67,10 +69,10 @@ const home=`<main>${nav}
 render({path:'/',title:'iot.ai.id — Testing robots and sensors where the world is messy.',description:'Real-world hardware verification from Indonesia. We test robotics, sensor and IoT hardware in humid, hot, unstable field conditions and return verifiable evidence for engineering and AI teams.',body:home,
  jsonld:{'@context':'https://schema.org','@type':'FAQPage',mainEntity:faq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))}});
 
-const hwLine=(h:HardwareReference)=>`<a href="/hardware/${h.id}">${esc(h.name)}</a> (${h.kind}, ${h.protocols.join('/')}): ${esc(h.summary)}`;
+const hwLine=(h:HardwareReference)=>`<a href="/hardware/${h.id}/">${esc(h.name)}</a> (${h.kind}, ${h.protocols.join('/')}): ${esc(h.summary)}`;
 render({path:'/hardware',title:'Hardware library — iot.ai.id',description:`Reference specifications for ${hardwareLibrary.length} boards, sensors and modules: ESP32, Arduino, Raspberry Pi and common I2C/SPI sensors.`,
  body:`<main>${nav}<h1>Hardware library</h1><p>${hardwareLibrary.length} hardware references. Specifications only; listing does not imply verified firmware support.</p>${list(hardwareLibrary.map(hwLine))}</main>`,
- jsonld:{'@context':'https://schema.org','@type':'ItemList',name:'iot.ai.id hardware library',numberOfItems:hardwareLibrary.length,itemListElement:hardwareLibrary.map((h,i)=>({'@type':'ListItem',position:i+1,url:`${SITE}/hardware/${h.id}`,name:h.name}))}});
+ jsonld:{'@context':'https://schema.org','@type':'ItemList',name:'iot.ai.id hardware library',numberOfItems:hardwareLibrary.length,itemListElement:hardwareLibrary.map((h,i)=>({'@type':'ListItem',position:i+1,url:`${SITE}/hardware/${h.id}/`,name:h.name}))}});
 
 for(const h of hardwareLibrary){
  const body=`<main>${nav}<article><h1>${esc(h.name)}</h1><p>${esc(h.summary)}</p>
@@ -84,7 +86,7 @@ ${h.software.length?`<h2>Software</h2>${list(h.software.map(esc))}`:''}
 <h2>Sources</h2>${list(h.sources.map(s=>`<a href="${esc(s.url)}" rel="nofollow">${esc(s.title)}</a>`))}
 <p>Review status: ${h.reviewStatus}. Support: ${h.support}.</p></article></main>`;
  render({path:`/hardware/${h.id}`,title:`${h.name} — specifications, pinout and limits | iot.ai.id`,description:`${h.name}: ${h.summary}`.slice(0,300),body,
-  jsonld:{'@context':'https://schema.org','@type':'TechArticle',headline:`${h.name} reference specification`,about:{'@type':'Thing',name:h.name,alternateName:h.aliases},description:h.summary,url:`${SITE}/hardware/${h.id}`,publisher:{'@id':`${SITE}/#org`},citation:h.sources.map(s=>s.url)}});
+  jsonld:{'@context':'https://schema.org','@type':'TechArticle',headline:`${h.name} reference specification`,about:{'@type':'Thing',name:h.name,alternateName:h.aliases},description:h.summary,url:`${SITE}/hardware/${h.id}/`,publisher:{'@id':`${SITE}/#org`},citation:h.sources.map(s=>s.url)}});
 }
 render({path:'/learn',title:'Learn hardware — iot.ai.id',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
 render({path:'/docs',title:'Documentation — iot.ai.id',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
@@ -128,7 +130,7 @@ iot.ai.id is based in Indonesia and serves robotics, sensor and AI teams worldwi
 
 - [Home](${SITE}/): positioning, scenario atlas, verification loop, network and partnership offer
 - [Partnership brief](${SITE}/partnership-brief.txt): services, what partners provide, current limits
-- [Hardware library](${SITE}/hardware): ${hardwareLibrary.length} board, sensor and module reference specifications
+- [Hardware library](${SITE}/hardware/): ${hardwareLibrary.length} board, sensor and module reference specifications
 - [Full LLM context](${SITE}/llms-full.txt): everything on this site in one plain-text file
 
 ## Services
@@ -154,7 +156,7 @@ ${faq.map(([q,a])=>`- ${q} ${a}`).join('\n')}
 `;
 writeFileSync(join(OUT,'llms.txt'),llms);
 const hwFull=hardwareLibrary.map(h=>`### ${h.name}
-URL: ${SITE}/hardware/${h.id}
+URL: ${SITE}/hardware/${h.id}/
 Kind: ${h.kind} · Family: ${h.family} · Category: ${h.category} · Protocols: ${h.protocols.join(', ')}
 Aliases: ${h.aliases.join(', ')||'-'}
 Summary: ${h.summary}
