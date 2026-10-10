@@ -64,3 +64,5 @@
 }
 .app-shell .content-page :is(.research-list>a,.method-grid>*){padding:28px 30px}
 .app-shell .content-page .research-list{display:grid;gap:12px}
+/* Legacy page bodies inside the new PageShell: the shell owns width and gutters. */
+.app-shell .ds-page .content-page.legacy-content{max-width:none;padding:0;margin:0}

@@ -1,0 +1,65 @@
+/* iot.ai.id design tokens — the single source of truth. Raw colour values live only in this file. */
+:root{
+ /* Colour: monochrome clinical ground, ink at three strengths, one inverse surface, rationed status hues */
+ --ds-ground:#f0efed;
+ --ds-surface:#f7f6f4;
+ --ds-surface-raised:#ffffff;
+ --ds-sunken:#e9e8e5;
+ --ds-ink:#0a0a0a;
+ --ds-ink-2:#66645f;
+ --ds-ink-3:#8f8d88;
+ --ds-line:#dcdad6;
+ --ds-line-strong:#c9c7c2;
+ --ds-inverse:#0a0a0a;
+ --ds-inverse-2:#1a1a1a;
+ --ds-inverse-line:#2c2c2c;
+ --ds-on-inverse:#f0efed;
+ --ds-on-inverse-2:#a9a7a2;
+ --ds-ok:#2f6b45;
+ --ds-ok-soft:#e3ece5;
+ --ds-warn:#8a5a00;
+ --ds-warn-soft:#f3ead7;
+ --ds-error:#b42318;
+ --ds-error-soft:#f6e3e1;
+ --ds-signal:#c9f5c0;
+
+ /* Type */
+ --ds-font:Archivo,Arial,sans-serif;
+ --ds-mono:'IBM Plex Mono',ui-monospace,monospace;
+ --ds-text-display:clamp(2.6rem,5.4vw,5.25rem);
+ --ds-text-h1:clamp(2.25rem,4vw,4rem);
+ --ds-text-h2:clamp(1.6rem,2.4vw,2.4rem);
+ --ds-text-h3:1.25rem;
+ --ds-text-lead:1.125rem;
+ --ds-text-body:1rem;
+ --ds-text-small:.875rem;
+ --ds-text-label:.6875rem;
+ --ds-track-display:-.045em;
+ --ds-track-heading:-.03em;
+ --ds-track-label:.1em;
+
+ /* Space (4px base) */
+ --ds-1:4px;--ds-2:8px;--ds-3:12px;--ds-4:16px;--ds-5:20px;--ds-6:24px;--ds-8:32px;--ds-10:40px;--ds-12:48px;--ds-16:64px;--ds-20:80px;--ds-28:112px;
+ --ds-gutter:4.5%;
+ --ds-max:1280px;
+
+ /* Shape */
+ --ds-radius-0:0;
+ --ds-radius-1:4px;
+ --ds-radius-2:12px;
+ --ds-radius-3:20px;
+ --ds-radius-pill:999px;
+
+ /* Depth: two shadows only */
+ --ds-shadow-1:0 6px 16px rgb(0 0 0/.05);
+ --ds-shadow-2:0 20px 40px rgb(0 0 0/.08);
+
+ /* Motion: one curve, three durations */
+ --ds-ease:cubic-bezier(.2,0,0,1);
+ --ds-fast:150ms;
+ --ds-base:250ms;
+ --ds-slow:600ms;
+
+ color-scheme:light;
+}
+@media(max-width:767px){:root{--ds-gutter:6%}}

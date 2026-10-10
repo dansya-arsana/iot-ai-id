@@ -1,12 +1,12 @@
 import {useEffect,useRef,useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link,useLocation} from 'react-router-dom';
 import {ArrowUpRightIcon,ArrowRightIcon,ArrowLeftIcon,CircuitryIcon} from '@phosphor-icons/react';
 import {mountLandingMotion} from './landing-motion';
+import {useLang} from './i18n';
+import {SiteHeader,SiteFooter} from './site-shell';
 import {idn} from './indonesia-dots';
 import './landing-new.css';
-const releases='https://github.com/dansya-arsana/iot-ai-id/releases/tag/v0.1.0-preview.1';
 const partnership='/partnership-brief.txt';
-type Lang='en'|'id';
 const copy={
  en:{
   nav:['Scenarios','Verification','Network'],cta:'Partner with us',menu:'Menu',close:'Close',skip:'Skip to content',loader:'FROM THE FIELD. INTO EVIDENCE.',
@@ -63,11 +63,10 @@ dry / wet .......... 3180 / 1210
 
 COMPILE ✓  FLASH ✓  BOOT ✓  DATA ✓
 STATUS   VERIFIED`;
-const ids=['scenarios','verification','network'];
+
 const siteCoords:[number,number][]=[[106.99,-6.24],[107.61,-6.91],[110.37,-7.8]];
 const dots=idn.dots.split(' ').map(p=>p.split(',').map(Number) as [number,number]);
 const toGrid=([lon,lat]:[number,number])=>[(lon-idn.lon0)/idn.step,(idn.lat1-lat)/idn.step] as const;
-function Brand(){return <Link to="/" className="rl-logo" aria-label="iot.ai.id home"><CircuitryIcon size={22} weight="bold"/></Link>;}
 function Lines({lines}:{lines:string[]}){return <>{lines.map((l,i)=><span className="rl-line" key={i}>{l}</span>)}</>;}
 const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function onceVisible(el:Element|null,fn:()=>void){if(!el)return()=>{};if(reduced()){fn();return()=>{};}const o=new IntersectionObserver(e=>{if(e[0].isIntersecting){fn();o.disconnect();}},{threshold:.4});o.observe(el);return()=>o.disconnect();}
@@ -94,17 +93,15 @@ function HalftoneMap({t}:{t:typeof copy.en}){
  </div>;
 }
 export function Landing(){
- const root=useRef<HTMLDivElement>(null),header=useRef<HTMLElement>(null),menuButton=useRef<HTMLButtonElement>(null),rail=useRef<HTMLDivElement>(null);const[menu,setMenu]=useState(false);
- const[lang,setLang]=useState<Lang>(()=>localStorage.getItem('iot-lang')==='id'?'id':'en');const t=copy[lang];
- useEffect(()=>{localStorage.setItem('iot-lang',lang);document.documentElement.lang=lang;},[lang]);
+ const root=useRef<HTMLDivElement>(null),rail=useRef<HTMLDivElement>(null);
+ const{lang}=useLang();const t=copy[lang];const{hash}=useLocation();
  useEffect(()=>root.current?mountLandingMotion(root.current):undefined,[]);
- useEffect(()=>{const outside=(e:PointerEvent)=>{if(e.target instanceof Node&&!header.current?.contains(e.target))setMenu(false);};const escape=(e:KeyboardEvent)=>{if(e.key==='Escape'&&menu){setMenu(false);menuButton.current?.focus();}};document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape);};},[menu]);
+ useEffect(()=>{if(!hash)return;const id=window.setTimeout(()=>document.getElementById(hash.slice(1))?.scrollIntoView({behavior:reduced()?'auto':'smooth'}),reduced()?0:1500);return()=>clearTimeout(id);},[hash]);
  const slide=(dir:number)=>{const r=rail.current;if(r)r.scrollBy({left:dir*r.clientWidth*.8,behavior:reduced()?'auto':'smooth'});};
- const toggle=<div className="rl-lang" role="group" aria-label="Language">{(['en','id'] as Lang[]).map(l=><button key={l} aria-pressed={lang===l} onClick={()=>setLang(l)}>{l.toUpperCase()}</button>)}</div>;
  return <div ref={root} className="result-landing">
   <div className="rl-loader" role="status" aria-label="Loading"><span><CircuitryIcon size={36}/>iot.ai.id</span><div className="rl-loader-track"><i/></div><small>{t.loader}</small></div>
   <a className="rl-skip" href="#landing-main">{t.skip}</a>
-  <header ref={header} className="rl-header" data-enter><Brand/><nav className="rl-pill-nav" aria-label="Main">{t.nav.map((n,i)=><a key={i} href={`#${ids[i]}`}>{n}</a>)}</nav><div className="rl-header-right">{toggle}<a className="rl-cta-pill" href={partnership} download>{t.cta}</a></div><button ref={menuButton} className="rl-menu-toggle" aria-expanded={menu} aria-controls="landing-menu" onClick={()=>setMenu(!menu)}>{menu?t.close:t.menu}</button>{menu&&<nav id="landing-menu" className="rl-mobile-nav" aria-label="Mobile">{t.nav.map((n,i)=><a key={i} onClick={()=>setMenu(false)} href={`#${ids[i]}`}>{n}</a>)}<a href={partnership} download>{t.cta}</a>{toggle}</nav>}</header>
+  <SiteHeader overlay data-enter/>
   <main id="landing-main" tabIndex={-1}>
    <section className="rl-hero" aria-labelledby="landing-title"><img className="rl-capsule" data-enter src="/assets/landing/hero-capsule.png" alt="Concept render: a robotic hand holding an ESP32 board inside a glass test capsule" width="1024" height="1024" fetchPriority="high"/><div className="rl-hero-copy" data-enter><p className="rl-eyebrow">{t.eyebrow}</p><h1 id="landing-title"><Lines lines={t.title}/></h1><p className="rl-hero-description">{t.lead}</p><a className="rl-button rl-button-dark" href={partnership} download>{t.heroCta} <ArrowRightIcon size={18}/></a></div><div className="rl-specimens">{[['FN-01','card-field-node'],['TS-01','card-tactile']].map(([code,img],i)=><figure className="rl-specimen rl-brackets" data-enter key={code}><img src={`/assets/landing/${img}.png`} alt={`Concept render: ${t.specimens[i]}`} width="768" height="1024" loading="lazy"/><figcaption><b>{code}</b><span>{t.specimens[i]}</span></figcaption></figure>)}</div><div className="rl-hero-bottom"><span>{t.renders}</span><a href="#gap">{t.scroll}</a></div></section>
 
@@ -129,6 +126,6 @@ export function Landing(){
    {/* composition: negantropy-persist — centered manifesto stack */}
    <section className="rl-section rl-final" data-reveal><p className="rl-index">( 05 )<i/>{t.finalEyebrow}</p><h2>{t.finalTitle}</h2><p>{t.finalText}</p><div><a className="rl-button rl-button-dark" href={partnership} download>{t.finalCta} <ArrowRightIcon size={18}/></a><Link className="rl-text-link" to="/hardware">{t.library} <ArrowUpRightIcon size={18}/></Link></div></section>
   </main>
-  <footer className="rl-footer"><div><span className="rl-wordmark"><CircuitryIcon size={20} weight="bold"/>iot.ai.id</span><p>{t.footer}</p></div><nav aria-label="Footer"><Link to="/hardware">{t.links[0]}</Link><Link to="/docs">{t.links[1]}</Link><a href={releases}>{t.links[2]}</a><a href="https://github.com/dansya-arsana/iot-ai-id">{t.links[3]}</a></nav><div className="rl-footer-bottom"><span>{t.bottom}</span><span>© 2026 iot.ai.id</span></div></footer>
+  <SiteFooter data-enter/>
  </div>;
 }

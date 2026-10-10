@@ -102,6 +102,7 @@ Disallow: /build
 Disallow: /project/
 Disallow: /site/
 Disallow: /sites
+Disallow: /design
 
 # AI crawlers: explicitly allowed
 User-agent: GPTBot

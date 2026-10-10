@@ -1,7 +1,7 @@
 /** Baseline's mass-one spring, with 1ms integration and a finite frame lifetime. */
 export function mountLandingMotion(root:HTMLElement){
  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const content=Array.from(root.querySelectorAll<HTMLElement>('.rl-header, main, .rl-footer'));
+ const content=Array.from(root.querySelectorAll<HTMLElement>('.ds-header, main, .ds-footer'));
  const previousOverflow=document.body.style.overflow;
  if(!reduced){document.body.style.overflow='hidden';content.forEach(el=>el.inert=true);}
  const timers:number[]=[];const cancels:Array<()=>void>=[];let disposed=false;
@@ -9,7 +9,7 @@ export function mountLandingMotion(root:HTMLElement){
  function spring(el:HTMLElement,delay=0){
   if(reduced){el.style.opacity='1';el.style.transform='none';return;}
   el.style.opacity='0';el.style.transform='translate3d(0,32px,0)';
-  later(()=>{let x=el.classList.contains('rl-header')?-32:48,v=0,last=0,frame=0;const start=performance.now();
+  later(()=>{let x=el.classList.contains('ds-header')?-32:48,v=0,last=0,frame=0;const start=performance.now();
    const tick=(now:number)=>{const dt=last?Math.min(now-last,64):16;last=now;for(let i=0;i<Math.ceil(dt);i++){v+=-180*.000001*x-26*.001*v;x+=v;}
     el.style.transform=`translate3d(0,${x}px,0)`;el.style.opacity=String(Math.min(1,(now-start)/400));
     if((Math.abs(x)<.032&&Math.abs(v)<.0032)||now-start>2200){el.style.transform='none';el.style.opacity='1';}else frame=requestAnimationFrame(tick);};
