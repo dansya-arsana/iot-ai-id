@@ -1,6 +1,6 @@
 {
   "name": "iot-ai-id",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -12,6 +12,7 @@
     "web": "vite --config apps/web/vite.config.ts",
     "build": "vite build --config apps/web/vite.config.ts && tsx scripts/build-seo.ts",
     "typecheck": "tsc --noEmit",
+    "release:notes": "tsx scripts/release-notes.ts",
     "lint": "eslint .",
     "test": "tsx --test tests/*.test.ts",
     "check": "npm run typecheck && npm run lint && npm run check:tokens && npm test && npm run build",
