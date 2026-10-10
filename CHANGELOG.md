@@ -6,12 +6,18 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-11
+
+Device adapter specification and release tooling.
+
 ### Added
 - ADR 008 and `packages/device-adapter`: device adapter protocol v1 for partner hardware (robot hands, tactile sensors). One adapter per device family wraps the vendor SDK behind 13 fixed JSON-RPC methods. Includes manifest, channel model, session state machine and conformance requirements.
+- `CHANGELOG.md` covering every release since 0.1.0, with local annotated tags `v0.1.0`–`v0.5.0`.
+- `npm run release:notes`: drafts the next entry from commits since the last tag, grouped by commit type with a security keyword check.
 
 ### Changed
 - `deploy/nginx.conf` now carries the Indonesia geo redirect that has run in production since 0.4.0, so the repository matches the live gateway.
-- `package.json` version set to 0.4.0; `npm run release:notes` drafts the next entry from commits since the last tag.
+- `package.json` version follows the changelog (now 0.5.0).
 
 ### Security
 - Adapter safety model: no actuation before human-approved `arm`; commands outside the run envelope are rejected (never clamped); envelopes cannot exceed vendor limits; `stop` callable in every state; heartbeat deadman; hardware stop required for risky devices; only signed adapters may run physical tests; adapters report observations, never pass/fail.
@@ -104,7 +110,8 @@ Initial public snapshot of the hardware workspace.
 ### Security
 - Local API accepts loopback Host/Origin only and requires a session token; physical runs need a human-authorised USB port (20-minute trust window).
 
-[Unreleased]: https://github.com/dansya-arsana/iot-ai-id/compare/2bbbaa3...HEAD
+[Unreleased]: https://github.com/dansya-arsana/iot-ai-id/compare/8cdee0a...HEAD
+[0.5.0]: https://github.com/dansya-arsana/iot-ai-id/compare/2bbbaa3...8cdee0a
 [0.4.0]: https://github.com/dansya-arsana/iot-ai-id/compare/6ea1215...2bbbaa3
 [0.3.0]: https://github.com/dansya-arsana/iot-ai-id/compare/eb01b3f...6ea1215
 [0.2.0]: https://github.com/dansya-arsana/iot-ai-id/compare/6f232b7...eb01b3f
