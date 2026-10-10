@@ -20,3 +20,12 @@ The hardware library, learning material, public repository, desktop preview rele
 ## Boundaries
 
 Home and its dedicated presentation change. The public catalog now dynamically loads canonical bundled specifications on iot.ai.id so its CTA works without an owner API session. Local API failure uses a labeled read-only fallback. Internal canvas, API, runtime, admin authentication, and project behavior retain their existing implementations. Supplier business contact and official partner logos require separate factual input before publication.
+
+## Hero revamp: clinical capsule (2026-10-10)
+
+The hero now positions iot.ai.id as real-world hardware verification in Indonesia for robotics and AI teams, styled after a user-supplied monochrome medical-device reference. All three images are original Higgsfield `gpt_image_2_5` concept renders, labelled on-page as not available products:
+- `hero-capsule.png`: job `e3eddf57-3ce8-4d4c-87a9-0734b56c49ee`
+- `card-field-node.png`: job `5607884e-4af1-4edd-b43f-4d436f2b2196`
+- `card-tactile.png`: job `4fb40e78-6d3d-4d70-9208-35a357de44a7`
+
+The hero makes no claim about scenario counts, verified deployments, or partner relationships.

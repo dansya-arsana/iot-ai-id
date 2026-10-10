@@ -26,7 +26,7 @@ export function mountLandingMotion(root:HTMLElement){
  };
  if(reduced)begin();else{
   const started=performance.now();let exited=false;const exit=()=>{if(exited)return;exited=true;later(begin,Math.max(0,1400-(performance.now()-started)));};
-  const image=root.querySelector<HTMLImageElement>('.rl-robot');if(image?.complete)exit();else image?.addEventListener('load',exit,{once:true});
+  const image=root.querySelector<HTMLImageElement>('.rl-capsule');if(image?.complete)exit();else image?.addEventListener('load',exit,{once:true});
   later(exit,2600);cancels.push(()=>image?.removeEventListener('load',exit));
  }
  return()=>{disposed=true;document.body.style.overflow=previousOverflow;content.forEach(el=>el.inert=false);timers.forEach(clearTimeout);cancels.forEach(fn=>fn());observer.disconnect();};
