@@ -92,7 +92,7 @@ render({path:'/learn',title:'Learn hardware — iot.ai.id',description:'Practica
 render({path:'/docs',title:'Documentation — iot.ai.id',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
 
 const urls=['/','/hardware','/learn','/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
-writeFileSync(join(OUT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod><priority>${u==='/'?'1.0':u==='/hardware'?'0.8':'0.6'}</priority></url>`).join('\n')}\n</urlset>\n`);
+writeFileSync(join(OUT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${SITE}${slash(u)}</loc><lastmod>${today}</lastmod><priority>${u==='/'?'1.0':u==='/hardware'?'0.8':'0.6'}</priority></url>`).join('\n')}\n</urlset>\n`);
 writeFileSync(join(OUT,'robots.txt'),`# iot.ai.id — crawlers and AI agents are welcome on public pages.
 User-agent: *
 Allow: /
