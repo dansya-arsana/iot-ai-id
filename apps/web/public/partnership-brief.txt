@@ -1,24 +1,35 @@
-iot.ai.id — Indonesia hardware partnership brief
+iot.ai.id — Real-world hardware verification partnership brief
 
 Purpose
-Connect useful IoT and robotics hardware with builders, schools, makers, and engineers in Indonesia through documented experiments and practical learning.
+Test robotics, sensor and IoT hardware in real Indonesian field conditions and return machine-readable, verifiable evidence for engineering and AI training.
 
-Partnership topics
-- Evaluation samples and exact board/module variants.
-- Pin maps, electrical ratings, datasheets, SDKs, and example firmware.
-- Pilot testing with explicit acceptance criteria and recorded failures.
-- Repair documentation and reproducible retesting.
-- Distribution discussions after commercial and authorization terms are agreed.
+Why Indonesia
+- Tropical field environments: heat, high humidity, brackish water, unstable power and intermittent networks.
+- Diverse deployment sites: aquaculture ponds, greenhouses and plantations, cold-chain and warehouses, factory floors, smart buildings and remote telemetry.
+- Local vocational electronics and mechatronics talent to operate lab benches and field sites.
+- Close access to the low-cost component supply chain for comparative and clone testing.
 
-Current product
-An AI-assisted hardware workspace with a hardware catalog, visual wiring canvas, structured hardware contracts, deterministic validation, and a local desktop bridge for supported ESP32 experiments.
+What we offer
+- Environmental stress testing: run your hand, sensor or node under defined field conditions.
+- Field pilot deployments: long-running installations with telemetry, observation and failure reporting.
+- Failure and recovery datasets: identity-bound records linking configuration, conditions, measurements and outcomes.
+
+How verification works
+1. Specify: hardware, target behaviour and environment are written as a machine-checkable contract.
+2. Deploy: operators install the setup at a lab bench or field site following generated instructions.
+3. Execute: the agent compiles, flashes, boots and measures, capturing serial output and readings.
+4. Record: results, camera evidence and failures are stored as a verifiable record.
+
+What we need from partners
+- Evaluation units and exact variant identifiers.
+- Electrical ratings, interfaces, SDKs and reference firmware.
+- Acceptance criteria and the conditions you want tested.
 
 Current limits
-The public website is an introduction and documentation surface. Hardware availability, official distribution rights, active tester numbers, and verified robotics results are not asserted. The humanoid visual is a concept illustration. Raspberry Pi and robotics catalog entries do not imply full runtime support. Physical verification requires connected hardware and captured evidence.
+Images on the website are concept renders, not available products. Site counts, partner relationships and verified robotics results are not asserted on the public website. Evidence formats shown are examples of the record structure.
 
-Public source and desktop preview
+Public source
 https://github.com/dansya-arsana/iot-ai-id
-https://github.com/dansya-arsana/iot-ai-id/releases/tag/v0.1.0-preview.1
 
 Next discussion
-Agree on the product, electrical requirements, evaluation protocol, documentation, sample terms, and distribution scope. Business contact details will be published separately when available.
+Agree on the hardware, test conditions, evaluation protocol, data rights and timeline. Business contact details will be published separately.
