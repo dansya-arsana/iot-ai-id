@@ -102,11 +102,11 @@
 
 /* Loader + motion gates */
 .rl-loader{position:fixed;inset:0;z-index:100;background:var(--rl-ink);color:var(--ds-surface-raised);display:flex;flex-direction:column;gap:30px;justify-content:center;align-items:center;transition:transform 850ms cubic-bezier(.65,0,.35,1)}.rl-loader[hidden]{display:none}
-.rl-loader>span{display:flex;gap:12px;align-items:center;font-size:34px;font-weight:600;letter-spacing:-1px}.rl-loader small{font:9px 'IBM Plex Mono',monospace;letter-spacing:1.5px}
-.rl-loader-track{width:160px;height:1px;background:color-mix(in srgb,var(--ds-on-inverse) 30%,transparent)}.rl-loader-track i{display:block;height:1px;background:var(--ds-surface-raised);transform-origin:left;animation:rl-load 1280ms cubic-bezier(.65,0,.35,1) both}
+
+
 .rl-loader-exit{transform:translateY(-105%);pointer-events:none}
 .result-landing:not([data-ready]) [data-enter]{opacity:0}.result-landing [data-reveal]{opacity:0}
-@keyframes rl-load{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
 
 @media(max-width:1050px){
  .rl-hero{grid-template-columns:1fr 1fr;padding-top:110px}.rl-capsule{grid-column:1/-1;width:min(80%,620px)}.rl-hero-copy{grid-row:2;padding-bottom:90px}.rl-specimens{grid-column:2;grid-row:2;padding-bottom:90px}.rl-hero h1{font-size:44px;letter-spacing:-1.4px}
@@ -127,3 +127,13 @@
  .rl-partner{grid-template-columns:1fr;min-height:0;gap:40px}.rl-portrait{grid-column:1}
  .rl-final{min-height:0;padding:90px 6%}.rl-final h2{font-size:40px}.rl-final>div{flex-direction:column}
 }
+
+/* Loader: dot-matrix Indonesia scan → Java locks → wordmark */
+.rl-loader{gap:28px;color:var(--ds-on-inverse)}
+.rl-loader-mark{width:min(420px,78vw);height:auto;color:var(--ds-on-inverse)}
+.rl-loader-word{display:flex;font-size:30px;font-weight:600;letter-spacing:-1px}
+.rl-loader-word i{font-style:normal;display:inline-block;opacity:0;transform:translateY(10px);animation:rl-letter 520ms calc(780ms + var(--i) * 32ms) cubic-bezier(.2,.9,.2,1) both}
+.rl-loader small{font:500 9px var(--ds-mono);letter-spacing:.18em;color:var(--ds-on-inverse-2);opacity:0;animation:rl-fade 600ms 1150ms ease both}
+@keyframes rl-letter{to{opacity:1;transform:none}}
+@keyframes rl-fade{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.rl-loader-word i,.rl-loader small{animation:none;opacity:1;transform:none}}

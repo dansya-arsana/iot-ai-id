@@ -1,8 +1,9 @@
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {Link,useLocation} from 'react-router-dom';
 import {ArrowUpRightIcon,ArrowRightIcon,ArrowLeftIcon,CircuitryIcon} from '@phosphor-icons/react';
 import {mountLandingMotion} from './landing-motion';
 import {useLang} from './i18n';
+import {DotMark} from './brand/dot-mark';
 import {SiteHeader,SiteFooter} from './site-shell';
 import {idn} from './indonesia-dots';
 import './landing-new.css';
@@ -99,7 +100,7 @@ export function Landing(){
  useEffect(()=>{if(!hash)return;const id=window.setTimeout(()=>document.getElementById(hash.slice(1))?.scrollIntoView({behavior:reduced()?'auto':'smooth'}),reduced()?0:1500);return()=>clearTimeout(id);},[hash]);
  const slide=(dir:number)=>{const r=rail.current;if(r)r.scrollBy({left:dir*r.clientWidth*.8,behavior:reduced()?'auto':'smooth'});};
  return <div ref={root} className="result-landing">
-  <div className="rl-loader" role="status" aria-label="Loading"><span><CircuitryIcon size={36}/>iot.ai.id</span><div className="rl-loader-track"><i/></div><small>{t.loader}</small></div>
+  <div className="rl-loader" role="status" aria-label="Loading"><DotMark animated className="rl-loader-mark" label="iot.ai.id"/><span className="rl-loader-word" aria-hidden="true">{'iot.ai.id'.split('').map((ch,i)=><i key={i} style={{'--i':i} as CSSProperties}>{ch}</i>)}</span><small>{t.loader}</small></div>
   <a className="rl-skip" href="#landing-main">{t.skip}</a>
   <SiteHeader overlay data-enter/>
   <main id="landing-main" tabIndex={-1}>

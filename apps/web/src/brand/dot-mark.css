@@ -1,0 +1,21 @@
+/* Dot-matrix Indonesia mark. Colours follow currentColor so it works on ground and inverse surfaces. */
+.dm{display:block;overflow:visible;color:var(--ds-ink)}
+.dm-dots circle{fill:currentColor;opacity:.42}
+.dm-core{fill:currentColor}
+.dm-ring{fill:none;stroke:currentColor;stroke-width:.07}
+
+/* Animated sequence (≈1.3s): scanline sweeps west→east, dots surface as it passes, Java locks and pulses. */
+.dm--animated .dm-scan{fill:currentColor;opacity:0;transform-box:view-box;animation:dm-scan 900ms 120ms linear both}
+.dm--animated .dm-dots circle{transform-box:fill-box;transform-origin:center;opacity:0;animation:dm-dot 560ms var(--d) cubic-bezier(.2,.9,.25,1.25) both}
+.dm--animated .dm-core{transform-box:fill-box;transform-origin:center;transform:scale(0);animation:dm-lock 520ms 1000ms cubic-bezier(.2,.9,.25,1.35) both}
+.dm--animated .dm-ring{transform-box:fill-box;transform-origin:center;opacity:0;animation:dm-ring 1700ms 1250ms cubic-bezier(.2,0,0,1) infinite}
+@keyframes dm-scan{0%{opacity:0;transform:translateX(0)}8%{opacity:.9}88%{opacity:.9}100%{opacity:0;transform:translateX(25.4px)}}
+@keyframes dm-dot{0%{opacity:0;transform:scale(.1)}45%{opacity:1;transform:scale(1.45)}100%{opacity:.42;transform:scale(1)}}
+@keyframes dm-lock{0%{transform:scale(0)}100%{transform:scale(1)}}
+@keyframes dm-ring{0%{opacity:.9;transform:scale(1)}80%,100%{opacity:0;transform:scale(3.6)}}
+
+@media(prefers-reduced-motion:reduce){
+ .dm--animated .dm-scan{display:none}
+ .dm--animated .dm-dots circle,.dm--animated .dm-core,.dm--animated .dm-ring{animation:none;transform:none}
+ .dm--animated .dm-dots circle{opacity:.42}.dm--animated .dm-ring{opacity:0}
+}
