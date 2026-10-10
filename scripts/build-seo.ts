@@ -70,7 +70,7 @@ render({path:'/',title:'iot.ai.id — Testing robots and sensors where the world
  jsonld:{'@context':'https://schema.org','@type':'FAQPage',mainEntity:faq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))}});
 
 const hwLine=(h:HardwareReference)=>`<a href="/hardware/${h.id}/">${esc(h.name)}</a> (${h.kind}, ${h.protocols.join('/')}): ${esc(h.summary)}`;
-render({path:'/hardware',title:'Hardware library — iot.ai.id',description:`Reference specifications for ${hardwareLibrary.length} boards, sensors and modules: ESP32, Arduino, Raspberry Pi and common I2C/SPI sensors.`,
+render({path:'/hardware',title:'Hardware library | iot.ai.id',description:`Reference specifications for ${hardwareLibrary.length} boards, sensors and modules: ESP32, Arduino, Raspberry Pi and common I2C/SPI sensors.`,
  body:`<main>${nav}<h1>Hardware library</h1><p>${hardwareLibrary.length} hardware references. Specifications only; listing does not imply verified firmware support.</p>${list(hardwareLibrary.map(hwLine))}</main>`,
  jsonld:{'@context':'https://schema.org','@type':'ItemList',name:'iot.ai.id hardware library',numberOfItems:hardwareLibrary.length,itemListElement:hardwareLibrary.map((h,i)=>({'@type':'ListItem',position:i+1,url:`${SITE}/hardware/${h.id}/`,name:h.name}))}});
 
@@ -88,8 +88,8 @@ ${h.software.length?`<h2>Software</h2>${list(h.software.map(esc))}`:''}
  render({path:`/hardware/${h.id}`,title:`${h.name} — specifications, pinout and limits | iot.ai.id`,description:`${h.name}: ${h.summary}`.slice(0,300),body,
   jsonld:{'@context':'https://schema.org','@type':'TechArticle',headline:`${h.name} reference specification`,about:{'@type':'Thing',name:h.name,alternateName:h.aliases},description:h.summary,url:`${SITE}/hardware/${h.id}/`,publisher:{'@id':`${SITE}/#org`},citation:h.sources.map(s=>s.url)}});
 }
-render({path:'/learn',title:'Learn hardware — iot.ai.id',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
-render({path:'/docs',title:'Documentation — iot.ai.id',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
+render({path:'/learn',title:'Learn | iot.ai.id',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
+render({path:'/docs',title:'Documentation | iot.ai.id',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
 
 const urls=['/','/hardware','/learn','/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
 writeFileSync(join(OUT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${SITE}${slash(u)}</loc><lastmod>${today}</lastmod><priority>${u==='/'?'1.0':u==='/hardware'?'0.8':'0.6'}</priority></url>`).join('\n')}\n</urlset>\n`);
