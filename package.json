@@ -10,7 +10,7 @@
     "dev": "tsx scripts/dev.ts",
     "api": "tsx services/api/server.ts",
     "web": "vite --config apps/web/vite.config.ts",
-    "build": "vite build --config apps/web/vite.config.ts",
+    "build": "vite build --config apps/web/vite.config.ts && tsx scripts/build-seo.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "tsx --test tests/*.test.ts",
