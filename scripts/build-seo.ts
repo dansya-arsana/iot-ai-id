@@ -36,7 +36,9 @@ const faq:[string,string][]=[
  ['How do I start?',`Download the partnership brief at ${SITE}/partnership-brief.txt.`],
 ];
 
-type Page={path:string,title:string,description:string,body:string,jsonld?:object};
+type Page={path:string,title:string,description:string,body:string,jsonld?:object,lang?:'en'|'id',alternates?:boolean};
+/** The global (EN) home and the Indonesian SMK landing are language alternates of each other. */
+const hreflang=`<link rel="alternate" hreflang="en" href="${SITE}/">\n<link rel="alternate" hreflang="id" href="${SITE}/id/">\n<link rel="alternate" hreflang="x-default" href="${SITE}/">`;
 function render(p:Page){
  const url=SITE+slash(p.path);
  let html=template
@@ -49,6 +51,8 @@ function render(p:Page){
   .replace(/(<meta name="twitter:title" content=")[^"]*/,`$1${esc(p.title)}`)
   .replace(/(<meta name="twitter:description" content=")[^"]*/,`$1${esc(p.description)}`)
   .replace('<!--prerender-->',`<div class="seo-prerender">${p.body}</div>`);
+ if(p.lang==='id')html=html.replace('<html lang="en"','<html lang="id"').replace(/(<meta property="og:locale" content=")[^"]*/,'$1id_ID');
+ if(p.alternates)html=html.replace('</head>',`${hreflang}\n</head>`);
  if(p.jsonld)html=html.replace('</head>',`<script type="application/ld+json">${JSON.stringify(p.jsonld)}</script>\n</head>`);
  const file=p.path==='/'?join(OUT,'index.html'):join(OUT,p.path,'index.html');
  mkdirSync(dirname(file),{recursive:true});writeFileSync(file,html);
@@ -66,8 +70,24 @@ const home=`<main>${nav}
 <h2>For robotics, sensor and AI teams</h2>${list(offers)}<p><a href="/partnership-brief.txt">Download the partnership brief</a></p>
 <h2>FAQ</h2>${faq.map(([q,a])=>`<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join('')}
 </main>`;
-render({path:'/',title:'iot.ai.id — Testing robots and sensors where the world is messy.',description:'Real-world hardware verification from Indonesia. We test robotics, sensor and IoT hardware in humid, hot, unstable field conditions and return verifiable evidence for engineering and AI teams.',body:home,
+render({path:'/',alternates:true,title:'iot.ai.id — Testing robots and sensors where the world is messy.',description:'Real-world hardware verification from Indonesia. We test robotics, sensor and IoT hardware in humid, hot, unstable field conditions and return verifiable evidence for engineering and AI teams.',body:home,
  jsonld:{'@context':'https://schema.org','@type':'FAQPage',mainEntity:faq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))}});
+
+const idFaq:[string,string][]=[
+ ['Apa itu Program Lab Mitra?','Program iot.ai.id untuk SMK: guru dan siswa dilatih IoT, lalu lab sekolah menerima tugas uji hardware berbayar dari perusahaan robotika, sensor, dan AI.'],
+ ['Berapa biayanya?','Paket Guru Rp1.490.000 per guru. Paket Lab Mitra Sekolah Rp9.900.000 per sekolah (3 guru, 10 siswa operator, 5 kit uji, verifikasi lab, akses tugas berbayar). Paket agency dan yayasan sesuai penawaran.'],
+ ['Berapa honor tugas uji?','Uji modul dasar Rp75.000–150.000, uji lingkungan dan berulang Rp250.000–500.000, pilot lapangan Rp1–3 juta per lokasi. Dibagi 60% siswa, 25% kas TEFA sekolah, 15% guru pembimbing. Jumlah tugas tidak dijamin per bulan.'],
+ ['Apakah sertifikatnya BNSP?','Bukan. Sertifikat pelatihan 32 JP diterbitkan oleh iot.ai.id.'],
+ ['Bagaimana cara daftar?','Chat WhatsApp +62 812-114-040. Kami kirim penawaran resmi dan invoice atas nama sekolah.'],
+];
+render({path:'/id',lang:'id',alternates:true,title:'Program Lab Mitra SMK — pelatihan IoT & tugas uji berbayar | iot.ai.id',description:'Lab SMK Anda bisa dibayar untuk menguji hardware. Pelatihan IoT untuk guru dan siswa, lalu tugas uji berbayar mulai Rp75.000 per tugas. Daftar via WhatsApp.',
+ body:`<main><nav><a href="/">Global site (EN)</a> · <a href="/hardware">Hardware library</a></nav>
+<h1>Lab SMK Anda bisa dibayar untuk menguji hardware.</h1>
+<p>Program Lab Mitra iot.ai.id melatih guru dan siswa SMK di bidang IoT, lalu mengirim tugas uji hardware dari perusahaan robotika dan sensor ke lab sekolah. Setiap tugas yang lulus dibayar.</p>
+<h2>Paket</h2>${list(['Paket Guru: Rp1.490.000 per guru','Paket Lab Mitra Sekolah: Rp9.900.000 per sekolah','Agency & yayasan: hubungi kami'])}
+<h2>Pertanyaan</h2>${idFaq.map(([q,a])=>`<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join('')}
+<p><a href="https://wa.me/62812114040">Daftar via WhatsApp +62 812-114-040</a></p></main>`,
+ jsonld:{'@context':'https://schema.org','@type':'FAQPage',inLanguage:'id',mainEntity:idFaq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))}});
 
 const hwLine=(h:HardwareReference)=>`<a href="/hardware/${h.id}/">${esc(h.name)}</a> (${h.kind}, ${h.protocols.join('/')}): ${esc(h.summary)}`;
 render({path:'/hardware',title:'Hardware library | iot.ai.id',description:`Reference specifications for ${hardwareLibrary.length} boards, sensors and modules: ESP32, Arduino, Raspberry Pi and common I2C/SPI sensors.`,
@@ -91,8 +111,8 @@ ${h.software.length?`<h2>Software</h2>${list(h.software.map(esc))}`:''}
 render({path:'/learn',title:'Learn | iot.ai.id',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
 render({path:'/docs',title:'Documentation | iot.ai.id',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
 
-const urls=['/','/hardware','/learn','/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
-writeFileSync(join(OUT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${SITE}${slash(u)}</loc><lastmod>${today}</lastmod><priority>${u==='/'?'1.0':u==='/hardware'?'0.8':'0.6'}</priority></url>`).join('\n')}\n</urlset>\n`);
+const urls=['/','/id','/hardware','/learn','/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
+writeFileSync(join(OUT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${SITE}${slash(u)}</loc><lastmod>${today}</lastmod><priority>${u==='/'||u==='/id'?'1.0':u==='/hardware'?'0.8':'0.6'}</priority></url>`).join('\n')}\n</urlset>\n`);
 writeFileSync(join(OUT,'robots.txt'),`# iot.ai.id — crawlers and AI agents are welcome on public pages.
 User-agent: *
 Allow: /
@@ -131,6 +151,7 @@ iot.ai.id is based in Indonesia and serves robotics, sensor and AI teams worldwi
 
 - [Home](${SITE}/): positioning, scenario atlas, verification loop, network and partnership offer
 - [Partnership brief](${SITE}/partnership-brief.txt): services, what partners provide, current limits
+- [Program Lab Mitra (Indonesian)](${SITE}/id/): IoT training and paid hardware-testing tasks for Indonesian vocational schools (SMK)
 - [Hardware library](${SITE}/hardware/): ${hardwareLibrary.length} board, sensor and module reference specifications
 - [Full LLM context](${SITE}/llms-full.txt): everything on this site in one plain-text file
 

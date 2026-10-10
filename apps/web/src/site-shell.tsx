@@ -4,6 +4,7 @@ import {ArrowUpRightIcon,CaretDownIcon,ListIcon,XIcon} from '@phosphor-icons/rea
 import {useLang} from './i18n';
 import {AnchorButton,LangToggle,PageHeader} from './ui';
 import {DotMark} from './brand/dot-mark';
+import {rememberRegion} from './region';
 import './site-shell.css';
 
 export const PARTNERSHIP_BRIEF='/partnership-brief.txt';
@@ -70,7 +71,7 @@ export function SiteFooter({className,...rest}:{className?:string;'data-enter'?:
   <nav aria-label={tr('Footer','Footer')}>
    <div><span>{tr('Explore','Jelajahi')}</span><Link to="/#scenarios">{tr('Scenarios','Skenario')}</Link><Link to="/hardware">{tr('Hardware library','Pustaka hardware')}</Link><Link to="/learn">{tr('Learn','Belajar')}</Link></div>
    <div><span>{tr('Build','Bangun')}</span><Link to="/docs">{tr('Docs','Dokumentasi')}</Link><Link to="/api">API</Link><a href={RELEASES}>{tr('Desktop app','Aplikasi desktop')}</a></div>
-   <div><span>{tr('Company','Perusahaan')}</span><a href={PARTNERSHIP_BRIEF} download>{tr('Partnership brief','Partnership brief')}</a><Link to="/research">{tr('Research','Riset')}</Link><a href={REPOSITORY}>GitHub <ArrowUpRightIcon size={12}/></a></div>
+   <div><span>{tr('Company','Perusahaan')}</span><a href={PARTNERSHIP_BRIEF} download>{tr('Partnership brief','Partnership brief')}</a><Link to="/research">{tr('Research','Riset')}</Link><a href={REPOSITORY}>GitHub <ArrowUpRightIcon size={12}/></a><Link to="/id" hrefLang="id" onClick={()=>rememberRegion('id')}>{tr('Indonesia: SMK program','Program SMK Indonesia')}</Link></div>
   </nav>
   <div className="ds-footer-bottom"><span>{tr('INDONESIA · TESTED WHERE IT MATTERS.','INDONESIA · DIUJI DI TEMPAT YANG PENTING.')}</span><span>© 2026 iot.ai.id</span></div>
  </footer>;

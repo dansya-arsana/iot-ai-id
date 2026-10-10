@@ -13,6 +13,7 @@ import './styles.css';
 import './experience.css';
 import {SchoolWorkbench} from './school-workbench';
 import {Landing} from './landing-new';
+import {LandingID} from './pages/landing-id';
 import {Backoffice} from './backoffice';
 import {LangProvider,useLang} from './i18n';
 import {Spinner} from './ui';
@@ -28,15 +29,15 @@ function Sites(){return <Suspense fallback={<RouteLoading en="Loading sites…" 
 function SiteWorkbench(){return <Suspense fallback={<RouteLoading en="Loading canvas…" id="Memuat canvas…"/>}><LazySiteWorkbench/></Suspense>;}
 function Home(){return <Landing/>;}
 const SITE_TITLE='iot.ai.id';
-const routeTitles:[RegExp,string][]=[[/^\/$/,'iot.ai.id — Testing robots and sensors where the world is messy.'],[/^\/hardware\/?$/,'Hardware library'],[/^\/learn\/?$/,'Learn'],[/^\/docs\/?$/,'Documentation'],[/^\/api\/?$/,'API'],[/^\/research\/?$/,'Research'],[/^\/bench\/?$/,'PhysicalBench'],[/^\/arena\/?$/,'Hardware Arena'],[/^\/arena\/[^/]+/,'Arena challenge'],[/^\/builders\/?$/,'Builders'],[/^\/build\/?$/,'Build'],[/^\/sites\/?$/,'Sites'],[/^\/site\//,'Site workbench'],[/^\/project\/[^/]+\/episode/,'Episode'],[/^\/project\//,'Project'],[/^\/backoffice/,'Backoffice'],[/^\/design\/?$/,'Design system']];
+const routeTitles:[RegExp,string][]=[[/^\/$/,'iot.ai.id — Testing robots and sensors where the world is messy.'],[/^\/id\/?$/,'Program Lab Mitra SMK — pelatihan IoT & tugas uji berbayar | iot.ai.id'],[/^\/hardware\/?$/,'Hardware library'],[/^\/learn\/?$/,'Learn'],[/^\/docs\/?$/,'Documentation'],[/^\/api\/?$/,'API'],[/^\/research\/?$/,'Research'],[/^\/bench\/?$/,'PhysicalBench'],[/^\/arena\/?$/,'Hardware Arena'],[/^\/arena\/[^/]+/,'Arena challenge'],[/^\/builders\/?$/,'Builders'],[/^\/build\/?$/,'Build'],[/^\/sites\/?$/,'Sites'],[/^\/site\//,'Site workbench'],[/^\/project\/[^/]+\/episode/,'Episode'],[/^\/project\//,'Project'],[/^\/backoffice/,'Backoffice'],[/^\/design\/?$/,'Design system']];
 function useRouteTitle(){
  const {pathname}=useLocation();
  useEffect(()=>{
   const hw=pathname.match(/^\/hardware\/([a-z0-9-]+)\/?$/);
   if(hw){let live=true;document.title=`Hardware reference | ${SITE_TITLE}`;import('../../../packages/hardware-library/index').then(({hardwareLibrary})=>{if(!live)return;const name=hardwareLibrary.find(h=>h.id===hw[1])?.name;document.title=name?`${name} — specifications, pinout and limits | ${SITE_TITLE}`:`Hardware not found | ${SITE_TITLE}`;});return()=>{live=false;};}
   const match=routeTitles.find(([re])=>re.test(pathname));
-  document.title=!match?`Not found | ${SITE_TITLE}`:pathname==='/'?match[1]:`${match[1]} | ${SITE_TITLE}`;
+  document.title=!match?`Not found | ${SITE_TITLE}`:pathname==='/'||match[1].endsWith(SITE_TITLE)?match[1]:`${match[1]} | ${SITE_TITLE}`;
  },[pathname]);
 }
-function App(){useRouteTitle();return <Routes><Route path="/" element={<Home/>}/><Route path="/build" element={<Build/>}/><Route path="/sites" element={<Sites/>}/><Route path="/site/:id" element={<SiteWorkbench/>}/><Route path="/site/:id/area/:areaId" element={<SiteWorkbench/>}/><Route path="/learn" element={<Learn/>}/><Route path="/backoffice" element={<Backoffice/>}/><Route path="/project/:id/episode" element={<EpisodePage/>}/><Route path="/project/:id" element={<SchoolWorkbench/>}/><Route path="/hardware" element={<Hardware/>}/><Route path="/hardware/:slug" element={<HardwareDetail/>}/><Route path="/bench" element={<Bench/>}/><Route path="/arena" element={<Arena/>}/><Route path="/arena/:id" element={<ArenaDetail/>}/><Route path="/builders" element={<Builders/>}/><Route path="/research" element={<Research/>}/><Route path="/docs" element={<Docs/>}/><Route path="/api" element={<Docs apiOverview/>}/><Route path="/design" element={<DesignSystem/>}/><Route path="*" element={<NotFound/>}/></Routes>;}
+function App(){useRouteTitle();return <Routes><Route path="/" element={<Home/>}/><Route path="/id" element={<LandingID/>}/><Route path="/build" element={<Build/>}/><Route path="/sites" element={<Sites/>}/><Route path="/site/:id" element={<SiteWorkbench/>}/><Route path="/site/:id/area/:areaId" element={<SiteWorkbench/>}/><Route path="/learn" element={<Learn/>}/><Route path="/backoffice" element={<Backoffice/>}/><Route path="/project/:id/episode" element={<EpisodePage/>}/><Route path="/project/:id" element={<SchoolWorkbench/>}/><Route path="/hardware" element={<Hardware/>}/><Route path="/hardware/:slug" element={<HardwareDetail/>}/><Route path="/bench" element={<Bench/>}/><Route path="/arena" element={<Arena/>}/><Route path="/arena/:id" element={<ArenaDetail/>}/><Route path="/builders" element={<Builders/>}/><Route path="/research" element={<Research/>}/><Route path="/docs" element={<Docs/>}/><Route path="/api" element={<Docs apiOverview/>}/><Route path="/design" element={<DesignSystem/>}/><Route path="*" element={<NotFound/>}/></Routes>;}
 createRoot(document.getElementById('root')!).render(<React.StrictMode><BrowserRouter><LangProvider><App/></LangProvider></BrowserRouter></React.StrictMode>);
