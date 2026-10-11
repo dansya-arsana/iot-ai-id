@@ -1,70 +1,41 @@
 /** Lab Mitra commissions (ADR 010): people and logins, ledger postings, allocations, payout batches. Commissions are paid to the school; the school distributes. */
-import {randomBytes,randomInt,randomUUID,scrypt,timingSafeEqual,createHash} from 'node:crypto';
-import {promisify} from 'node:util';
+import {randomUUID} from 'node:crypto';
 import {allocationErrors,payoutSplit,type Allocation,type Batch,type LabTask,type Organization,type Person,type Share,type PersonRole} from '../../packages/ops-contract/index.js';
 import type {OpsStore} from './ops.js';
 import {fail} from './http.js';
-
-const ALPHABET='ABCDEFGHJKMNPQRSTUVWXYZ23456789';// No 0/O/1/I/L: invite codes are read aloud and typed by hand.
-const INVITE_DAYS=7,LOCK_AFTER=5,PERSON_LOCK_AFTER=30,LOCK_MS=15*60_000,SESSION_MS=12*3_600_000,IDLE_MS=2*3_600_000,TOUCH_MS=60_000,MAX_SESSIONS=5;
-const scryptAsync=promisify(scrypt) as (secret:string,salt:Buffer,keylen:number)=>Promise<Buffer>;
-/** Async scrypt so password and invite checks never block the event loop. */
-const hashSecret=async(secret:string)=>{const salt=randomBytes(16);return `${salt.toString('hex')}$${(await scryptAsync(secret,salt,32)).toString('hex')}`;};
-const verifySecret=async(secret:string,stored:string)=>{const [salt,hash]=stored.split('$');if(!salt||!hash)return false;const a=await scryptAsync(secret,Buffer.from(salt,'hex'),32),b=Buffer.from(hash,'hex');return a.length===b.length&&timingSafeEqual(a,b);};
-let dummy:Promise<string>|undefined;
-/** Unknown, locked and not-yet-activated accounts still cost one scrypt, so timing does not reveal the account state. */
-const burn=async(secret:string)=>{await verifySecret(secret,await(dummy??=hashSecret('timing-equalizer')));};
-const sha=(s:string)=>createHash('sha256').update(s).digest('hex');
+import {Auth} from './auth.js';
 const slugify=(s:string,max:number)=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,max).replace(/-+$/,'');
-const chars=(n:number)=>Array.from({length:n},()=>ALPHABET[randomInt(ALPHABET.length)]).join('');
 
-type Login={person_id:string;username:string;pass_hash:string|null;invite_id:string|null;invite_hash:string|null;invite_expires:number;failed:number;locked_until:number};
 export type PersonView=Person&{activated:boolean;inviteExpires?:string};
 
 export class Commissions{
- constructor(readonly store:OpsStore,readonly clock:()=>Date){
-  const db=store.db;
-  db.exec(`CREATE TABLE IF NOT EXISTS logins(person_id TEXT PRIMARY KEY,username TEXT NOT NULL UNIQUE,pass_hash TEXT,invite_hash TEXT,invite_expires INTEGER NOT NULL DEFAULT 0,failed INTEGER NOT NULL DEFAULT 0,locked_until INTEGER NOT NULL DEFAULT 0);
-CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,person_id TEXT NOT NULL,expires_at INTEGER NOT NULL);
-CREATE TABLE IF NOT EXISTS login_fails(person_id TEXT NOT NULL,ip TEXT NOT NULL,failed INTEGER NOT NULL DEFAULT 0,locked_until INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(person_id,ip));`);
-  const has=(table:string,col:string)=>(db.prepare(`PRAGMA table_info(${table})`).all() as {name:string}[]).some(r=>r.name===col);
-  if(!has('logins','invite_id'))db.exec('ALTER TABLE logins ADD COLUMN invite_id TEXT');
-  if(!has('sessions','last_seen'))db.exec('ALTER TABLE sessions ADD COLUMN last_seen INTEGER NOT NULL DEFAULT 0');
-  db.exec('CREATE INDEX IF NOT EXISTS logins_invite ON logins(invite_id);CREATE INDEX IF NOT EXISTS sessions_person ON sessions(person_id)');
- }
+ constructor(readonly store:OpsStore,readonly clock:()=>Date,readonly auth=new Auth(store,clock)){}
  private get db(){return this.store.db;}
  private get ledger(){return this.store.ledger;}
  private now(){return this.clock().getTime();}
  private stamp(by:string,action:string){const at=this.clock().toISOString();return{at,entry:{at,by,action}};}
- private login(personId:string){return this.db.prepare('SELECT * FROM logins WHERE person_id=?').get(personId) as Login|undefined;}
 
  // People and logins
  people(orgId?:string){return this.store.list<Person>('people').filter(p=>!orgId||p.orgId===orgId);}
  person(id:string,orgId?:string){const p=this.store.get<Person>('people',id);return p&&(!orgId||p.orgId===orgId)?p:undefined;}
- view(p:Person):PersonView{const l=this.login(p.id);return{...p,activated:!!l?.pass_hash,...(l?.invite_hash&&l.invite_expires>this.now()?{inviteExpires:new Date(l.invite_expires).toISOString()}:{})};}
+ view(p:Person):PersonView{return{...p,...this.auth.state(p.id)};}
  private username(name:string,org:Organization){
   const first=slugify(name.split(/\s+/)[0]??'',20).replace(/-/g,'')||'user',school=slugify(org.name,24)||'school';
-  for(let n=0;;n++){const candidate=`${first}${n?n+1:''}.${school}`;if(!this.db.prepare('SELECT 1 FROM logins WHERE username=?').get(candidate))return candidate;}
+  for(let n=0;;n++){const candidate=`${first}${n?n+1:''}.${school}`;if(!this.auth.usernameTaken(candidate))return candidate;}
  }
  /** Creates a person. Login-capable roles get a one-time invite code that is returned here and never again. */
  async createPerson(org:Organization,input:{role:PersonRole;name:string;className?:string;nisn?:string;guardianConsent?:true},by:string){
   const {at,entry}=this.stamp(by,'created');const id=randomUUID();
   const person:Person={id,orgId:org.id,role:input.role,name:input.name.trim(),status:'active',createdBy:by,createdAt:at,updatedAt:at,history:[entry],
    ...(input.role==='student'?{className:input.className,...(input.nisn?{nisn:input.nisn}:{}),guardianConsent:{at,recordedBy:by}}:{})};
-  let code:string|undefined;const invite=input.role!=='student'?await this.newInvite():undefined;
+  let code:string|undefined;const invite=input.role!=='student'?await this.auth.newInvite():undefined;
   this.store.tx(()=>{
-   if(input.role!=='student'){person.username=this.username(person.name,org);this.db.prepare('INSERT INTO logins(person_id,username) VALUES(?,?)').run(id,person.username);code=this.storeInvite(id,invite!);}
+   if(input.role!=='student'){person.username=this.username(person.name,org);this.auth.create(id,person.username);code=this.auth.storeInvite(id,invite!);}
    this.store.put('people',person);
   });
   return{person:this.view(person),inviteCode:code};
  }
 
- /** Invite code `<4-char lookup id>-<10-char secret>`: the id is stored plain and indexed, only the secret is scrypt-hashed, so activation costs one scrypt. */
- private async newInvite(){const secret=chars(10);return{secret,hash:await hashSecret(secret)};}
- private storeInvite(personId:string,inv:{secret:string;hash:string}){
-  let id:string;do id=chars(4);while(this.db.prepare('SELECT 1 FROM logins WHERE invite_id=?').get(id));
-  this.db.prepare('UPDATE logins SET invite_id=?,invite_hash=?,invite_expires=? WHERE person_id=?').run(id,inv.hash,this.now()+INVITE_DAYS*86_400_000,personId);return `${id}-${inv.secret}`;
- }
  /** Open work a teacher holds: unpaid tasks they lead, pending allocations, approved-but-unbatched allocations. */
  teacherBusy(p:Person){
   const tasks=this.store.list<LabTask>('tasks').some(t=>t.leadId===p.id&&t.status!=='paid');
@@ -73,11 +44,11 @@ CREATE TABLE IF NOT EXISTS login_fails(person_id TEXT NOT NULL,ip TEXT NOT NULL,
  /** Any reset replaces the code, clears the password and sessions, and voids the teacher's pending proposals. */
 async resetInvite(p:Person,by:string,opts:{requireIdle?:boolean}={}){
   if(p.role==='student')fail(400,'Students do not log in yet');
-  const inv=await this.newInvite();const {at,entry}=this.stamp(by,'invite reset');let code='';
+  const inv=await this.auth.newInvite();const {at,entry}=this.stamp(by,'invite reset');let code='';
   this.store.tx(()=>{
    const fresh=this.person(p.id);if(!fresh||fresh.status!=='active')return fail(409,'Person is disabled');
    if(opts.requireIdle&&this.teacherBusy(fresh))return fail(409,'This teacher leads an unpaid task or has open allocations. AIoT must reset this invite: contact AIoT.');
-   code=this.storeInvite(p.id,inv);this.db.prepare('UPDATE logins SET pass_hash=NULL,failed=0,locked_until=0 WHERE person_id=?').run(p.id);this.db.prepare('DELETE FROM login_fails WHERE person_id=?').run(p.id);this.db.prepare('DELETE FROM sessions WHERE person_id=?').run(p.id);this.voidPending(a=>a.proposedBy===p.id,'invite reset',by);this.store.put('people',{...fresh,updatedAt:at,history:[...fresh.history,entry]});
+   code=this.auth.reissue(p.id,inv);this.voidPending(a=>a.proposedBy===p.id,'invite reset',by);this.store.put('people',{...fresh,updatedAt:at,history:[...fresh.history,entry]});
   });
   return{person:this.view(this.person(p.id)!),inviteCode:code};
  }
@@ -90,61 +61,18 @@ async resetInvite(p:Person,by:string,opts:{requireIdle?:boolean}={}){
   if(p.role!=='student'&&(changes.className!==undefined||changes.nisn!==undefined))fail(400,'Only students have a class and NISN');
   const {at,entry}=this.stamp(by,`updated ${Object.keys(changes).join(', ')||'nothing'}`);
   const next:Person={...p,...Object.fromEntries(Object.entries(changes).filter(([,v])=>v!==undefined)),updatedAt:at,history:[...p.history,entry]} as Person;
-  this.store.tx(()=>{this.store.put('people',next);if(changes.status==='disabled'){this.voidPending(a=>a.proposedBy===p.id,'proposer disabled',by);this.db.prepare('DELETE FROM sessions WHERE person_id=?').run(p.id);this.db.prepare('UPDATE logins SET invite_hash=NULL WHERE person_id=?').run(p.id);}});
+  this.store.tx(()=>{this.store.put('people',next);if(changes.status==='disabled'){this.voidPending(a=>a.proposedBy===p.id,'proposer disabled',by);this.auth.revoke(p.id);}});
   return this.view(next);
  }
 
- /** Invite code plus a new password. One indexed lookup, one scrypt for the secret, one for the password. */
- async activate(code:string,password:string):Promise<Person|undefined>{
-  const [id,secret]=code.split('-');
-  const l=this.db.prepare('SELECT * FROM logins WHERE invite_id=? AND invite_hash IS NOT NULL AND invite_expires>?').get(id??'',this.now()) as Login|undefined;
-  if(!l||!await verifySecret(secret??'',l.invite_hash!)){if(!l)await burn(secret??'');return undefined;}
-  const p=this.person(l.person_id);if(!p||p.status!=='active')return undefined;
-  const hash=await hashSecret(password);const {at}=this.stamp(p.name,'activated');
-  // The awaits above may have let another request change the invite or the person: re-read and compare inside the transaction.
-  return this.store.tx(()=>{
-   const cur=this.db.prepare('SELECT * FROM logins WHERE person_id=?').get(l.person_id) as Login|undefined,fresh=this.person(l.person_id);
-   if(!cur||cur.invite_id!==l.invite_id||cur.invite_hash!==l.invite_hash||cur.invite_expires<=this.now()||!fresh||fresh.status!=='active')return fail(409,'This invite code was just used or changed. Ask for a new one.');
-   const r=this.db.prepare('UPDATE logins SET pass_hash=?,invite_id=NULL,invite_hash=NULL,failed=0,locked_until=0 WHERE person_id=? AND invite_id=? AND invite_hash=?').run(hash,l.person_id,l.invite_id,l.invite_hash);
-   if(Number(r.changes)!==1)return fail(409,'This invite code was just used or changed. Ask for a new one.');
-   this.store.put('people',{...fresh,updatedAt:at,history:[...fresh.history,{at,by:fresh.name,action:'activated'}]});return fresh;
-  });
+ /** Invite code plus a new password (see Auth.activate). */
+ activate(code:string,password:string):Promise<Person|undefined>{
+  return this.auth.activate(code,password,id=>{const p=this.person(id);return p&&p.status==='active'?p:undefined;},(fresh,at)=>{this.store.put('people',{...fresh,updatedAt:at,history:[...fresh.history,{at,by:fresh.name,action:'activated'}]});});
  }
- /** Five failures lock a (person, IP) pair for 15 minutes; 30 failures across all IPs lock the person. Locked, unknown and unactivated accounts all cost one scrypt. */
- async authenticate(username:string,password:string,ip:string):Promise<Person|undefined>{
-  const l=this.db.prepare('SELECT * FROM logins WHERE username=?').get(username.trim().toLowerCase()) as Login|undefined;
-  const now=this.now();const pair=l?this.db.prepare('SELECT * FROM login_fails WHERE person_id=? AND ip=?').get(l.person_id,ip) as {failed:number;locked_until:number}|undefined:undefined;
-  if(!l||!l.pass_hash||l.locked_until>now||(pair?.locked_until??0)>now){await burn(password);return undefined;}
-  if(!await verifySecret(password,l.pass_hash)){
-   this.db.prepare('INSERT INTO login_fails(person_id,ip,failed,locked_until) VALUES(?,?,1,0) ON CONFLICT(person_id,ip) DO UPDATE SET failed=failed+1').run(l.person_id,ip);
-   this.db.prepare('UPDATE logins SET failed=failed+1 WHERE person_id=?').run(l.person_id);
-   const pf=this.db.prepare('SELECT failed FROM login_fails WHERE person_id=? AND ip=?').get(l.person_id,ip) as {failed:number},tf=this.db.prepare('SELECT failed FROM logins WHERE person_id=?').get(l.person_id) as {failed:number};
-   if(pf.failed>=LOCK_AFTER)this.db.prepare('UPDATE login_fails SET failed=0,locked_until=? WHERE person_id=? AND ip=?').run(now+LOCK_MS,l.person_id,ip);
-   if(tf.failed>=PERSON_LOCK_AFTER)this.db.prepare('UPDATE logins SET failed=0,locked_until=? WHERE person_id=?').run(now+LOCK_MS,l.person_id);
-   return undefined;
-  }
-  const p=this.person(l.person_id);if(!p||p.status!=='active')return undefined;
-  this.db.prepare('UPDATE logins SET failed=0,locked_until=0 WHERE person_id=?').run(l.person_id);this.db.prepare('DELETE FROM login_fails WHERE person_id=?').run(l.person_id);return p;
- }
-
- private lastPurge=0;
- private purge(now:number){this.lastPurge=now;this.db.prepare('DELETE FROM sessions WHERE expires_at<? OR last_seen<?').run(now,now-IDLE_MS);}
- /** Random 32-byte token; only its sha256 is stored. Expired sessions are purged, and a person keeps at most 5 active ones (oldest dropped). */
- startSession(p:Person){
-  const token=randomBytes(32).toString('base64url');const now=this.now();this.purge(now);
-  this.db.prepare('INSERT INTO sessions(token_hash,person_id,expires_at,last_seen) VALUES(?,?,?,?)').run(sha(token),p.id,now+SESSION_MS,now);
-  this.db.prepare('DELETE FROM sessions WHERE person_id=? AND rowid NOT IN (SELECT rowid FROM sessions WHERE person_id=? ORDER BY rowid DESC LIMIT ?)').run(p.id,p.id,MAX_SESSIONS);
-  return{token,maxAgeSeconds:SESSION_MS/1000};
- }
- /** Absolute 12 h plus a 2 h idle timeout; last_seen is refreshed at most once a minute. */
- session(token:string):Person|undefined{
-  if(!token)return undefined;const now=this.now();if(now-this.lastPurge>5*60_000)this.purge(now);
-  const hash=sha(token),row=this.db.prepare('SELECT person_id,expires_at,last_seen FROM sessions WHERE token_hash=?').get(hash) as {person_id:string;expires_at:number;last_seen:number}|undefined;
-  if(!row||row.expires_at<now||row.last_seen<now-IDLE_MS){if(row)this.endSession(token);return undefined;}
-  if(now-row.last_seen>TOUCH_MS)this.db.prepare('UPDATE sessions SET last_seen=? WHERE token_hash=?').run(now,hash);
-  const p=this.person(row.person_id);return p&&p.status==='active'&&p.role!=='student'?p:undefined;
- }
- endSession(token:string){this.db.prepare('DELETE FROM sessions WHERE token_hash=?').run(sha(token));}
+ authenticate(username:string,password:string,ip:string):Promise<Person|undefined>{return this.auth.authenticate(username,password,ip,id=>{const p=this.person(id);return p&&p.status==='active'?p:undefined;});}
+ startSession(p:Person){return this.auth.startSession(p.id);}
+ session(token:string):Person|undefined{const id=this.auth.session(token),p=id?this.person(id):undefined;return p&&p.status==='active'&&p.role!=='student'?p:undefined;}
+ endSession(token:string){this.auth.endSession(token);}
 
  // Ledger postings
  /** Verified task: split the fee into pools and book what AIoT owes the school. */

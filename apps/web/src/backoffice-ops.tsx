@@ -2,8 +2,8 @@
 import {useCallback,useEffect,useMemo,useState,type FormEvent,type ReactNode} from 'react';
 import {useLang} from './i18n';
 import {Button,Eyebrow,Input,Notice,Select,Stat,StatGrid,Tag,Textarea} from './ui';
-import {idr,opsAdmin,type Commissions as CommissionData,type Me,type PayoutRow,type PersonView,type Summary,type TaskRow} from './ops-client';
-import {CHECK_STATES,INQUIRY_STATUSES,LOCALIZATION_ITEMS,ORG_STATUSES,ORG_TYPES,PRODUCT_STATUSES,SCHOOL_PACKAGES,type Inquiry,type Organization,type Product} from '../../../packages/ops-contract/index';
+import {idr,opsAdmin,type Commissions as CommissionData,type Me,type PayoutRow,type PersonView,type StaffView,type Summary,type TaskRow} from './ops-client';
+import {CHECK_STATES,INQUIRY_STATUSES,ROLES,LOCALIZATION_ITEMS,ORG_STATUSES,ORG_TYPES,PRODUCT_STATUSES,SCHOOL_PACKAGES,type Inquiry,type Organization,type Product} from '../../../packages/ops-contract/index';
 
 export const opsSections=[
  {hash:'#bo-inquiries',en:'Inquiries',id:'Inquiry'},
@@ -11,9 +11,10 @@ export const opsSections=[
  {hash:'#bo-products',en:'Products',id:'Produk'},
  {hash:'#bo-tasks',en:'Lab tasks',id:'Tugas lab'},
  {hash:'#bo-commissions',en:'Commissions & payouts',id:'Komisi & payout'},
+ {hash:'#bo-team',en:'Team',id:'Tim'},
 ];
-async function fetchAll():Promise<Data>{const [me,summary,inquiries,orgs,products,tasks,payouts,commissions,people]=await Promise.all([opsAdmin.me(),opsAdmin.summary(),opsAdmin.inquiries(),opsAdmin.organizations(),opsAdmin.products(),opsAdmin.tasks(),opsAdmin.payouts(),opsAdmin.commissions(),opsAdmin.people()]);return{me,summary,inquiries,orgs,products,tasks,payouts,commissions,people};}
-type Data={me:Me;summary:Summary;inquiries:Inquiry[];orgs:Organization[];products:Product[];tasks:TaskRow[];payouts:{payouts:PayoutRow[];totals:{dueIdr:number;paidIdr:number}};commissions:CommissionData;people:PersonView[]};
+async function fetchAll():Promise<Data>{const [me,summary,inquiries,orgs,products,tasks,payouts,commissions,people,team]=await Promise.all([opsAdmin.me(),opsAdmin.summary(),opsAdmin.inquiries(),opsAdmin.organizations(),opsAdmin.products(),opsAdmin.tasks(),opsAdmin.payouts(),opsAdmin.commissions(),opsAdmin.people(),opsAdmin.staff().catch(()=>undefined)]);return{me,summary,inquiries,orgs,products,tasks,payouts,commissions,people,team:me.role==='owner'?team:undefined};}
+type Data={me:Me;summary:Summary;inquiries:Inquiry[];orgs:Organization[];products:Product[];tasks:TaskRow[];payouts:{payouts:PayoutRow[];totals:{dueIdr:number;paidIdr:number}};commissions:CommissionData;people:PersonView[];team?:StaffView[]};
 const when=(iso:string,locale:string)=>new Date(iso).toLocaleString(locale,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 const tone=(status:string):'ok'|'warn'|'error'|'neutral'=>['won','active','available','verified','paid','done'].includes(status)?'ok':['new','submitted','in_progress','testing','localizing','proposal'].includes(status)?'warn':['lost','spam','rejected','ended','discontinued'].includes(status)?'error':'neutral';
 
@@ -50,6 +51,7 @@ export function BusinessOps(){
   <Products data={data} canWrite={write('products')} run={run}/>
   <Tasks data={data} canWrite={write('tasks')} run={run}/>
   <Commissions data={data} canPay={write('tasks')} canPeople={write('organizations')} run={run} locale={locale}/>
+  {data.team&&<Team data={data} team={data.team} run={run} locale={locale}/>}
  </>;
 }
 type Run=(action:()=>Promise<unknown>,ok:string)=>Promise<boolean>;
@@ -214,5 +216,32 @@ function Commissions({data,canPay,canPeople,run,locale}:{data:Data;canPay:boolea
    <th scope="row">{p.name}</th><td>{p.role}</td><td>{schoolName(p.orgId)}</td><td><code>{p.username}</code></td><td>{status(p)}</td>
    <td>{canPeople&&<div className="bo-ops-inline">{p.status==='active'&&<Button size="sm" variant="secondary" onClick={()=>void run(async()=>reveal(p.name,await opsAdmin.resetInvite(p.id)),tr('New invite code created','Kode undangan baru dibuat'))}>{tr('Reset invite','Reset undangan')}</Button>}<Button size="sm" variant="secondary" onClick={()=>void run(()=>opsAdmin.setPersonStatus(p.id,p.status==='active'?'disabled':'active'),p.status==='active'?tr('Person disabled','Orang dinonaktifkan'):tr('Person enabled','Orang diaktifkan'))}>{p.status==='active'?tr('Disable','Nonaktifkan'):tr('Enable','Aktifkan')}</Button></div>}</td>
   </tr>)}</tbody></table></div>}
+ </Section>;
+}
+
+/** Owner only: staff accounts for the admin host. Codes are shown once; accounts are disabled, never deleted. */
+function Team({data,team,run,locale}:{data:Data;team:StaffView[];run:Run;locale:string}){
+ const{tr}=useLang();const [form,setForm]=useState<{username:string;name:string;role:StaffView['role']}>({username:'',name:'',role:'sales'});const [invite,setInvite]=useState<{name:string;username:string;code:string}>();const [copied,setCopied]=useState(false);
+ const reveal=(s:StaffView,code:string)=>{setInvite({name:s.name,username:s.username,code});setCopied(false);};
+ const add=(e:FormEvent)=>{e.preventDefault();void run(async()=>{const r=await opsAdmin.createStaff({username:form.username.trim().toLowerCase(),name:form.name.trim(),role:form.role});reveal(r.staff,r.inviteCode);setForm(f=>({...f,username:'',name:''}));},tr('Person added','Orang ditambahkan'));};
+ const copy=()=>{if(invite)void navigator.clipboard?.writeText(invite.code).then(()=>setCopied(true));};
+ const status=(s:StaffView)=>s.status==='disabled'?<Tag tone="error">{tr('disabled','nonaktif')}</Tag>:s.activated?<Tag tone="ok">{tr('active','aktif')}</Tag>:s.inviteExpires?<Tag tone="warn">{tr('invite until','undangan s/d')} {new Date(s.inviteExpires).toLocaleDateString(locale,{day:'numeric',month:'short'})}</Tag>:<Tag>{tr('invite expired','undangan kedaluwarsa')}</Tag>;
+ return <Section id="bo-team" eyebrow={tr('Access','Akses')} title={tr('Team','Tim')}>
+  <p className="bo-muted">{tr('Staff sign in at this address with their own username and password. Roles decide what each person can change. Accounts are disabled, never deleted, and the last active owner cannot be removed. Codes are shown once and expire in 7 days.','Staf masuk di alamat ini dengan nama pengguna dan kata sandi masing-masing. Peran menentukan apa yang dapat diubah. Akun dinonaktifkan, tidak dihapus, dan owner aktif terakhir tidak dapat dihapus. Kode hanya tampil sekali dan kedaluwarsa dalam 7 hari.')}</p>
+  {invite&&<Notice tone="warn" title={tr(`Invite code for ${invite.name}`,`Kode undangan untuk ${invite.name}`)} action={<Button size="sm" variant="secondary" onClick={copy}>{copied?tr('Copied','Tersalin'):tr('Copy code','Salin kode')}</Button>}>
+   <span className="bo-ops-code" data-testid="staff-invite-code">{invite.code}</span> · {tr('username','nama pengguna')} <code>{invite.username}</code> <span>{tr('Shown once. Copy it now and hand it to the person; it cannot be displayed again, only replaced with a new code.','Tampil sekali. Salin sekarang dan serahkan ke orangnya; kode tidak dapat ditampilkan lagi, hanya diganti kode baru.')}</span> <Button size="sm" variant="secondary" onClick={()=>setInvite(undefined)}>{tr('I have copied it','Sudah saya salin')}</Button>
+  </Notice>}
+  <form className="bo-ops-form" onSubmit={add} aria-label={tr('Add a person','Tambah orang')}>
+   <Input id="tm-username" label={tr('Username','Nama pengguna')} hint="a-z 0-9 . _ -" required minLength={3} maxLength={40} autoCapitalize="none" value={form.username} onChange={e=>setForm({...form,username:e.target.value.toLowerCase()})}/>
+   <Input id="tm-name" label={tr('Name','Nama')} required value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
+   <Select id="tm-role" label={tr('Role','Peran')} value={form.role} onChange={e=>setForm({...form,role:e.target.value as StaffView['role']})}>{ROLES.map(r=><option key={r} value={r}>{r}</option>)}</Select>
+   <Button type="submit" size="sm" disabled={!/^[a-z0-9._-]{3,40}$/.test(form.username)||form.name.trim().length<2}>{tr('Add person','Tambah orang')}</Button>
+  </form>
+  <div className="bo-ops-table"><table><thead><tr><th scope="col">{tr('Name','Nama')}</th><th scope="col">{tr('Username','Nama pengguna')}</th><th scope="col">{tr('Role','Peran')}</th><th scope="col">{tr('Account','Akun')}</th><th scope="col">{tr('Action','Aksi')}</th></tr></thead><tbody>{team.map(s=>{const self=s.username===data.me.user;return <tr key={s.id}>
+   <th scope="row">{s.name}{self&&<small> · {tr('you','Anda')}</small>}</th><td><code>{s.username}</code></td>
+   <td><Select id={`tm-r-${s.id}`} hideLabel label={tr(`Role of ${s.name}`,`Peran ${s.name}`)} value={s.role} disabled={s.status==='disabled'} onChange={e=>void run(()=>opsAdmin.updateStaff(s.id,{role:e.target.value as StaffView['role']}),tr('Role changed','Peran diubah'))}>{ROLES.map(r=><option key={r} value={r}>{r}</option>)}</Select></td>
+   <td>{status(s)}</td>
+   <td><div className="bo-ops-inline">{s.status==='active'&&!self&&<Button size="sm" variant="secondary" onClick={()=>void run(async()=>{const r=await opsAdmin.resetStaffInvite(s.id);reveal(r.staff,r.inviteCode);},tr('New invite code created','Kode undangan baru dibuat'))}>{tr('Reset invite','Reset undangan')}</Button>}<Button size="sm" variant="secondary" onClick={()=>void run(()=>opsAdmin.updateStaff(s.id,{status:s.status==='active'?'disabled':'active'}),s.status==='active'?tr('Person disabled and signed out','Orang dinonaktifkan dan dikeluarkan'):tr('Person enabled','Orang diaktifkan'))}>{s.status==='active'?tr('Disable','Nonaktifkan'):tr('Enable','Aktifkan')}</Button></div></td>
+  </tr>;})}</tbody></table></div>
  </Section>;
 }

@@ -15,6 +15,7 @@
 .bo-topbar-label{padding-left:var(--ds-4);border-left:1px solid var(--ds-line);color:var(--ds-ink-2)}
 .bo-topbar-actions{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:var(--ds-3)}
 .bo-topbar-actions .ds-button{gap:6px}
+.bo-topbar-who{display:inline-flex;align-items:center;gap:var(--ds-2);font-size:var(--ds-text-small);font-weight:500}
 .bo-topbar-note{font:500 var(--ds-text-label)/1.4 var(--ds-mono);letter-spacing:var(--ds-track-label);text-transform:uppercase;color:var(--ds-ink-3)}
 
 /* Shell: sidebar + main */

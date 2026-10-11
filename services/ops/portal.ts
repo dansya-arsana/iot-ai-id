@@ -1,11 +1,11 @@
 /** School portal API (ADR 010): /ops/v1/portal/*. Cookie session, CSRF header on mutations, every read and write scoped to the session's school. */
 import {AllocationDecisionSchema,AllocationProposalSchema,EvidenceSchema,PersonUpdateSchema,PortalActivateSchema,PortalLoginSchema,PortalPersonInputSchema,payoutSplit,portalCan,taskTransition,type Allocation,type Batch,type LabTask,type Organization,type PortalAction} from '../../packages/ops-contract/index.js';
 import type {Ops,OpsCall,OpsResult} from './ops.js';
-import {fail,parse} from './http.js';
+import {cookieValue as cookie,fail,parse,setCookie as cookieHeader} from './http.js';
 
 const COOKIE='aiot_portal',PATH='/ops/v1/portal';
-const cookieValue=(header:string|undefined)=>{for(const part of (header??'').split(';')){const [k,...v]=part.trim().split('=');if(k===COOKIE)return v.join('=');}return'';};
-const setCookie=(value:string,maxAge:number,plainLoopback:boolean)=>`${COOKIE}=${value}; Path=${PATH}; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${plainLoopback?'':'; Secure'}`;
+const cookieValue=(header:string|undefined)=>cookie(header,COOKIE);
+const setCookie=(value:string,maxAge:number,plainLoopback:boolean)=>cookieHeader(COOKIE,PATH,value,maxAge,plainLoopback);
 const ok=(data:unknown,status=200):OpsResult=>({status,data});
 const tooMany={status:429,data:{error:'Too many attempts. Please wait a few minutes and try again.'}};
 

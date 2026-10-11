@@ -4,6 +4,7 @@ import {useEffect, useState, useCallback, useRef, type ReactNode} from 'react';
 import {Link} from 'react-router-dom';
 import {ArrowClockwiseIcon, ArrowUpRightIcon, PlusIcon} from '@phosphor-icons/react';
 import {api} from './api';
+import type {StaffMe} from './ops-client';
 import {isAdminHost,PUBLIC_SITE} from './host';
 import {useLang} from './i18n';
 import {Brand} from './site-shell';
@@ -51,12 +52,12 @@ function Panel({id, className, eyebrow, title, aside, children}: {id?: string; c
   </section>;
 }
 
-export function Backoffice() {
+export function Backoffice({staff}: {staff?: {me: StaffMe; onSignOut: () => void}} = {}) {
   const {tr, lang} = useLang();
   const locale = lang === 'id' ? 'id-ID' : 'en-GB';
   const [hash,setHash]=useState(()=>window.location.hash);
   useEffect(()=>{const sync=()=>setHash(window.location.hash);window.addEventListener('hashchange',sync);window.addEventListener('popstate',sync);return()=>{window.removeEventListener('hashchange',sync);window.removeEventListener('popstate',sync);};},[]);
-  const activeSection=['#bo-ringkasan','#bo-eksperimen','#bo-proyek','#bo-runtime','#bo-ai'].includes(hash)?hash:'#bo-ringkasan';
+  const activeSection=['#bo-ringkasan','#bo-eksperimen','#bo-proyek','#bo-runtime','#bo-ai','#bo-team'].includes(hash)?hash:'#bo-ringkasan';
   const [data, setData] = useState<any>();
   const [status, setStatus] = useState<any>();
   const [comparisons, setComparisons] = useState<any>();
@@ -109,7 +110,7 @@ export function Backoffice() {
   const label = (map: Record<string, Pair>, key: string) => map[key] ? tr(map[key][0], map[key][1]) : key;
   const topbar = (actions?: ReactNode) => <header className="bo-topbar">
     <div className="bo-topbar-brand"><Brand/><Eyebrow as="span" className="bo-topbar-label">{tr('Backoffice','Backoffice')}</Eyebrow></div>
-    <div className="bo-topbar-actions"><LangToggle/>{actions}</div>
+    <div className="bo-topbar-actions">{staff && <span className="bo-topbar-who" data-testid="staff-who"><span>{staff.me.name}</span><Tag>{staff.me.role}</Tag></span>}<LangToggle/>{actions}{staff && <Button size="sm" variant="secondary" onClick={staff.onSignOut}>{tr('Sign out','Keluar')}</Button>}</div>
   </header>;
 
   if (!data) return <div className="bo-app">
@@ -155,7 +156,7 @@ export function Backoffice() {
       <aside className="bo-sidebar">
         <Eyebrow className="bo-sidebar-label">{tr('Workspace','Ruang kerja')}</Eyebrow>
         <nav aria-label={tr('Backoffice navigation','Navigasi backoffice')}>
-          {sections.map(s => <a key={s.hash} href={s.hash} aria-current={activeSection === s.hash ? 'location' : undefined}>{tr(s.en, s.id)}</a>)}
+          {sections.filter(s => s.hash !== '#bo-team' || !staff || staff.me.role === 'owner').map(s => <a key={s.hash} href={s.hash} aria-current={activeSection === s.hash ? 'location' : undefined}>{tr(s.en, s.id)}</a>)}
         </nav>
         <Eyebrow className="bo-sidebar-label">{tr('Site','Situs')}</Eyebrow>
         <nav aria-label={tr('Site links','Tautan situs')} className="bo-sidebar-secondary">

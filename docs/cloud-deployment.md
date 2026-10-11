@@ -5,8 +5,8 @@ The main website serves landing pages, documentation, downloads and static asset
 | Host | Purpose | Authentication |
 |---|---|---|
 | iot.ai.id | Public landing, documentation, downloads and static pages | None; /api/* returns JSON 403 without a login challenge |
-| admin.iot.ai.id | Backoffice at / (old /backoffice links redirect) | Testing workspace login |
-| api.iot.ai.id | Local API proxy at /api/* | Testing workspace login plus X-IOT-Session |
+| admin.iot.ai.id | Landing and sign-in at /, backoffice after sign-in (old /backoffice links redirect) | Per-person staff login (cookie `aiot_admin`); no HTTP Basic |
+| api.iot.ai.id | Local API proxy at /api/* | HTTP Basic (testing workspace login) plus X-IOT-Session; unchanged |
 | edge.iot.ai.id | Coordinator at /v1/* | Scoped node/owner bearer token |
 | iot.ai.id/ops/v1/ | Partner inquiries (POST), tested catalog and Lab Mitra board (GET) | None; rate-limited; /ops/v1/admin/ returns 404 |
 | iot.ai.id/ops/v1/portal/ | Lab Mitra school portal API (all methods) used by `/mitra` | Invite code, password and the `aiot_portal` cookie; `X-AIoT-Portal: 1` on writes; nginx zones `iot_portal` (20 r/m) and `iot_portal_auth` (5 r/m on login and activate) |
@@ -49,7 +49,21 @@ The school portal (ADR 010) is served by the same ops service under `/ops/v1/por
 
 The ops service (ADR 009) keeps inquiries, organizations, products and Lab Mitra tasks in its own volume. Work them in the backoffice at `#bo-inquiries`, `#bo-orgs`, `#bo-products` and `#bo-tasks`; the API forwards these requests to `iot-ai-ops:8791` with the owner token and the gateway login as `X-Remote-User`.
 
-Roles follow the HTTP Basic login. To add a teammate, add their user to the gateway htpasswd file for the admin and API hosts. Then set `OPS_ROLES=owner-user:owner,sales-user:sales,ops-user:ops,viewer-user:viewer` in `ops.env` and restart `api` and `ops`. Users not listed get 403 on business panels; an empty `OPS_ROLES` makes every gateway user owner.
+## Staff login on the admin host (ADR 009 addendum)
+
+admin.iot.ai.id no longer uses HTTP Basic. The page at `/` is a landing with Sign in and Activate invite. Staff accounts (username, name, role owner, sales, ops or viewer) live in the ops database and reuse the school portal's login core: 7-day single-use invite codes, scrypt passwords of at least 10 characters, lockout after 5 failures per person and IP (30 per person) for 15 minutes, sessions with a 2 h idle and 12 h absolute limit (max 5), and the `aiot_admin` cookie (HttpOnly, SameSite=Strict, Secure behind nginx, Path=/). Writes need the `X-AIoT-Staff: 1` header.
+
+How a request is authorized: nginx runs `auth_request /_staff_check` for every `/api/` call. That internal location calls the ops service at `/ops/v1/staff/check`, which answers 204 with `X-Staff-User` and `X-Staff-Role` for a live session (refreshing its idle time) or 401. nginx passes the username on as `X-Remote-User`, and the role comes from the staff account. `/ops/v1/staff/check` is internal only: the admin host returns 404 for it, and the ops service itself is never published. The public auth routes are `/ops/v1/staff/login`, `activate`, `logout` and `me`; `login` and `activate` use the `iot_staff_auth` zone (5 per minute, burst 3), the rest `iot_portal`. The repo `deploy/nginx.conf` carries these blocks and the new zone; they take effect only after the next nginx deploy.
+
+Bootstrap the first owner once, on the server, against the ops database (the CLI prints only the code and its expiry):
+
+```
+docker compose -f compose.yml exec -T ops node --import tsx services/ops/cli.ts staff-invite <username> owner "Full Name"
+```
+
+Run it with `OPS_DB` pointing at the same file the ops service uses (it is already set in the container). Open admin.iot.ai.id, choose Activate invite and set a password. The CLI refuses to create a second owner while an active owner exists unless `--force` is passed; re-running it for an existing person only issues a new invite. After that, the owner manages everyone in the backoffice under `#bo-team`: add a person (the code is shown once), change a role, disable (ends their sessions) or reset an invite. Accounts are never deleted, and the last active owner cannot be disabled or demoted.
+
+Role resolution: an `X-Ops-User` that matches a staff account uses that account's role (a disabled account gets none). Other users fall back to `OPS_ROLES`, and with no `OPS_ROLES` an install is single-owner, which keeps the desktop app and local dev unchanged. Local hosts keep `/backoffice` with no staff login. api.iot.ai.id still uses HTTP Basic.
 
 Conversion tracking stays off until `VITE_GA4_ID` or `VITE_META_PIXEL_ID` is set for the web build; visitors must accept the consent banner before any tag loads.
 

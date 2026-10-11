@@ -50,4 +50,14 @@ Analytics (GA4, Meta Pixel) loads only after consent, and only if `VITE_GA4_ID` 
 - The owner API stays closed to the public. A compromise of the public intake reaches only the ops database, not projects or AI keys.
 - Notifications are an inbox in the backoffice only. Email or WhatsApp alerts need a mailbox or API account first.
 - Payouts are recorded, not executed: marking a task paid is a bookkeeping step after a manual transfer.
-- Multi-user roles depend on the gateway's HTTP Basic users. Per-user accounts with their own passwords remain future work.
+- Multi-user roles originally depended on the gateway's HTTP Basic users; the addendum below replaces that on the admin host.
+
+## Addendum: staff accounts replace HTTP Basic on the admin host
+
+admin.iot.ai.id sat behind one shared nginx Basic login. It now has per-person staff accounts with the existing roles (owner, sales, ops, viewer):
+
+- Accounts live in the ops database and reuse the school portal's auth core (`services/ops/auth.ts`, extracted from the commissions module): invite codes, scrypt passwords, lockout, hashed sessions, CSRF header. Usernames are unique across staff and school people. Accounts are disabled, never deleted, with a history; disabling ends sessions, and the last active owner cannot be disabled or demoted.
+- nginx authorizes `/api/` with `auth_request` against the internal `GET /ops/v1/staff/check` (204 with `X-Staff-User` and `X-Staff-Role`, or 401). The route is not proxied publicly; the ops service is internal-only, so it accepts the call from any caller.
+- An `X-Ops-User` that matches a staff account takes that account's role. Other names fall back to `OPS_ROLES`, then to single-owner, so the desktop app and dev setups are unchanged.
+- The first owner is created on the server with `services/ops/cli.ts staff-invite`; the CLI refuses a second owner unless `--force` is passed. The owner then manages the team in the backoffice (`#bo-team`).
+- api.iot.ai.id keeps HTTP Basic. Not done: email or SSO sign-in, password reset by email (an owner resets the invite instead) and a staff audit view beyond each account's history.

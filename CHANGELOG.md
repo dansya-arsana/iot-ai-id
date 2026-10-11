@@ -10,6 +10,12 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 - Tasks are marked paid when their payout batch is marked paid; the per-task "Mark paid" action is removed. Tasks can carry a lead teacher set at assignment.
 
 ### Added
+- Staff accounts for the admin host (ADR 009 addendum):
+  - `admin.iot.ai.id` replaces HTTP Basic with a landing page and per-person login (owner, sales, ops, viewer): invite activation, password login with lockout, `aiot_admin` session cookie, and a signed-in name, role and Sign out in the backoffice header.
+  - Owner-only Team section (`#bo-team`) to add people (one-time invite code), change roles, disable and reset invites; the last active owner is protected.
+  - Ops routes `/ops/v1/staff/{activate,login,logout,me}`, owner routes `/ops/v1/admin/staff`, and the internal `GET /ops/v1/staff/check` for nginx `auth_request`. Login, invite and session code is shared with the school portal (`services/ops/auth.ts`).
+  - Bootstrap CLI: `node --import tsx services/ops/cli.ts staff-invite <username> <role> [name] [--force]`.
+  - Nginx (repo copy; deploy separately): admin host drops Basic auth, adds `auth_request` on `/api/`, the `iot_staff_auth` zone and a 404 for the public `/ops/v1/staff/check`. The API host keeps Basic.
 - Lab Mitra commissions (ADR 010):
   - Append-only commission ledger (SQLite triggers reject UPDATE and DELETE; corrections are reversal rows) with balances derived by SUM.
   - School portal at `/mitra` for school admins and teachers, served at `/ops/v1/portal/*`: invite-code activation, password login with lockout, `aiot_portal` session cookie, CSRF header, strict per-school isolation.

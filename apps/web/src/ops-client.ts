@@ -1,6 +1,6 @@
 /** Browser client for the ops service: public routes go to /ops/v1, owner routes through the session-guarded /api/ops proxy. */
 import {api,apiDownload,saveBlob} from './api';
-import type {Inquiry,InquiryInput,Organization,Product,LabTask,PublicProduct,Role,Resource,Person,Allocation,Batch,Share} from '../../../packages/ops-contract/index';
+import type {Inquiry,InquiryInput,Organization,Product,LabTask,PublicProduct,Role,Resource,Person,Allocation,Batch,Share,Staff} from '../../../packages/ops-contract/index';
 
 export class OpsError extends Error{constructor(message:string,readonly status:number,readonly issues:{path:string;message:string}[]=[]){super(message);}}
 async function publicCall<T>(path:string,init?:RequestInit):Promise<T>{
@@ -35,6 +35,10 @@ export const opsAdmin={
  createTask:(input:{title:string;feeIdr:number;labId?:string;leadId?:string;productId?:string;instructions?:string})=>admin<LabTask>('tasks','POST',input),
  taskAction:(id:string,input:{action:string;labId?:string;leadId?:string;evidenceRef?:string;note?:string})=>admin<LabTask>(`tasks/${id}`,'PATCH',input),
  payouts:()=>admin<{payouts:PayoutRow[];totals:{dueIdr:number;paidIdr:number}}>('payouts'),
+ staff:()=>admin<{staff:StaffView[]}>('staff').then(d=>d.staff),
+ createStaff:(input:{username:string;name:string;role:Role})=>admin<{staff:StaffView;inviteCode:string}>('staff','POST',input),
+ updateStaff:(id:string,changes:{role?:Role;status?:'active'|'disabled'})=>admin<StaffView>(`staff/${id}`,'PATCH',changes),
+ resetStaffInvite:(id:string)=>admin<{staff:StaffView;inviteCode:string}>(`staff/${id}/invite`,'POST',{}),
  people:()=>admin<{people:PersonView[]}>('people').then(d=>d.people),
  createSchoolAdmin:(input:{orgId:string;name:string})=>admin<{person:PersonView;inviteCode:string}>('people','POST',input),
  resetInvite:(id:string)=>admin<{person:PersonView;inviteCode:string}>(`people/${id}/invite`,'POST',{}),
@@ -82,3 +86,19 @@ export const portal={
  downloadBatch:async(id:string)=>{const response=await fetch(`/ops/v1/portal/batches/${id}/csv`,{credentials:'same-origin'});if(!response.ok)throw new OpsError('Download failed',response.status);saveBlob(await response.blob(),`batch-${id.slice(0,8)}.csv`);},
 };
 export const idr=(n:number)=>'Rp'+n.toLocaleString('id-ID');
+
+// Staff login on the admin host: cookie session (aiot_admin), CSRF header on every write. A 401 means signed out.
+export type StaffView=Staff&{activated:boolean;inviteExpires?:string};
+export type StaffMe={username:string;name:string;role:Role};
+async function staffCall<T>(path:string,method='GET',body?:unknown):Promise<T>{
+ const response=await fetch('/ops/v1/staff'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json','X-AIoT-Staff':'1'},...(body===undefined?{}:{body:JSON.stringify(body)})});
+ const data=await response.json().catch(()=>({error:'The service did not answer'}));
+ if(!response.ok)throw new OpsError(data.error??'Request failed',response.status,data.issues);
+ return data;
+}
+export const staffAuth={
+ me:()=>staffCall<StaffMe>('/me'),
+ login:(username:string,password:string)=>staffCall<StaffMe>('/login','POST',{username,password}),
+ activate:(code:string,password:string)=>staffCall<StaffMe>('/activate','POST',{code,password}),
+ logout:()=>staffCall<{ok:true}>('/logout','POST',{}),
+};
