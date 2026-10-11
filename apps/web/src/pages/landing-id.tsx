@@ -11,10 +11,10 @@ export const waLink=(text:string)=>`https://wa.me/${WA_NUMBER}?text=${encodeURIC
 const WA_DISPLAY='+62 812-114-040';
 
 const msg={
- general:'Halo iot.ai.id, saya tertarik dengan Program Lab Mitra untuk sekolah kami. Nama sekolah: … Kota: …',
- guru:'Halo iot.ai.id, saya mau daftar Paket Guru (Rp1.490.000/guru). Nama: … Sekolah: … Jumlah guru: …',
- lab:'Halo iot.ai.id, saya mau daftar Paket Lab Mitra Sekolah (Rp9.900.000). Nama sekolah: … Kota: … Kontak kepala sekolah/guru: …',
- agency:'Halo iot.ai.id, kami agency/yayasan dan ingin paket untuk beberapa sekolah. Lembaga: … Jumlah sekolah: … Wilayah: …',
+ general:'Halo AIoT, saya tertarik dengan Program Lab Mitra untuk sekolah kami. Nama sekolah: … Kota: …',
+ guru:'Halo AIoT, saya mau daftar Paket Guru (Rp1.490.000/guru). Nama: … Sekolah: … Jumlah guru: …',
+ lab:'Halo AIoT, saya mau daftar Paket Lab Mitra Sekolah (Rp9.900.000). Nama sekolah: … Kota: … Kontak kepala sekolah/guru: …',
+ agency:'Halo AIoT, kami agency/yayasan dan ingin paket untuk beberapa sekolah. Lembaga: … Jumlah sekolah: … Wilayah: …',
 };
 
 const rates:[string,string,string][]=[
@@ -61,7 +61,7 @@ export function LandingID(){
  const example=150000;
  return <div className="lid">
   <header className="lid-header">
-   <Link to="/id" className="lid-brand" aria-label="iot.ai.id Indonesia"><DotMark className="lid-brand-mark" label=""/><span>iot.ai.id</span></Link>
+   <Link to="/id" className="lid-brand" aria-label="AIoT Indonesia"><DotMark className="lid-brand-mark" label=""/><span>AIoT</span></Link>
    <nav aria-label="Navigasi halaman"><a href="#cara-kerja">Cara kerja</a><a href="#paket">Paket & harga</a><a href="#papan">Papan</a><a href="#faq">FAQ</a></nav>
    <Link className="lid-global" to="/" onClick={()=>rememberRegion('global')} hrefLang="en">Global site (EN)</Link>
    <Wa kind="general" className="lid-btn lid-btn--dark lid-btn--sm">Daftar</Wa>
@@ -128,7 +128,7 @@ export function LandingID(){
    </section>
   </main>
 
-  <footer className="lid-footer"><span>© 2026 iot.ai.id · Program Lab Mitra</span><span>Foto adalah ilustrasi. Sertifikat diterbitkan iot.ai.id, bukan BNSP.</span><Link to="/" onClick={()=>rememberRegion('global')} hrefLang="en">Global site (EN) <ArrowUpRightIcon size={12}/></Link></footer>
+  <footer className="lid-footer"><span>© 2026 AIoT · iot.ai.id · Program Lab Mitra</span><span>Foto adalah ilustrasi. Sertifikat diterbitkan iot.ai.id, bukan BNSP.</span><Link to="/" onClick={()=>rememberRegion('global')} hrefLang="en">Global site (EN) <ArrowUpRightIcon size={12}/></Link></footer>
   <Wa kind="general" className="lid-btn lid-btn--dark lid-sticky">Daftar via WhatsApp</Wa>
  </div>;
 }

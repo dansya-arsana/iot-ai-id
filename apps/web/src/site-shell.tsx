@@ -24,7 +24,7 @@ const groups:{en:string;id:string;items:NavItem[]}[]=[
 ];
 
 export function Brand({wordmark=true}:{wordmark?:boolean}){
- return <Link to="/" className="ds-brand" aria-label="iot.ai.id home"><DotMark className="ds-brand-mark" label=""/>{wordmark&&<span>iot.ai.id</span>}</Link>;
+ return <Link to="/" className="ds-brand" aria-label="AIoT home"><DotMark className="ds-brand-mark" label=""/>{wordmark&&<span>AIoT</span>}</Link>;
 }
 function Item({item,onNavigate}:{item:NavItem;onNavigate?:()=>void}){
  const{tr}=useLang();
@@ -73,7 +73,7 @@ export function SiteFooter({className,...rest}:{className?:string;'data-enter'?:
    <div><span>{tr('Build','Bangun')}</span><Link to="/docs">{tr('Docs','Dokumentasi')}</Link><Link to="/api">API</Link><a href={RELEASES}>{tr('Desktop app','Aplikasi desktop')}</a></div>
    <div><span>{tr('Company','Perusahaan')}</span><a href={PARTNERSHIP_BRIEF} download>{tr('Partnership brief','Partnership brief')}</a><Link to="/research">{tr('Research','Riset')}</Link><a href={REPOSITORY}>GitHub <ArrowUpRightIcon size={12}/></a><Link to="/id" hrefLang="id" onClick={()=>rememberRegion('id')}>{tr('Indonesia: SMK program','Program SMK Indonesia')}</Link></div>
   </nav>
-  <div className="ds-footer-bottom"><span>{tr('INDONESIA · TESTED WHERE IT MATTERS.','INDONESIA · DIUJI DI TEMPAT YANG PENTING.')}</span><span>© 2026 iot.ai.id</span></div>
+  <div className="ds-footer-bottom"><span>{tr('TESTED IN INDONESIA. READY FOR INDONESIA.','DIUJI DI INDONESIA. SIAP UNTUK INDONESIA.')}</span><span>© 2026 AIoT · iot.ai.id</span></div>
  </footer>;
 }
 

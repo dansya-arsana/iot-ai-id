@@ -22,6 +22,6 @@ test('Indonesian SMK landing sells the program and every CTA opens WhatsApp',asy
  await expect(page.locator('.lid-faq details').first()).toHaveAttribute('open','');
  await page.locator('.lid-header').getByRole('link',{name:'Global site (EN)'}).click();
  await expect(page).toHaveURL(/\/$/);
- await expect(page.getByRole('heading',{level:1})).toContainText('Testing robots');
+ await expect(page.getByRole('heading',{level:1})).toContainText('gateway for AI robotics');
  expect((await context.cookies()).find(c=>c.name==='iot_region')?.value).toBe('global');
 });

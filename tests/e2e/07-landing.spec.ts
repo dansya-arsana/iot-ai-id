@@ -4,7 +4,7 @@ test('landing has original visual, usable navigation and real destinations',asyn
  await page.goto('/');
  await expect(page.locator('.result-landing')).toHaveAttribute('data-ready','true');
  await expect(page.locator('.rl-loader')).toBeHidden();
- await expect(page.getByRole('heading',{level:1})).toHaveText(/Testing robots\s*and sensors where\s*the world is messy\./);
+ await expect(page.getByRole('heading',{level:1})).toHaveText(/The real-world\s*gateway for AI robotics\s*in Indonesia\./);
  const capsule=page.locator('.rl-capsule');
  await expect(capsule).toBeVisible();
  expect(await capsule.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0)).toBe(true);
@@ -28,12 +28,12 @@ test('landing has original visual, usable navigation and real destinations',asyn
 test('language toggle switches the landing to Indonesian and remembers it',async({page})=>{
  await page.goto('/');
  await page.locator('.ds-header').getByRole('button',{name:'ID',exact:true}).click();
- await expect(page.getByRole('heading',{level:1})).toHaveText(/Menguji robot/);
+ await expect(page.getByRole('heading',{level:1})).toHaveText(/Gerbang AI robotika/);
  await expect(page.locator('html')).toHaveAttribute('lang','id');
  await page.reload();
- await expect(page.getByRole('heading',{level:1})).toHaveText(/Menguji robot/);
+ await expect(page.getByRole('heading',{level:1})).toHaveText(/Gerbang AI robotika/);
  await page.locator('.ds-header').getByRole('button',{name:'EN',exact:true}).click();
- await expect(page.getByRole('heading',{level:1})).toHaveText(/Testing robots/);
+ await expect(page.getByRole('heading',{level:1})).toHaveText(/gateway for AI robotics/);
 });
 
 test('reduced motion reveals all content immediately and Learn stays usable',async({page})=>{

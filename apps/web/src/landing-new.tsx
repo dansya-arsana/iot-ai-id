@@ -11,8 +11,8 @@ const partnership='/partnership-brief.txt';
 const copy={
  en:{
   nav:['Scenarios','Verification','Network'],cta:'Partner with us',menu:'Menu',close:'Close',skip:'Skip to content',loader:'FROM THE FIELD. INTO EVIDENCE.',
-  eyebrow:'INDONESIA · REAL-WORLD HARDWARE VERIFICATION',title:['Testing robots','and sensors where','the world is messy.'],
-  lead:'Heat, humidity, unstable power and field conditions. Turned into verifiable evidence for robotics and AI teams.',heroCta:'Explore field testing',
+  eyebrow:'INDONESIA · TESTING · DISTRIBUTION · DATA',title:['The real-world','gateway for AI robotics','in Indonesia.'],
+  lead:'Tested in Indonesian heat, humidity and unstable power. Localized, brought to market, and returned to your team as real-world data.',heroCta:'Explore field testing',
   specimens:['Field telemetry node','Tactile sensor module'],renders:'CONCEPT RENDERS · NOT AVAILABLE PRODUCTS',scroll:'SCROLL ↓',
   gapIndex:'01',gapMeta:'THE GAP',gapText:'Robots and hardware agents learn from clean benchmarks and tidy datasheets. Real deployments fail on drift, corrosion, noise and power loss, and that experience is rarely recorded in a form a machine can use.',
   gapTitle:['AI can write firmware.','It has never felt','a monsoon.'],gapMetrics:[['70–90%','RELATIVE HUMIDITY'],['25–35°C','AMBIENT HEAT'],['17,000+','ISLANDS TO REACH']],gapNote:'Typical Indonesian conditions, not test results.',
@@ -33,8 +33,8 @@ const copy={
  },
  id:{
   nav:['Skenario','Verifikasi','Jaringan'],cta:'Jadi partner',menu:'Menu',close:'Tutup',skip:'Lewati ke konten',loader:'DARI LAPANGAN. JADI BUKTI.',
-  eyebrow:'INDONESIA · VERIFIKASI HARDWARE DI DUNIA NYATA',title:['Menguji robot','dan sensor di dunia','yang berantakan.'],
-  lead:'Panas, lembap, listrik tidak stabil, dan kondisi lapangan. Diubah menjadi bukti terverifikasi untuk tim robotika dan AI.',heroCta:'Lihat uji lapangan',
+  eyebrow:'INDONESIA · UJI · DISTRIBUSI · DATA',title:['Gerbang AI robotika','ke Indonesia.'],
+  lead:'Diuji di lapangan, siap dipasarkan. Panas, lembap, dan listrik tidak stabil Indonesia jadi data nyata untuk tim robotika dan AI.',heroCta:'Lihat uji lapangan',
   specimens:['Node telemetri lapangan','Modul sensor taktil'],renders:'RENDER KONSEP · BUKAN PRODUK YANG DIJUAL',scroll:'GULIR ↓',
   gapIndex:'01',gapMeta:'CELAHNYA',gapText:'Robot dan agent hardware belajar dari benchmark bersih dan datasheet rapi. Deployment nyata gagal karena drift, korosi, noise, dan listrik padam, dan pengalaman itu jarang dicatat dalam bentuk yang bisa dipakai mesin.',
   gapTitle:['AI bisa menulis firmware.','Tapi belum pernah','kena musim hujan.'],gapMetrics:[['70–90%','KELEMBAPAN RELATIF'],['25–35°C','SUHU LINGKUNGAN'],['17.000+','PULAU UNTUK DIJANGKAU']],gapNote:'Kondisi umum di Indonesia, bukan hasil uji.',
@@ -100,7 +100,7 @@ export function Landing(){
  useEffect(()=>{if(!hash)return;const id=window.setTimeout(()=>document.getElementById(hash.slice(1))?.scrollIntoView({behavior:reduced()?'auto':'smooth'}),reduced()?0:1500);return()=>clearTimeout(id);},[hash]);
  const slide=(dir:number)=>{const r=rail.current;if(r)r.scrollBy({left:dir*r.clientWidth*.8,behavior:reduced()?'auto':'smooth'});};
  return <div ref={root} className="result-landing">
-  <div className="rl-loader" role="status" aria-label="Loading"><DotMark animated className="rl-loader-mark" label="iot.ai.id"/><span className="rl-loader-word" aria-hidden="true">{'iot.ai.id'.split('').map((ch,i)=><i key={i} style={{'--i':i} as CSSProperties}>{ch}</i>)}</span><small>{t.loader}</small></div>
+  <div className="rl-loader" role="status" aria-label="Loading"><DotMark animated className="rl-loader-mark" label="AIoT"/><span className="rl-loader-word" aria-hidden="true">{'AIoT'.split('').map((ch,i)=><i key={i} style={{'--i':i} as CSSProperties}>{ch}</i>)}</span><small>{t.loader}</small></div>
   <a className="rl-skip" href="#landing-main">{t.skip}</a>
   <SiteHeader overlay data-enter/>
   <main id="landing-main" tabIndex={-1}>

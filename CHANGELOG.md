@@ -6,6 +6,11 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+### Changed
+- Brand name is now **AIoT**; the domain stays `iot.ai.id`. Header, loader, footer, tab titles, Open Graph and JSON-LD use the new name (`alternateName: iot.ai.id`).
+- Positioning: "The real-world gateway for AI robotics in Indonesia": field testing, localization, distribution and real-world data. New hero copy in EN and ID, footer line "Tested in Indonesia. Ready for Indonesia.", updated `llms.txt` pitch.
+- WhatsApp prefilled messages on `/id` greet AIoT.
+
 ## [0.5.0] - 2026-10-11
 
 Device adapter specification and release tooling.

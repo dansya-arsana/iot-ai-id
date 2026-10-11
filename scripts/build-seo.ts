@@ -11,7 +11,7 @@ const today=new Date().toISOString().slice(0,10);
 const template=readFileSync(join(OUT,'index.html'),'utf8');
 const esc=(s:string)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-const pitch='iot.ai.id tests robotics, sensor and IoT hardware in real Indonesian field conditions (heat, 70–90% humidity, unstable power, intermittent networks) and returns machine-readable, verifiable evidence for engineering and AI teams.';
+const pitch='AIoT (iot.ai.id) is the real-world gateway for AI robotics in Indonesia. We test robotics, sensor and IoT hardware in real Indonesian field conditions (heat, 70–90% humidity, unstable power, intermittent networks), help vendors localize and bring it to market, and return machine-readable, verifiable real-world data to engineering and AI teams.';
 const scenarios:[string,string,string[]][]=[
  ['Aquaculture ponds','Water quality telemetry over brackish water.',['Humidity','Corrosion','Remote power']],
  ['Greenhouses & plantations','Soil and climate sensing under tropical heat.',['Sensor drift','Heat','Intermittent network']],
@@ -28,7 +28,7 @@ const steps:[string,string][]=[
 ];
 const offers=['Environmental stress testing','Field pilot deployments','Failure and recovery datasets'];
 const faq:[string,string][]=[
- ['What is iot.ai.id?',pitch],
+ ['What is AIoT?',pitch],
  ['Who is it for?','Robotics companies (for example dexterous hand and tactile sensor makers), sensor and IoT hardware manufacturers, and AI teams that need verified physical-world data.'],
  ['Why Indonesia?','Tropical field environments, diverse deployment sites, close access to the low-cost component supply chain, and vocational electronics and mechatronics talent to operate lab benches and field sites.'],
  ['What do partners receive?','Evidence records linking a hardware configuration, the test conditions, measurements and the outcome, including failures and recovery history.'],
@@ -70,7 +70,7 @@ const home=`<main>${nav}
 <h2>For robotics, sensor and AI teams</h2>${list(offers)}<p><a href="/partnership-brief.txt">Download the partnership brief</a></p>
 <h2>FAQ</h2>${faq.map(([q,a])=>`<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join('')}
 </main>`;
-render({path:'/',alternates:true,title:'iot.ai.id — Testing robots and sensors where the world is messy.',description:'Real-world hardware verification from Indonesia. We test robotics, sensor and IoT hardware in humid, hot, unstable field conditions and return verifiable evidence for engineering and AI teams.',body:home,
+render({path:'/',alternates:true,title:'AIoT — The real-world gateway for AI robotics in Indonesia.',description:'Real-world hardware verification from Indonesia. We test robotics, sensor and IoT hardware in humid, hot, unstable field conditions and return verifiable evidence for engineering and AI teams.',body:home,
  jsonld:{'@context':'https://schema.org','@type':'FAQPage',mainEntity:faq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))}});
 
 const idFaq:[string,string][]=[
@@ -80,7 +80,7 @@ const idFaq:[string,string][]=[
  ['Apakah sertifikatnya BNSP?','Bukan. Sertifikat pelatihan 32 JP diterbitkan oleh iot.ai.id.'],
  ['Bagaimana cara daftar?','Chat WhatsApp +62 812-114-040. Kami kirim penawaran resmi dan invoice atas nama sekolah.'],
 ];
-render({path:'/id',lang:'id',alternates:true,title:'Program Lab Mitra SMK — pelatihan IoT & tugas uji berbayar | iot.ai.id',description:'Lab SMK Anda bisa dibayar untuk menguji hardware. Pelatihan IoT untuk guru dan siswa, lalu tugas uji berbayar mulai Rp75.000 per tugas. Daftar via WhatsApp.',
+render({path:'/id',lang:'id',alternates:true,title:'Program Lab Mitra SMK — pelatihan IoT & tugas uji berbayar | AIoT',description:'Lab SMK Anda bisa dibayar untuk menguji hardware. Pelatihan IoT untuk guru dan siswa, lalu tugas uji berbayar mulai Rp75.000 per tugas. Daftar via WhatsApp.',
  body:`<main><nav><a href="/">Global site (EN)</a> · <a href="/hardware">Hardware library</a></nav>
 <h1>Lab SMK Anda bisa dibayar untuk menguji hardware.</h1>
 <p>Program Lab Mitra iot.ai.id melatih guru dan siswa SMK di bidang IoT, lalu mengirim tugas uji hardware dari perusahaan robotika dan sensor ke lab sekolah. Setiap tugas yang lulus dibayar.</p>
@@ -90,7 +90,7 @@ render({path:'/id',lang:'id',alternates:true,title:'Program Lab Mitra SMK — pe
  jsonld:{'@context':'https://schema.org','@type':'FAQPage',inLanguage:'id',mainEntity:idFaq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))}});
 
 const hwLine=(h:HardwareReference)=>`<a href="/hardware/${h.id}/">${esc(h.name)}</a> (${h.kind}, ${h.protocols.join('/')}): ${esc(h.summary)}`;
-render({path:'/hardware',title:'Hardware library | iot.ai.id',description:`Reference specifications for ${hardwareLibrary.length} boards, sensors and modules: ESP32, Arduino, Raspberry Pi and common I2C/SPI sensors.`,
+render({path:'/hardware',title:'Hardware library | AIoT',description:`Reference specifications for ${hardwareLibrary.length} boards, sensors and modules: ESP32, Arduino, Raspberry Pi and common I2C/SPI sensors.`,
  body:`<main>${nav}<h1>Hardware library</h1><p>${hardwareLibrary.length} hardware references. Specifications only; listing does not imply verified firmware support.</p>${list(hardwareLibrary.map(hwLine))}</main>`,
  jsonld:{'@context':'https://schema.org','@type':'ItemList',name:'iot.ai.id hardware library',numberOfItems:hardwareLibrary.length,itemListElement:hardwareLibrary.map((h,i)=>({'@type':'ListItem',position:i+1,url:`${SITE}/hardware/${h.id}/`,name:h.name}))}});
 
@@ -105,11 +105,11 @@ ${h.software.length?`<h2>Software</h2>${list(h.software.map(esc))}`:''}
 <h2>Limitations</h2>${list(h.limitations.map(esc))}
 <h2>Sources</h2>${list(h.sources.map(s=>`<a href="${esc(s.url)}" rel="nofollow">${esc(s.title)}</a>`))}
 <p>Review status: ${h.reviewStatus}. Support: ${h.support}.</p></article></main>`;
- render({path:`/hardware/${h.id}`,title:`${h.name} — specifications, pinout and limits | iot.ai.id`,description:`${h.name}: ${h.summary}`.slice(0,300),body,
+ render({path:`/hardware/${h.id}`,title:`${h.name} — specifications, pinout and limits | AIoT`,description:`${h.name}: ${h.summary}`.slice(0,300),body,
   jsonld:{'@context':'https://schema.org','@type':'TechArticle',headline:`${h.name} reference specification`,about:{'@type':'Thing',name:h.name,alternateName:h.aliases},description:h.summary,url:`${SITE}/hardware/${h.id}/`,publisher:{'@id':`${SITE}/#org`},citation:h.sources.map(s=>s.url)}});
 }
-render({path:'/learn',title:'Learn | iot.ai.id',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
-render({path:'/docs',title:'Documentation | iot.ai.id',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
+render({path:'/learn',title:'Learn | AIoT',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
+render({path:'/docs',title:'Documentation | AIoT',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
 
 const urls=['/','/id','/hardware','/learn','/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
 writeFileSync(join(OUT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${SITE}${slash(u)}</loc><lastmod>${today}</lastmod><priority>${u==='/'||u==='/id'?'1.0':u==='/hardware'?'0.8':'0.6'}</priority></url>`).join('\n')}\n</urlset>\n`);
@@ -141,7 +141,7 @@ Disallow: /api/
 Sitemap: ${SITE}/sitemap.xml
 `);
 
-const llms=`# iot.ai.id
+const llms=`# AIoT (iot.ai.id)
 
 > ${pitch}
 

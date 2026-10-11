@@ -28,8 +28,8 @@ function RouteLoading({en,id}:{en:string;id:string}){const{tr}=useLang();return 
 function Sites(){return <Suspense fallback={<RouteLoading en="Loading sites…" id="Memuat lokasi…"/>}><LazySites/></Suspense>;}
 function SiteWorkbench(){return <Suspense fallback={<RouteLoading en="Loading canvas…" id="Memuat canvas…"/>}><LazySiteWorkbench/></Suspense>;}
 function Home(){return <Landing/>;}
-const SITE_TITLE='iot.ai.id';
-const routeTitles:[RegExp,string][]=[[/^\/$/,'iot.ai.id — Testing robots and sensors where the world is messy.'],[/^\/id\/?$/,'Program Lab Mitra SMK — pelatihan IoT & tugas uji berbayar | iot.ai.id'],[/^\/hardware\/?$/,'Hardware library'],[/^\/learn\/?$/,'Learn'],[/^\/docs\/?$/,'Documentation'],[/^\/api\/?$/,'API'],[/^\/research\/?$/,'Research'],[/^\/bench\/?$/,'PhysicalBench'],[/^\/arena\/?$/,'Hardware Arena'],[/^\/arena\/[^/]+/,'Arena challenge'],[/^\/builders\/?$/,'Builders'],[/^\/build\/?$/,'Build'],[/^\/sites\/?$/,'Sites'],[/^\/site\//,'Site workbench'],[/^\/project\/[^/]+\/episode/,'Episode'],[/^\/project\//,'Project'],[/^\/backoffice/,'Backoffice'],[/^\/design\/?$/,'Design system']];
+const SITE_TITLE='AIoT';
+const routeTitles:[RegExp,string][]=[[/^\/$/,'AIoT — The real-world gateway for AI robotics in Indonesia.'],[/^\/id\/?$/,'Program Lab Mitra SMK — pelatihan IoT & tugas uji berbayar | AIoT'],[/^\/hardware\/?$/,'Hardware library'],[/^\/learn\/?$/,'Learn'],[/^\/docs\/?$/,'Documentation'],[/^\/api\/?$/,'API'],[/^\/research\/?$/,'Research'],[/^\/bench\/?$/,'PhysicalBench'],[/^\/arena\/?$/,'Hardware Arena'],[/^\/arena\/[^/]+/,'Arena challenge'],[/^\/builders\/?$/,'Builders'],[/^\/build\/?$/,'Build'],[/^\/sites\/?$/,'Sites'],[/^\/site\//,'Site workbench'],[/^\/project\/[^/]+\/episode/,'Episode'],[/^\/project\//,'Project'],[/^\/backoffice/,'Backoffice'],[/^\/design\/?$/,'Design system']];
 function useRouteTitle(){
  const {pathname}=useLocation();
  useEffect(()=>{
