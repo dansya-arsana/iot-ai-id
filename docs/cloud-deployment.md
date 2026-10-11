@@ -8,6 +8,7 @@ The main website serves landing pages, documentation, downloads and static asset
 | admin.iot.ai.id | Backoffice entry at /backoffice | Testing workspace login |
 | api.iot.ai.id | Local API proxy at /api/* | Testing workspace login plus X-IOT-Session |
 | edge.iot.ai.id | Coordinator at /v1/* | Scoped node/owner bearer token |
+| iot.ai.id/ops/v1/ | Partner inquiries (POST), tested catalog and Lab Mitra board (GET) | None; rate-limited; /ops/v1/admin/ returns 404 |
 
 The main website does not proxy the shared owner API. Build, hardware and other API-dependent pages show an unavailable-workspace message when requesting data; use the desktop app or an authorized admin workspace for interactive work. The `/api` page remains public API documentation; `/api/` requests are blocked.
 
@@ -22,7 +23,8 @@ The API remains strict about loopback Host and Origin. The authenticated admin a
 - /opt/iot-ai-id/secrets/access.txt: generated testing workspace login, mode 600.
 - /opt/iot-ai-id/secrets/coordinator.env: generated owner and node scopes, mode 600.
 - /opt/iot-ai-id/releases/nginx-before.conf: previous iot nginx configuration for rollback.
-- Docker volumes: iot-ai-release_iot_data and iot-ai-release_coordinator_data.
+- /opt/iot-ai-id/secrets/ops.env: `OPS_OWNER_TOKEN` shared by the API and ops service, and `OPS_ROLES`, mode 600. Created on first ops deploy.
+- Docker volumes: iot-ai-release_iot_data, iot-ai-release_coordinator_data and iot-ai-release_ops_data.
 
 ## AI settings
 
@@ -34,12 +36,20 @@ Bootstrap environment is optional. Never commit secrets, mount a user's home dir
 
 The bundled Jev decision scripts use TypeSafe; the frontier provider uses OpenAI Responses. Missing or rejected credentials produce an explicit unavailable-provider error, never a fixture fallback. OpenViking runs as a separate internal service with local CPU embeddings and vectors-only ingestion. VLM is unconfigured, so semantic generation is unavailable. Network authentication uses a dedicated tenant-bound data key; the root key is reserved for account provisioning. Its knowledge network publishes no host port. Deployment verification indexed all 56 catalog records and returned live ESP32/BME280 search results. Catalog specifications and validation remain deterministic.
 
+## Business operations
+
+The ops service (ADR 009) keeps inquiries, organizations, products and Lab Mitra tasks in its own volume. Work them in the backoffice at `#bo-inquiries`, `#bo-orgs`, `#bo-products` and `#bo-tasks`; the API forwards these requests to `iot-ai-ops:8791` with the owner token and the gateway login as `X-Remote-User`.
+
+Roles follow the HTTP Basic login. To add a teammate, add their user to the gateway htpasswd file for the admin and API hosts. Then set `OPS_ROLES=owner-user:owner,sales-user:sales,ops-user:ops,viewer-user:viewer` in `ops.env` and restart `api` and `ops`. Users not listed get 403 on business panels; an empty `OPS_ROLES` makes every gateway user owner.
+
+Conversion tracking stays off until `VITE_GA4_ID` or `VITE_META_PIXEL_ID` is set for the web build; visitors must accept the consent banner before any tag loads.
+
 ## Edge scopes and USB
 
 The initial test-laptop node has an empty project allowlist. Before enabling it, add only the required local project UUIDs to its server configuration and the matching local node environment. Start the local API/desktop and outbound node with explicit synchronization authorization. The cloud cannot access laptop USB. Flashing remains authorized on the local machine for a detected port, with an expiring approval window. A cloud project is not automatically synchronized into desktop storage in this release.
 
 ## Verification and rollback
 
-Check anonymous main-site landing, documentation, downloads and assets return 200 without `WWW-Authenticate`. Main-site /api/session, /api/projects and /api/ai-settings must return JSON 403 without `WWW-Authenticate` or owner data. Anonymous admin and API subdomain requests must return 401 with the owner login challenge. Check API-dependent public pages show a clear message without a password popup, hostile Origin returns 403, coordinator /v1/jobs without a bearer token returns 403, and existing applications remain healthy. Inspect provider readiness and a fresh planning request before claiming live AI. Software simulation never establishes physical hardware verification.
+Check anonymous main-site landing, documentation, downloads and assets return 200 without `WWW-Authenticate`. Main-site /api/session, /api/projects and /api/ai-settings must return JSON 403 without `WWW-Authenticate` or owner data. Anonymous admin and API subdomain requests must return 401 with the owner login challenge. Check API-dependent public pages show a clear message without a password popup, hostile Origin returns 403, coordinator /v1/jobs without a bearer token returns 403, `/ops/v1/catalog` returns 200, an invalid inquiry returns 400, public `/ops/v1/admin/*` returns 404, and existing applications remain healthy. Inspect provider readiness and a fresh planning request before claiming live AI. Software simulation never establishes physical hardware verification.
 
 For rollback, restore nginx-before.conf to the iot vhost, run nginx -t, then reload the gateway. Preserve the data volumes. Do not run compose down -v. Certificate renewal runs twice daily through `/etc/cron.d/iot-ai-id-cert`, using the existing certbot container and a project-specific lock. `deploy/renew-certificate.sh` renews only this project certificate, validates nginx and reloads the gateway.

@@ -57,7 +57,7 @@ function render(p:Page){
  const file=p.path==='/'?join(OUT,'index.html'):join(OUT,p.path,'index.html');
  mkdirSync(dirname(file),{recursive:true});writeFileSync(file,html);
 }
-const nav=`<nav><a href="/">Home</a> · <a href="/hardware">Hardware library</a> · <a href="/learn">Learn</a> · <a href="/docs">Docs</a> · <a href="/llms.txt">llms.txt</a></nav>`;
+const nav=`<nav><a href="/">Home</a> · <a href="/partner">Partner with us</a> · <a href="/products">Products</a> · <a href="/hardware">Hardware library</a> · <a href="/learn">Learn</a> · <a href="/docs">Docs</a> · <a href="/llms.txt">llms.txt</a></nav>`;
 const list=(xs:string[])=>`<ul>${xs.map(x=>`<li>${x}</li>`).join('')}</ul>`;
 
 const home=`<main>${nav}
@@ -90,6 +90,10 @@ render({path:'/id',lang:'id',alternates:true,title:'Program Lab Mitra SMK — pe
  jsonld:{'@context':'https://schema.org','@type':'FAQPage',inLanguage:'id',mainEntity:idFaq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))}});
 
 const hwLine=(h:HardwareReference)=>`<a href="/hardware/${h.id}/">${esc(h.name)}</a> (${h.kind}, ${h.protocols.join('/')}): ${esc(h.summary)}`;
+render({path:'/partner',title:'Partner with us | AIoT',description:'Device makers, schools and buyers: send an inquiry to AIoT. Field testing in Indonesia, localization, distribution and real-world data. Reply within one working day.',
+ body:`<main>${nav}<h1>Partner with AIoT</h1><p>${esc(pitch)}</p><p>Device makers (vendors), Indonesian schools (Lab Mitra) and buyers can send an inquiry through the form on this page. We reply within one working day by email or WhatsApp (+62 812-114-040).</p></main>`});
+render({path:'/products',title:'Tested products | AIoT',description:'Partner robotics, sensor and IoT hardware on its way into Indonesia, with test status and a localization checklist (SDPPI, Indonesian manual, warranty, service, stock, IDR pricing).',
+ body:`<main>${nav}<h1>Tested products</h1><p>Partner devices are listed only after a vendor partnership is signed. Each listing shows its field-test status and localization checklist; "Tested in Indonesia" appears only with linked evidence.</p><p><a href="/partner/">Request a quote or bring your device to Indonesia</a>.</p></main>`});
 render({path:'/hardware',title:'Hardware library | AIoT',description:`Reference specifications for ${hardwareLibrary.length} boards, sensors and modules: ESP32, Arduino, Raspberry Pi and common I2C/SPI sensors.`,
  body:`<main>${nav}<h1>Hardware library</h1><p>${hardwareLibrary.length} hardware references. Specifications only; listing does not imply verified firmware support.</p>${list(hardwareLibrary.map(hwLine))}</main>`,
  jsonld:{'@context':'https://schema.org','@type':'ItemList',name:'iot.ai.id hardware library',numberOfItems:hardwareLibrary.length,itemListElement:hardwareLibrary.map((h,i)=>({'@type':'ListItem',position:i+1,url:`${SITE}/hardware/${h.id}/`,name:h.name}))}});
@@ -111,7 +115,7 @@ ${h.software.length?`<h2>Software</h2>${list(h.software.map(esc))}`:''}
 render({path:'/learn',title:'Learn | AIoT',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
 render({path:'/docs',title:'Documentation | AIoT',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
 
-const urls=['/','/id','/hardware','/learn','/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
+const urls=['/','/id','/partner','/products','/hardware','/learn','/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
 writeFileSync(join(OUT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${SITE}${slash(u)}</loc><lastmod>${today}</lastmod><priority>${u==='/'||u==='/id'?'1.0':u==='/hardware'?'0.8':'0.6'}</priority></url>`).join('\n')}\n</urlset>\n`);
 writeFileSync(join(OUT,'robots.txt'),`# iot.ai.id — crawlers and AI agents are welcome on public pages.
 User-agent: *
@@ -150,6 +154,8 @@ iot.ai.id is based in Indonesia and serves robotics, sensor and AI teams worldwi
 ## Core pages
 
 - [Home](${SITE}/): positioning, scenario atlas, verification loop, network and partnership offer
+- [Partner with us](${SITE}/partner/): inquiry form for device makers, schools and buyers; reply within one working day
+- [Tested products](${SITE}/products/): partner devices with test status and Indonesian localization checklist
 - [Partnership brief](${SITE}/partnership-brief.txt): services, what partners provide, current limits
 - [Program Lab Mitra (Indonesian)](${SITE}/id/): IoT training and paid hardware-testing tasks for Indonesian vocational schools (SMK)
 - [Hardware library](${SITE}/hardware/): ${hardwareLibrary.length} board, sensor and module reference specifications

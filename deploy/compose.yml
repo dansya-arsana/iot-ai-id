@@ -9,6 +9,7 @@ services:
       - /opt/iot-ai-id/secrets/provider.env
       - /opt/iot-ai-id/secrets/coordinator.env
       - /opt/iot-ai-id/secrets/knowledge.env
+      - /opt/iot-ai-id/secrets/ops.env
     environment:
       API_BIND: 0.0.0.0
       API_PORT: 8787
@@ -19,12 +20,14 @@ services:
       JEV_CODEX_BIN: /work/jev/jev-codex
       OPENVIKING_URL: http://knowledge:1933
       IOT_COORDINATOR_URL: http://coordinator:8790
+      OPS_URL: http://ops:8791
     volumes:
       - iot_data:/data
     networks:
       gateway:
         aliases: [iot-ai-api]
       knowledge: {}
+      ops: {}
   coordinator:
     build:
       context: ../
@@ -41,6 +44,23 @@ services:
     networks:
       gateway:
         aliases: [iot-ai-coordinator]
+  ops:
+    build:
+      context: ../
+      dockerfile: deploy/Dockerfile
+    command: node --import tsx services/ops/server.ts
+    restart: unless-stopped
+    env_file: /opt/iot-ai-id/secrets/ops.env
+    environment:
+      OPS_HOST: 0.0.0.0
+      OPS_PORT: 8791
+      OPS_DB: /data/ops.sqlite
+    volumes:
+      - ops_data:/data
+    networks:
+      gateway:
+        aliases: [iot-ai-ops]
+      ops: {}
   knowledge:
     build:
       context: ../
@@ -56,7 +76,9 @@ networks:
     external: true
     name: prod-client_default
   knowledge: {}
+  ops: {}
 volumes:
   iot_data:
   coordinator_data:
   knowledge_data:
+  ops_data:

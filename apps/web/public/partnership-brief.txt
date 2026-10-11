@@ -1,7 +1,8 @@
-iot.ai.id — Real-world hardware verification partnership brief
+AIoT (iot.ai.id) — The real-world gateway for AI robotics in Indonesia
+Partnership brief
 
 Purpose
-Test robotics, sensor and IoT hardware in real Indonesian field conditions and return machine-readable, verifiable evidence for engineering and AI training.
+Test robotics, sensor and IoT hardware in real Indonesian field conditions, help device makers localize and bring it to the Indonesian market, and return machine-readable, verifiable real-world data for engineering and AI training.
 
 Why Indonesia
 - Tropical field environments: heat, high humidity, brackish water, unstable power and intermittent networks.
@@ -13,6 +14,8 @@ What we offer
 - Environmental stress testing: run your hand, sensor or node under defined field conditions.
 - Field pilot deployments: long-running installations with telemetry, observation and failure reporting.
 - Failure and recovery datasets: identity-bound records linking configuration, conditions, measurements and outcomes.
+- Market entry for device makers: localization checklist (SDPPI certification for wireless devices, Indonesian manual, local warranty and service, stock, IDR pricing) and distribution to schools, institutions and industry.
+- Lab Mitra network: trained vocational-school (SMK) labs that run paid, verified test tasks.
 
 How verification works
 1. Specify: hardware, target behaviour and environment are written as a machine-checkable contract.
@@ -26,10 +29,10 @@ What we need from partners
 - Acceptance criteria and the conditions you want tested.
 
 Current limits
-Images on the website are concept renders, not available products. Site counts, partner relationships and verified robotics results are not asserted on the public website. Evidence formats shown are examples of the record structure.
+Images on the website are concept renders, not available products. Site counts, partner relationships and verified robotics results are not asserted on the public website. Products appear in the public catalog only after a vendor partnership is signed, and are marked as tested in Indonesia only with linked evidence. Evidence formats shown are examples of the record structure.
 
 Public source
 https://github.com/dansya-arsana/iot-ai-id
 
 Next discussion
-Agree on the hardware, test conditions, evaluation protocol, data rights and timeline. Business contact details will be published separately.
+Agree on the hardware, test conditions, evaluation protocol, data rights and timeline. Contact: send an inquiry at https://iot.ai.id/partner/ or WhatsApp +62 812-114-040. We reply within one working day.

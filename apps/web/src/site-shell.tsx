@@ -2,7 +2,7 @@ import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {Link,NavLink,useLocation} from 'react-router-dom';
 import {ArrowUpRightIcon,CaretDownIcon,ListIcon,XIcon} from '@phosphor-icons/react';
 import {useLang} from './i18n';
-import {AnchorButton,LangToggle,PageHeader} from './ui';
+import {LangToggle,LinkButton,PageHeader} from './ui';
 import {DotMark} from './brand/dot-mark';
 import {rememberRegion} from './region';
 import './site-shell.css';
@@ -15,6 +15,7 @@ type NavItem={to:string;en:string;id:string};
 const primary:NavItem[]=[
  {to:'/#scenarios',en:'Scenarios',id:'Skenario'},
  {to:'/hardware',en:'Hardware',id:'Hardware'},
+ {to:'/products',en:'Products',id:'Produk'},
  {to:'/learn',en:'Learn',id:'Belajar'},
  {to:'/docs',en:'Docs',id:'Dokumentasi'},
 ];
@@ -54,12 +55,12 @@ export function SiteHeader({overlay,className,...rest}:{overlay?:boolean;classNa
     {resources&&<div id="ds-resources" className="ds-menu">{groups.map(g=><div key={g.en}><span>{tr(g.en,g.id)}</span>{g.items.map(i=><Item key={i.to} item={i} onNavigate={()=>setResources(false)}/>)}</div>)}</div>}
    </div>
   </nav>
-  <div className="ds-header-actions"><LangToggle/><AnchorButton href={PARTNERSHIP_BRIEF} download>{tr('Partner with us','Jadi partner')}</AnchorButton></div>
+  <div className="ds-header-actions"><LangToggle/><LinkButton to="/partner" data-cta="header-partner">{tr('Partner with us','Jadi partner')}</LinkButton></div>
   <button type="button" className="ds-menu-toggle" aria-expanded={menu} aria-controls="ds-mobile-menu" aria-label={menu?tr('Close menu','Tutup menu'):tr('Open menu','Buka menu')} onClick={()=>setMenu(!menu)}>{menu?<XIcon size={18}/>:<ListIcon size={18}/>}</button>
   {menu&&<nav id="ds-mobile-menu" className="ds-mobile-menu" aria-label={tr('Mobile','Mobile')}>
    {primary.map(i=><Item key={i.to} item={i} onNavigate={()=>setMenu(false)}/>)}
    {groups.map(g=><div key={g.en} className="ds-mobile-group"><span>{tr(g.en,g.id)}</span>{g.items.map(i=><Item key={i.to} item={i} onNavigate={()=>setMenu(false)}/>)}</div>)}
-   <div className="ds-mobile-foot"><LangToggle/><AnchorButton href={PARTNERSHIP_BRIEF} download size="sm">{tr('Partner with us','Jadi partner')}</AnchorButton></div>
+   <div className="ds-mobile-foot"><LangToggle/><LinkButton to="/partner" size="sm" data-cta="menu-partner">{tr('Partner with us','Jadi partner')}</LinkButton></div>
   </nav>}
  </header>;
 }
@@ -67,11 +68,11 @@ export function SiteHeader({overlay,className,...rest}:{overlay?:boolean;classNa
 export function SiteFooter({className,...rest}:{className?:string;'data-enter'?:boolean}){
  const{tr}=useLang();
  return <footer className={['ds-footer',className].filter(Boolean).join(' ')} {...(rest['data-enter']?{'data-enter':''}:{})}>
-  <div className="ds-footer-brand"><Brand/><p>{tr('Real-world hardware verification from Indonesia.','Verifikasi hardware di dunia nyata, dari Indonesia.')}</p></div>
+  <div className="ds-footer-brand"><Brand/><p>{tr('The real-world gateway for AI robotics in Indonesia.','Gerbang AI robotika ke Indonesia.')}</p></div>
   <nav aria-label={tr('Footer','Footer')}>
    <div><span>{tr('Explore','Jelajahi')}</span><Link to="/#scenarios">{tr('Scenarios','Skenario')}</Link><Link to="/hardware">{tr('Hardware library','Pustaka hardware')}</Link><Link to="/learn">{tr('Learn','Belajar')}</Link></div>
    <div><span>{tr('Build','Bangun')}</span><Link to="/docs">{tr('Docs','Dokumentasi')}</Link><Link to="/api">API</Link><a href={RELEASES}>{tr('Desktop app','Aplikasi desktop')}</a></div>
-   <div><span>{tr('Company','Perusahaan')}</span><a href={PARTNERSHIP_BRIEF} download>{tr('Partnership brief','Partnership brief')}</a><Link to="/research">{tr('Research','Riset')}</Link><a href={REPOSITORY}>GitHub <ArrowUpRightIcon size={12}/></a><Link to="/id" hrefLang="id" onClick={()=>rememberRegion('id')}>{tr('Indonesia: SMK program','Program SMK Indonesia')}</Link></div>
+   <div><span>{tr('Company','Perusahaan')}</span><Link to="/partner">{tr('Partner with us','Jadi partner')}</Link><Link to="/products">{tr('Tested products','Produk teruji')}</Link><a href={PARTNERSHIP_BRIEF} download>{tr('Partnership brief','Partnership brief')}</a><Link to="/research">{tr('Research','Riset')}</Link><a href={REPOSITORY}>GitHub <ArrowUpRightIcon size={12}/></a><Link to="/id" hrefLang="id" onClick={()=>rememberRegion('id')}>{tr('Indonesia: SMK program','Program SMK Indonesia')}</Link></div>
   </nav>
   <div className="ds-footer-bottom"><span>{tr('TESTED IN INDONESIA. READY FOR INDONESIA.','DIUJI DI LAPANGAN. SIAP DIPASARKAN.')}</span><span>© 2026 AIoT · iot.ai.id</span></div>
  </footer>;

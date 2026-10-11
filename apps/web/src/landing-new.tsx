@@ -12,7 +12,7 @@ const copy={
  en:{
   nav:['Scenarios','Verification','Network'],cta:'Partner with us',menu:'Menu',close:'Close',skip:'Skip to content',loader:'FROM THE FIELD. INTO EVIDENCE.',
   eyebrow:'INDONESIA · TESTING · DISTRIBUTION · DATA',title:['The real-world','gateway for AI robotics','in Indonesia.'],
-  lead:'Tested in Indonesian heat, humidity and unstable power. Localized, brought to market, and returned to your team as real-world data.',heroCta:'Explore field testing',
+  lead:'Tested in Indonesian heat, humidity and unstable power. Localized, brought to market, and returned to your team as real-world data.',heroCta:'Partner with us',
   specimens:['Field telemetry node','Tactile sensor module'],renders:'CONCEPT RENDERS · NOT AVAILABLE PRODUCTS',scroll:'SCROLL ↓',
   gapIndex:'01',gapMeta:'THE GAP',gapText:'Robots and hardware agents learn from clean benchmarks and tidy datasheets. Real deployments fail on drift, corrosion, noise and power loss, and that experience is rarely recorded in a form a machine can use.',
   gapTitle:['AI can write firmware.','It has never felt','a monsoon.'],gapMetrics:[['70–90%','RELATIVE HUMIDITY'],['25–35°C','AMBIENT HEAT'],['17,000+','ISLANDS TO REACH']],gapNote:'Typical Indonesian conditions, not test results.',
@@ -34,7 +34,7 @@ const copy={
  id:{
   nav:['Skenario','Verifikasi','Jaringan'],cta:'Jadi partner',menu:'Menu',close:'Tutup',skip:'Lewati ke konten',loader:'DARI LAPANGAN. JADI BUKTI.',
   eyebrow:'INDONESIA · UJI · DISTRIBUSI · DATA',title:['Gerbang AI robotika','ke Indonesia.'],
-  lead:'Diuji di lapangan, siap dipasarkan. Panas, lembap, dan listrik tidak stabil Indonesia jadi data nyata untuk tim robotika dan AI.',heroCta:'Lihat uji lapangan',
+  lead:'Diuji di lapangan, siap dipasarkan. Panas, lembap, dan listrik tidak stabil Indonesia jadi data nyata untuk tim robotika dan AI.',heroCta:'Jadi partner',
   specimens:['Node telemetri lapangan','Modul sensor taktil'],renders:'RENDER KONSEP · BUKAN PRODUK YANG DIJUAL',scroll:'GULIR ↓',
   gapIndex:'01',gapMeta:'CELAHNYA',gapText:'Robot dan agent hardware belajar dari benchmark bersih dan datasheet rapi. Deployment nyata gagal karena drift, korosi, noise, dan listrik padam, dan pengalaman itu jarang dicatat dalam bentuk yang bisa dipakai mesin.',
   gapTitle:['AI bisa menulis firmware.','Tapi belum pernah','kena musim hujan.'],gapMetrics:[['70–90%','KELEMBAPAN RELATIF'],['25–35°C','SUHU LINGKUNGAN'],['17.000+','PULAU UNTUK DIJANGKAU']],gapNote:'Kondisi umum di Indonesia, bukan hasil uji.',
@@ -104,7 +104,7 @@ export function Landing(){
   <a className="rl-skip" href="#landing-main">{t.skip}</a>
   <SiteHeader overlay data-enter/>
   <main id="landing-main" tabIndex={-1}>
-   <section className="rl-hero" aria-labelledby="landing-title"><img className="rl-capsule" data-enter src="/assets/landing/hero-capsule.png" alt="Concept render: a robotic hand holding an ESP32 board inside a glass test capsule" width="1024" height="1024" fetchPriority="high"/><div className="rl-hero-copy" data-enter><p className="rl-eyebrow">{t.eyebrow}</p><h1 id="landing-title"><Lines lines={t.title}/></h1><p className="rl-hero-description">{t.lead}</p><a className="rl-button rl-button-dark" href={partnership} download>{t.heroCta} <ArrowRightIcon size={18}/></a></div><div className="rl-specimens">{[['FN-01','card-field-node'],['TS-01','card-tactile']].map(([code,img],i)=><figure className="rl-specimen rl-brackets" data-enter key={code}><img src={`/assets/landing/${img}.png`} alt={`Concept render: ${t.specimens[i]}`} width="768" height="1024" loading="lazy"/><figcaption><b>{code}</b><span>{t.specimens[i]}</span></figcaption></figure>)}</div><div className="rl-hero-bottom"><span>{t.renders}</span><a href="#gap">{t.scroll}</a></div></section>
+   <section className="rl-hero" aria-labelledby="landing-title"><img className="rl-capsule" data-enter src="/assets/landing/hero-capsule.png" alt="Concept render: a robotic hand holding an ESP32 board inside a glass test capsule" width="1024" height="1024" fetchPriority="high"/><div className="rl-hero-copy" data-enter><p className="rl-eyebrow">{t.eyebrow}</p><h1 id="landing-title"><Lines lines={t.title}/></h1><p className="rl-hero-description">{t.lead}</p><Link className="rl-button rl-button-dark" to="/partner" data-cta="hero-partner">{t.heroCta} <ArrowRightIcon size={18}/></Link></div><div className="rl-specimens">{[['FN-01','card-field-node'],['TS-01','card-tactile']].map(([code,img],i)=><figure className="rl-specimen rl-brackets" data-enter key={code}><img src={`/assets/landing/${img}.png`} alt={`Concept render: ${t.specimens[i]}`} width="768" height="1024" loading="lazy"/><figcaption><b>{code}</b><span>{t.specimens[i]}</span></figcaption></figure>)}</div><div className="rl-hero-bottom"><span>{t.renders}</span><a href="#gap">{t.scroll}</a></div></section>
 
    {/* composition: negantropy-refusal — corner-loaded flipped split with bracketed metrics */}
    <section id="gap" className="rl-section rl-gap"><div className="rl-gap-left" data-reveal><p className="rl-index">( {t.gapIndex} )<i/>{t.gapMeta}</p><p>{t.gapText}</p></div><div className="rl-gap-right" data-reveal><h2><Lines lines={t.gapTitle}/></h2><dl>{t.gapMetrics.map(([v,l])=><div key={l}><dt>[ {v} ]</dt><dd>{l}</dd></div>)}</dl><small>{t.gapNote}</small></div></section>
@@ -125,7 +125,7 @@ export function Landing(){
    <section className="rl-section rl-partner"><div data-reveal><p className="rl-eyebrow"><i/>{t.partnerEyebrow}</p><h2><Lines lines={t.partnerTitle}/></h2><p>{t.partnerText}</p><ul>{t.offers.map(o=><li key={o}>{o}</li>)}</ul><a className="rl-button rl-button-light" href={partnership} download>{t.partnerCta} <ArrowUpRightIcon size={18}/></a></div><figure className="rl-portrait" data-reveal><img src="/assets/landing/partner-hand.jpg" alt="Concept render: robotic hand holding a sensor module" width="768" height="1024" loading="lazy"/></figure></section>
 
    {/* composition: negantropy-persist — centered manifesto stack */}
-   <section className="rl-section rl-final" data-reveal><p className="rl-index">( 05 )<i/>{t.finalEyebrow}</p><h2>{t.finalTitle}</h2><p>{t.finalText}</p><div><a className="rl-button rl-button-dark" href={partnership} download>{t.finalCta} <ArrowRightIcon size={18}/></a><Link className="rl-text-link" to="/hardware">{t.library} <ArrowUpRightIcon size={18}/></Link></div></section>
+   <section className="rl-section rl-final" data-reveal><p className="rl-index">( 05 )<i/>{t.finalEyebrow}</p><h2>{t.finalTitle}</h2><p>{t.finalText}</p><div><Link className="rl-button rl-button-dark" to="/partner" data-cta="final-partner">{t.finalCta} <ArrowRightIcon size={18}/></Link><Link className="rl-text-link" to="/hardware">{t.library} <ArrowUpRightIcon size={18}/></Link></div></section>
   </main>
   <SiteFooter data-enter/>
  </div>;

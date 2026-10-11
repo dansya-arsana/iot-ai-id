@@ -1,14 +1,14 @@
-import {useEffect,type ReactNode} from 'react';
+import {useEffect,useState,type ReactNode} from 'react';
 import {Link} from 'react-router-dom';
 import {ArrowRightIcon,ArrowUpRightIcon,CheckIcon,WhatsappLogoIcon} from '@phosphor-icons/react';
 import {DotMark} from '../brand/dot-mark';
 import {rememberRegion} from '../region';
+import {WA_DISPLAY,waLink} from '../contact';
+import {fetchBoard,idr,type BoardRow} from '../ops-client';
+export {WA_NUMBER,waLink} from '../contact';
 import './landing-id.css';
 
 /** Indonesian ad landing: Program Lab Mitra for SMKs. Every CTA opens WhatsApp with a prefilled message. */
-export const WA_NUMBER='62812114040';
-export const waLink=(text:string)=>`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
-const WA_DISPLAY='+62 812-114-040';
 
 const msg={
  general:'Halo AIoT, saya tertarik dengan Program Lab Mitra untuk sekolah kami. Nama sekolah: … Kota: …',
@@ -58,6 +58,9 @@ function Wa({kind,children,className='lid-btn lid-btn--dark'}:{kind:keyof typeof
 
 export function LandingID(){
  useEffect(()=>rememberRegion('id'),[]);
+ const [board,setBoard]=useState<BoardRow[]>([]);
+ useEffect(()=>{let live=true;fetchBoard().then(rows=>{if(live)setBoard(rows);}).catch(()=>{/* Board stays on open slots. */});return()=>{live=false;};},[]);
+ const slots=Math.max(0,5-board.length);
  const example=150000;
  return <div className="lid">
   <header className="lid-header">
@@ -109,10 +112,10 @@ export function LandingID(){
    </section>
 
    <section id="papan" className="lid-section lid-board" aria-labelledby="lid-board-title">
-    <div className="lid-board-head"><p className="lid-eyebrow">PAPAN LAB MITRA 2026</p><h2 id="lid-board-title">Peringkat pertama masih kosong.</h2><p>Papan ini diisi dari record uji yang benar-benar lulus: jumlah tugas, ketepatan, dan honor yang sudah dibayar. Lab yang bergabung di angkatan pertama punya kesempatan pertama menempati posisi teratas.</p><Wa kind="lab">Ambil slot sekolah Anda</Wa></div>
+    <div className="lid-board-head"><p className="lid-eyebrow">PAPAN LAB MITRA 2026</p><h2 id="lid-board-title">{board.length?'Lab Mitra yang sudah lulus verifikasi.':'Peringkat pertama masih kosong.'}</h2><p>Papan ini diisi dari record uji yang benar-benar lulus: jumlah tugas, ketepatan, dan honor yang sudah dibayar. Lab yang bergabung di angkatan pertama punya kesempatan pertama menempati posisi teratas.</p><Wa kind="lab">Ambil slot sekolah Anda</Wa></div>
     <div className="lid-table-wrap"><table className="lid-leader"><thead><tr><th scope="col">#</th><th scope="col">Sekolah</th><th scope="col">Kota</th><th scope="col">Tugas lulus</th><th scope="col">Honor dibayar</th></tr></thead>
-     <tbody>{[1,2,3,4,5].map(n=><tr key={n}><td>{String(n).padStart(2,'0')}</td><td><span className="lid-slot">Slot terbuka</span></td><td>—</td><td>0</td><td>Rp0</td></tr>)}</tbody></table>
-     <small>Belum ada lab aktif. Papan diperbarui otomatis setelah lab pertama lolos verifikasi.</small></div>
+     <tbody>{board.map((b,i)=><tr key={b.name}><td>{String(i+1).padStart(2,'0')}</td><td><b>{b.name}</b></td><td>{b.city||'—'}</td><td>{b.passed}</td><td>{idr(b.paidIdr)}</td></tr>)}{Array.from({length:slots},(_,n)=><tr key={'slot'+n}><td>{String(board.length+n+1).padStart(2,'0')}</td><td><span className="lid-slot">Slot terbuka</span></td><td>—</td><td>0</td><td>Rp0</td></tr>)}</tbody></table>
+     <small>{board.length?'Hanya sekolah aktif yang setuju ditampilkan. Angka dari tugas yang lolos verifikasi.':'Belum ada lab aktif. Papan diperbarui otomatis setelah lab pertama lolos verifikasi.'}</small></div>
    </section>
 
    <section id="faq" className="lid-section lid-faq" aria-labelledby="lid-faq-title">
@@ -125,6 +128,7 @@ export function LandingID(){
     <h2 id="lid-final-title">Kuota angkatan pertama terbatas.</h2>
     <p>Chat kami sekarang. Kami balas dengan penawaran resmi untuk sekolah Anda.</p>
     <Wa kind="general" className="lid-btn lid-btn--light">Chat WhatsApp {WA_DISPLAY}</Wa>
+    <Link className="lid-final-form" to="/partner?kind=school">Lebih suka isi form? Kirim lewat formulir</Link>
    </section>
   </main>
 

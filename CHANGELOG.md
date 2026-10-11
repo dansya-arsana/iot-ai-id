@@ -6,6 +6,30 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+### Added
+- `/partner`: partner inquiry form for vendors, distributors, schools and investors. It shows a reference number, offers a WhatsApp follow-up and falls back to WhatsApp on failure. Header, hero and footer CTAs now lead here.
+- Ops service (`services/ops`, ADR 009) with a shared contract in `packages/ops-contract`. The public routes are `POST /ops/v1/inquiries`, `GET /ops/v1/catalog` and `GET /ops/v1/labs`; admin routes are reached only through the authenticated API at `/api/ops/*`.
+- Backoffice business panels:
+  - Inquiry inbox with status, assignee, notes, history and convert-to-organization.
+  - Organizations CRM (vendors, distributors, schools, customers).
+  - Product catalog with a localization checklist.
+  - Lab Mitra tasks with payouts.
+  - KPI summary.
+- Roles: owner, sales, ops and viewer, set with `OPS_ROLES` and mapped from the gateway login. Empty `OPS_ROLES` means a single owner.
+- `/products`: public catalog of tested products. A product appears only when it is published and available, with evidence, a test summary and a complete localization checklist (SDPPI required for wireless devices).
+- Lab Mitra tasks: open → assigned → submitted → verified/rejected → paid. Fees split 60% students / 25% TEFA / 15% teacher, and the backoffice tracks payouts due and paid.
+- `/id` partner board lists real active schools that opted in, then open slots.
+- Consent-gated conversion tracking (GA4, Meta Pixel). It is inert unless `VITE_GA4_ID` or `VITE_META_PIXEL_ID` is set at build time.
+- The partnership brief points to `/partner` and WhatsApp.
+
+### Security
+- Public intake:
+  - Honeypot field.
+  - Per-IP and global rate limits, plus an nginx `limit_req` keyed on `CF-Connecting-IP`.
+  - Explicit consent and body size caps.
+- Ops admin routes are never served on the public host: `/ops/v1/admin/` returns 404 there. They require a 32+ character owner token compared in constant time, and public proxies strip `Authorization` and `X-Ops-User`.
+- The admin and API gateways forward `X-Remote-User` so roles follow the HTTP Basic login.
+
 ### Changed
 - Brand name is now **AIoT**; the domain stays `iot.ai.id`. Header, loader, footer, tab titles, Open Graph and JSON-LD use the new name (`alternateName: iot.ai.id`).
 - Positioning: "The real-world gateway for AI robotics in Indonesia": field testing, localization, distribution and real-world data. New hero copy in EN and ID, footer line "Tested in Indonesia. Ready for Indonesia." (ID: "Diuji di lapangan. Siap dipasarkan."), updated `llms.txt` pitch.

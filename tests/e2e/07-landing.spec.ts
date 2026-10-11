@@ -8,8 +8,9 @@ test('landing has original visual, usable navigation and real destinations',asyn
  const capsule=page.locator('.rl-capsule');
  await expect(capsule).toBeVisible();
  expect(await capsule.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0)).toBe(true);
- await expect(page.getByRole('link',{name:/Explore field testing/})).toHaveAttribute('href','/partnership-brief.txt');
- await expect(page.locator('.ds-header').getByRole('link',{name:'Partner with us'})).toHaveAttribute('href','/partnership-brief.txt');
+ await expect(page.locator('.rl-hero').getByRole('link',{name:/Partner with us/})).toHaveAttribute('href','/partner');
+ await expect(page.locator('.rl-partner').getByRole('link',{name:/Download partnership brief/})).toHaveAttribute('href','/partnership-brief.txt');
+ await expect(page.locator('.ds-header').getByRole('link',{name:'Partner with us'})).toHaveAttribute('href','/partner');
  await expect(page.locator('.rl-scenario')).toHaveCount(6);
  await expect(page.locator('.rl-map svg circle').first()).toBeAttached();
  for(const width of [1440,768,390]){

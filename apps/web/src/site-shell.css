@@ -44,3 +44,8 @@
 }
 @media(max-width:520px){.ds-footer nav{grid-template-columns:1fr}.ds-footer-bottom{flex-direction:column}}
 .route-loading{min-height:60vh;display:flex;align-items:center;justify-content:center;gap:var(--ds-3);font-size:var(--ds-text-small);color:var(--ds-ink-2);background:var(--ds-ground)}
+
+/* Analytics consent (only rendered when tracking IDs are configured) */
+.ds-consent{position:fixed;left:var(--ds-4);right:var(--ds-4);bottom:var(--ds-4);z-index:60;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--ds-4);max-width:720px;margin-inline:auto;padding:var(--ds-4) var(--ds-5);border:1px solid var(--ds-line);border-radius:var(--ds-radius-2);background:var(--ds-surface-raised);box-shadow:var(--ds-shadow-2);font-size:var(--ds-text-small);line-height:1.5}
+.ds-consent p{margin:0;flex:1 1 320px;color:var(--ds-ink-2)}
+.ds-consent div{display:flex;gap:var(--ds-2)}

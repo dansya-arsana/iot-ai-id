@@ -4,7 +4,7 @@ test('shared navigation groups routes and closes predictably',async({page})=>{
  await page.goto('/build');
  const header=page.locator('.ds-header');
  const main=header.getByRole('navigation',{name:'Main',exact:true});
- await expect(main.getByRole('link')).toHaveCount(4);
+ await expect(main.getByRole('link')).toHaveCount(5);
  const resources=main.getByRole('button',{name:'Resources'});
  await resources.click();
  await expect(resources).toHaveAttribute('aria-expanded','true');
