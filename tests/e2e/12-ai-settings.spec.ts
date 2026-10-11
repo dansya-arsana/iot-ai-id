@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 test('owner AI settings clear secret input, survive reload and delete without browser storage',async({page})=>{
  await page.goto('/backoffice#bo-ai');
  const panel=page.getByRole('region',{name:'AI settings'});
- await expect(panel).toContainText('no separate per-user BYOK yet');
+ await expect(panel).toContainText('Keys stay on this computer, encrypted. AIoT never receives them.');
  await expect(panel).toBeInViewport();
  const form=panel.locator('form').filter({has:page.getByRole('heading',{name:'OpenAI',exact:true})});
  const secret='browser-test-private-sentinel';

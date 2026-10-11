@@ -7,6 +7,8 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 ## [Unreleased]
 
 ### Added
+- AI provider adapter layer (`packages/ai-providers`): OpenAI, Anthropic Claude, MiniMax and Z.ai GLM, plus OpenAI-compatible endpoints and signed-in Codex or Claude Code CLIs on the desktop. AI settings show one card per allowed provider with model choice and an active provider. TypeSafe/Jev routing is now optional and skipped when unavailable.
+- Desktop: bring-your-own-key stays on the user's computer; the desktop app is renamed AIoT.
 - `/partner`: partner inquiry form for vendors, distributors, schools and investors. It shows a reference number, offers a WhatsApp follow-up and falls back to WhatsApp on failure. Header, hero and footer CTAs now lead here.
 - Ops service (`services/ops`, ADR 009) with a shared contract in `packages/ops-contract`. The public routes are `POST /ops/v1/inquiries`, `GET /ops/v1/catalog` and `GET /ops/v1/labs`; admin routes are reached only through the authenticated API at `/api/ops/*`.
 - Backoffice business panels:
@@ -23,6 +25,7 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 - The partnership brief points to `/partner` and WhatsApp.
 
 ### Security
+- Cloud AI runs only on owner keys: end-user keys, custom endpoints and CLI providers are refused when `IOT_DEPLOYMENT=cloud`. The vault master key moves to `IOT_VAULT_KEY_FILE` outside the data volume (an identical old copy is removed, a different one aborts startup). AI settings changes are written to an append-only audit log without key material, and cloud AI calls have a daily limit (`IOT_AI_DAILY_LIMIT`, default 300).
 - Public intake:
   - Honeypot field.
   - Per-IP and global rate limits, plus an nginx `limit_req` keyed on `CF-Connecting-IP`.

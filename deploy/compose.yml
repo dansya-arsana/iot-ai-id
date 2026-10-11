@@ -17,12 +17,15 @@ services:
       IOT_DB_PATH: /data/iot.sqlite
       IOT_RUNTIME_BUILDS_PATH: /data/builds
       IOT_AGENT_PROVIDER: jev
+      IOT_DEPLOYMENT: cloud
+      IOT_VAULT_KEY_FILE: /run/secrets/vault.key
       JEV_CODEX_BIN: /work/jev/jev-codex
       OPENVIKING_URL: http://knowledge:1933
       IOT_COORDINATOR_URL: http://coordinator:8790
       OPS_URL: http://ops:8791
     volumes:
       - iot_data:/data
+      - /opt/iot-ai-id/secrets/vault.key:/run/secrets/vault.key:ro
     networks:
       gateway:
         aliases: [iot-ai-api]

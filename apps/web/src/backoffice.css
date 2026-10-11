@@ -98,6 +98,10 @@
 .bo-ai-meta>div{display:grid;grid-template-columns:120px 1fr;gap:var(--ds-4);padding:var(--ds-2) 0;border-bottom:1px solid var(--ds-line)}
 .bo-ai-meta dt{font:500 var(--ds-text-label)/1.6 var(--ds-mono);letter-spacing:var(--ds-track-label);text-transform:uppercase;color:var(--ds-ink-2)}
 .bo-ai-meta dd{margin:0}
+.bo-ai-radio{display:flex;align-items:center;gap:var(--ds-2);min-width:0}
+.bo-ai-cli{display:grid;gap:var(--ds-2);margin:var(--ds-4) 0 0;padding:var(--ds-4) 0 0;border:0;border-top:1px solid var(--ds-ink);min-width:0}
+.bo-ai-cli legend{padding:0;font:500 var(--ds-text-label)/1.6 var(--ds-mono);text-transform:uppercase;color:var(--ds-ink-2)}
+.bo-ai-form-head{flex-wrap:wrap}
 .bo-ai-actions{display:flex;flex-wrap:wrap;gap:var(--ds-2)}
 .bo-ai-result:empty{display:none}
 .bo-ai-busy{display:inline-flex;align-items:center;gap:var(--ds-2);color:var(--ds-ink-2)}
