@@ -7,6 +7,7 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 ## [Unreleased]
 
 ### Added
+- `admin.iot.ai.id` opens the backoffice at its root; `/backoffice` there redirects to `/` and keeps the section hash. Local installs keep `/backoffice`.
 - AI provider adapter layer (`packages/ai-providers`): OpenAI, Anthropic Claude, MiniMax and Z.ai GLM, plus OpenAI-compatible endpoints and signed-in Codex or Claude Code CLIs on the desktop. AI settings show one card per allowed provider with model choice and an active provider. TypeSafe/Jev routing is now optional and skipped when unavailable.
 - Desktop: bring-your-own-key stays on the user's computer; the desktop app is renamed AIoT.
 - `/partner`: partner inquiry form for vendors, distributors, schools and investors. It shows a reference number, offers a WhatsApp follow-up and falls back to WhatsApp on failure. Header, hero and footer CTAs now lead here.

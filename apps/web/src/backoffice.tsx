@@ -4,6 +4,7 @@ import {useEffect, useState, useCallback, useRef, type ReactNode} from 'react';
 import {Link} from 'react-router-dom';
 import {ArrowClockwiseIcon, ArrowUpRightIcon, PlusIcon} from '@phosphor-icons/react';
 import {api} from './api';
+import {isAdminHost,PUBLIC_SITE} from './host';
 import {useLang} from './i18n';
 import {Brand} from './site-shell';
 import {Button, EmptyState, Eyebrow, Input, LangToggle, LinkButton, Notice, Segmented, Select, SpecList, Spinner, Stat, StatGrid, Tag, TextLink} from './ui';
@@ -118,7 +119,7 @@ export function Backoffice() {
         ? <EmptyState eyebrow={tr('Backoffice unavailable','Backoffice tidak tersedia')} title={tr('Could not load the dashboard','Dashboard gagal dimuat')} action={<><Button onClick={() => void load()}>{tr('Retry','Coba lagi')}</Button><LinkButton to="/" variant="secondary">{tr('Back to home','Kembali ke beranda')}</LinkButton></>}>
             {tr('The local runtime did not respond or this session is not the workspace owner.','Runtime lokal tidak merespons atau sesi ini bukan pemilik workspace.')} <code className="bo-mono">{error}</code>
           </EmptyState>
-        : <div className="bo-loading"><Spinner label={tr('Loading','Memuat')}/><p>{tr('Loading local runtime data…','Memuat data runtime lokal…')}</p><TextLink to="/">{tr('Back to home','Kembali ke beranda')}</TextLink></div>}
+        : <div className="bo-loading"><Spinner label={tr('Loading','Memuat')}/><p>{tr('Loading local runtime data…','Memuat data runtime lokal…')}</p>{isAdminHost()?<a className="ds-text-link" href={PUBLIC_SITE}>{tr('Back to home','Kembali ke beranda')}</a>:<TextLink to="/">{tr('Back to home','Kembali ke beranda')}</TextLink>}</div>}
     </main>
   </div>;
 
@@ -159,7 +160,7 @@ export function Backoffice() {
         <Eyebrow className="bo-sidebar-label">{tr('Site','Situs')}</Eyebrow>
         <nav aria-label={tr('Site links','Tautan situs')} className="bo-sidebar-secondary">
           <Link to="/build">{tr('Workspace','Workspace')}</Link>
-          <Link to="/">{tr('Home','Beranda')}</Link>
+          {isAdminHost()?<a href={PUBLIC_SITE}>{tr('Public site','Situs publik')}</a>:<Link to="/">{tr('Home','Beranda')}</Link>}
         </nav>
       </aside>
       <main className="bo-main">

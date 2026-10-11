@@ -1,6 +1,7 @@
 import React,{useEffect,lazy,Suspense} from 'react';
 import {createRoot} from 'react-dom/client';
-import {BrowserRouter,Route,Routes,useLocation} from 'react-router-dom';
+import {BrowserRouter,Navigate,Route,Routes,useLocation} from 'react-router-dom';
+import {isAdminHost} from './host';
 import '@fontsource/archivo/400.css';
 import '@fontsource/archivo/500.css';
 import '@fontsource/archivo/600.css';
@@ -38,8 +39,11 @@ function useRouteTitle(){
   const hw=pathname.match(/^\/hardware\/([a-z0-9-]+)\/?$/);
   if(hw){let live=true;document.title=`Hardware reference | ${SITE_TITLE}`;import('../../../packages/hardware-library/index').then(({hardwareLibrary})=>{if(!live)return;const name=hardwareLibrary.find(h=>h.id===hw[1])?.name;document.title=name?`${name} — specifications, pinout and limits | ${SITE_TITLE}`:`Hardware not found | ${SITE_TITLE}`;});return()=>{live=false;};}
   const match=routeTitles.find(([re])=>re.test(pathname));
+  if(isAdminHost()&&pathname==='/'){document.title=`Backoffice | ${SITE_TITLE}`;return;}
   document.title=!match?`Not found | ${SITE_TITLE}`:pathname==='/'||match[1].endsWith(SITE_TITLE)?match[1]:`${match[1]} | ${SITE_TITLE}`;
  },[pathname]);
 }
-function App(){useRouteTitle();const{pathname}=useLocation();useTracking(pathname);return <><Routes><Route path="/partner" element={<Partner/>}/><Route path="/products" element={<Products/>}/><Route path="/" element={<Home/>}/><Route path="/id" element={<LandingID/>}/><Route path="/build" element={<Build/>}/><Route path="/sites" element={<Sites/>}/><Route path="/site/:id" element={<SiteWorkbench/>}/><Route path="/site/:id/area/:areaId" element={<SiteWorkbench/>}/><Route path="/learn" element={<Learn/>}/><Route path="/backoffice" element={<Backoffice/>}/><Route path="/project/:id/episode" element={<EpisodePage/>}/><Route path="/project/:id" element={<SchoolWorkbench/>}/><Route path="/hardware" element={<Hardware/>}/><Route path="/hardware/:slug" element={<HardwareDetail/>}/><Route path="/bench" element={<Bench/>}/><Route path="/arena" element={<Arena/>}/><Route path="/arena/:id" element={<ArenaDetail/>}/><Route path="/builders" element={<Builders/>}/><Route path="/research" element={<Research/>}/><Route path="/docs" element={<Docs/>}/><Route path="/api" element={<Docs apiOverview/>}/><Route path="/design" element={<DesignSystem/>}/><Route path="*" element={<NotFound/>}/></Routes><ConsentBanner/></>;}
+/** Old admin.iot.ai.id/backoffice links land on the admin root, keeping the section hash. */
+function AdminRoot(){const{hash}=useLocation();return <Navigate to={{pathname:'/',hash}} replace/>;}
+function App(){useRouteTitle();const{pathname}=useLocation();useTracking(pathname);return <><Routes><Route path="/partner" element={<Partner/>}/><Route path="/products" element={<Products/>}/><Route path="/" element={isAdminHost()?<Backoffice/>:<Home/>}/><Route path="/id" element={<LandingID/>}/><Route path="/build" element={<Build/>}/><Route path="/sites" element={<Sites/>}/><Route path="/site/:id" element={<SiteWorkbench/>}/><Route path="/site/:id/area/:areaId" element={<SiteWorkbench/>}/><Route path="/learn" element={<Learn/>}/><Route path="/backoffice" element={isAdminHost()?<AdminRoot/>:<Backoffice/>}/><Route path="/project/:id/episode" element={<EpisodePage/>}/><Route path="/project/:id" element={<SchoolWorkbench/>}/><Route path="/hardware" element={<Hardware/>}/><Route path="/hardware/:slug" element={<HardwareDetail/>}/><Route path="/bench" element={<Bench/>}/><Route path="/arena" element={<Arena/>}/><Route path="/arena/:id" element={<ArenaDetail/>}/><Route path="/builders" element={<Builders/>}/><Route path="/research" element={<Research/>}/><Route path="/docs" element={<Docs/>}/><Route path="/api" element={<Docs apiOverview/>}/><Route path="/design" element={<DesignSystem/>}/><Route path="*" element={<NotFound/>}/></Routes><ConsentBanner/></>;}
 createRoot(document.getElementById('root')!).render(<React.StrictMode><BrowserRouter><LangProvider><App/></LangProvider></BrowserRouter></React.StrictMode>);

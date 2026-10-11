@@ -5,7 +5,7 @@ The main website serves landing pages, documentation, downloads and static asset
 | Host | Purpose | Authentication |
 |---|---|---|
 | iot.ai.id | Public landing, documentation, downloads and static pages | None; /api/* returns JSON 403 without a login challenge |
-| admin.iot.ai.id | Backoffice entry at /backoffice | Testing workspace login |
+| admin.iot.ai.id | Backoffice at / (old /backoffice links redirect) | Testing workspace login |
 | api.iot.ai.id | Local API proxy at /api/* | Testing workspace login plus X-IOT-Session |
 | edge.iot.ai.id | Coordinator at /v1/* | Scoped node/owner bearer token |
 | iot.ai.id/ops/v1/ | Partner inquiries (POST), tested catalog and Lab Mitra board (GET) | None; rate-limited; /ops/v1/admin/ returns 404 |
