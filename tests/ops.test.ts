@@ -66,12 +66,12 @@ test('distributor products: SDPPI for wireless, no sale without settled localiza
  assert.equal(JSON.stringify(catalog).includes('internal margin'),false);assert.equal('history' in catalog[0],false);assert.equal('vendorId' in catalog[0],false);
 });
 
-test('Lab Mitra tasks: assign to active schools, evidence before verification, pay only verified, 60/25/15 split and public board',async()=>{
+test('Lab Mitra tasks: assign to active schools, evidence before verification, verified, 60/25/15 split and public board',async()=>{
  const ops=fresh();
  const prospect=(await call(ops,'POST','/ops/v1/admin/organizations',{type:'school',name:'SMK Prospect'})).data;
  const lab=(await call(ops,'POST','/ops/v1/admin/organizations',{type:'school',name:'SMK Negeri 2 Contoh',city:'Bekasi',status:'active',package:'lab',publicListing:true})).data;
  const task=(await call(ops,'POST','/ops/v1/admin/tasks',{title:'Humidity soak, 24 h',feeIdr:150001})).data;assert.equal(task.status,'open');
- assert.equal((await call(ops,'PATCH',`/ops/v1/admin/tasks/${task.id}`,{action:'pay'})).status,409,'cannot pay an open task');
+ assert.equal((await call(ops,'PATCH',`/ops/v1/admin/tasks/${task.id}`,{action:'pay'})).status,400,'there is no per-task pay action: payment goes through batches');
  assert.equal((await call(ops,'PATCH',`/ops/v1/admin/tasks/${task.id}`,{action:'assign',labId:prospect.id})).status,400,'lab must be active');
  assert.equal((await call(ops,'PATCH',`/ops/v1/admin/tasks/${task.id}`,{action:'assign',labId:lab.id})).data.status,'assigned');
  assert.equal((await call(ops,'PATCH',`/ops/v1/admin/tasks/${task.id}`,{action:'submit'})).status,409,'needs evidence');
@@ -79,9 +79,8 @@ test('Lab Mitra tasks: assign to active schools, evidence before verification, p
  assert.equal((await call(ops,'PATCH',`/ops/v1/admin/tasks/${task.id}`,{action:'verify'})).data.status,'verified');
  assert.deepEqual(payoutSplit(150001),{students:90000,tefa:37501,teacher:22500});
  const due=(await call(ops,'GET','/ops/v1/admin/payouts')).data;assert.equal(due.totals.dueIdr,150001);assert.equal(due.payouts[0].students,90000);
- assert.equal((await call(ops,'PATCH',`/ops/v1/admin/tasks/${task.id}`,{action:'pay'})).data.status,'paid');
- assert.deepEqual((await call(ops,'GET','/ops/v1/labs')).data.labs,[{name:'SMK Negeri 2 Contoh',city:'Bekasi',passed:1,paidIdr:150001}]);
- assert.equal((await call(ops,'GET','/ops/v1/admin/summary')).data.tasks.paid,1);
+ assert.deepEqual((await call(ops,'GET','/ops/v1/labs')).data.labs,[{name:'SMK Negeri 2 Contoh',city:'Bekasi',passed:1,paidIdr:0}],'paid only after a payout batch is marked paid');
+ assert.equal((await call(ops,'GET','/ops/v1/admin/summary')).data.tasks.verified,1);
  assert.deepEqual(taskTransition({status:'rejected',labId:lab.id,evidenceRef:'x'},{action:'assign',labId:lab.id}),{status:'assigned'});
  assert.equal((await call(ops,'POST','/ops/v1/admin/organizations',{type:'vendor',name:'V',publicListing:true})).status,400,'only schools are listed');
 });

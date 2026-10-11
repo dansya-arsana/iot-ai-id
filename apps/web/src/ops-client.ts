@@ -1,6 +1,6 @@
 /** Browser client for the ops service: public routes go to /ops/v1, owner routes through the session-guarded /api/ops proxy. */
-import {api} from './api';
-import type {Inquiry,InquiryInput,Organization,Product,LabTask,PublicProduct,Role,Resource} from '../../../packages/ops-contract/index';
+import {api,apiDownload,saveBlob} from './api';
+import type {Inquiry,InquiryInput,Organization,Product,LabTask,PublicProduct,Role,Resource,Person,Allocation,Batch,Share} from '../../../packages/ops-contract/index';
 
 export class OpsError extends Error{constructor(message:string,readonly status:number,readonly issues:{path:string;message:string}[]=[]){super(message);}}
 async function publicCall<T>(path:string,init?:RequestInit):Promise<T>{
@@ -32,8 +32,53 @@ export const opsAdmin={
  createProduct:(input:Partial<Product>)=>admin<Product>('products','POST',input),
  updateProduct:(id:string,changes:Partial<Product>)=>admin<Product>(`products/${id}`,'PATCH',changes),
  tasks:()=>admin<{tasks:TaskRow[]}>('tasks').then(d=>d.tasks),
- createTask:(input:{title:string;feeIdr:number;labId?:string;productId?:string;instructions?:string})=>admin<LabTask>('tasks','POST',input),
- taskAction:(id:string,input:{action:string;labId?:string;evidenceRef?:string;note?:string})=>admin<LabTask>(`tasks/${id}`,'PATCH',input),
+ createTask:(input:{title:string;feeIdr:number;labId?:string;leadId?:string;productId?:string;instructions?:string})=>admin<LabTask>('tasks','POST',input),
+ taskAction:(id:string,input:{action:string;labId?:string;leadId?:string;evidenceRef?:string;note?:string})=>admin<LabTask>(`tasks/${id}`,'PATCH',input),
  payouts:()=>admin<{payouts:PayoutRow[];totals:{dueIdr:number;paidIdr:number}}>('payouts'),
+ people:()=>admin<{people:PersonView[]}>('people').then(d=>d.people),
+ createSchoolAdmin:(input:{orgId:string;name:string})=>admin<{person:PersonView;inviteCode:string}>('people','POST',input),
+ resetInvite:(id:string)=>admin<{person:PersonView;inviteCode:string}>(`people/${id}/invite`,'POST',{}),
+ setPersonStatus:(id:string,status:'active'|'disabled')=>admin<PersonView>(`people/${id}`,'PATCH',{status}),
+ commissions:()=>admin<Commissions>('commissions'),
+ createBatch:(orgId:string)=>admin<BatchView>('batches','POST',{orgId}),
+ markBatchPaid:(id:string,input:{transferRef:string;paidAt:string})=>admin<BatchView>(`batches/${id}/paid`,'POST',input),
+ downloadBatch:(id:string)=>apiDownload(`/ops/batches/${id}/csv`,`batch-${id.slice(0,8)}.csv`),
+};
+export type PersonView=Person&{activated:boolean;inviteExpires?:string};
+export type Totals={accruedIdr:number;pendingApprovalIdr:number;approvedIdr:number;paidIdr:number;distributedIdr:number;waitingIdr:number;owedIdr:number};
+export type ShareView=Share&{name:string;className:string};
+export type AllocationView=Omit<Allocation,'shares'>&{shares:ShareView[];taskTitle:string;taskStatus:string;studentPoolIdr:number;proposedByName:string};
+export type BatchView=Batch&{tasks:{id:string;title:string;feeIdr:number}[];orgName?:string};
+export type Commissions={schools:{orgId:string;name:string;status:string;totals:Totals;people:{teachers:number;students:number};pending:AllocationView[];readyForBatch:number}[];batches:BatchView[]};
+
+// School portal (/mitra): cookie session on the public host, CSRF header on every write.
+async function portalCall<T>(path:string,method='GET',body?:unknown):Promise<T>{
+ const response=await fetch('/ops/v1/portal'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json','X-AIoT-Portal':'1'},...(body===undefined?{}:{body:JSON.stringify(body)})});
+ const data=await response.json().catch(()=>({error:'The service did not answer'}));
+ if(!response.ok)throw new OpsError(data.error??'Request failed',response.status,data.issues);
+ return data;
+}
+export type PortalMe={person:{id:string;name:string;role:'school_admin'|'teacher';username:string};school:{id:string;name:string;city:string};can:Record<string,boolean>};
+export type PortalTask={id:string;title:string;instructions:string;status:string;evidenceRef:string;feeIdr:number;payout:{students:number;tefa:number;teacher:number};leadId:string|null;leadName:string;mine:boolean;batchId:string|null;allocation:{id:string;status:string}|null};
+export type PortalPerson=Partial<PersonView>&{id:string;name:string;role:string;status:string;className?:string;allocatedIdr?:number;distributedIdr?:number;balanceIdr?:number};
+export const portal={
+ activate:(code:string,password:string)=>portalCall<{username:string;name:string}>('/activate','POST',{code,password}),
+ login:(username:string,password:string)=>portalCall<{username:string;name:string}>('/login','POST',{username,password}),
+ logout:()=>portalCall<{ok:true}>('/logout','POST',{}),
+ me:()=>portalCall<PortalMe>('/me'),
+ summary:()=>portalCall<Totals>('/summary'),
+ people:()=>portalCall<{people:PortalPerson[]}>('/people').then(d=>d.people),
+ addTeacher:(name:string)=>portalCall<{person:PersonView;inviteCode:string}>('/people','POST',{role:'teacher',name}),
+ addStudent:(input:{name:string;className:string;nisn?:string;guardianConsent:boolean})=>portalCall<{person:PersonView}>('/people','POST',{role:'student',...input}),
+ setStatus:(id:string,status:'active'|'disabled')=>portalCall<PersonView>(`/people/${id}`,'PATCH',{status}),
+ resetInvite:(id:string)=>portalCall<{person:PersonView;inviteCode:string}>(`/people/${id}/invite`,'POST',{}),
+ tasks:()=>portalCall<{tasks:PortalTask[]}>('/tasks').then(d=>d.tasks),
+ submitEvidence:(taskId:string,evidenceRef:string)=>portalCall<PortalTask>(`/tasks/${taskId}/evidence`,'POST',{evidenceRef}),
+ allocations:()=>portalCall<{allocations:AllocationView[]}>('/allocations').then(d=>d.allocations),
+ propose:(taskId:string,shares:Share[])=>portalCall<AllocationView>('/allocations','POST',{taskId,shares}),
+ decide:(id:string,action:'approve'|'reject',note?:string)=>portalCall<AllocationView>(`/allocations/${id}/${action}`,'POST',note?{note}:{}),
+ batches:()=>portalCall<{batches:BatchView[]}>('/batches').then(d=>d.batches),
+ confirmBatch:(id:string)=>portalCall<BatchView>(`/batches/${id}/confirm`,'POST',{}),
+ downloadBatch:async(id:string)=>{const response=await fetch(`/ops/v1/portal/batches/${id}/csv`,{credentials:'same-origin'});if(!response.ok)throw new OpsError('Download failed',response.status);saveBlob(await response.blob(),`batch-${id.slice(0,8)}.csv`);},
 };
 export const idr=(n:number)=>'Rp'+n.toLocaleString('id-ID');

@@ -2,17 +2,18 @@
 import {useCallback,useEffect,useMemo,useState,type FormEvent,type ReactNode} from 'react';
 import {useLang} from './i18n';
 import {Button,Eyebrow,Input,Notice,Select,Stat,StatGrid,Tag,Textarea} from './ui';
-import {idr,opsAdmin,type Me,type PayoutRow,type Summary,type TaskRow} from './ops-client';
+import {idr,opsAdmin,type Commissions as CommissionData,type Me,type PayoutRow,type PersonView,type Summary,type TaskRow} from './ops-client';
 import {CHECK_STATES,INQUIRY_STATUSES,LOCALIZATION_ITEMS,ORG_STATUSES,ORG_TYPES,PRODUCT_STATUSES,SCHOOL_PACKAGES,type Inquiry,type Organization,type Product} from '../../../packages/ops-contract/index';
 
 export const opsSections=[
  {hash:'#bo-inquiries',en:'Inquiries',id:'Inquiry'},
  {hash:'#bo-orgs',en:'Organizations',id:'Organisasi'},
  {hash:'#bo-products',en:'Products',id:'Produk'},
- {hash:'#bo-tasks',en:'Lab tasks & payouts',id:'Tugas lab & payout'},
+ {hash:'#bo-tasks',en:'Lab tasks',id:'Tugas lab'},
+ {hash:'#bo-commissions',en:'Commissions & payouts',id:'Komisi & payout'},
 ];
-async function fetchAll():Promise<Data>{const [me,summary,inquiries,orgs,products,tasks,payouts]=await Promise.all([opsAdmin.me(),opsAdmin.summary(),opsAdmin.inquiries(),opsAdmin.organizations(),opsAdmin.products(),opsAdmin.tasks(),opsAdmin.payouts()]);return{me,summary,inquiries,orgs,products,tasks,payouts};}
-type Data={me:Me;summary:Summary;inquiries:Inquiry[];orgs:Organization[];products:Product[];tasks:TaskRow[];payouts:{payouts:PayoutRow[];totals:{dueIdr:number;paidIdr:number}}};
+async function fetchAll():Promise<Data>{const [me,summary,inquiries,orgs,products,tasks,payouts,commissions,people]=await Promise.all([opsAdmin.me(),opsAdmin.summary(),opsAdmin.inquiries(),opsAdmin.organizations(),opsAdmin.products(),opsAdmin.tasks(),opsAdmin.payouts(),opsAdmin.commissions(),opsAdmin.people()]);return{me,summary,inquiries,orgs,products,tasks,payouts,commissions,people};}
+type Data={me:Me;summary:Summary;inquiries:Inquiry[];orgs:Organization[];products:Product[];tasks:TaskRow[];payouts:{payouts:PayoutRow[];totals:{dueIdr:number;paidIdr:number}};commissions:CommissionData;people:PersonView[]};
 const when=(iso:string,locale:string)=>new Date(iso).toLocaleString(locale,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 const tone=(status:string):'ok'|'warn'|'error'|'neutral'=>['won','active','available','verified','paid','done'].includes(status)?'ok':['new','submitted','in_progress','testing','localizing','proposal'].includes(status)?'warn':['lost','spam','rejected','ended','discontinued'].includes(status)?'error':'neutral';
 
@@ -48,6 +49,7 @@ export function BusinessOps(){
   <Organizations data={data} canWrite={write('organizations')} run={run}/>
   <Products data={data} canWrite={write('products')} run={run}/>
   <Tasks data={data} canWrite={write('tasks')} run={run}/>
+  <Commissions data={data} canPay={write('tasks')} canPeople={write('organizations')} run={run} locale={locale}/>
  </>;
 }
 type Run=(action:()=>Promise<unknown>,ok:string)=>Promise<boolean>;
@@ -139,28 +141,78 @@ function Products({data,canWrite,run}:{data:Data;canWrite:boolean;run:Run}){
 
 function Tasks({data,canWrite,run}:{data:Data;canWrite:boolean;run:Run}){
  const{tr}=useLang();const labs=useMemo(()=>data.orgs.filter(o=>o.type==='school'&&o.status==='active'),[data.orgs]);const labName=(id?:string)=>data.orgs.find(o=>o.id===id)?.name??'—';
- const [form,setForm]=useState({title:'',feeIdr:'150000',labId:''});const [refs,setRefs]=useState<Record<string,string>>({});const [assign,setAssign]=useState<Record<string,string>>({});
+ const [form,setForm]=useState({title:'',feeIdr:'150000',labId:'',leadId:''});const [refs,setRefs]=useState<Record<string,string>>({});const [assign,setAssign]=useState<Record<string,string>>({});const [leads,setLeads]=useState<Record<string,string>>({});
+ const teachers=(labId:string)=>data.people.filter(p=>p.role==='teacher'&&p.status==='active'&&p.orgId===labId);const personName=(id?:string)=>data.people.find(p=>p.id===id)?.name;
  const submit=(e:FormEvent)=>{e.preventDefault();void run(()=>opsAdmin.createTask({title:form.title,feeIdr:Number(form.feeIdr),...(form.labId?{labId:form.labId}:{})}),tr('Task created','Tugas dibuat')).then(ok=>ok&&setForm(f=>({...f,title:''})));};
  const act=(t:TaskRow,action:string,extra:Record<string,string>={})=>void run(()=>opsAdmin.taskAction(t.id,{action,...extra}),tr(`Task: ${action}`,`Tugas: ${action}`));
  const {payouts,totals}=data.payouts;
  return <Section id="bo-tasks" eyebrow="Lab Mitra" title={tr('Lab tasks & payouts','Tugas lab & payout')}>
-  <p className="bo-muted">{tr('Flow: open → assigned → submitted (with evidence) → verified → paid. Payout split per task: 60% student operators, 25% school TEFA fund, 15% supervising teacher, paid to the school account.','Alur: open → assigned → submitted (dengan bukti) → verified → paid. Pembagian per tugas: 60% siswa operator, 25% kas TEFA sekolah, 15% guru pembimbing, dibayar ke rekening sekolah.')}</p>
+  <p className="bo-muted">{tr('Flow: open → assigned → submitted (with evidence) → verified → paid. A task is paid when its payout batch is marked paid (see Commissions & payouts). Split per task: 60% student operators, 25% school TEFA fund, 15% supervising teacher, always paid to the school account.','Alur: open → assigned → submitted (dengan bukti) → verified → paid. Tugas berstatus paid saat batch payout-nya ditandai dibayar (lihat Komisi & payout). Pembagian per tugas: 60% siswa operator, 25% kas TEFA sekolah, 15% guru pembimbing, selalu dibayar ke rekening sekolah.')}</p>
   {canWrite&&<form className="bo-ops-form" onSubmit={submit} aria-label={tr('Create task','Buat tugas')}>
    <Input id="tk-title" label={tr('Task','Tugas')} required placeholder={tr('e.g. Humidity soak 24 h, sensor X','mis. Uji lembap 24 jam, sensor X')} value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/>
    <Input id="tk-fee" label={tr('Fee (IDR)','Honor (Rp)')} type="number" min={10000} step={1000} required value={form.feeIdr} onChange={e=>setForm({...form,feeIdr:e.target.value})}/>
-   <Select id="tk-lab" label="Lab Mitra" value={form.labId} onChange={e=>setForm({...form,labId:e.target.value})}><option value="">{tr('Unassigned','Belum ditugaskan')}</option>{labs.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</Select>
+   <Select id="tk-lab" label="Lab Mitra" value={form.labId} onChange={e=>setForm({...form,labId:e.target.value,leadId:''})}><option value="">{tr('Unassigned','Belum ditugaskan')}</option>{labs.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</Select>
+   {form.labId&&<Select id="tk-lead" label={tr('Lead teacher','Guru pembimbing')} value={form.leadId} onChange={e=>setForm({...form,leadId:e.target.value})}><option value="">{tr('No lead yet','Belum ada')}</option>{teachers(form.labId).map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</Select>}
    <Button type="submit" size="sm">{tr('Create task','Buat tugas')}</Button>
   </form>}
   {!labs.length&&<p className="bo-muted">{tr('No active Lab Mitra schools yet: set a school organization to active to assign tasks.','Belum ada sekolah Lab Mitra aktif: ubah status organisasi sekolah menjadi active untuk menugaskan.')}</p>}
   {data.tasks.length>0&&<div className="bo-ops-table"><table><thead><tr><th scope="col">{tr('Task','Tugas')}</th><th scope="col">Lab</th><th scope="col">{tr('Fee','Honor')}</th><th scope="col">60 / 25 / 15</th><th scope="col">Status</th><th scope="col">{tr('Action','Aksi')}</th></tr></thead><tbody>{data.tasks.map(t=><tr key={t.id}>
-   <th scope="row">{t.title}{t.evidenceRef&&<small> · {t.evidenceRef}</small>}</th><td>{labName(t.labId)}</td><td>{idr(t.feeIdr)}</td><td><small>{idr(t.payout.students)} / {idr(t.payout.tefa)} / {idr(t.payout.teacher)}</small></td><td><Tag tone={tone(t.status)}>{t.status}</Tag></td>
+   <th scope="row">{t.title}{t.evidenceRef&&<small> · {t.evidenceRef}</small>}</th><td>{labName(t.labId)}{t.leadId&&<small> · {personName(t.leadId)}</small>}</td><td>{idr(t.feeIdr)}</td><td><small>{idr(t.payout.students)} / {idr(t.payout.tefa)} / {idr(t.payout.teacher)}</small></td><td><Tag tone={tone(t.status)}>{t.status}</Tag></td>
    <td>{canWrite&&<div className="bo-ops-inline">
-    {(t.status==='open'||t.status==='rejected')&&<><Select id={`as-${t.id}`} hideLabel label="Lab" value={assign[t.id]??''} onChange={e=>setAssign(a=>({...a,[t.id]:e.target.value}))}><option value="">{tr('Choose lab','Pilih lab')}</option>{labs.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</Select><Button size="sm" variant="secondary" disabled={!assign[t.id]} onClick={()=>act(t,'assign',{labId:assign[t.id]})}>{tr('Assign','Tugaskan')}</Button></>}
+    {(t.status==='open'||t.status==='rejected')&&<><Select id={`as-${t.id}`} hideLabel label="Lab" value={assign[t.id]??''} onChange={e=>{setAssign(a=>({...a,[t.id]:e.target.value}));setLeads(l=>({...l,[t.id]:''}));}}><option value="">{tr('Choose lab','Pilih lab')}</option>{labs.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</Select>{assign[t.id]&&<Select id={`ld-${t.id}`} hideLabel label={tr('Lead teacher','Guru pembimbing')} value={leads[t.id]??''} onChange={e=>setLeads(l=>({...l,[t.id]:e.target.value}))}><option value="">{tr('No lead yet','Belum ada guru')}</option>{teachers(assign[t.id]).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</Select>}<Button size="sm" variant="secondary" disabled={!assign[t.id]} onClick={()=>act(t,'assign',{labId:assign[t.id],...(leads[t.id]?{leadId:leads[t.id]}:{})})}>{tr('Assign','Tugaskan')}</Button></>}
+    {t.status==='assigned'&&t.labId&&teachers(t.labId).length>0&&<><Select id={`lead-${t.id}`} hideLabel label={tr('Lead teacher','Guru pembimbing')} value={leads[t.id]??t.leadId??''} onChange={e=>setLeads(l=>({...l,[t.id]:e.target.value}))}><option value="">{tr('No lead yet','Belum ada guru')}</option>{teachers(t.labId).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</Select><Button size="sm" variant="secondary" disabled={!leads[t.id]||leads[t.id]===t.leadId} onClick={()=>act(t,'assign',{labId:t.labId!,leadId:leads[t.id]})}>{tr('Set lead','Atur guru')}</Button></>}
     {t.status==='assigned'&&<><Input id={`ref-${t.id}`} hideLabel label={tr('Evidence reference','Referensi bukti')} placeholder={tr('Job id or link','Job id atau link')} value={refs[t.id]??''} onChange={e=>setRefs(r=>({...r,[t.id]:e.target.value}))}/><Button size="sm" variant="secondary" disabled={!refs[t.id]} onClick={()=>act(t,'submit',{evidenceRef:refs[t.id]})}>{tr('Mark submitted','Tandai terkirim')}</Button></>}
     {t.status==='submitted'&&<><Button size="sm" onClick={()=>act(t,'verify')}>{tr('Verify','Verifikasi')}</Button><Button size="sm" variant="secondary" onClick={()=>act(t,'reject')}>{tr('Reject','Tolak')}</Button></>}
-    {t.status==='verified'&&<Button size="sm" onClick={()=>act(t,'pay')}>{tr('Mark paid','Tandai dibayar')}</Button>}
+    {t.status==='verified'&&<a className="bo-ops-link" href="#bo-commissions">{t.batchId?tr('In a payout batch','Ada di batch payout'):tr('Pay via a payout batch','Bayar lewat batch payout')}</a>}
    </div>}</td>
   </tr>)}</tbody></table></div>}
-  <div className="bo-ops-payouts"><StatGrid><Stat label={tr('Payout due (verified)','Payout tertunda (terverifikasi)')} value={idr(totals.dueIdr)}/><Stat label={tr('Paid to schools','Sudah dibayar ke sekolah')} value={idr(totals.paidIdr)}/><Stat label={tr('Verified tasks','Tugas terverifikasi')} value={payouts.length}/></StatGrid></div>
+  <div className="bo-ops-payouts"><StatGrid><Stat label={tr('Payout due (verified)','Payout tertunda (terverifikasi)')} value={idr(totals.dueIdr)}/><Stat label={tr('Paid to schools (batches)','Sudah dibayar ke sekolah (batch)')} value={idr(totals.paidIdr)}/><Stat label={tr('Verified tasks','Tugas terverifikasi')} value={payouts.length}/></StatGrid></div>
+ </Section>;
+}
+
+const today=()=>new Date().toISOString().slice(0,10);
+function Commissions({data,canPay,canPeople,run,locale}:{data:Data;canPay:boolean;canPeople:boolean;run:Run;locale:string}){
+ const{tr}=useLang();const {schools,batches}=data.commissions;const activeSchools=data.orgs.filter(o=>o.type==='school'&&o.status==='active');
+ const [form,setForm]=useState({orgId:'',name:''});const [invite,setInvite]=useState<{name:string;username?:string;code:string}>();const [copied,setCopied]=useState(false);
+ const [paid,setPaid]=useState<Record<string,{ref:string;date:string}>>({});const [fileError,setFileError]=useState('');
+ const staff=data.people.filter(p=>p.role!=='student');const schoolName=(id:string)=>data.orgs.find(o=>o.id===id)?.name??'—';
+ const reveal=(name:string,r:{person:PersonView;inviteCode:string})=>{setInvite({name,username:r.person.username,code:r.inviteCode});setCopied(false);};
+ const createAdmin=(e:FormEvent)=>{e.preventDefault();void run(async()=>{const r=await opsAdmin.createSchoolAdmin({orgId:form.orgId,name:form.name.trim()});reveal(form.name.trim(),r);setForm(f=>({...f,name:''}));},tr('School admin created','Admin sekolah dibuat'));};
+ const copy=()=>{if(invite)void navigator.clipboard?.writeText(invite.code).then(()=>setCopied(true));};
+ const status=(p:PersonView)=>p.status==='disabled'?<Tag tone="error">{tr('disabled','nonaktif')}</Tag>:p.activated?<Tag tone="ok">{tr('active','aktif')}</Tag>:p.inviteExpires?<Tag tone="warn">{tr('invite until','undangan s/d')} {new Date(p.inviteExpires).toLocaleDateString(locale,{day:'numeric',month:'short'})}</Tag>:<Tag>{tr('invite expired','undangan kedaluwarsa')}</Tag>;
+ return <Section id="bo-commissions" eyebrow="Lab Mitra" title={tr('Commissions & payouts','Komisi & payout')}>
+  <p className="bo-muted">{tr('Commissions are always transferred to the school bank account, never to students. The school admin approves the per-student split proposed by the teacher, then confirms it distributed the money. Every posting is appended to an immutable ledger.','Komisi selalu ditransfer ke rekening sekolah, tidak pernah ke siswa. Admin sekolah menyetujui pembagian per siswa yang diusulkan guru, lalu mengonfirmasi bahwa dana sudah dibagikan. Setiap posting masuk ke ledger yang tidak bisa diubah.')}</p>
+  {fileError&&<Notice tone="error">{fileError}</Notice>}
+  <div className="bo-ops-table"><table><caption className="bo-muted">{tr('Balances per school','Saldo per sekolah')}</caption><thead><tr><th scope="col">{tr('School','Sekolah')}</th><th scope="col">{tr('Accrued','Terakru')}</th><th scope="col">{tr('Student share awaiting school approval','Porsi siswa menunggu persetujuan sekolah')}</th><th scope="col">{tr('Approved to students','Disetujui ke siswa')}</th><th scope="col">{tr('Paid to school','Dibayar ke sekolah')}</th><th scope="col">{tr('Awaiting distribution','Menunggu dibagikan')}</th><th scope="col">{tr('Still owed','Masih terutang')}</th><th scope="col">{tr('Action','Aksi')}</th></tr></thead><tbody>{schools.filter(s=>s.status==='active'||s.totals.accruedIdr>0).map(s=><tr key={s.orgId}>
+   <th scope="row">{s.name}<small> · {s.people.teachers} {tr('teachers','guru')}, {s.people.students} {tr('students','siswa')}</small></th><td>{idr(s.totals.accruedIdr)}</td><td>{idr(s.totals.pendingApprovalIdr)}</td><td>{idr(s.totals.approvedIdr)}</td><td>{idr(s.totals.paidIdr)}</td><td>{idr(s.totals.waitingIdr)}</td><td>{idr(s.totals.owedIdr)}</td>
+   <td>{canPay&&s.readyForBatch>0?<Button size="sm" onClick={()=>void run(()=>opsAdmin.createBatch(s.orgId),tr('Payout batch created','Batch payout dibuat'))}>{tr(`Create batch (${s.readyForBatch})`,`Buat batch (${s.readyForBatch})`)}</Button>:'—'}</td>
+  </tr>)}</tbody></table></div>
+  {schools.every(s=>s.status!=='active'&&!s.totals.accruedIdr)&&<p className="bo-muted">{tr('No active Lab Mitra schools yet.','Belum ada sekolah Lab Mitra aktif.')}</p>}
+
+  <h3>{tr('Allocations waiting for school approval','Alokasi menunggu persetujuan sekolah')}</h3>
+  {schools.every(s=>!s.pending.length)?<p className="bo-muted">{tr('Nothing is waiting. AIoT cannot approve allocations: the school admin does.','Tidak ada yang menunggu. AIoT tidak dapat menyetujui alokasi: itu tugas admin sekolah.')}</p>:
+  <ul className="bo-ops-list">{schools.flatMap(s=>s.pending.map(a=><li key={a.id}><div className="bo-ops-row"><Tag tone="warn">{tr('pending','menunggu')}</Tag><span className="bo-ops-main"><b>{a.taskTitle}</b><small>{s.name} · {tr('proposed by','diusulkan')} {a.proposedByName} · {a.shares.map(x=>`${x.name} ${idr(x.amountIdr)}`).join(', ')}</small></span><small className="bo-ops-meta">{idr(a.studentPoolIdr)}</small></div></li>))}</ul>}
+
+  <h3>{tr('Payout batches','Batch payout')}</h3>
+  {!batches.length?<p className="bo-muted">{tr('No batches yet. A batch collects the approved, unpaid allocations of one school.','Belum ada batch. Batch berisi alokasi yang sudah disetujui dan belum dibayar dari satu sekolah.')}</p>:
+  <div className="bo-ops-table"><table><thead><tr><th scope="col">{tr('School','Sekolah')}</th><th scope="col">{tr('Tasks','Tugas')}</th><th scope="col">{tr('Amount','Jumlah')}</th><th scope="col">Status</th><th scope="col">{tr('Transfer','Transfer')}</th><th scope="col">{tr('Action','Aksi')}</th></tr></thead><tbody>{batches.map(b=>{const f=paid[b.id]??{ref:'',date:today()};return <tr key={b.id}>
+   <th scope="row">{b.orgName}<small> · {b.id.slice(0,8)}</small></th><td><small>{b.tasks.map(t=>t.title).join(', ')}</small></td><td>{idr(b.amountIdr)}</td><td><Tag tone={b.status==='paid'?'ok':'warn'}>{b.status}</Tag>{b.distributedAt&&<> <Tag tone="ok">{tr('distributed','dibagikan')}</Tag></>}</td><td>{b.status==='paid'?<small>{b.transferRef} · {b.paidAt?.slice(0,10)}</small>:canPay?<div className="bo-ops-inline"><Input id={`tr-${b.id}`} hideLabel label={tr('Transfer reference','Referensi transfer')} placeholder={tr('Transfer reference','Referensi transfer')} value={f.ref} onChange={e=>setPaid(x=>({...x,[b.id]:{...f,ref:e.target.value}}))}/><Input id={`td-${b.id}`} hideLabel label={tr('Paid on','Dibayar pada')} type="date" value={f.date} onChange={e=>setPaid(x=>({...x,[b.id]:{...f,date:e.target.value}}))}/></div>:'—'}</td>
+   <td><div className="bo-ops-inline">{canPay&&b.status==='created'&&<Button size="sm" disabled={f.ref.trim().length<3} onClick={()=>void run(()=>opsAdmin.markBatchPaid(b.id,{transferRef:f.ref.trim(),paidAt:f.date}),tr('Batch marked paid; tasks are now paid','Batch ditandai dibayar; tugas kini paid'))}>{tr('Mark paid','Tandai dibayar')}</Button>}<Button size="sm" variant="secondary" onClick={()=>void opsAdmin.downloadBatch(b.id).catch(e=>setFileError(e instanceof Error?e.message:String(e)))}>CSV</Button></div></td>
+  </tr>;})}</tbody></table></div>}
+
+  <h3>{tr('School people','Orang di sekolah')}</h3>
+  <p className="bo-muted">{tr('AIoT creates the first school admin for an active school; the school admin then adds teachers and students in the portal at /mitra. Codes are shown once and expire in 7 days.','AIoT membuat admin sekolah pertama untuk sekolah aktif; admin sekolah lalu menambah guru dan siswa di portal /mitra. Kode hanya tampil sekali dan kedaluwarsa dalam 7 hari.')}</p>
+  {invite&&<Notice tone="warn" title={tr(`Invite code for ${invite.name}`,`Kode undangan untuk ${invite.name}`)} action={<Button size="sm" variant="secondary" onClick={copy}>{copied?tr('Copied','Tersalin'):tr('Copy code','Salin kode')}</Button>}>
+   <span className="bo-ops-code" data-testid="invite-code">{invite.code}</span>{invite.username&&<> · {tr('username','nama pengguna')} <code>{invite.username}</code></>} <span>{tr('Shown once. Copy it now and hand it to the person; it cannot be displayed again, only replaced with a new code. Valid for 7 days.','Tampil sekali. Salin sekarang dan serahkan ke orangnya; kode tidak dapat ditampilkan lagi, hanya diganti kode baru. Berlaku 7 hari.')}</span> <Button size="sm" variant="secondary" onClick={()=>setInvite(undefined)}>{tr('I have copied it','Sudah saya salin')}</Button>
+  </Notice>}
+  {canPeople&&(activeSchools.length?<form className="bo-ops-form" onSubmit={createAdmin} aria-label={tr('Create school admin','Buat admin sekolah')}>
+   <Select id="sa-org" label={tr('School','Sekolah')} required value={form.orgId} onChange={e=>setForm({...form,orgId:e.target.value})}><option value="">{tr('Choose school','Pilih sekolah')}</option>{activeSchools.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</Select>
+   <Input id="sa-name" label={tr('School admin name','Nama admin sekolah')} required value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
+   <Button type="submit" size="sm" disabled={!form.orgId||form.name.trim().length<2}>{tr('Create school admin','Buat admin sekolah')}</Button>
+  </form>:<p className="bo-muted">{tr('Set a school organization to active first.','Ubah status organisasi sekolah menjadi active terlebih dahulu.')}</p>)}
+  {staff.length>0&&<div className="bo-ops-table"><table><thead><tr><th scope="col">{tr('Name','Nama')}</th><th scope="col">{tr('Role','Peran')}</th><th scope="col">{tr('School','Sekolah')}</th><th scope="col">{tr('Username','Nama pengguna')}</th><th scope="col">Status</th><th scope="col">{tr('Action','Aksi')}</th></tr></thead><tbody>{staff.map(p=><tr key={p.id}>
+   <th scope="row">{p.name}</th><td>{p.role}</td><td>{schoolName(p.orgId)}</td><td><code>{p.username}</code></td><td>{status(p)}</td>
+   <td>{canPeople&&<div className="bo-ops-inline">{p.status==='active'&&<Button size="sm" variant="secondary" onClick={()=>void run(async()=>reveal(p.name,await opsAdmin.resetInvite(p.id)),tr('New invite code created','Kode undangan baru dibuat'))}>{tr('Reset invite','Reset undangan')}</Button>}<Button size="sm" variant="secondary" onClick={()=>void run(()=>opsAdmin.setPersonStatus(p.id,p.status==='active'?'disabled':'active'),p.status==='active'?tr('Person disabled','Orang dinonaktifkan'):tr('Person enabled','Orang diaktifkan'))}>{p.status==='active'?tr('Disable','Nonaktifkan'):tr('Enable','Aktifkan')}</Button></div>}</td>
+  </tr>)}</tbody></table></div>}
  </Section>;
 }

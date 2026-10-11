@@ -6,7 +6,18 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+### Changed
+- Tasks are marked paid when their payout batch is marked paid; the per-task "Mark paid" action is removed. Tasks can carry a lead teacher set at assignment.
+
 ### Added
+- Lab Mitra commissions (ADR 010):
+  - Append-only commission ledger (SQLite triggers reject UPDATE and DELETE; corrections are reversal rows) with balances derived by SUM.
+  - School portal at `/mitra` for school admins and teachers, served at `/ops/v1/portal/*`: invite-code activation, password login with lockout, `aiot_portal` session cookie, CSRF header, strict per-school isolation.
+  - Teachers propose per-student allocations of the 60% student pool, school admins approve them under a two-person rule, and schools confirm distribution.
+  - Payout batches in the backoffice (`#bo-commissions`): create from approved allocations, mark paid with a transfer reference, download CSV. Commissions are always paid to the school account.
+  - Students are stored with guardian consent and minimal data only.
+- Portal hardening: stale allocations are voided on reassignment or lead change, invite resets are restricted, ledger corrections are whole-allocation or whole-accrual reversals, invite codes carry a lookup id, scrypt is asynchronous, lockout is per person and IP, sessions have idle timeout and a cap.
+- Nginx rate zones `iot_portal` and `iot_portal_auth` for the portal (repo copy; deploy separately).
 - `admin.iot.ai.id` opens the backoffice at its root; `/backoffice` there redirects to `/` and keeps the section hash. Local installs keep `/backoffice`.
 - AI provider adapter layer (`packages/ai-providers`): OpenAI, Anthropic Claude, MiniMax and Z.ai GLM, plus OpenAI-compatible endpoints and signed-in Codex or Claude Code CLIs on the desktop. AI settings show one card per allowed provider with model choice and an active provider. TypeSafe/Jev routing is now optional and skipped when unavailable.
 - Desktop: bring-your-own-key stays on the user's computer; the desktop app is renamed AIoT.

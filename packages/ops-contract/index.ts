@@ -93,13 +93,14 @@ export type PublicProduct=ReturnType<typeof publicProduct>;
 // Lab Mitra tasks: paid test work done by a school lab, verified before payout.
 export const TASK_STATUSES=['open','assigned','submitted','verified','rejected','paid'] as const;
 export type TaskStatus=typeof TASK_STATUSES[number];
-export const TaskInputSchema=z.object({title:text(160).min(4),feeIdr:z.number().int().min(10000).max(100_000_000),productId:z.string().uuid().optional(),partnerId:z.string().uuid().optional(),labId:z.string().uuid().optional(),instructions:text(4000).default('')}).strict();
+export const TaskInputSchema=z.object({title:text(160).min(4),feeIdr:z.number().int().min(10000).max(100_000_000),productId:z.string().uuid().optional(),partnerId:z.string().uuid().optional(),labId:z.string().uuid().optional(),leadId:z.string().uuid().optional(),instructions:text(4000).default('')}).strict().refine(t=>!t.leadId||!!t.labId,{message:'A lead teacher needs an assigned school',path:['leadId']});
 export type TaskInput=z.infer<typeof TaskInputSchema>;
-export type LabTask=TaskInput&{id:string;status:TaskStatus;evidenceRef:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
-export const TASK_ACTIONS=['assign','submit','verify','reject','pay'] as const;
-export const TaskActionSchema=z.object({action:z.enum(TASK_ACTIONS),labId:z.string().uuid().optional(),evidenceRef:text(500).optional(),note:text(1000).optional()}).strict();
-const flow:Record<typeof TASK_ACTIONS[number],{from:TaskStatus[];to:TaskStatus}>={assign:{from:['open','rejected','assigned'],to:'assigned'},submit:{from:['assigned'],to:'submitted'},verify:{from:['submitted'],to:'verified'},reject:{from:['submitted'],to:'rejected'},pay:{from:['verified'],to:'paid'}};
-/** Next task status, or an error. Payment is only possible after verification; submission needs an evidence reference. */
+export type LabTask=TaskInput&{id:string;status:TaskStatus;evidenceRef:string;batchId?:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
+/** Tasks become `paid` when their payout batch is marked paid (ADR 010), so there is no per-task pay action. */
+export const TASK_ACTIONS=['assign','submit','verify','reject'] as const;
+export const TaskActionSchema=z.object({action:z.enum(TASK_ACTIONS),labId:z.string().uuid().optional(),leadId:z.string().uuid().optional(),evidenceRef:text(500).optional(),note:text(1000).optional()}).strict();
+const flow:Record<typeof TASK_ACTIONS[number],{from:TaskStatus[];to:TaskStatus}>={assign:{from:['open','rejected','assigned'],to:'assigned'},submit:{from:['assigned'],to:'submitted'},verify:{from:['submitted'],to:'verified'},reject:{from:['submitted'],to:'rejected'}};
+/** Next task status, or an error. Payment happens through payout batches after verification; submission needs an evidence reference. */
 export function taskTransition(task:Pick<LabTask,'status'|'labId'|'evidenceRef'>,input:z.infer<typeof TaskActionSchema>):{status:TaskStatus}|{error:string}{
  const step=flow[input.action];
  if(!step.from.includes(task.status))return{error:`Cannot ${input.action} a task that is ${task.status}`};
@@ -112,6 +113,46 @@ export function taskTransition(task:Pick<LabTask,'status'|'labId'|'evidenceRef'>
 /** Lab Mitra payout split: 60% student operators, 25% school TEFA fund, 15% supervising teacher. Rounding goes to the TEFA fund. */
 export const PAYOUT_SPLIT={students:60,tefa:25,teacher:15} as const;
 export function payoutSplit(feeIdr:number){const students=Math.floor(feeIdr*PAYOUT_SPLIT.students/100),teacher=Math.floor(feeIdr*PAYOUT_SPLIT.teacher/100);return{students,tefa:feeIdr-students-teacher,teacher};}
+
+/** Integer split of `total` over `n` students; the remainder goes 1 rupiah each to the first students. */
+export function equalShares(total:number,n:number):number[]{if(!(n>0))return[];const base=Math.floor(total/n),rest=total-base*n;return Array.from({length:n},(_,i)=>base+(i<rest?1:0));}
+
+// Lab Mitra portal (ADR 010): school-side people, allocations, payout batches. Commissions are paid to the school, never to students.
+export const PERSON_ROLES=['school_admin','teacher','student'] as const;
+export type PersonRole=typeof PERSON_ROLES[number];
+export const PERSON_STATUSES=['active','disabled'] as const;
+const personName=text(120).min(2);
+export const TeacherInputSchema=z.object({role:z.literal('teacher'),name:personName}).strict();
+export const StudentInputSchema=z.object({role:z.literal('student'),name:personName,className:text(40).min(1),nisn:z.union([z.literal(''),z.string().trim().regex(/^[0-9]{10}$/,'NISN has 10 digits')]).optional(),guardianConsent:z.literal(true,{error:'Guardian consent is required for students'})}).strict();
+export const PortalPersonInputSchema=z.discriminatedUnion('role',[TeacherInputSchema,StudentInputSchema]);
+export const SchoolAdminInputSchema=z.object({orgId:z.string().uuid(),name:personName}).strict();
+export const PersonUpdateSchema=z.object({name:personName.optional(),className:text(40).min(1).optional(),nisn:z.union([z.literal(''),z.string().trim().regex(/^[0-9]{10}$/,'NISN has 10 digits')]).optional(),status:z.enum(PERSON_STATUSES).optional()}).strict();
+export type Person={id:string;orgId:string;role:PersonRole;name:string;className?:string;nisn?:string;username?:string;status:typeof PERSON_STATUSES[number];guardianConsent?:{at:string;recordedBy:string};createdBy:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
+export const PortalLoginSchema=z.object({username:text(80).min(3),password:z.string().min(1).max(200)}).strict();
+export const PortalActivateSchema=z.object({code:z.string().trim().toUpperCase().regex(/^[A-HJKMNP-Z2-9]{4}-[A-HJKMNP-Z2-9]{10}$/,{error:'Invite codes look like ABCD-EFGHJKMNPQ'}),password:z.string().min(10,{error:'Password needs at least 10 characters'}).max(200)}).strict();
+export const AllocationProposalSchema=z.object({taskId:z.string().uuid(),shares:z.array(z.object({studentId:z.string().uuid(),amountIdr:z.number().int().min(0).max(100_000_000)}).strict()).min(1).max(60)}).strict();
+export const AllocationDecisionSchema=z.object({note:text(500).optional()}).strict();
+export const ReasonSchema=z.object({reason:text(300).min(3,{error:'A reason is required'})}).strict();
+export const EvidenceSchema=z.object({evidenceRef:text(500).min(1)}).strict();
+export const BatchCreateSchema=z.object({orgId:z.string().uuid()}).strict();
+export const BatchPaidSchema=z.object({transferRef:text(120).min(3,{error:'Transfer reference is required'}),paidAt:z.string().regex(/^\d{4}-\d{2}-\d{2}(T[\d:.]+Z?)?$/,{error:'Use a date like 2026-10-31'})}).strict();
+export type Share={studentId:string;amountIdr:number};
+export type Allocation={id:string;taskId:string;orgId:string;proposedBy:string;shares:Share[];status:'pending'|'approved'|'rejected'|'void'|'reversed';decidedBy?:string;decidedAt?:string;note:string;batchId?:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
+export type Batch={id:string;orgId:string;taskIds:string[];allocationIds:string[];amountIdr:number;status:'created'|'paid';transferRef:string;paidAt?:string;distributedAt?:string;distributedBy?:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
+/** An allocation must hand out exactly the task's student pool to distinct students. */
+export function allocationErrors(poolIdr:number,shares:Share[]):string[]{
+ const errors:string[]=[];const total=shares.reduce((n,s)=>n+s.amountIdr,0);
+ if(new Set(shares.map(s=>s.studentId)).size!==shares.length)errors.push('Each student can appear only once');
+ if(total!==poolIdr)errors.push(`Shares must add up to the student pool of ${poolIdr} (got ${total})`);
+ return errors;
+}
+export const PORTAL_ACTIONS=['summary.read','people.read','people.write','tasks.read','tasks.evidence','allocations.read','allocations.propose','allocations.decide','batches.read','batches.confirm'] as const;
+export type PortalAction=typeof PORTAL_ACTIONS[number];
+const portalGrants:Record<'school_admin'|'teacher',PortalAction[]>={
+ school_admin:['summary.read','people.read','people.write','tasks.read','allocations.read','allocations.propose','allocations.decide','batches.read','batches.confirm'],
+ teacher:['people.read','tasks.read','tasks.evidence','allocations.read','allocations.propose'],
+};
+export function portalCan(role:PersonRole,action:PortalAction){return role!=='student'&&portalGrants[role].includes(action);}
 
 // Roles: per-user access behind the admin gateway login.
 export const ROLES=['owner','sales','ops','viewer'] as const;

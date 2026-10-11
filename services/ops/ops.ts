@@ -3,30 +3,36 @@ import {DatabaseSync} from 'node:sqlite';
 import {mkdirSync} from 'node:fs';
 import {dirname} from 'node:path';
 import {randomUUID} from 'node:crypto';
+import {Ledger} from './ledger.js';
+import {Commissions} from './commissions.js';
+import {HttpError,fail,parse} from './http.js';
 import {z} from 'zod';
+import {handlePortal} from './portal.js';
 import {
  InquiryInputSchema,InquiryUpdateSchema,OrganizationInputSchema,OrganizationUpdateSchema,ProductInputSchema,ProductUpdateSchema,TaskInputSchema,TaskActionSchema,
- INQUIRY_STATUSES,ORG_TYPES,PRODUCT_STATUSES,TASK_STATUSES,can,permissions,resolveRole,payoutSplit,productErrors,publicProduct,taskTransition,
- type Inquiry,type Organization,type Product,type LabTask,type Role,type Resource,
+ SchoolAdminInputSchema,ReasonSchema,PersonUpdateSchema,BatchCreateSchema,BatchPaidSchema,INQUIRY_STATUSES,ORG_TYPES,PRODUCT_STATUSES,TASK_STATUSES,can,permissions,resolveRole,payoutSplit,productErrors,publicProduct,taskTransition,
+ type Inquiry,type Organization,type Product,type LabTask,type Batch,type Allocation,type Role,type Resource,
 } from '../../packages/ops-contract/index.js';
 
-const kinds=['inquiries','organizations','products','tasks'] as const;
+const UuidSchema=z.string().uuid({error:'Invalid id'});
+const kinds=['inquiries','organizations','products','tasks','people','allocations','batches'] as const;
 type Kind=typeof kinds[number];
 type Row={id:string;createdAt:string;updatedAt:string;history:{at:string;by:string;action:string}[]};
 
 export class OpsStore{
- readonly db:DatabaseSync;
- constructor(path:string){if(path!==':memory:')mkdirSync(dirname(path),{recursive:true});this.db=new DatabaseSync(path);this.db.exec('PRAGMA journal_mode=WAL;');for(const kind of kinds)this.db.exec(`CREATE TABLE IF NOT EXISTS ${kind}(id TEXT PRIMARY KEY,payload TEXT NOT NULL,created_at TEXT NOT NULL,updated_at TEXT NOT NULL)`);}
+ readonly db:DatabaseSync;readonly ledger:Ledger;
+ constructor(path:string){if(path!==':memory:')mkdirSync(dirname(path),{recursive:true});this.db=new DatabaseSync(path);this.db.exec('PRAGMA journal_mode=WAL;');for(const kind of kinds)this.db.exec(`CREATE TABLE IF NOT EXISTS ${kind}(id TEXT PRIMARY KEY,payload TEXT NOT NULL,created_at TEXT NOT NULL,updated_at TEXT NOT NULL)`);this.ledger=new Ledger(this.db);}
+ /** Runs `fn` atomically. Synchronous only: do not await inside. */
+ tx<T>(fn:()=>T):T{this.db.exec('BEGIN IMMEDIATE');try{const out=fn();this.db.exec('COMMIT');return out;}catch(error){this.db.exec('ROLLBACK');throw error;}}
  put<T extends Row>(kind:Kind,value:T){this.db.prepare(`INSERT INTO ${kind}(id,payload,created_at,updated_at) VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,updated_at=excluded.updated_at`).run(value.id,JSON.stringify(value),value.createdAt,value.updatedAt);return value;}
  get<T>(kind:Kind,id:string):T|undefined{const row=this.db.prepare(`SELECT payload FROM ${kind} WHERE id=?`).get(id);return row?JSON.parse(row.payload as string):undefined;}
  list<T>(kind:Kind):T[]{return this.db.prepare(`SELECT payload FROM ${kind} ORDER BY created_at DESC,rowid DESC`).all().map(row=>JSON.parse(row.payload as string));}
 }
 
-export type OpsCall={method:string;path:string;body?:unknown;ip:string;admin?:{user:string}};
-export type OpsResult={status:number;data:unknown};
-class HttpError extends Error{constructor(readonly status:number,message:string,readonly issues?:unknown){super(message);}}
-const fail=(status:number,message:string):never=>{throw new HttpError(status,message);};
-function parse<S extends z.ZodTypeAny>(schema:S,value:unknown):z.infer<S>{const result=schema.safeParse(value);if(!result.success)throw new HttpError(400,result.error.issues[0]?.message??'Invalid input',result.error.issues.map(i=>({path:i.path.join('.'),message:i.message})));return result.data;}
+/** `headers` are lowercase request headers (portal cookie and CSRF); `plainLoopback` is true only for plain-http requests straight from this machine. */
+export type OpsCall={method:string;path:string;body?:unknown;ip:string;admin?:{user:string};headers?:Record<string,string|undefined>;plainLoopback?:boolean};
+/** `text` replaces the JSON body (CSV export); `setCookie` is a full Set-Cookie value. */
+export type OpsResult={status:number;data:unknown;setCookie?:string;text?:{type:string;body:string;filename?:string}};
 
 /** Per-IP and global limits for the public form. In memory: a restart resets them, which is acceptable for a contact form. */
 export class RateLimit{
@@ -40,16 +46,18 @@ export class RateLimit{
 }
 
 export class Ops{
- constructor(readonly store:OpsStore,readonly roles=new Map<string,Role>(),readonly limit=new RateLimit(),readonly clock=()=>new Date()){}
+ readonly commissions:Commissions;readonly loginLimit=new RateLimit(20,10*60_000,2000);readonly activateLimit=new RateLimit(10,10*60_000,500);
+ constructor(readonly store:OpsStore,readonly roles=new Map<string,Role>(),readonly limit=new RateLimit(),readonly clock=()=>new Date()){this.commissions=new Commissions(store,clock);}
 
  async handle(call:OpsCall):Promise<OpsResult|undefined>{
   try{return await this.route(call);}
   catch(error){if(error instanceof HttpError)return{status:error.status,data:{error:error.message,...(error.issues?{issues:error.issues}:{})}};throw error;}
  }
 
- private stamp(by:string,action:string){const at=this.clock().toISOString();return{at,entry:{at,by,action}};}
+ stamp(by:string,action:string){const at=this.clock().toISOString();return{at,entry:{at,by,action}};}
 
- private async route({method,path,body,ip,admin}:OpsCall):Promise<OpsResult|undefined>{
+ private async route(call:OpsCall):Promise<OpsResult|undefined>{
+  const {method,path,body,ip,admin}=call;
   if(!path.startsWith('/ops/v1/'))return undefined;
   // Public surface: the inquiry form, the distributor catalog and the Lab Mitra board.
   if(path==='/ops/v1/inquiries'&&method==='POST'){
@@ -68,6 +76,7 @@ export class Ops{
    return{status:200,data:{products}};
   }
   if(path==='/ops/v1/labs'&&method==='GET')return{status:200,data:{labs:this.board()}};
+  if(path.startsWith('/ops/v1/portal/'))return handlePortal(this,call);
   if(!path.startsWith('/ops/v1/admin/'))return{status:404,data:{error:'Not found'}};
 
   // Owner side: the caller has already authenticated the gateway user; roles decide what they may do.
@@ -131,18 +140,48 @@ export class Ops{
   if(resource==='tasks'){
    if(!id&&method==='GET'){need('tasks',false);return{status:200,data:{tasks:this.store.list<LabTask>('tasks').map(t=>({...t,payout:payoutSplit(t.feeIdr)}))}};}
    if(!id&&method==='POST'){
-    need('tasks',true);const input=parse(TaskInputSchema,body);if(input.labId)this.lab(input.labId);if(input.partnerId)this.org(input.partnerId);if(input.productId&&!this.store.get('products',input.productId))fail(400,'Unknown product');
+    need('tasks',true);const input=parse(TaskInputSchema,body);if(input.labId)this.lab(input.labId);if(input.leadId)this.lead(input.leadId,input.labId!);if(input.partnerId)this.org(input.partnerId);if(input.productId&&!this.store.get('products',input.productId))fail(400,'Unknown product');
     const {at}=this.stamp(by,'');const task:LabTask={...input,id:randomUUID(),status:input.labId?'assigned':'open',evidenceRef:'',createdAt:at,updatedAt:at,history:[{at,by,action:input.labId?'created and assigned':'created'}]};
     return{status:201,data:this.store.put('tasks',task)};
    }
    const task=id?this.store.get<LabTask>('tasks',id):undefined;if(!task)return{status:404,data:{error:'Task not found'}};
+   if(sub==='reverse-accrual'&&method==='POST'){need('tasks',true);parse(UuidSchema,id);return{status:200,data:this.commissions.reverseAccrual(task,by,parse(ReasonSchema,body).reason)};}
    if(method==='PATCH'){
     need('tasks',true);const input=parse(TaskActionSchema,body);if(input.labId)this.lab(input.labId);
     const step=taskTransition(task,input);if('error' in step)return{status:409,data:{error:step.error}};
+    if(input.leadId&&input.action!=='assign')fail(400,'A lead teacher is set when assigning');
     const {at}=this.stamp(by,'');const labId=input.action==='assign'?input.labId:task.labId;const evidenceRef=input.evidenceRef??task.evidenceRef;
-    const action=`${input.action}${input.action==='assign'?` → ${this.lab(labId!).name}`:''}${input.note?`: ${input.note}`:''}`;
-    return{status:200,data:this.store.put('tasks',{...task,labId,evidenceRef,status:step.status,updatedAt:at,history:[...task.history,{at,by,action}]})};
+    const leadId=input.action==='assign'?(input.leadId??(labId===task.labId?task.leadId:undefined)):task.leadId;if(leadId)this.lead(leadId,labId!);
+    const action=`${input.action}${input.action==='assign'?` → ${this.lab(labId!).name}${leadId?`, lead ${this.commissions.person(leadId)?.name}`:''}`:''}${input.note?`: ${input.note}`:''}`;
+    const next:LabTask={...task,labId,leadId,evidenceRef,status:step.status,updatedAt:at,history:[...task.history,{at,by,action}]};if(!leadId)delete next.leadId;
+    return{status:200,data:this.store.tx(()=>{if(step.status==='verified')this.commissions.accrue(next,by,at);if(input.action==='assign'&&(labId!==task.labId||leadId!==task.leadId))this.commissions.voidPending(a=>a.taskId===task.id,'task school or lead changed',by);return this.store.put('tasks',next);})};
    }
+  }
+
+  // Lab Mitra commissions: school people, allocations waiting for approval, payout batches and the ledger.
+  if(resource==='people'){
+   need('organizations',false);
+   if(!id&&method==='GET')return{status:200,data:{people:this.commissions.people().map(p=>this.commissions.view(p))}};
+   if(!id&&method==='POST'){need('organizations',true);const input=parse(SchoolAdminInputSchema,body);const org=this.lab(input.orgId);const {person,inviteCode}=await this.commissions.createPerson(org,{role:'school_admin',name:input.name},by);return{status:201,data:{person,inviteCode}};}
+   const person=id?this.commissions.person(id):undefined;if(!person)return{status:404,data:{error:'Person not found'}};
+   if(sub==='invite'&&method==='POST'){need('organizations',true);return{status:200,data:await this.commissions.resetInvite(person,by)};}
+   if(!sub&&method==='PATCH'){need('organizations',true);const changes=parse(PersonUpdateSchema,body);if(changes.status===undefined||Object.keys(changes).length!==1)fail(400,'Admins can only enable or disable a person');return{status:200,data:this.commissions.updatePerson(person,changes,by)};}
+  }
+  if(resource==='commissions'&&method==='GET'){need('tasks',false);return{status:200,data:this.commissionOverview()};}
+  if(resource==='batches'){
+   need('tasks',false);
+   if(!id&&method==='POST'){need('tasks',true);const input=parse(BatchCreateSchema,body);this.lab(input.orgId);return{status:201,data:(()=>{const r=this.commissions.createBatch(input.orgId,by);return{...this.commissions.batchView(r.batch),skipped:r.skipped};})()};}
+   const batch=id?this.store.get<Batch>('batches',id):undefined;if(!batch)return{status:404,data:{error:'Batch not found'}};
+   if(sub==='paid'&&method==='POST'){need('tasks',true);return{status:200,data:this.commissions.batchView(this.commissions.markPaid(batch,parse(BatchPaidSchema,body),by))};}
+   if(sub==='csv'&&method==='GET')return{status:200,data:{},text:{type:'text/csv; charset=utf-8',body:this.commissions.csv(batch),filename:`batch-${batch.id.slice(0,8)}.csv`}};
+  }
+  if(resource==='allocations'&&id&&sub==='reverse'&&method==='POST'){
+   need('tasks',true);parse(UuidSchema,id);const reason=parse(ReasonSchema,body).reason;const a=this.store.get<Allocation>('allocations',id);if(!a)return{status:404,data:{error:'Allocation not found'}};
+   return{status:200,data:this.commissions.allocationView(this.commissions.reverseAllocation(a,by,reason))};
+  }
+  if(resource==='ledger'){
+   need('tasks',false);
+   if(!id&&method==='GET')return{status:200,data:{entries:this.store.ledger.entries().reverse().slice(0,500)}};
   }
 
   if(resource==='payouts'&&method==='GET'){
@@ -157,12 +196,21 @@ export class Ops{
 
  private org(id:string){const org=this.store.get<Organization>('organizations',id);if(!org)fail(400,'Unknown organization');return org!;}
  private vendor(id:string){const org=this.org(id);if(org.type!=='vendor')fail(400,`${org.name} is not a vendor`);return org;}
+ private lead(id:string,labId:string){const p=this.commissions.person(id,labId);if(!p||p.role!=='teacher'||p.status!=='active')fail(400,'The lead must be an active teacher of the assigned school');return p;}
  private lab(id:string){const org=this.org(id);if(org.type!=='school')fail(400,`${org.name} is not a Lab Mitra school`);if(org.status!=='active')fail(400,`${org.name} is not active`);return org;}
 
  /** Public Lab Mitra board: only schools that agreed to be listed, ranked by verified tasks. */
  board(){
   const tasks=this.store.list<LabTask>('tasks');
   return this.store.list<Organization>('organizations').filter(o=>o.type==='school'&&o.publicListing&&o.status==='active').map(o=>{const done=tasks.filter(t=>t.labId===o.id&&(t.status==='verified'||t.status==='paid'));return{name:o.name,city:o.city,passed:done.length,paidIdr:done.filter(t=>t.status==='paid').reduce((n,t)=>n+t.feeIdr,0)};}).sort((a,b)=>b.passed-a.passed||b.paidIdr-a.paidIdr||a.name.localeCompare(b.name));
+ }
+
+
+ /** Per-school commission balances, allocations waiting for school approval and payout batches, for the backoffice. */
+ commissionOverview(){
+  const c=this.commissions,orgs=this.store.list<Organization>('organizations').filter(o=>o.type==='school');
+  const schools=orgs.map(o=>({orgId:o.id,name:o.name,status:o.status,totals:c.totals(o.id),people:{teachers:c.people(o.id).filter(p=>p.role==='teacher'&&p.status==='active').length,students:c.people(o.id).filter(p=>p.role==='student'&&p.status==='active').length},pending:c.allocations(o.id).filter(a=>c.livePending(a)).map(a=>c.allocationView(a)),readyForBatch:c.allocations(o.id).filter(a=>a.status==='approved'&&!a.batchId).length}));
+  return{schools,batches:c.batches().map(b=>({...c.batchView(b),orgName:orgs.find(o=>o.id===b.orgId)?.name??''}))};
  }
 
  summary(){

@@ -81,14 +81,15 @@ test('distributor catalog and Lab Mitra payouts flow end to end, and reach the p
  await row.getByRole('button',{name:'Verify'}).click();
  await expect(row.locator('.ds-tag')).toHaveText('verified');
  await expect(page.locator('.bo-ops-payouts')).toContainText('Payout due');
- await row.getByRole('button',{name:'Mark paid'}).click();
- await expect(row.locator('.ds-tag')).toHaveText('paid');
- expect((await call('GET','tasks')).tasks.find((t:{id:string})=>t.id===task.id).status).toBe('paid');
+ // Payment now goes through payout batches (15-mitra-portal.spec.ts): no per-task button remains.
+ await expect(row.getByRole('button',{name:'Mark paid'})).toHaveCount(0);
+ await expect(row.getByRole('link',{name:'Pay via a payout batch'})).toBeVisible();
+ expect((await call('GET','tasks')).tasks.find((t:{id:string})=>t.id===task.id).status).toBe('verified');
 
  await page.goto('/id/');
  const board=page.locator('#papan tbody');
  await expect(board).toContainText(school);
- await expect(board.locator('tr').filter({hasText:school})).toContainText('Rp150.000');
+ await expect(board.locator('tr').filter({hasText:school})).toContainText('Rp0');
 });
 
 test('public intake rejects junk and never exposes admin routes without a session',async({request})=>{

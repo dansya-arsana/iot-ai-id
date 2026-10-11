@@ -129,6 +129,7 @@ export function LandingID(){
     <p>Chat kami sekarang. Kami balas dengan penawaran resmi untuk sekolah Anda.</p>
     <Wa kind="general" className="lid-btn lid-btn--light">Chat WhatsApp {WA_DISPLAY}</Wa>
     <Link className="lid-final-form" to="/partner?kind=school">Lebih suka isi form? Kirim lewat formulir</Link>
+    <Link className="lid-final-form" to="/mitra">Masuk portal mitra</Link>
    </section>
   </main>
 

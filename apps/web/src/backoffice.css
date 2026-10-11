@@ -199,3 +199,4 @@
 .bo-ops-evidence-form{padding-top:var(--ds-3);border-top:1px solid var(--ds-line)}
 .bo-ops-payouts{padding-top:var(--ds-4);border-top:1px solid var(--ds-line)}
 @media(max-width:720px){.bo-ops-row{grid-template-columns:auto minmax(0,1fr)}.bo-ops-meta{grid-column:2}.bo-ops-note{flex-direction:column;align-items:stretch}}
+.bo-ops-code{display:inline-block;padding:var(--ds-1) var(--ds-3);border:1px solid var(--ds-line-strong);border-radius:var(--ds-radius-1);font:500 var(--ds-text-h3)/1.4 var(--ds-mono);letter-spacing:.14em;user-select:all}

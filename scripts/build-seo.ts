@@ -122,6 +122,7 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /backoffice
+Disallow: /mitra
 Disallow: /build
 Disallow: /project/
 Disallow: /site/

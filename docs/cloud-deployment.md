@@ -9,6 +9,7 @@ The main website serves landing pages, documentation, downloads and static asset
 | api.iot.ai.id | Local API proxy at /api/* | Testing workspace login plus X-IOT-Session |
 | edge.iot.ai.id | Coordinator at /v1/* | Scoped node/owner bearer token |
 | iot.ai.id/ops/v1/ | Partner inquiries (POST), tested catalog and Lab Mitra board (GET) | None; rate-limited; /ops/v1/admin/ returns 404 |
+| iot.ai.id/ops/v1/portal/ | Lab Mitra school portal API (all methods) used by `/mitra` | Invite code, password and the `aiot_portal` cookie; `X-AIoT-Portal: 1` on writes; nginx zones `iot_portal` (20 r/m) and `iot_portal_auth` (5 r/m on login and activate) |
 
 The main website does not proxy the shared owner API. Build, hardware and other API-dependent pages show an unavailable-workspace message when requesting data; use the desktop app or an authorized admin workspace for interactive work. The `/api` page remains public API documentation; `/api/` requests are blocked.
 
@@ -41,6 +42,10 @@ Bootstrap environment is optional. Never commit secrets, mount a user's home dir
 The bundled Jev decision scripts use TypeSafe when present; the frontier provider is whichever AI provider is active (OpenAI Responses, or an Anthropic-compatible API). Missing or rejected credentials produce an explicit unavailable-provider error, never a fixture fallback. OpenViking runs as a separate internal service with local CPU embeddings and vectors-only ingestion. VLM is unconfigured, so semantic generation is unavailable. Network authentication uses a dedicated tenant-bound data key; the root key is reserved for account provisioning. Its knowledge network publishes no host port. Deployment verification indexed all 56 catalog records and returned live ESP32/BME280 search results. Catalog specifications and validation remain deterministic.
 
 ## Business operations
+
+`X-Real-IP` is trusted only because the ops service listens on the internal docker network or loopback behind nginx: never publish `OPS_HOST` or the ops port, or callers could forge the header and dodge the per-IP limits.
+
+The school portal (ADR 010) is served by the same ops service under `/ops/v1/portal/*` on the public host. nginx proxies every method there, strips `Authorization` and `X-Ops-User`, sets `X-Real-IP` from `CF-Connecting-IP` and `X-Forwarded-Proto` from the scheme (the service sets the cookie `Secure` flag from it), caps bodies at 32 KB and applies the `iot_portal` and `iot_portal_auth` rate zones. The repo `deploy/nginx.conf` carries these blocks and the two `limit_req_zone` lines; they take effect only after the next nginx deploy. Commissions, payout batches and school admin invites are worked in the backoffice at `#bo-commissions`. The ledger lives in the same `ops.sqlite` volume, so back that volume up.
 
 The ops service (ADR 009) keeps inquiries, organizations, products and Lab Mitra tasks in its own volume. Work them in the backoffice at `#bo-inquiries`, `#bo-orgs`, `#bo-products` and `#bo-tasks`; the API forwards these requests to `iot-ai-ops:8791` with the owner token and the gateway login as `X-Remote-User`.
 
