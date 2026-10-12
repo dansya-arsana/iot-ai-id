@@ -7,6 +7,7 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 ## [Unreleased]
 
 ### Fixed
+- Visitors in Indonesia who had already opened `/id/` were no longer redirected there from `/` (the geo redirect only matched an empty region cookie). A region cookie of `id` now always redirects, and the "Global site" choice lasts only for the browser session.
 - Blank page after a deploy for visitors with a cached page: hashed `/assets/` files now return 404 when missing instead of `index.html`, are cached as immutable, HTML is revalidated (`Cache-Control: no-cache`), and web deploys keep the previous builds' assets for 30 days.
 
 ## [0.6.0] - 2026-10-12
