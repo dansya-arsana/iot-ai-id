@@ -84,3 +84,22 @@ test('Lab Mitra tasks: assign to active schools, evidence before verification, v
  assert.deepEqual(taskTransition({status:'rejected',labId:lab.id,evidenceRef:'x'},{action:'assign',labId:lab.id}),{status:'assigned'});
  assert.equal((await call(ops,'POST','/ops/v1/admin/organizations',{type:'vendor',name:'V',publicListing:true})).status,400,'only schools are listed');
 });
+
+test('inquiry test context: optional enum fields are stored and unknown values are refused',async()=>{
+ const ops=fresh();
+ assert.equal((await call(ops,'POST','/ops/v1/inquiries',{...inquiry,region:'java',build:'drone',month:'aug',stressor:'haze',site:'semarang-kendal'})).status,201);
+ assert.equal((await call(ops,'POST','/ops/v1/inquiries',{...inquiry,region:'narnia'})).status,400);
+ assert.equal((await call(ops,'POST','/ops/v1/inquiries',{...inquiry,site:'<script>'})).status,400);
+ const [row]=(await call(ops,'GET','/ops/v1/admin/inquiries')).data.inquiries;
+ assert.deepEqual([row.region,row.build,row.month,row.stressor,row.site],['java','drone','aug','haze','semarang-kendal']);
+});
+
+test('additive by design: rows stored before the context fields existed still load, with no migration',async()=>{
+ const store=new OpsStore(':memory:');
+ const old={...inquiry,id:'00000000-0000-4000-8000-000000000001',status:'new',assignee:'',consentAt:'2026-10-01T00:00:00Z',createdAt:'2026-10-01T00:00:00Z',updatedAt:'2026-10-01T00:00:00Z',history:[],organization:'',email:'a@b.co',phone:'',interest:''};
+ store.db.prepare('INSERT INTO inquiries(id,payload,created_at,updated_at) VALUES(?,?,?,?)').run(old.id,JSON.stringify(old),old.createdAt,old.updatedAt);
+ const ops=new Ops(store,parseRoles(''));
+ assert.equal((await call(ops,'POST','/ops/v1/inquiries',{...inquiry,region:'papua'})).status,201);
+ const rows=(await call(ops,'GET','/ops/v1/admin/inquiries')).data.inquiries;
+ assert.equal(rows.length,2);assert.equal(rows.find((r:{id:string})=>r.id===old.id).region,undefined);assert.equal(rows.find((r:{region?:string})=>r.region==='papua').kind,'vendor');
+});

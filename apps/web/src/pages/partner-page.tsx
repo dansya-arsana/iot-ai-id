@@ -1,4 +1,4 @@
-import {useEffect,useState,type FormEvent} from 'react';
+import {useEffect,useMemo,useState,type FormEvent} from 'react';
 import {Link,useLocation} from 'react-router-dom';
 import {ArrowUpRightIcon,CheckCircleIcon,WhatsappLogoIcon} from '@phosphor-icons/react';
 import {useLang} from '../i18n';
@@ -8,7 +8,11 @@ import {WA_DISPLAY,waLink} from '../contact';
 import {track} from '../analytics';
 import {fetchCatalog,OpsError,submitInquiry} from '../ops-client';
 import {useAccess} from '../preview';
-import {INQUIRY_KINDS,LOCALIZATION_ITEMS,type PublicProduct} from '../../../../packages/ops-contract/index';
+import {INQUIRY_KINDS,LOCALIZATION_ITEMS,TEST_BUILDS,TEST_MONTHS,TEST_REGIONS,TEST_SITES,TEST_STRESSORS,type PublicProduct} from '../../../../packages/ops-contract/index';
+import {BUILD_LABEL,MONTH_LABEL,STRESS_LABEL} from '../hero-map/model';
+import {REGION} from '../hero-map/regions';
+import {HOTSPOT} from '../hero-map/hotspots';
+import {useCompany} from '../use-company';
 import './partner-page.css';
 
 type Kind=typeof INQUIRY_KINDS[number];
@@ -18,10 +22,18 @@ const kindCopy:Record<Kind,{en:string;id:string;hintEn:string;hintId:string}>={
  buyer:{en:'Buyer / institution',id:'Pembeli / institusi',hintEn:'Buy hardware that has been tested in Indonesian conditions.',hintId:'Beli hardware yang sudah diuji di kondisi Indonesia.'},
  other:{en:'Other',id:'Lainnya',hintEn:'Research, media, investment or anything else.',hintId:'Riset, media, investasi, atau hal lain.'},
 };
+/** Test context from the home map (?region=&build=&month=&stressor=&site=). Unknown values are ignored. */
+const oneOf=<T extends string>(list:readonly T[],v:string|null)=>list.find(x=>x===v);
+export function readContext(search:string){
+ const q=new URLSearchParams(search);const site=q.get('site')??'';
+ return{region:oneOf(TEST_REGIONS,q.get('region')),build:oneOf(TEST_BUILDS,q.get('build')),month:oneOf(TEST_MONTHS,q.get('month')),stressor:oneOf(TEST_STRESSORS,q.get('stressor')),site:oneOf(TEST_SITES,Object.hasOwn(HOTSPOT,site)?site:null)};
+}
 const empty={name:'',organization:'',email:'',phone:'',country:'',interest:'',message:'',consent:false,website:''};
 
 export function Partner(){
- const{tr,lang}=useLang();const{search}=useLocation();const{can}=useAccess();
+ const{tr,lang}=useLang();const{search}=useLocation();const{can}=useAccess();const company=useCompany();const reply=company('replyTime');
+ const context=useMemo(()=>{const c=readContext(search);return Object.fromEntries(Object.entries(c).filter(([,v])=>v));},[search]) as ReturnType<typeof readContext>;
+ const contextRows=[['Region',context.region&&REGION[context.region].name],['Place',context.site&&HOTSPOT[context.site].name],['I build',context.build&&BUILD_LABEL[context.build]],['Stressor',context.stressor&&STRESS_LABEL[context.stressor]],['Month',context.month&&MONTH_LABEL[context.month]]].filter((r):r is [string,string]=>!!r[1]);
  const initial=new URLSearchParams(search).get('kind');
  const [kind,setKind]=useState<Kind>((INQUIRY_KINDS as readonly string[]).includes(initial??'')?initial as Kind:'vendor');
  const [form,setForm]=useState(empty);const [busy,setBusy]=useState(false);
@@ -37,7 +49,7 @@ export function Partner(){
   if(!form.consent)local.consent=tr('Please agree so we can contact you.','Mohon setujui agar kami bisa menghubungi Anda.');
   if(Object.keys(local).length){setErrors(local);return;}
   setBusy(true);
-  try{const result=await submitInquiry({...form,kind,source:(window.location.pathname+window.location.search).slice(0,300)});setDone(result);track('lead',{kind});requestAnimationFrame(()=>document.querySelector('.pt-layout')?.scrollIntoView({block:'start'}));}
+  try{const result=await submitInquiry({...form,...context,kind,source:(window.location.pathname+window.location.search).slice(0,300)});setDone(result);track('lead',{kind});requestAnimationFrame(()=>document.querySelector('.pt-layout')?.scrollIntoView({block:'start'}));}
   catch(error){
    if(error instanceof OpsError&&error.status===400&&error.issues.length){setErrors(Object.fromEntries(error.issues.map(i=>[i.path.split('.')[0]||'message',i.message])));}
    else setFailure(error instanceof OpsError&&error.status===429?tr('Too many submissions from your network. Please message us on WhatsApp instead.','Terlalu banyak pengiriman dari jaringan Anda. Silakan hubungi kami lewat WhatsApp.'):tr('The form could not be sent. Your message is still here; send it on WhatsApp instead.','Form gagal dikirim. Pesan Anda masih ada; kirim lewat WhatsApp saja.'));
@@ -54,6 +66,7 @@ export function Partner(){
      <div className="pt-actions"><AnchorButton href={waLink(waText(done.reference))} data-cta="partner-wa-after" target="_blank" rel="noopener"><WhatsappLogoIcon size={18} aria-hidden="true"/> WhatsApp</AnchorButton><LinkButton variant="secondary" to="/">{tr('Back to home','Kembali ke beranda')}</LinkButton></div>
     </Card>
    :<form className="pt-form" onSubmit={submit} noValidate aria-label={tr('Partner inquiry','Inquiry partner')}>
+     {contextRows.length>0&&<aside className="pt-context" aria-label={tr('Your test context','Konteks uji Anda')} data-testid="test-context"><Eyebrow as="span">{tr('Your test context','Konteks uji Anda')}</Eyebrow><dl>{contextRows.map(([k,v])=><div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl><small>{tr('From the home map. It is sent with your inquiry.','Dari peta beranda. Dikirim bersama inquiry Anda.')}</small></aside>}
      <fieldset className="pt-kinds"><legend>{tr('I am a…','Saya adalah…')}</legend>
       {INQUIRY_KINDS.map(k=><label key={k} className={k===kind?'is-active':''}><input type="radio" name="kind" value={k} checked={k===kind} onChange={()=>setKind(k)}/><b>{tr(kindCopy[k].en,kindCopy[k].id)}</b><span>{tr(kindCopy[k].hintEn,kindCopy[k].hintId)}</span></label>)}
      </fieldset>
@@ -74,7 +87,7 @@ export function Partner(){
      <label className="pt-consent"><input type="checkbox" checked={form.consent} onChange={e=>setForm(f=>({...f,consent:e.target.checked}))} aria-invalid={!!errors.consent||undefined}/><span>{tr('AIoT may store these details and contact me about this inquiry. No marketing lists, no resale.','AIoT boleh menyimpan data ini dan menghubungi saya terkait inquiry ini. Tanpa daftar marketing, tidak dijual.')}</span></label>
      {errors.consent&&<p className="pt-error" role="alert">{errors.consent}</p>}
      {failure&&<Notice tone="error" title={tr('Not sent','Belum terkirim')} action={<AnchorButton size="sm" href={waLink(waText())} data-cta="partner-wa-fallback" target="_blank" rel="noopener">WhatsApp</AnchorButton>}>{failure}</Notice>}
-     <div className="pt-actions"><Button type="submit" disabled={busy}>{busy?tr('Sending…','Mengirim…'):tr('Send inquiry','Kirim inquiry')}</Button><span className="pt-fine">{tr('Usually answered within 1 working day.','Biasanya dibalas dalam 1 hari kerja.')}</span></div>
+     <div className="pt-actions"><Button type="submit" disabled={busy}>{busy?tr('Sending…','Mengirim…'):tr('Send inquiry','Kirim inquiry')}</Button><span className="pt-fine">{tr('Usually answered within 1 working day.','Biasanya dibalas dalam 1 hari kerja.')}</span>{reply&&<span className="pt-fine">{reply}</span>}</div>
     </form>}
    <aside className="pt-aside">
     <Card tone="raised" as="section"><Eyebrow>{tr('What happens next','Langkah berikutnya')}</Eyebrow><ol className="pt-steps">{steps.map(([h,p],i)=><li key={h}><span>0{i+1}</span><div><b>{h}</b><p>{p}</p></div></li>)}</ol></Card>

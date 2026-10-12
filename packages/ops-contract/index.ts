@@ -8,6 +8,13 @@ export const HistorySchema=z.array(z.object({at:z.string(),by:z.string(),action:
 // Inquiries: the public form posts these; everything else is owner-side.
 export const INQUIRY_KINDS=['vendor','school','buyer','other'] as const;
 export const INQUIRY_STATUSES=['new','contacted','qualified','proposal','won','lost','spam'] as const;
+/** Test context carried from the global home map into the inquiry (all optional, fixed vocabularies). */
+export const TEST_REGIONS=['java','batam','sumatra','kalimantan','sulawesi','nusa-tenggara','maluku','papua','maritime'] as const;
+export const TEST_BUILDS=['ground','drone','amr','marine','sensors','humanoid'] as const;
+/** Hotspot ids on the home map (apps/web/src/hero-map/hotspots.ts); a unit test keeps the two in sync. */
+export const TEST_SITES=['jakarta','bekasi-karawang','bandung','cilegon','semarang-kendal','yogyakarta','surabaya-perak','gresik-jiipe','malang-singhasari','medan','sei-mangkei-kuala-tanjung','pekanbaru-riau-palm','palembang','batam','kek-tanjung-sauh','balikpapan-ikn','makassar','denpasar-sanur'] as const;
+export const TEST_STRESSORS=['heat','haze','flood','salt','power','connectivity'] as const;
+export const TEST_MONTHS=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'] as const;
 export const InquiryInputSchema=z.object({
  kind:z.enum(INQUIRY_KINDS),
  name:text(120).min(2),
@@ -19,6 +26,11 @@ export const InquiryInputSchema=z.object({
  message:text(4000).min(10),
  consent:z.literal(true,{error:'Consent is required'}),
  source:text(300).default(''),
+ region:z.enum(TEST_REGIONS).optional(),
+ build:z.enum(TEST_BUILDS).optional(),
+ month:z.enum(TEST_MONTHS).optional(),
+ stressor:z.enum(TEST_STRESSORS).optional(),
+ site:z.enum(TEST_SITES).optional(),
 }).strict().refine(i=>!!(i.email||i.phone),{message:'Provide an email or a WhatsApp number',path:['email']});
 export type InquiryInput=z.infer<typeof InquiryInputSchema>;
 export type Inquiry=Omit<InquiryInput,'consent'>&{id:string;status:typeof INQUIRY_STATUSES[number];assignee:string;organizationId?:string;consentAt:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};

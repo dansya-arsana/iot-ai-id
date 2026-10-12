@@ -4,19 +4,19 @@ test('landing has original visual, usable navigation and real destinations',asyn
  await page.goto('/');
  await expect(page.locator('.result-landing')).toHaveAttribute('data-ready','true');
  await expect(page.locator('.rl-loader')).toBeHidden();
- await expect(page.getByRole('heading',{level:1})).toHaveText(/The real-world\s*gateway for AI robotics\s*in Indonesia\./);
- const capsule=page.locator('.rl-capsule');
- await expect(capsule).toBeVisible();
- expect(await capsule.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0)).toBe(true);
+ await expect(page.getByRole('heading',{level:1})).toHaveText('Prove your robot where it actually breaks.');
+ const hero=page.getByTestId('hero-map');
+ await expect(hero).toBeVisible();
  await expect(page.locator('.rl-hero').getByRole('link',{name:/Partner with us/})).toHaveAttribute('href','/partner');
  await expect(page.locator('.rl-partner').getByRole('link',{name:/Download partnership brief/})).toHaveAttribute('href','/partnership-brief.txt');
  await expect(page.locator('.ds-header').getByRole('link',{name:'Partner with us'})).toHaveAttribute('href','/partner');
  await expect(page.locator('.rl-scenario')).toHaveCount(6);
- await expect(page.locator('.rl-map svg circle').first()).toBeAttached();
+ await expect(page.locator('.hm-map svg circle').first()).toBeAttached();
+ await expect(page.locator('.rl-labs li')).toHaveCount(3);
  for(const width of [1440,768,390]){
   await page.setViewportSize({width,height:900});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
-  await expect(capsule).toBeVisible();
+  await expect(hero).toBeVisible();
  }
  const toggle=page.locator('.ds-menu-toggle');
  await toggle.click();await expect(toggle).toHaveAttribute('aria-expanded','true');
@@ -30,11 +30,12 @@ test('language toggle switches the landing to Indonesian and remembers it',async
  await page.goto('/');
  await page.locator('.ds-header').getByRole('button',{name:'ID',exact:true}).click();
  await expect(page.getByRole('heading',{level:1})).toHaveText(/Gerbang AI robotika/);
+ await expect(page.locator('.rl-capsule')).toBeVisible();
  await expect(page.locator('html')).toHaveAttribute('lang','id');
  await page.reload();
  await expect(page.getByRole('heading',{level:1})).toHaveText(/Gerbang AI robotika/);
  await page.locator('.ds-header').getByRole('button',{name:'EN',exact:true}).click();
- await expect(page.getByRole('heading',{level:1})).toHaveText(/gateway for AI robotics/);
+ await expect(page.getByRole('heading',{level:1})).toHaveText(/Prove your robot/);
 });
 
 test('reduced motion reveals all content immediately and Learn stays usable',async({page})=>{

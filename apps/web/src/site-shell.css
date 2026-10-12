@@ -34,6 +34,7 @@
 .ds-footer nav{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--ds-6)}
 .ds-footer nav>div{display:flex;flex-direction:column;gap:var(--ds-3)}
 .ds-footer nav a{display:inline-flex;align-items:center;gap:4px;font-size:14px;color:var(--ds-ink);text-decoration:none}.ds-footer nav a:hover{text-decoration:underline;text-underline-offset:4px}
+.ds-footer-legal{grid-column:1/-1;margin:0;font:500 11px/1.5 var(--ds-mono);color:var(--ds-ink-2)}
 .ds-footer-bottom{grid-column:1/-1;display:flex;justify-content:space-between;gap:var(--ds-4);padding-top:var(--ds-5);border-top:1px solid var(--ds-line);font:500 9px/1.4 var(--ds-mono);letter-spacing:.08em;color:var(--ds-ink-2)}
 
 @media(max-width:1100px){.ds-nav>a,.ds-nav-resources>button{padding:0 13px}.ds-header-actions .ds-segmented{display:none}}

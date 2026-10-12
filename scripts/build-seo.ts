@@ -61,9 +61,16 @@ function render(p:Page){
 const nav=`<nav><a href="/">Home</a> · <a href="/partner">Partner with us</a> · <a href="/hardware">Hardware library</a> · <a href="/learn">Learn</a> · <a href="/docs">Docs</a> · <a href="/llms.txt">llms.txt</a></nav>`;
 const list=(xs:string[])=>`<ul>${xs.map(x=>`<li>${x}</li>`).join('')}</ul>`;
 
+const homeTitle='Prove your robot where it actually breaks.';
+const homeSub='Indonesia puts tropical heat, humidity above 80%, haze, monsoon floods, salt air and unstable power in one country. Pick what you build, and see where to test it.';
 const home=`<main>${nav}
-<h1>Testing robots and sensors where the world is messy.</h1>
+<p>The real-world gateway for AI robotics in Indonesia</p>
+<h1>${esc(homeTitle)}</h1>
+<p>${esc(homeSub)}</p>
+<p>National mean air temperature 27.5 °C in 2024 (BMKG) · relative humidity 70–100% (BMKG).</p>
 <p>${esc(pitch)}</p>
+<h2>Where robots break: nine test areas</h2><p>Java, Batam &amp; Riau Islands, Sumatra, Kalimantan, Sulawesi, Bali &amp; Nusa Tenggara, Maluku, Papua and Maritime Indonesia, each with sourced conditions and test scenarios. General conditions in Indonesia, not test results.</p>
+<h2>Entry path</h2><p>The steps we help you through: Komdigi type approval (Permenkominfo 3/2024), importer ID (API-U or API-P, Permendag 16/2025 and 21/2025), SNI checked per HS code, and the PDP Law (UU 27/2022).</p>
 <h2>The gap</h2><p>AI can write firmware, but it has never felt a monsoon. Real deployments fail on drift, corrosion, noise and power loss, and that experience is rarely recorded in a form a machine can use.</p>
 <h2>Scenario atlas</h2>${list(scenarios.map(([n,d,t])=>`<strong>${esc(n)}</strong>: ${esc(d)} Failure modes: ${t.join(', ')}.`))}
 <h2>Verification loop</h2><ol>${steps.map(([h,d])=>`<li><strong>${h}</strong>: ${esc(d)}</li>`).join('')}</ol>
@@ -71,7 +78,7 @@ const home=`<main>${nav}
 <h2>For robotics, sensor and AI teams</h2>${list(offers)}<p><a href="/partnership-brief.txt">Download the partnership brief</a></p>
 <h2>FAQ</h2>${faq.map(([q,a])=>`<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join('')}
 </main>`;
-render({path:'/',alternates:true,title:'AIoT — The real-world gateway for AI robotics in Indonesia.',description:'Real-world hardware verification from Indonesia. We test robotics, sensor and IoT hardware in humid, hot, unstable field conditions and return verifiable evidence for engineering and AI teams.',body:home,
+render({path:'/',alternates:true,title:`AIoT — ${homeTitle} Field testing for robots in Indonesia`,description:'Indonesia puts heat, 80%+ humidity, haze, monsoon floods, salt air and unstable power in one country. Pick what you build and see where to test your robot, sensor or AI hardware.',body:home,
  jsonld:{'@context':'https://schema.org','@type':'FAQPage',mainEntity:faq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))}});
 
 const idFaq:[string,string][]=[
@@ -158,7 +165,7 @@ iot.ai.id is based in Indonesia and serves robotics, sensor and AI teams worldwi
 
 ## Core pages
 
-- [Home](${SITE}/): positioning, scenario atlas, verification loop, network and partnership offer
+- [Home](${SITE}/): "Prove your robot where it actually breaks." An interactive map of nine Indonesian test areas with sourced conditions, scenario atlas, verification loop, planned labs and partnership offer
 - [Partner with us](${SITE}/partner/): inquiry form for device makers, schools and buyers; reply within one working day
 - [Partnership brief](${SITE}/partnership-brief.txt): services, what partners provide, current limits
 - [Program Lab Mitra (Indonesian)](${SITE}/id/): IoT training and paid hardware-testing tasks for Indonesian vocational schools (SMK)

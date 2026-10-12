@@ -1,0 +1,1315 @@
+{
+  "generated": "2026-10-12",
+  "note": "Sourced hotspot facts for the hero map. Secondary sources are labelled; see hotspots-review.md.",
+  "hotspots": [
+    {
+      "id": "medan",
+      "name": "Medan",
+      "region": "sumatra",
+      "lon": 98.6722,
+      "lat": 3.5952,
+      "kind": "city",
+      "identity": "Indonesia's largest city outside Java and Sumatra's main gateway on the Malacca Strait. A dense, hot, humid market of about 2.5 million people where you can test urban robots and IoT on a busy port and airport corridor.",
+      "facts": [
+        {
+          "claim": "Kota Medan population (BPS series cited in academic work)",
+          "value": "2,474,166 (2023); 2,494,512 (2022)",
+          "year": "2023",
+          "source_name": "BPS Kota Medan via Universitas Negeri Medan thesis (secondary)",
+          "source_url": "https://digilib.unimed.ac.id/66880/12/3203331001_BAB_IV.pdf",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Kualanamu International Airport passenger movements and flights",
+          "value": "7.3 million passengers, 58,915 flights",
+          "year": "2023",
+          "source_name": "Antara via Medcom (press)",
+          "source_url": "https://www.medcom.id/ekonomi/bisnis/3NO19yyk-bandar-udara-kualanamu-layani-58-915-penerbangan-selama-2023",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Belawan container terminal crane productivity rose after the Pelindo merger reforms",
+          "value": "20 to 60 boxes per ship per hour",
+          "year": "2023",
+          "source_name": "Pelindo / press coverage of Belawan expansion with INA",
+          "source_url": "https://ekonomi.bisnis.com/read/20230316/98/1638155/gandeng-ina-pelindo-kembangkan-pelabuhan-belawan",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Last-mile delivery robots and sidewalk AMRs in dense mixed traffic, heat and tropical downpours",
+        "Container-yard and port-gate IoT tracking (OCR, RFID, condition sensors) at Belawan",
+        "Indoor service and logistics robots in airport and mall environments around Kualanamu"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "sensors-iot",
+        "drone"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "weak-connectivity"
+      ]
+    },
+    {
+      "id": "sei-mangkei-kuala-tanjung",
+      "name": "KEK Sei Mangkei and Kuala Tanjung",
+      "region": "sumatra",
+      "lon": 99.33,
+      "lat": 3.13,
+      "kind": "special-zone",
+      "identity": "A palm and rubber processing special economic zone 40 km from the deep-water Kuala Tanjung port. Oleochemical plants and plantations sit side by side, which makes it a ready site for industrial automation and plantation robotics.",
+      "facts": [
+        {
+          "claim": "KEK Sei Mangkei area (Bosar Maligas, Simalungun) dedicated to palm oil and rubber downstream industry",
+          "value": "~2,002.77 ha",
+          "year": "2014-2026",
+          "source_name": "Industry.co.id / PKN STAN journal (secondary; check kek.go.id)",
+          "source_url": "https://www.industry.co.id/read/12781/kek-sei-mangkei-sumut-untuk-hilirisasi-kelapa-sawit",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Unilever Oleochemical expansion in KEK Sei Mangkei focused on fatty alcohols",
+          "value": "US$155 million (Rp2.59 trillion)",
+          "year": "2026",
+          "source_name": "Bisnis.com (press)",
+          "source_url": "https://market.bisnis.com/read/20260827/192/1999179/unilever-oleochemical-investasi-rp259-triliun-di-kek-sei-mangkei",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Distances from the zone: Trans-Sumatra road ~10 km, Kuala Tanjung port ~40 km, Kualanamu airport ~110 km",
+          "value": "10 / 40 / 110 km",
+          "year": "2025",
+          "source_name": "Antara Sumut (press)",
+          "source_url": "https://sumut.antaranews.com/berita/605710/dpr-pastikan-kek-sei-mangkei-beri-dampak-perekonomian-ke-masyarakat",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Kuala Tanjung Multipurpose Terminal phase 1: 600,000 TEU capacity, 100,000 t CPO tank storage, automated RTG cranes",
+          "value": "600,000 TEU; 8 ARTG cranes",
+          "year": "2021",
+          "source_name": "Antara Sumut / Pelindo I (press)",
+          "source_url": "https://sumut.antaranews.com/berita/184028/ktmt-diharapkan-dorong-potensi-ekonomi-daerah",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Cobots and AMRs for palletising and bagging oleochemical and soap-noodle lines",
+        "Plantation drones and ground robots for fresh-fruit-bunch scouting and harvest logistics in surrounding estates",
+        "Tank-farm and pipeline IoT (level, leak, corrosion sensors) between the zone and Kuala Tanjung port"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "ground-ag",
+        "drone",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "salt-corrosion",
+        "weak-connectivity"
+      ]
+    },
+    {
+      "id": "pekanbaru-riau-palm",
+      "name": "Pekanbaru and the Riau palm belt",
+      "region": "sumatra",
+      "lon": 101.4478,
+      "lat": 0.5071,
+      "kind": "agri",
+      "identity": "The centre of Indonesia's largest palm oil province, linked by toll road to Dumai, the country's top CPO export port. Plantation-scale ag robotics can be tested here under heat, peat and seasonal haze.",
+      "facts": [
+        {
+          "claim": "Riau was the largest palm oil producing province, about 19% of national output (BPS)",
+          "value": "8,790.7 thousand tonnes of 46,986.1 thousand tonnes national",
+          "year": "2023",
+          "source_name": "BPS via Databoks Katadata",
+          "source_url": "https://databoks.katadata.co.id/en/agroindustri/multiple/319be190a2cb82b/volume-produksi-kelapa-sawit-menurut-provinsi",
+          "confidence": "high"
+        },
+        {
+          "claim": "Pekanbaru-Dumai toll road (part of Trans-Sumatra) shortened the route from ~200 km to 131.5 km",
+          "value": "131.5 km, Rp12.18 trillion",
+          "year": "2020",
+          "source_name": "Kementerian Sekretariat Negara (setneg.go.id)",
+          "source_url": "https://www.setneg.go.id/baca/index/sambutan_presiden_pada_peresmian_jalan_tol_trans_sumatera_ruas_pekanbaru_dumai",
+          "confidence": "high"
+        },
+        {
+          "claim": "Dumai port exported CPO and derivatives to India, China, Japan and Europe",
+          "value": "4,751,701 t (up 5.77% from 2018)",
+          "year": "2019",
+          "source_name": "Pelindo I via press",
+          "source_url": "https://www.industry.co.id/read/60294/pelindo-i-optimalkan-layanan-ekspor-cpo-nasional",
+          "confidence": "medium"
+        },
+        {
+          "claim": "BMKG Pekanbaru tracks dry-season hotspots by satellite. Haze episodes have cut visibility in Pekanbaru to about 2 km, and the east-coast districts (Bengkalis, Siak, Dumai, Rokan Hilir) are the most fire-prone",
+          "value": "visibility ~2 km (Aug 2015 episode)",
+          "year": "2015-2017",
+          "source_name": "BMKG Stasiun Pekanbaru via press (Bisnis, Republika)",
+          "source_url": "https://kabar24.bisnis.com/read/20160407/78/535554/bmkg-22-titik-panas-teridentifikasi-di-lahan-dan-hutan-di-riau",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Drone canopy surveys and yield or disease mapping across large estates and smallholder plots",
+        "Ground robots for fresh-fruit-bunch collection and infield transport on peat and soft soils",
+        "Fire-risk sensor networks (peat water table, smoke, hotspot alerts) with long-range low-bandwidth links"
+      ],
+      "fit": [
+        "ground-ag",
+        "drone",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "haze-dust",
+        "flood-rain",
+        "weak-connectivity"
+      ]
+    },
+    {
+      "id": "palembang",
+      "name": "Palembang",
+      "region": "sumatra",
+      "lon": 104.7754,
+      "lat": -2.9761,
+      "kind": "city",
+      "identity": "A river city on the tidal Musi that serves as the industrial hub of South Sumatra's coal and fertilizer economy. Flood-prone low ground and heavy industry make it a good place to test rugged robots and IoT.",
+      "facts": [
+        {
+          "claim": "PT Pupuk Sriwidjaja (Pusri) Palembang installed urea capacity",
+          "value": "2,620,000 t/year",
+          "year": "2025",
+          "source_name": "Pusri ESG documents / CNBC Indonesia",
+          "source_url": "https://esg.pusri.co.id/assets/document/landing/environmental/environmental_management_performance_summary.pdf",
+          "confidence": "medium"
+        },
+        {
+          "claim": "South Sumatra coal production (Dinas ESDM Sumsel), rising from 65 Mt in 2021",
+          "value": "105 Mt (2023), 113 Mt (2024), ~120 Mt (2025)",
+          "year": "2025",
+          "source_name": "Dinas ESDM Sumsel via Bisnis.com",
+          "source_url": "https://ekonomi.bisnis.com/read/20260126/44/1947366/produksi-batu-bara-sumsel-tembus-120-juta-ton-sepanjang-2025",
+          "confidence": "medium"
+        },
+        {
+          "claim": "BMKG warns of daily Musi river tides. Rain falling at high tide floods low-lying districts, with tides reaching 3.4-3.9 m at the river mouth",
+          "value": "3.9 m tide (20 Jan 2026)",
+          "year": "2026",
+          "source_name": "BMKG SMB II Palembang via Metro TV",
+          "source_url": "https://www.metrotvnews.com/read/bzGCe99m-bmkg-palembang-imbau-waspadai-potensi-banjir-akibat-pasang-air-sungai-musi",
+          "confidence": "medium"
+        },
+        {
+          "claim": "LRT Palembang elevated line from SMB II airport to Jakabaring",
+          "value": "23.4 km",
+          "year": "2018",
+          "source_name": "Sekretariat Kabinet (setkab.go.id)",
+          "source_url": "https://setkab.go.id/en/minister-of-transportation-palembang-lrt-to-operate-early-july/",
+          "confidence": "high"
+        }
+      ],
+      "scenarios": [
+        "Inspection robots and crawlers for fertilizer-plant pipes, tanks and ammonia units",
+        "Urban flood and tide sensor networks with drone mapping along the Musi and its tributaries",
+        "Autonomous haulage and rail-loading IoT for coal moving from Muara Enim toward river and rail terminals"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "sensors-iot",
+        "drone",
+        "marine"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "haze-dust",
+        "unstable-power"
+      ]
+    },
+    {
+      "id": "batam",
+      "name": "Batam (BP Batam FTZ and shipyards)",
+      "region": "kepri",
+      "lon": 104.0305,
+      "lat": 1.0456,
+      "kind": "industrial",
+      "identity": "A free-trade island across the strait from Singapore with about a hundred shipyards and a dense electronics and offshore base. It is the easiest entry point for marine and industrial robotics in Indonesia.",
+      "facts": [
+        {
+          "claim": "PP 46/2007 designates Batam (with Rempang, Galang and other islands) a Free Trade Zone and Free Port for 70 years, managed by BP Batam",
+          "value": "70 years",
+          "year": "2007",
+          "source_name": "PP 46/2007 (regulation text via kbli.co.id)",
+          "source_url": "https://kbli.co.id/regulations/pp-46-2007",
+          "confidence": "high"
+        },
+        {
+          "claim": "Batam shipyards: ~60 members of the Batam Shipyard and Offshore Association plus ~45 non-members",
+          "value": "~105 shipyards",
+          "year": "2015-2017",
+          "source_name": "Tirto (press, citing BSOA)",
+          "source_url": "https://tirto.id/akal-akalan-tarif-tambat-kapal-pasal-siluman-di-pelabuhan-batam-gh7Q",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Batamec Shipyard is building an Offshore Patrol Vessel (OPV-3) for the Ministry of Defence. Menhan visited Batam yards in March 2026",
+          "value": "OPV-3",
+          "year": "2026",
+          "source_name": "Kementerian Pertahanan (kemhan.go.id)",
+          "source_url": "https://www.kemhan.go.id/?p=40074",
+          "confidence": "high"
+        }
+      ],
+      "scenarios": [
+        "Hull-inspection crawlers, welding cobots and ultrasonic NDT robots in shipyards",
+        "Underwater ROV/AUV trials for hull, mooring and subsea checks in Strait waters",
+        "Salt-fog corrosion endurance testing for sensors and robot enclosures at coastal industrial estates"
+      ],
+      "fit": [
+        "marine",
+        "industrial-amr-cobot",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "salt-corrosion",
+        "heat-humidity",
+        "flood-rain"
+      ]
+    },
+    {
+      "id": "kek-nongsa",
+      "name": "KEK Nongsa Digital Park, Batam",
+      "region": "kepri",
+      "lon": 104.11,
+      "lat": 1.19,
+      "kind": "special-zone",
+      "identity": "A digital special economic zone that is becoming a hyperscale data-centre campus within ferry range of Singapore. It suits AI compute-adjacent pilots, data-centre robotics and dataset hosting near the field.",
+      "facts": [
+        {
+          "claim": "KEK Nongsa Digital Park approved by the National KEK Council (PP 68/2021)",
+          "value": "166.45 ha",
+          "year": "2020",
+          "source_name": "Kontan (press, citing Dewan Nasional KEK)",
+          "source_url": "https://nasional.kontan.co.id/news/dewan-nasional-kek-setujui-pembentukan-dua-kek-baru-di-batam",
+          "confidence": "medium"
+        },
+        {
+          "claim": "BP Batam reports data-centre investment across nine projects, with power demand projected to rise from ~800 MW to 3,000 MW",
+          "value": "> Rp120 trillion",
+          "year": "2026",
+          "source_name": "BP Batam via Mongabay (press)",
+          "source_url": "https://mongabay.co.id/2026/10/04/proyek-data-center-batam-ancam-sumber-air/",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Ministry of Communications planned a National Data Centre (PDN) in KEK Nongsa",
+          "value": "PDN site",
+          "year": "2024",
+          "source_name": "Bisnis.com (press)",
+          "source_url": "https://teknologi.bisnis.com/read/20240628/84/1777888/kominfo-bakal-bangun-pusat-data-nasional-di-kek-nongsa-batam",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Data-centre inspection and hot-aisle monitoring robots plus dense environmental IoT",
+        "Edge-to-cloud dataset pipelines that upload field robot logs from Indonesian test sites into an in-country facility",
+        "Coastal campus security and patrol robots at a resort and marina mixed-use site"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "sensors-iot",
+        "humanoid-manipulation"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "salt-corrosion",
+        "unstable-power"
+      ]
+    },
+    {
+      "id": "lampung-agri",
+      "name": "Lampung agri belt",
+      "region": "sumatra",
+      "lon": 105.21,
+      "lat": -4.97,
+      "kind": "agri",
+      "identity": "Indonesia's top cassava province and number-two robusta region, one ferry crossing from Java. Smallholder row crops and tree crops here make an accessible testbed for ag drones and field robots.",
+      "facts": [
+        {
+          "claim": "Lampung is the main cassava production centre, contributing 39.74% of national output (Kementan Pusdatin)",
+          "value": "5.95 million t (39.74%)",
+          "year": "2022",
+          "source_name": "Kementan (repository.pertanian.go.id)",
+          "source_url": "https://repository.pertanian.go.id/bitstreams/c6c1ae3c-3d32-4c6b-b70b-c3e2fe676b49/download",
+          "confidence": "high"
+        },
+        {
+          "claim": "Lampung ranks second in robusta coffee after South Sumatra (Kementan average share 2019-2023)",
+          "value": "~115.76 thousand t/yr average (20.84%)",
+          "year": "2019-2023",
+          "source_name": "Kementerian Pertanian via IPB journal (secondary)",
+          "source_url": "https://jai.ipb.ac.id/index.php/jagbi/article/download/42545/26836",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Lampung maize output, sixth-largest province",
+          "value": "~1.10 million t",
+          "year": "2024",
+          "source_name": "BPS via aviNews (secondary)",
+          "source_url": "https://avinews.com/id/provinsi-mana-saja-sebagai-sentra-produksi-jagung-di-indonesia/",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Merak-Bakauheni ferry carried a record 42,145 vehicles at the 2024 Lebaran peak (H-3). Lampung is the southern end of the 2,878 km Trans-Sumatra toll network",
+          "value": "42,145 vehicles in peak day",
+          "year": "2024",
+          "source_name": "ASDP via Investortrust (press)",
+          "source_url": "https://investortrust.id/national/20027/puncak-arus-terlewati-asdp-catat-jumlah-pemudik-dan-kendaraan-terbesar-sepanjang-sejarah",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Spray and scouting drones over smallholder cassava and maize plots with variable field shapes",
+        "Soil-moisture and weather IoT networks for robusta farms on the Lampung Barat and Tanggamus slopes",
+        "Ground robots for weeding and harvest assistance in cassava rows, plus logistics tracking to starch mills"
+      ],
+      "fit": [
+        "ground-ag",
+        "drone",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "weak-connectivity",
+        "haze-dust"
+      ]
+    },
+    {
+      "id": "balikpapan-ikn",
+      "name": "Balikpapan / IKN Nusantara",
+      "region": "kalimantan",
+      "lon": 116.8312,
+      "lat": -1.2654,
+      "kind": "city",
+      "identity": "Indonesia's oil-refining city and the logistics gateway to Nusantara, the new capital being built from scratch next door: a place to test robots in a greenfield smart-city build and a heavy-industry port at the same time.",
+      "facts": [
+        {
+          "claim": "Pertamina's RDMP project raised the Balikpapan refinery's capacity from 260,000 to 360,000 barrels per day, making it Indonesia's largest refinery. It was reported as inaugurated in January 2026.",
+          "value": "360,000 bpd",
+          "year": "2026",
+          "source_name": "Kontan / GNFI (secondary press, citing Pertamina)",
+          "source_url": "https://www.goodnewsfromindonesia.id/2026/01/14/rdmp-balikpapan-kilang-minyak-terbesar-di-indonesia-yang-bisa-produksi-360-ribu-barel-minyak-per-hari",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Law 3/2022 gives Nusantara (IKN) about 256,142 ha of land and about 68,189 ha of sea, nearly four times the size of Jakarta.",
+          "value": "256,142 ha land",
+          "year": "2024",
+          "source_name": "Otorita IKN press release",
+          "source_url": "https://ikn.go.id/storage/press-release/2024/20240817siaran-pers-pengunjung-sambut-upacara-kenegaraan-hut-ri-ke-79-di-ibu-kota-nusantara-dengan-sukacita.pdf",
+          "confidence": "high"
+        },
+        {
+          "claim": "The IKN strategic environmental study recommends Kaltim Kariangau Terminal (Balikpapan) as the main logistics port for building IKN. Its container flow rose from 171,272 TEUs in 2015 to 206,652 TEUs in 2019.",
+          "value": "206,652 TEUs (2019)",
+          "year": "2021",
+          "source_name": "IKN / Bappenas press release",
+          "source_url": "https://ikn.go.id/storage/press-release/2021/en/eng-9-press-release-bappenas-surveys-the-logistics-infrastructure-development-sites-in-samarinda-balikpapan-and-penajam-paser-utara.pdf",
+          "confidence": "medium"
+        },
+        {
+          "claim": "The East Kalimantan provincial government has studied whether the Kariangau Industrial Estate in Balikpapan is viable for marine-product processing, agriculture and manufacturing. Recommendations included toll-road and rail links to IKN and applying for Special Economic Zone (KEK) status.",
+          "year": "2022",
+          "source_name": "Bappeda Kaltim",
+          "source_url": "https://bappeda.kaltimprov.go.id/beranda/berita/fgd-dalam-rangka-studi-kelayakan-awal-untuk-menarik-investasi-asing-di-kawasan-industri-kariangau/detail",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Construction-site autonomy at IKN: survey drones, site-progress mapping and autonomous inspection rovers on tropical earthworks in rain-forest humidity",
+        "Refinery and port inspection: crawler or legged robots and fixed gas/corrosion sensors in a large tropical coastal refinery",
+        "Smart-city IoT pilots: mesh sensor networks and delivery robots in a newly built government district with fresh infrastructure"
+      ],
+      "fit": [
+        "drone",
+        "industrial-amr-cobot",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "salt-corrosion"
+      ]
+    },
+    {
+      "id": "makassar",
+      "name": "Makassar",
+      "region": "sulawesi",
+      "lon": 119.4327,
+      "lat": -5.1477,
+      "kind": "city",
+      "identity": "Eastern Indonesia's main trade and transhipment city, with a deep-water container port and Sulawesi's rice and plantation hinterland behind it.",
+      "facts": [
+        {
+          "claim": "After Phases 1B and 1C, Makassar New Port's container capacity rose from 1 million to 2.5 million TEUs. The government wants it to be the main logistics hub for eastern Indonesia.",
+          "value": "2.5M TEUs capacity",
+          "year": "2024",
+          "source_name": "Bisnis.com citing Pelindo / Kemenhub",
+          "source_url": "https://ekonomi.bisnis.com/read/20240105/98/1729619/port-baru-rampung-kapasitas-makassar-new-port-naik-150-persen",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Makassar New Port has a -16 m draft that allows direct calls by post-Panamax vessels. Actual throughput is far below capacity: about 258,000 TEUs through November 2023.",
+          "value": "-16 m draft",
+          "year": "2025",
+          "source_name": "Bisnis.com citing Kemenhub",
+          "source_url": "https://ekonomi.bisnis.com/read/20250430/98/1873505/kemenhub-pelabuhan-makassar-new-port-bakal-jadi-hub-ekspor-baru",
+          "confidence": "medium"
+        },
+        {
+          "claim": "South Sulawesi produced about 4.82 million tonnes of rice (padi) in 2024 at 50.65 qu/ha, which makes it one of the largest rice provinces outside Java. Bone regency produced the most.",
+          "value": "4,818,429 t (2024)",
+          "year": "2025",
+          "source_name": "BPS Sulawesi Selatan (via Universitas Hasanuddin thesis)",
+          "source_url": "https://repository.unhas.ac.id/id/eprint/54012/2/G021201131-1-2.pdf",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Port-yard automation pilots: AGVs, container-tracking IoT and crane-inspection drones at an under-utilised deep-water terminal",
+        "Paddy-field robotics in the Bone/Wajo rice belt: spraying drones and field rovers in wet-season mud",
+        "Urban last-mile delivery robots and rain-hardened sensor kits in a dense coastal city"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "drone",
+        "ground-ag",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "salt-corrosion"
+      ]
+    },
+    {
+      "id": "morowali",
+      "name": "Morowali nickel industrial area",
+      "region": "sulawesi",
+      "lon": 122.17,
+      "lat": -2.82,
+      "kind": "industrial",
+      "identity": "The centre of Indonesia's nickel downstreaming: a priority industrial park running ferronickel smelters and stainless-steel lines on a remote coast, where heavy-industry robots can be proven in extreme heat and dust.",
+      "facts": [
+        {
+          "claim": "Morowali Industrial Park (managed by PT IMIP) is a government-designated priority industrial estate and a National Strategic Project (PSN). It focuses on nickel smelting and refining.",
+          "year": "2023",
+          "source_name": "Investortrust citing Kemenperin",
+          "source_url": "https://investortrust.id/business/75719/pacu-hilirisasi-nikel-kemenperin-genjot-produksi-di-kawasan-industri-morowali",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Kemenperin records nameplate capacities of ferronickel smelters of 300,000 t/yr (PT SMI) and 600,000 t/yr (PT GCNS) in the area, plus 1 million t/yr stainless-steel plants. These figures date from about 2016-2017.",
+          "value": "1M t/yr stainless lines",
+          "year": "2017",
+          "source_name": "Industry.co.id citing Kemenperin",
+          "source_url": "https://www.industry.co.id/read/16931/indonesia-akan-menjadi-produsen-baja-tahan-karat-kedua-terbesar-di-dunia",
+          "confidence": "medium"
+        },
+        {
+          "claim": "The park's land area has grown from 1,350 ha to 2,000 ha and then to about 4,000 ha. Bappenas also cites more than 4,000 ha.",
+          "value": "~4,000 ha",
+          "year": "2021",
+          "source_name": "Kontan citing IMIP management; Bappenas working paper",
+          "source_url": "https://industri.kontan.co.id/news/bakal-makin-ramai-3-tahun-lagi-akan-ada-40-tenant-di-kawasan-industri-morowali",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Hazardous-area inspection: thermal-camera drones and crawler robots near furnaces and slag handling",
+        "Heavy-duty AMRs and haul-yard autonomy carrying ore and coil in dust and heat",
+        "Industrial IoT condition monitoring (vibration, temperature, air quality) on smelter assets with an unstable captive grid"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "drone",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "haze-dust",
+        "salt-corrosion",
+        "unstable-power"
+      ]
+    },
+    {
+      "id": "denpasar-sanur",
+      "name": "Denpasar / Sanur (KEK Sanur)",
+      "region": "bali-nt",
+      "lon": 115.263,
+      "lat": -8.677,
+      "kind": "special-zone",
+      "identity": "Indonesia's international tourism hub, now home to its first health-and-tourism Special Economic Zone: a showcase for service, hospitality and healthcare robots in front of millions of foreign visitors.",
+      "facts": [
+        {
+          "claim": "KEK Sanur, Indonesia's first health-and-tourism Special Economic Zone, covers 41.6 ha and includes Bali International Hospital. It was inaugurated by President Prabowo on 25 June 2025 and is developed by InJourney.",
+          "value": "41.6 ha",
+          "year": "2025",
+          "source_name": "Warta Ekonomi / DPR e-media",
+          "source_url": "https://wartaekonomi.co.id/read573013/kek-sanur-diresmikan-menpar-imbau-daerah-bentuk-badan-koordinasi-pariwisata-kesehatan?page=all",
+          "confidence": "medium"
+        },
+        {
+          "claim": "BPS Bali recorded 6,333,360 foreign tourist visits to Bali in 2024, up 20.1% from 2023 and above pre-pandemic levels.",
+          "value": "6.33M visits",
+          "year": "2025",
+          "source_name": "Antara citing BPS Provinsi Bali",
+          "source_url": "https://manado.antaranews.com/berita/273977/kunjungan-wisman-ke-bali-sepanjang-2024-mencapai-63-juta-orang",
+          "confidence": "high"
+        },
+        {
+          "claim": "On 2 May 2025 most of Bali lost power after a fault on the Java-Bali subsea cable coincided with maintenance at a local power plant. This shows the island's dependence on a single grid interconnect.",
+          "year": "2025",
+          "source_name": "Listrik Indonesia / Kontan citing PLN",
+          "source_url": "https://listrikindonesia.com/detail/16542/pln-buka-suara-soal-penyebab-blackout-listrik-di-bali-ini-penjelasannya",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Hospital and hospitality service robots (delivery, disinfection, concierge) inside KEK Sanur's hospital and resort complex",
+        "Robots and kiosks tested with multilingual foreign visitors in high-traffic tourism settings",
+        "Resilience tests for robots and IoT edge devices: UPS and battery behaviour during grid disturbances, in salty coastal air"
+      ],
+      "fit": [
+        "humanoid-manipulation",
+        "industrial-amr-cobot",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "salt-corrosion",
+        "unstable-power"
+      ]
+    },
+    {
+      "id": "kupang",
+      "name": "Kupang",
+      "region": "bali-nt",
+      "lon": 123.607,
+      "lat": -10.1772,
+      "kind": "city",
+      "identity": "Capital of Indonesia's driest province and gateway port for East Nusa Tenggara: a place to test dryland agriculture, water and solar-powered systems under long dry seasons and dust.",
+      "facts": [
+        {
+          "claim": "BMKG has repeatedly classed Kupang City and Kupang Regency as 'extremely long' meteorological drought, meaning more than 60 consecutive days without rain, for example in 2021.",
+          "value": ">60 rainless days",
+          "year": "2021",
+          "source_name": "Antara Kupang citing BMKG",
+          "source_url": "https://kupang.antaranews.com/berita/55838/11-daerah-di-ntt-alami-kekeringan-ekstrem-panjang",
+          "confidence": "medium"
+        },
+        {
+          "claim": "BMKG's NTT climatology station forecast that the 2026 dry season in Kupang would begin in early April, peak in August-September, and be drier than normal in about 61% of NTT's season zones.",
+          "year": "2026",
+          "source_name": "RRI Kupang citing Stasiun Klimatologi NTT (BMKG)",
+          "source_url": "https://rri.co.id/kupang/regional/2252920/prediksi-musim-kemarau-2026-lebih-awal-lebih-kering",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Tenau port's container terminal is cited by the State Secretariat at 240,000 TEUs per year of capacity, against 110,000 TEUs handled in 2018. Tenau is the main gateway for goods entering and leaving NTT.",
+          "value": "240k TEUs capacity",
+          "year": "2019",
+          "source_name": "Kemensetneg",
+          "source_url": "https://setneg.go.id/baca/index/presiden_jokowi_tinjau_aktivitas_pelabuhan_tenau_di_kupang",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Dryland agriculture robotics: soil-moisture IoT and irrigation control, and crop- or livestock-monitoring drones through months-long dry seasons",
+        "Off-grid solar and battery durability tests for sensors and robots under high UV and dust",
+        "Water-infrastructure monitoring (wells, reservoirs) with low-bandwidth LPWAN sensor networks"
+      ],
+      "fit": [
+        "ground-ag",
+        "drone",
+        "sensors-iot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "haze-dust",
+        "weak-connectivity",
+        "salt-corrosion"
+      ]
+    },
+    {
+      "id": "ambon",
+      "name": "Ambon",
+      "region": "maluku",
+      "lon": 128.1814,
+      "lat": -3.6954,
+      "kind": "marine",
+      "identity": "Capital of a fisheries province bordering three national fishing zones and the planned site of the National Fish Granary: a place to test marine robotics, cold-chain IoT and vessel monitoring in deep tropical seas.",
+      "facts": [
+        {
+          "claim": "Maluku borders three national fisheries management areas: WPP 714 (Banda Sea), WPP 715 (Maluku Sea/Seram) and WPP 718 (Arafura Sea). Its often-cited fish resource potential is about 4.6 million t/yr, around 37% of the national 12.5 million t.",
+          "value": "~4.6M t/yr potential",
+          "year": "2021",
+          "source_name": "Mongabay Indonesia (secondary, citing KKP / Unpatti)",
+          "source_url": "https://mongabay.co.id/2021/02/10/support-lin-maluku-harus-cerdas-dan-bijak-kelola-kekayaan-lautnya/",
+          "confidence": "medium"
+        },
+        {
+          "claim": "The Ministry of Marine Affairs and Fisheries (KKP) planned a National Fish Granary (LIN) in Maluku with an integrated fishing port, cold storage, ice plant and laboratory. The target output was 750,000 t/yr (a planning figure, not actual output), with Ambon New Port as the export gateway.",
+          "value": "750,000 t/yr target",
+          "year": "2022",
+          "source_name": "DPR Puslit brief / Mongabay",
+          "source_url": "https://mongabay.co.id/2021/02/23/pusat-ekonomi-baru-dari-lumbung-ikan-nasional-maluku/",
+          "confidence": "medium"
+        },
+        {
+          "claim": "KKP's Ambon national fishing port (PPN Ambon) is described as the central capture-fisheries hub for Maluku. Tuna, skipjack and tuna-like species are its key resources.",
+          "year": "2026",
+          "source_name": "KKP PPID annual work plan (PPN Ambon)",
+          "source_url": "https://ppid.kkp.go.id/media/uploads/document_information_public/RENCANA_KERJA_TAHUNAN_2026____moOimgi.pdf",
+          "confidence": "low"
+        }
+      ],
+      "scenarios": [
+        "Marine robotics: ROVs and USVs for fish-stock surveys, FAD (fish aggregating device) monitoring and aquaculture-cage inspection in deep, clear water",
+        "Cold-chain IoT: temperature loggers and refrigerated-container telemetry from landing port to export",
+        "Vessel monitoring and catch-documentation sensors that work with patchy offshore connectivity"
+      ],
+      "fit": [
+        "marine",
+        "sensors-iot",
+        "drone"
+      ],
+      "stressors": [
+        "salt-corrosion",
+        "heat-humidity",
+        "weak-connectivity",
+        "flood-rain"
+      ]
+    },
+    {
+      "id": "jayapura",
+      "name": "Jayapura",
+      "region": "papua",
+      "lon": 140.7181,
+      "lat": -2.5337,
+      "kind": "city",
+      "identity": "Papua's capital and main port at Indonesia's far eastern edge, where long supply lines and thin fibre redundancy make it a true test of how robots and IoT handle weak connectivity.",
+      "facts": [
+        {
+          "claim": "Pelindo's TPK Jayapura container terminal handled 88,990 TEUs in 2024. Volumes were weaker in 2025 (61,346 TEUs through September), and port stay was cut from 3 days to 1 after the 2021 Pelindo merger.",
+          "value": "88,990 TEUs (2024)",
+          "year": "2025",
+          "source_name": "Bisnis.com (Jelajah Pelabuhan 2025)",
+          "source_url": "https://ekonomi.bisnis.com/read/20251014/98/1920331/jelajah-pelabuhan-dan-logistik-2025-volume-bongkar-muat-di-tpk-jayapura-tahun-ini-lesu",
+          "confidence": "medium"
+        },
+        {
+          "claim": "The government opened sea-toll route T-19 and Depapre port in Jayapura Regency in January 2021, with a scheduled Merauke-Jayapura service of about eight days.",
+          "year": "2021",
+          "source_name": "Setkab / Mongabay",
+          "source_url": "https://setkab.go.id/pemerintah-siapkan-pelabuhan-depapre-jayapura-jadi-hub-indonesia-timur/",
+          "confidence": "high"
+        },
+        {
+          "claim": "When Telkom's Biak-Jayapura subsea cable broke in 2021, the government-built Palapa Ring Timur fibre (about 50% subsea, passing Jayapura) became the backup path for Papua's data services.",
+          "year": "2021",
+          "source_name": "Bisnis.com",
+          "source_url": "https://teknologi.bisnis.com/read/20210505/101/1390639/kabel-bawah-laut-telkom-di-papua-putus-palapa-ring-timur-jadi-andalan",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Store-and-forward IoT and edge-AI robots tested under intermittent backhaul and fibre outages",
+        "Port logistics tracking from Jayapura and Depapre to inland districts, with satellite fallback",
+        "Mapping drones for remote terrain and infrastructure where road access is limited"
+      ],
+      "fit": [
+        "sensors-iot",
+        "drone",
+        "industrial-amr-cobot"
+      ],
+      "stressors": [
+        "weak-connectivity",
+        "heat-humidity",
+        "flood-rain",
+        "salt-corrosion"
+      ]
+    },
+    {
+      "id": "sorong",
+      "name": "Sorong (KEK Sorong)",
+      "region": "papua",
+      "lon": 131.2558,
+      "lat": -0.8762,
+      "kind": "special-zone",
+      "identity": "Papua's western gateway and home of its first Special Economic Zone, which targets nickel, palm-oil, fisheries and logistics processing at the edge of the Raja Ampat seas.",
+      "facts": [
+        {
+          "claim": "KEK Sorong was designated by Government Regulation 31/2016, covers 523.7 ha in Mayamuk District, and was inaugurated in October 2019 with a Rp32.5 trillion investment target.",
+          "value": "523.7 ha",
+          "year": "2019",
+          "source_name": "KPPIP (Committee for Acceleration of Priority Infrastructure)",
+          "source_url": "https://kppip.go.id/?p=15007",
+          "confidence": "high"
+        },
+        {
+          "claim": "Its planned activities include nickel processing, palm-oil and sago/forest-product processing, and logistics warehousing.",
+          "year": "2019",
+          "source_name": "Kemenko Perekonomian",
+          "source_url": "https://www.ekon.go.id/publikasi/detail/2640/pemerintah-memutuskan-kek-sorong",
+          "confidence": "medium"
+        },
+        {
+          "claim": "In September 2026 the Ministry of Investment and Downstreaming said KEK Sorong could become a fisheries-processing hub. A preliminary tuna-processing study found that supporting infrastructure and distribution routes still need strengthening.",
+          "year": "2026",
+          "source_name": "BCA Sekuritas (IQPlus) citing Kementerian Investasi",
+          "source_url": "https://bcasekuritas.co.id/latest-news/news/kementerian-investasikek-sorong-berpotensi-jadi-pusat-pengolahan-ikan",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Fish-processing automation and cold-chain IoT for a planned tuna processing hub",
+        "Marine survey USVs/ROVs and coastal monitoring buoys in the surrounding seas",
+        "Plantation and forestry-product monitoring drones over remote, cloud-covered terrain"
+      ],
+      "fit": [
+        "marine",
+        "sensors-iot",
+        "drone",
+        "industrial-amr-cobot"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "salt-corrosion",
+        "weak-connectivity"
+      ]
+    },
+    {
+      "id": "jakarta",
+      "name": "Jakarta (DKI)",
+      "region": "java",
+      "lon": 106.8272,
+      "lat": -6.1754,
+      "kind": "city",
+      "identity": "Indonesia's largest economy and densest urban test bed: hot, humid megacity streets, malls, hospitals and the country's main container gateway at Tanjung Priok.",
+      "facts": [
+        {
+          "claim": "Jakarta has the largest GRDP of Indonesia's 38 provinces; 2024 GRDP at current prices was about IDR 3,679 trillion, with 4.90% growth (c-to-c)",
+          "value": "IDR 3,679.36 trillion; +4.90%",
+          "year": "2024",
+          "source_name": "BPS Provinsi DKI Jakarta press release (via Kontan Insight)",
+          "source_url": "https://jakarta.bps.go.id/en/pressrelease/2025/02/05/1198/pertumbuhan-ekonomi-provinsi-dki-jakarta-triwulan-iv-2024.html",
+          "confidence": "high"
+        },
+        {
+          "claim": "Wholesale and retail trade is Jakarta's largest sector, at about 18% of GRDP, making retail, warehousing and last-mile delivery the core use cases",
+          "value": "18.01%",
+          "year": "2024",
+          "source_name": "BPS DKI Jakarta (reported by Kontan Insight)",
+          "source_url": "https://insight.kontan.co.id/news/porsi-pdrb-dki-jakarta-masih-tertinggi-di-2024-ini-daftar-lengkap-38-provinsi",
+          "confidence": "medium"
+        },
+        {
+          "claim": "BPS Jakarta reports an average air temperature of about 28 C for 2018-2023, and BMKG forecasts often put night-time humidity at 78-85%",
+          "value": "27.97 C average",
+          "year": "2018-2023",
+          "source_name": "BPS Jakarta via CNBC Indonesia Research (secondary)",
+          "source_url": "https://www.cnbcindonesia.com/research/20260131120019-128-706946/benarkah-suhu-udara-di-jakarta-sekarang-lebih-dingin",
+          "confidence": "medium"
+        },
+        {
+          "claim": "MRT Jakarta averaged 101,581 passengers a day in H1 2024, rising to about 122,000 on weekdays, so crowded stations and public spaces are realistic places to test people-dense operations",
+          "value": "101,581/day",
+          "year": "2024",
+          "source_name": "PT MRT Jakarta via Investortrust (secondary)",
+          "source_url": "https://investortrust.id/business/33461/mrt-jakarta-layani-18-48-juta-penumpang-pada-semester-i-2024",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Delivery and service robots in mall and office-tower lobbies, then on sidewalks with motorbikes, curbs and sudden tropical downpours",
+        "Indoor AMRs and inventory scanning in urban fulfilment and cold-chain warehouses around north Jakarta and the Tanjung Priok port",
+        "Crowd-flow, air-quality and flood-level IoT sensor networks across transit stations and low-lying districts"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "sensors-iot",
+        "humanoid-manipulation",
+        "drone"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "haze-dust",
+        "salt-corrosion"
+      ]
+    },
+    {
+      "id": "bekasi-karawang",
+      "name": "Bekasi-Karawang industrial corridor (Jababeka, MM2100, KIIC, Suryacipta)",
+      "region": "java",
+      "lon": 107.22,
+      "lat": -6.33,
+      "kind": "industrial",
+      "identity": "Indonesia's densest manufacturing belt east of Jakarta: automotive, electronics and consumer goods plants in back-to-back estates, ideal for scaling factory and warehouse automation trials.",
+      "facts": [
+        {
+          "claim": "Kabupaten Bekasi had the highest GRDP in West Java in 2025, about IDR 451.5 trillion at current prices, and BPS describes its economy as still dominated by manufacturing",
+          "value": "IDR 451.51 trillion",
+          "year": "2025",
+          "source_name": "BPS Kabupaten Bekasi, reported by GEBRAK.ID (secondary)",
+          "source_url": "https://www.gebrak.id/2026/05/bekasi-salip-bandung-jadi-daerah.html",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Manufacturing makes up about 70% of Kabupaten Karawang's GRDP: 70.92% in 2023 and 69.91% in 2024",
+          "value": "70.92% (2023), 69.91% (2024)",
+          "year": "2023-2024",
+          "source_name": "BPS Kabupaten Karawang tables cited in a Universitas Pasundan thesis (secondary)",
+          "source_url": "https://repository.unpas.ac.id/82886/6/Bab%20I%20%281%29.pdf",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Patimban Port, east of the corridor in Subang, handled 200,631 vehicles in 2024, 82.3% of its 218,000-unit installed capacity, and serves the area's car plants",
+          "value": "200,631 units",
+          "year": "2024",
+          "source_name": "Bisnis Indonesia (citing Kemenhub)",
+          "source_url": "https://ekonomi.bisnis.com/read/20250515/98/1876883/mengintip-profil-pelabuhan-patimban-calon-pengganti-tanjung-priok",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Jababeka reports about 1,650 companies from 30 countries in its Cikarang estate, and its Cikarang Dry Port is a customs-integrated service zone (KPPT), so export and import clearance can be done inside the estate",
+          "value": "~1,650 tenants, 30 countries",
+          "year": "c.2019",
+          "source_name": "Industry.co.id (secondary, older)",
+          "source_url": "https://www.industry.co.id/read/6437/menengok-kota-jababeka-cikarang-cikal-bakal-visi-100-kota-baru-di-indonesia",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Pilot AMRs and cobots on live automotive and electronics lines in Cikarang or Karawang estates, measuring uptime under heat, dust and grid dips",
+        "Yard and dry-port logistics automation: container tracking, autonomous tugs and gate IoT at Cikarang Dry Port",
+        "Predictive-maintenance and energy-monitoring sensor kits rolled out across multiple tenant factories to build a real-world industrial dataset"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "sensors-iot",
+        "humanoid-manipulation"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "haze-dust",
+        "flood-rain",
+        "unstable-power"
+      ]
+    },
+    {
+      "id": "bandung",
+      "name": "Bandung",
+      "region": "java",
+      "lon": 107.6098,
+      "lat": -6.9147,
+      "kind": "city",
+      "identity": "West Java's cool highland tech and university city (ITB, Telkom University) with textile and creative industries, planned as AIoT's lab city for R&D and pilot builds.",
+      "facts": [
+        {
+          "claim": "Bandung sits about 768 m above sea level, rising to 1,050 m in the north and falling to 675 m in the south, which makes it cooler than coastal Java",
+          "value": "768 m (675-1,050 m)",
+          "year": "n/a",
+          "source_name": "PPID Pemerintah Kota Bandung (official city document)",
+          "source_url": "https://ppid.bandung.go.id/storage/ppid_utama/GjMXbHIHgWEYBE2YhaE0614wx6esfWm1V8GyuDwk.pdf",
+          "confidence": "high"
+        },
+        {
+          "claim": "Kota Bandung's 2025 GRDP was about IDR 404 trillion at current prices, with growth of 5.29%, up from 4.99% in 2024",
+          "value": "IDR 403.97 trillion; +5.29%",
+          "year": "2025",
+          "source_name": "BPS Kota Bandung, reported by GEBRAK.ID (secondary)",
+          "source_url": "https://www.gebrak.id/2026/05/bekasi-salip-bandung-jadi-daerah.html",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Bandung Techno Park, an incubator inside Telkom University, links campus, industry and government, and keeps a dedicated IoT category in its innovation catalogue",
+          "value": "IoT category in catalogue",
+          "year": "2025",
+          "source_name": "Bandung Techno Park, Telkom University",
+          "source_url": "https://btp.telkomuniversity.ac.id/landing/telkom-university-innovation-gallery/tel-u-weather-station",
+          "confidence": "medium"
+        },
+        {
+          "claim": "BMKG regularly issues heavy rain and lightning warnings for dozens of sub-districts in Bandung Raya, with afternoon convective storms",
+          "value": "up to 45 sub-districts per alert",
+          "year": "2026",
+          "source_name": "BMKG early warnings via Databoks (secondary)",
+          "source_url": "https://databoks.katadata.co.id/datapublish/2026/09/29/peringatan-dini-bmkg-untuk-bandung-raya-bandung-dan-kabupaten-bandung-akan-diguyur-hujan-lebat-disertai-petir-siang-ini",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Lab-to-field loop: build, localize and calibrate robots with ITB and Telkom University engineers, then run them on hilly, rain-soaked city streets",
+        "Textile and garment factory automation pilots (fabric handling, inspection vision) in the Bandung Raya industrial belt",
+        "Lightning and heavy-rain resilience tests for outdoor IoT gateways and drones in highland weather"
+      ],
+      "fit": [
+        "sensors-iot",
+        "industrial-amr-cobot",
+        "drone",
+        "humanoid-manipulation"
+      ],
+      "stressors": [
+        "flood-rain",
+        "heat-humidity",
+        "weak-connectivity"
+      ]
+    },
+    {
+      "id": "cilegon",
+      "name": "Cilegon / Banten industrial port",
+      "region": "java",
+      "lon": 106.0538,
+      "lat": -6.0174,
+      "kind": "industrial",
+      "identity": "Java's west-end heavy-industry port city on the Sunda Strait: steel, petrochemicals and deep-water jetties, a harsh, salty, high-temperature proving ground.",
+      "facts": [
+        {
+          "claim": "Cilegon's economy grew 5.78% in 2025; manufacturing grew fastest at 7.09%, and real GRDP rose from IDR 88.63 trillion (2024) to IDR 93.75 trillion",
+          "value": "+5.78%; manufacturing +7.09%",
+          "year": "2025",
+          "source_name": "BPS Kota Cilegon via Databoks/Katadata (secondary)",
+          "source_url": "https://databoks.katadata.co.id/ekonomi-makro/statistik/6a8480ad4033060/pertumbuhan-ekonomi-kota-cilegon-2025-terkuat-di-sektor-industri-pengolahan",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Cigading Port, run by Krakatau Steel unit KBS, handles about 21 million tonnes a year across up to 17 berths and takes ships of up to 200,000 DWT; about 60% of its throughput is cargo for Krakatau Steel and Krakatau Posco",
+          "value": "~21-25 Mt capacity",
+          "year": "2019",
+          "source_name": "Bisnis Indonesia (secondary, older)",
+          "source_url": "https://ekonomi.bisnis.com/read/20190326/98/904672/kbs-incar-kenaikan-produksi-bongkar-muat-jadi-214-jut-ton",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Cilegon is planned to become a Special Economic Zone (KEK) in 2026, linked to a Krakatau Steel and city government agreement covering about 10,000 ha of industrial land and port development; no designating regulation was found, so it is still a plan",
+          "value": "~10,000 ha (planned)",
+          "year": "2026",
+          "source_name": "Investortrust (secondary)",
+          "source_url": "https://investortrust.id/indepth/93262/kek-cilegon-dan-masa-depan-industri-baja-nasional",
+          "confidence": "low"
+        }
+      ],
+      "scenarios": [
+        "Inspection robots and drones in steel and chemical plants (tank, pipe-rack and conveyor inspection) under heat, dust and corrosive coastal air",
+        "Bulk-port automation at Cigading: stockpile-volume drones, autonomous yard vehicles and berth sensor networks",
+        "Long-duration corrosion and dust-ingress tests of IoT enclosures and sensors exposed to sea salt and heavy-industry particulates"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "drone",
+        "sensors-iot",
+        "marine"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "salt-corrosion",
+        "haze-dust",
+        "unstable-power"
+      ]
+    },
+    {
+      "id": "semarang-kendal",
+      "name": "Semarang + KEK Kendal",
+      "region": "java",
+      "lon": 110.4203,
+      "lat": -6.9667,
+      "kind": "industrial",
+      "identity": "Central Java's port city and its biggest export-manufacturing zone, KEK Kendal, about 25 km west. Robots here meet working factory floors, a busy container terminal and a coast that floods at high tide.",
+      "facts": [
+        {
+          "claim": "KEK Kendal became a Special Economic Zone under PP 85/2019 and focuses on export-oriented supply-chain industry such as textiles, furniture, food and beverage, automotive and electronics. It is developed by a Sembcorp and Jababeka joint venture and sits near Tanjung Emas port, Ahmad Yani airport and the Trans-Java toll road.",
+          "value": "PP 85/2019; 1,000 ha (phase 1)",
+          "year": "2019",
+          "source_name": "Dewan Nasional KEK (kek.go.id), KEK Kendal profile",
+          "source_url": "https://kek.go.id/id/investment/distribution/kek-kendal",
+          "confidence": "high"
+        },
+        {
+          "claim": "KEK Kendal housed 136 companies from several countries by the end of 2025. It recorded Rp15.69 trillion of new investment and 19,935 workers absorbed in 2025 alone. Growing sectors include fashion, automotive and renewable energy, electronics and medical devices.",
+          "value": "136 companies; Rp15.69 T (2025)",
+          "year": "2025",
+          "source_name": "Kontan (citing Kendal Industrial Park), secondary",
+          "source_url": "https://industri.kontan.co.id/news/kek-kendal-dorong-realisasi-investasi-kabupaten-kendal-dan-jawa-tengah-sepanjang-2025",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Pelindo's Semarang container terminal (TPK Semarang) handled 895,904 TEUs in 2024, up about 15% from 781,841 TEUs in 2023.",
+          "value": "895,904 TEUs",
+          "year": "2024",
+          "source_name": "Bisnis.com (citing PT Pelindo Terminal Petikemas), secondary",
+          "source_url": "https://ekonomi.bisnis.com/read/20251003/98/1917061/tpk-semarang-targetkan-kelola-1-juta-teus-di-2026",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Semarang's northern coast is sinking, with measured rates of several cm a year and up to about 20 cm a year around Tanjung Mas and Bandarharjo near the port. This drives recurring tidal flooding (rob).",
+          "value": "2 to 20 cm/yr subsidence (varies by study)",
+          "year": "2010s",
+          "source_name": "Universitas Gadjah Mada (ugm.ac.id) news",
+          "source_url": "https://ugm.ac.id/?p=2074",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "AMR and cobot pilots in KEK Kendal's furniture, garment and electronics plants, measuring uptime in humid, dusty factory halls",
+        "Yard and gate automation sensors at TPK Semarang, including container-tracking IoT and corrosion endurance on the quay",
+        "Water-level and subsidence monitoring networks and drone surveys of the rob-prone north coast and port access roads"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "sensors-iot",
+        "drone",
+        "marine"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "salt-corrosion"
+      ]
+    },
+    {
+      "id": "yogyakarta",
+      "name": "Yogyakarta",
+      "region": "java",
+      "lon": 110.3695,
+      "lat": -7.7956,
+      "kind": "city",
+      "identity": "Indonesia's university city and the planned home of the AIoT lab. It offers a deep student talent pool, a new national AI centre at UGM, and mixed urban and rice-field terrain within half an hour.",
+      "facts": [
+        {
+          "claim": "UGM, Indosat and NVIDIA launched an AI Technology Center at UGM's GIK building on 13 August 2026. Its stated outputs include smart-agriculture technology that combines IoT, cloud and AI, plus disaster-management and decision-support platforms.",
+          "value": "Launched 13 Aug 2026",
+          "year": "2026",
+          "source_name": "Universitas Gadjah Mada (ugm.ac.id)",
+          "source_url": "https://ugm.ac.id/id/berita/ugm-indosat-dan-nvidia-resmi-luncurkan-ai-technology-center/",
+          "confidence": "high"
+        },
+        {
+          "claim": "UGM also formally opened an AI Center of Excellence on 15 November 2025. Its Department of Computer Science and Electronics runs an Embedded Systems and Robotics lab and funded AI-based UAV flight-control research in 2025.",
+          "value": "AI CoE opened 15 Nov 2025",
+          "year": "2025",
+          "source_name": "Kompas TV and DIKE FMIPA UGM (dcse.fmipa.ugm.ac.id)",
+          "source_url": "https://dcse.fmipa.ugm.ac.id/id/dosen-dike-ugm-raih-pendanaan-program-penelitian-direktorat-penelitian-dan-pengabdian-kepada-masyarakat-tahun-anggaran-2025",
+          "confidence": "medium"
+        },
+        {
+          "claim": "DI Yogyakarta has roughly 105 higher-education institutions and about 410,000 students, according to BPS DIY figures as cited in academic work. Other official sources give higher counts depending on definitions.",
+          "value": "~105 institutions; ~410,789 students",
+          "year": "2024",
+          "source_name": "BPS DIY, cited via Universitas Jenderal Achmad Yani Yogyakarta thesis (secondary)",
+          "source_url": "https://repository.unjaya.ac.id/4955/3/BAB%201_212303002_DIMAS%20ARIADI_PSIKOLOGI.pdf",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Yogyakarta International Airport (YIA) in Kulon Progo was built to replace the saturated Adisutjipto airport, which had a design capacity of 1.2 to 1.5 million passengers but was handling about 7.8 million. YIA was inaugurated in 2020 with a 14 to 20 million passengers-per-year terminal.",
+          "value": "14-20 million pax/yr",
+          "year": "2020",
+          "source_name": "Medcom / Setneg (presidential inauguration), secondary",
+          "source_url": "https://www.medcom.id/nasional/daerah/dN60v6pk-jokowi-resmikan-bandara-internasional-yogyakarta",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Base lab for sensor calibration and robot burn-in, with student field teams from UGM and other campuses running long-duration trials",
+        "Smart-agriculture IoT and drone crop-monitoring pilots on Sleman and Bantul rice fields, linked to UGM's AI centre",
+        "Sidewalk delivery robots and campus robots on dense, mixed-traffic streets with motorbikes and pedestrians"
+      ],
+      "fit": [
+        "sensors-iot",
+        "drone",
+        "ground-ag",
+        "humanoid-manipulation"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain"
+      ]
+    },
+    {
+      "id": "surabaya-perak",
+      "name": "Surabaya + Tanjung Perak",
+      "region": "java",
+      "lon": 112.7378,
+      "lat": -7.2458,
+      "kind": "city",
+      "identity": "Indonesia's second city and eastern Java's trading gateway, where Tanjung Perak port feeds a fast-growing trade and manufacturing economy. It is a hot, tidal coastal test bed for logistics robots.",
+      "facts": [
+        {
+          "claim": "Surabaya's economy grew 5.76% in 2024, the highest in East Java. Trade and vehicle repair contribute 27.63% of PDRB, manufacturing 18.99% and accommodation and food 14.81%.",
+          "value": "5.76% growth",
+          "year": "2024",
+          "source_name": "BPS Kota Surabaya (via Jatim Times and Pemkot Surabaya)",
+          "source_url": "https://surabayakota.bps.go.id/en/news/2025/02/13/176/pertumbuhan-ekonomi-surabaya.html",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Terminal Petikemas Surabaya (TPS), the main container terminal inside Tanjung Perak, handled about 1.58 million TEUs in 2024, its highest in 25 years and up 9.72% on 2023.",
+          "value": "~1.58 million TEUs",
+          "year": "2024",
+          "source_name": "Bisnis.com / ANTARA Jatim (citing TPS), secondary",
+          "source_url": "https://jatim.antaranews.com/berita/864214/arus-petikemas-tps-capai-lebih-dari-15-juta-teus-pada-2024",
+          "confidence": "medium"
+        },
+        {
+          "claim": "BMKG Maritime Tanjung Perak warned of tidal flooding (rob) at Surabaya port, including North Surabaya and Benowo, for 28 to 31 December 2024, with maximum tides of 130 to 150 cm.",
+          "value": "130-150 cm max tide",
+          "year": "2024",
+          "source_name": "detikJatim (citing BMKG Maritim Tanjung Perak), secondary",
+          "source_url": "https://www.detik.com/jatim/berita/d-7707958/bmkg-ingatkan-waspada-banjir-rob-di-pesisir-jatim-hingga-31-desember-2024/amp",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Container-yard and warehouse AMRs and gate IoT at Tanjung Perak terminals, with corrosion and heat endurance logging",
+        "Tide and flood sensor networks with drone inspection of quays and coastal drainage during rob warnings",
+        "Urban last-mile delivery robots and retail and service cobots in Indonesia's second-largest trade city"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "sensors-iot",
+        "marine",
+        "drone"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "flood-rain",
+        "salt-corrosion"
+      ]
+    },
+    {
+      "id": "gresik-jiipe",
+      "name": "Gresik (KEK JIIPE) / Sidoarjo",
+      "region": "java",
+      "lon": 112.615,
+      "lat": -7.105,
+      "kind": "special-zone",
+      "identity": "East Java's heavy-industry belt: KEK Gresik (JIIPE) combines an estate, a deep-water port and a world-scale copper smelter, and neighbouring Sidoarjo draws half its economy from manufacturing. It is a place to prove robots in real process industry.",
+      "facts": [
+        {
+          "claim": "KEK Gresik became a Special Economic Zone under PP 71/2021 (28 June 2021), covering 2,167 ha in Manyar district, Gresik.",
+          "value": "2,167 ha; PP 71/2021",
+          "year": "2021",
+          "source_name": "BPK regulation database (peraturan.bpk.go.id)",
+          "source_url": "https://peraturan.bpk.go.id/Details/170783",
+          "confidence": "high"
+        },
+        {
+          "claim": "Cumulative investment in KEK Gresik reached Rp113.4 trillion by Q1 2026 with 45,860 workers, according to the National KEK Council secretary. The government backs a proposed expansion of the zone.",
+          "value": "Rp113.4 T; 45,860 workers",
+          "year": "2026",
+          "source_name": "detikFinance (citing Kemenko Perekonomian / Dewan Nasional KEK), secondary",
+          "source_url": "https://finance.detik.com/industri/d-8531181/tarik-investasi-rp-113-4-t-kek-gresik-bakal-diperluas",
+          "confidence": "medium"
+        },
+        {
+          "claim": "PT Freeport Indonesia's Manyar copper smelter inside JIIPE, about 100 ha, is designed to process about 1.7 million tonnes of copper concentrate a year. It began operating in 2024.",
+          "value": "1.7 Mt concentrate/yr",
+          "year": "2024",
+          "source_name": "Bisnis.com, secondary",
+          "source_url": "https://ekonomi.bisnis.com/read/20240627/44/1777470/hari-ini-smelter-tembaga-raksasa-freeport-mulai-beroperasi",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Manufacturing contributed about 52% of Sidoarjo Regency's PDRB in 2024 (academic analysis of BPS Sidoarjo data).",
+          "value": "~52% of PDRB",
+          "year": "2024",
+          "source_name": "Jurnal Pendas Universitas Pasundan (citing BPS Sidoarjo), secondary",
+          "source_url": "https://journal.unpas.ac.id/index.php/pendas/article/view/47001",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Inspection robots and drones for smelter, tank and pipe-rack areas, testing heat, dust and corrosive-atmosphere durability",
+        "AMR and cobot pilots in JIIPE and Sidoarjo factories, from packaging to intralogistics",
+        "Port and estate IoT at JIIPE's multipurpose port, including asset tracking, air-quality and vibration sensors"
+      ],
+      "fit": [
+        "industrial-amr-cobot",
+        "drone",
+        "sensors-iot",
+        "marine"
+      ],
+      "stressors": [
+        "heat-humidity",
+        "haze-dust",
+        "salt-corrosion"
+      ]
+    },
+    {
+      "id": "malang-singhasari",
+      "name": "Malang / KEK Singhasari",
+      "region": "java",
+      "lon": 112.6326,
+      "lat": -7.9666,
+      "kind": "special-zone",
+      "identity": "A cool highland university city with a dedicated tourism and technology SEZ (KEK Singhasari) and farmland nearby in Batu's apple and vegetable belt. It suits digital, agri and service-robot trials away from the hot coast.",
+      "facts": [
+        {
+          "claim": "KEK Singhasari was designated under PP 68/2019 (27 September 2019). It covers 120.3 ha in Singosari district, Malang Regency, with a Tourism Zone and a Technology Development Zone.",
+          "value": "120.3 ha; PP 68/2019",
+          "year": "2019",
+          "source_name": "Sekretariat Kabinet (setkab.go.id)",
+          "source_url": "https://setkab.go.id/pemerintah-bentuk-kek-pariwisata-dan-pengembangan-teknologi-di-singosari-malang",
+          "confidence": "high"
+        },
+        {
+          "claim": "KEK Singhasari had realised about Rp2.3 trillion of investment, 27 businesses and 895 jobs by H1 2025, according to the National KEK Council report.",
+          "value": "Rp2.3 T; 27 businesses",
+          "year": "2025",
+          "source_name": "BCA Sekuritas news (citing Dewan Nasional KEK), secondary",
+          "source_url": "https://bcasekuritas.co.id/latest-news/news/kek-singhasari-kantongi-investasi-rp23-triliun-pada-semester-i-2025",
+          "confidence": "medium"
+        },
+        {
+          "claim": "Malang city has 5 state and 57 private higher-education institutions. Universitas Brawijaya alone had about 90,000 active students (2022).",
+          "value": "62 institutions",
+          "year": "2022",
+          "source_name": "TIMES Indonesia and UMM repository, secondary",
+          "source_url": "https://timesindonesia.co.id/pendidikan/425231/jumlah-mahasiswa-baru-di-perguruan-tinggi-malang-universitas-brawijaya-tertinggi",
+          "confidence": "medium"
+        },
+        {
+          "claim": "The highlands are cool: BMKG forecasts put Kota Batu at 17 to 23 °C, with dry-season dawn lows of 14 to 15 °C, against 18 to 28 °C in Malang city. Batu's cool climate supports apple, vegetable and flower farming.",
+          "value": "Batu 17-23 °C",
+          "year": "2026",
+          "source_name": "beritajatim (citing BMKG Juanda forecasts), secondary",
+          "source_url": "https://beritajatim.com/prakiraan-cuaca-hari-ini-jumat-27-februari-2026-malang-raya-diguyur-hujan-ringan-jabung-terpantau-berkabut",
+          "confidence": "medium"
+        }
+      ],
+      "scenarios": [
+        "Ag drones and ground robots on Batu and Poncokusumo slope orchards and vegetable farms, testing hill terrain and morning fog",
+        "Service and guide robots plus digital-twin pilots inside KEK Singhasari's tourism and technology zones",
+        "Low-temperature and high-altitude sensor calibration runs to contrast with lowland coastal trials"
+      ],
+      "fit": [
+        "ground-ag",
+        "drone",
+        "sensors-iot",
+        "humanoid-manipulation"
+      ],
+      "stressors": [
+        "flood-rain",
+        "weak-connectivity"
+      ]
+    }
+  ]
+}

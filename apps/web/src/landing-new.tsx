@@ -5,7 +5,7 @@ import {mountLandingMotion} from './landing-motion';
 import {useLang} from './i18n';
 import {DotMark} from './brand/dot-mark';
 import {SiteHeader,SiteFooter} from './site-shell';
-import {idn} from './indonesia-dots';
+import {GlobalHero,EntryPath} from './hero-map';
 import './landing-new.css';
 const partnership='/partnership-brief.txt';
 const copy={
@@ -65,9 +65,6 @@ dry / wet .......... 3180 / 1210
 COMPILE ✓  FLASH ✓  BOOT ✓  DATA ✓
 STATUS   VERIFIED`;
 
-const siteCoords:[number,number][]=[[106.99,-6.24],[107.61,-6.91],[110.37,-7.8]];
-const dots=idn.dots.split(' ').map(p=>p.split(',').map(Number) as [number,number]);
-const toGrid=([lon,lat]:[number,number])=>[(lon-idn.lon0)/idn.step,(idn.lat1-lat)/idn.step] as const;
 function Lines({lines}:{lines:string[]}){return <>{lines.map((l,i)=><span className="rl-line" key={i}>{l}</span>)}</>;}
 const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function onceVisible(el:Element|null,fn:()=>void){if(!el)return()=>{};if(reduced()){fn();return()=>{};}const o=new IntersectionObserver(e=>{if(e[0].isIntersecting){fn();o.disconnect();}},{threshold:.4});o.observe(el);return()=>o.disconnect();}
@@ -81,18 +78,6 @@ function TypedRecord({label}:{label:string}){
  useEffect(()=>onceVisible(ref.current,()=>{if(reduced())return setLen(record.length);let i=0;const id=window.setInterval(()=>{i+=3;setLen(Math.min(i,record.length));if(i>=record.length)clearInterval(id);},24);}),[]);
  return <figure className="rl-record"><figcaption>{label}<i className={len>=record.length?'rl-led on':'rl-led'}/></figcaption><pre ref={ref} aria-label={record}><span aria-hidden="true">{record.slice(0,len)}<b className="rl-caret"/></span></pre></figure>;
 }
-function HalftoneMap({t}:{t:typeof copy.en}){
- const wrap=useRef<HTMLDivElement>(null);const[cross,setCross]=useState<{x:number,y:number}|null>(null);
- const W=idn.cols+1,H=idn.rows+1;
- return <div ref={wrap} className="rl-map" onPointerMove={e=>{const r=wrap.current!.getBoundingClientRect();setCross({x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H});}} onPointerLeave={()=>setCross(null)}>
-  <svg viewBox={`-1 -1 ${W+1} ${H+1}`} role="img" aria-label={t.mapLabel}>
-   <g className="rl-map-dots">{dots.map(([c,r],i)=>{const d=cross?Math.hypot(c-cross.x,r-cross.y):99;return <circle key={i} cx={c} cy={r} r={d<4?.4:.27} className={d<4?'hot':''}/>;})}</g>
-   {cross&&<g className="rl-cross"><line x1={cross.x} y1={-1} x2={cross.x} y2={H}/><line x1={-1} y1={cross.y} x2={W} y2={cross.y}/><text x={cross.x+.8} y={cross.y-.8}>{(idn.lon0+cross.x*idn.step).toFixed(1)}°E {(idn.lat1-cross.y*idn.step).toFixed(1)}°</text></g>}
-   {siteCoords.map((s,i)=>{const[x,y]=toGrid(s);return <g key={i} className="rl-site"><circle cx={x} cy={y} r="1.6" className="ring" style={{animationDelay:`${i*.6}s`}}/><circle cx={x} cy={y} r=".55"/></g>;})}
-  </svg>
-  <ol className="rl-site-list">{t.sites.map((s,i)=><li key={s}><b>{String(i+1).padStart(2,'0')}</b>{s}<small>{t.planned}</small></li>)}</ol>
- </div>;
-}
 export function Landing(){
  const root=useRef<HTMLDivElement>(null),rail=useRef<HTMLDivElement>(null);
  const{lang}=useLang();const t=copy[lang];const{hash}=useLocation();
@@ -104,10 +89,12 @@ export function Landing(){
   <a className="rl-skip" href="#landing-main">{t.skip}</a>
   <SiteHeader overlay data-enter/>
   <main id="landing-main" tabIndex={-1}>
-   <section className="rl-hero" aria-labelledby="landing-title"><img className="rl-capsule" data-enter src="/assets/landing/hero-capsule.png" alt="Concept render: a robotic hand holding an ESP32 board inside a glass test capsule" width="1024" height="1024" fetchPriority="high"/><div className="rl-hero-copy" data-enter><p className="rl-eyebrow">{t.eyebrow}</p><h1 id="landing-title"><Lines lines={t.title}/></h1><p className="rl-hero-description">{t.lead}</p><Link className="rl-button rl-button-dark" to="/partner" data-cta="hero-partner">{t.heroCta} <ArrowRightIcon size={18}/></Link></div><div className="rl-specimens">{[['FN-01','card-field-node'],['TS-01','card-tactile']].map(([code,img],i)=><figure className="rl-specimen rl-brackets" data-enter key={code}><img src={`/assets/landing/${img}.png`} alt={`Concept render: ${t.specimens[i]}`} width="768" height="1024" loading="lazy"/><figcaption><b>{code}</b><span>{t.specimens[i]}</span></figcaption></figure>)}</div><div className="rl-hero-bottom"><span>{t.renders}</span><a href="#gap">{t.scroll}</a></div></section>
+   {lang==='en'?<GlobalHero/>:<section className="rl-hero" aria-labelledby="landing-title"><img className="rl-capsule" data-enter src="/assets/landing/hero-capsule.png" alt="Concept render: a robotic hand holding an ESP32 board inside a glass test capsule" width="1024" height="1024" fetchPriority="high"/><div className="rl-hero-copy" data-enter><p className="rl-eyebrow">{t.eyebrow}</p><h1 id="landing-title"><Lines lines={t.title}/></h1><p className="rl-hero-description">{t.lead}</p><Link className="rl-button rl-button-dark" to="/partner" data-cta="hero-partner">{t.heroCta} <ArrowRightIcon size={18}/></Link></div><div className="rl-specimens">{[['FN-01','card-field-node'],['TS-01','card-tactile']].map(([code,img],i)=><figure className="rl-specimen rl-brackets" data-enter key={code}><img src={`/assets/landing/${img}.png`} alt={`Concept render: ${t.specimens[i]}`} width="768" height="1024" loading="lazy"/><figcaption><b>{code}</b><span>{t.specimens[i]}</span></figcaption></figure>)}</div><div className="rl-hero-bottom"><span>{t.renders}</span><a href="#gap">{t.scroll}</a></div></section>}
 
    {/* composition: negantropy-refusal — corner-loaded flipped split with bracketed metrics */}
    <section id="gap" className="rl-section rl-gap"><div className="rl-gap-left" data-reveal><p className="rl-index">( {t.gapIndex} )<i/>{t.gapMeta}</p><p>{t.gapText}</p></div><div className="rl-gap-right" data-reveal><h2><Lines lines={t.gapTitle}/></h2><dl>{t.gapMetrics.map(([v,l])=><div key={l}><dt>[ {v} ]</dt><dd>{l}</dd></div>)}</dl><small>{t.gapNote}</small></div></section>
+
+   {lang==='en'&&<EntryPath/>}
 
    {/* composition: vexon-showcase — label left, statement right, over tall bracketed cards */}
    <section id="scenarios" className="rl-section rl-atlas"><div className="rl-showcase-head" data-reveal><p className="rl-eyebrow">{t.atlasEyebrow}</p><div><h2>{t.atlasTitle}</h2><p>{t.atlasText}</p></div></div><div className="rl-rail-controls"><button onClick={()=>slide(-1)} aria-label={t.prev}><ArrowLeftIcon size={18}/></button><button onClick={()=>slide(1)} aria-label={t.next}><ArrowRightIcon size={18}/></button></div><div ref={rail} className="rl-rail" tabIndex={0} aria-label={t.atlasTitle}>{t.scenarios.map(([name,desc,tags],i)=><article className="rl-scenario rl-brackets" key={i}><span className="rl-tag">SC-0{i+1}</span><img src={`/assets/landing/sc-0${i+1}.jpg`} alt="" width="768" height="1024" loading="lazy"/><div><h3>{name as string}</h3><p>{desc as string}</p><ul>{(tags as string[]).map(tag=><li key={tag}>{tag}</li>)}</ul></div></article>)}</div></section>
@@ -118,8 +105,8 @@ export function Landing(){
    {/* composition: creative-director-features — heading over divider, lead/spec split, asymmetric card row */}
    <section id="verification" className="rl-section rl-verify"><h2 data-reveal>{t.verifyTitle}</h2><div className="rl-verify-lead" data-reveal><p>{t.verifyLead}</p><dl>{t.verifySpec.map(([k,...v])=><div key={k}><dt>{k}</dt>{v.map(x=><dd key={x}>{x}</dd>)}</div>)}</dl></div><div className="rl-verify-row" data-reveal><TypedRecord label={t.recordLabel}/><ol className="rl-steps">{t.steps.map(([h,p],i)=><li key={i}><span>0{i+1}</span><h3>{h}</h3><p>{p}</p></li>)}</ol></div></section>
 
-   {/* composition: vexon-about — bordered modular ledger grid, with a halftone map cell */}
-   <section id="network" className="rl-section rl-network"><div className="rl-ledger" data-reveal><div className="rl-ledger-brand"><CircuitryIcon size={22} weight="bold"/><small>EST. 2026</small></div><div className="rl-ledger-head"><p className="rl-eyebrow">{t.networkEyebrow}</p><h2>{t.networkTitle}</h2></div><div className="rl-ledger-map"><HalftoneMap t={t}/></div><div className="rl-ledger-status"><span className="rl-pulse"/><small>{t.networkStatus}</small></div><div className="rl-ledger-body"><p>{t.networkText}</p><small>{t.networkNote}</small></div></div></section>
+   {/* composition: vexon-about — bordered modular ledger grid, with the planned-labs strip (the hero holds the only map) */}
+   <section id="network" className="rl-section rl-network"><div className="rl-ledger" data-reveal><div className="rl-ledger-brand"><CircuitryIcon size={22} weight="bold"/><small>EST. 2026</small></div><div className="rl-ledger-head"><p className="rl-eyebrow">{t.networkEyebrow}</p><h2>{t.networkTitle}</h2></div><div className="rl-ledger-map"><ol className="rl-labs" aria-label={t.planned}>{t.sites.map((s,i)=><li key={s}><b>{String(i+1).padStart(2,'0')}</b><span>{s}</span><small>{t.planned}</small></li>)}</ol></div><div className="rl-ledger-status"><span className="rl-pulse"/><small>{t.networkStatus}</small></div><div className="rl-ledger-body"><p>{t.networkText}</p><small>{t.networkNote}</small></div></div></section>
 
    {/* composition: artist-cta — viewport-tall inverted band, copy left, portrait plate right */}
    <section className="rl-section rl-partner"><div data-reveal><p className="rl-eyebrow"><i/>{t.partnerEyebrow}</p><h2><Lines lines={t.partnerTitle}/></h2><p>{t.partnerText}</p><ul>{t.offers.map(o=><li key={o}>{o}</li>)}</ul><a className="rl-button rl-button-light" href={partnership} download>{t.partnerCta} <ArrowUpRightIcon size={18}/></a></div><figure className="rl-portrait" data-reveal><img src="/assets/landing/partner-hand.jpg" alt="Concept render: robotic hand holding a sensor module" width="768" height="1024" loading="lazy"/></figure></section>

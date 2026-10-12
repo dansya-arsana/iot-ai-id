@@ -1,0 +1,439 @@
+{
+  "generated": "2026-10-12",
+  "note": "SMK counts are existing schools (potential Lab Mitra reach), not partners. See verify section.",
+  "national": {
+    "smk_total": 14445,
+    "negeri": 3813,
+    "swasta": 10632,
+    "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+    "period": "Live Data Referensi snapshot read 2026-10-12. The page gives no semester label. Bentuk = SMK only (id 15), Jalur Formal. Total includes 1 SMK under 'Luar Negeri' (abroad); the 38 provinces alone total 14,444."
+  },
+  "provinces": [
+    {
+      "province": "DKI Jakarta",
+      "smk": 559,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 74 / swasta 485)",
+      "confidence": "high"
+    },
+    {
+      "province": "Jawa Barat",
+      "smk": 2899,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 293 / swasta 2606)",
+      "confidence": "high"
+    },
+    {
+      "province": "Jawa Tengah",
+      "smk": 1559,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 239 / swasta 1320)",
+      "confidence": "high"
+    },
+    {
+      "province": "DI Yogyakarta",
+      "smk": 205,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 50 / swasta 155)",
+      "confidence": "high"
+    },
+    {
+      "province": "Jawa Timur",
+      "smk": 2172,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 299 / swasta 1873)",
+      "confidence": "high"
+    },
+    {
+      "province": "Aceh",
+      "smk": 229,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 155 / swasta 74)",
+      "confidence": "high"
+    },
+    {
+      "province": "Sumatera Utara",
+      "smk": 937,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 282 / swasta 655)",
+      "confidence": "high"
+    },
+    {
+      "province": "Sumatera Barat",
+      "smk": 220,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 117 / swasta 103)",
+      "confidence": "high"
+    },
+    {
+      "province": "Riau",
+      "smk": 324,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 141 / swasta 183)",
+      "confidence": "high"
+    },
+    {
+      "province": "Jambi",
+      "smk": 184,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 108 / swasta 76)",
+      "confidence": "high"
+    },
+    {
+      "province": "Sumatera Selatan",
+      "smk": 329,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 121 / swasta 208)",
+      "confidence": "high"
+    },
+    {
+      "province": "Lampung",
+      "smk": 494,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 113 / swasta 381)",
+      "confidence": "high"
+    },
+    {
+      "province": "Kalimantan Barat",
+      "smk": 236,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 121 / swasta 115)",
+      "confidence": "high"
+    },
+    {
+      "province": "Kalimantan Tengah",
+      "smk": 143,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 96 / swasta 47)",
+      "confidence": "high"
+    },
+    {
+      "province": "Kalimantan Selatan",
+      "smk": 128,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 65 / swasta 63)",
+      "confidence": "high"
+    },
+    {
+      "province": "Kalimantan Timur",
+      "smk": 218,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 90 / swasta 128)",
+      "confidence": "high"
+    },
+    {
+      "province": "Sulawesi Utara",
+      "smk": 192,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 94 / swasta 98)",
+      "confidence": "high"
+    },
+    {
+      "province": "Sulawesi Tengah",
+      "smk": 186,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 107 / swasta 79)",
+      "confidence": "high"
+    },
+    {
+      "province": "Sulawesi Selatan",
+      "smk": 407,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 168 / swasta 239)",
+      "confidence": "high"
+    },
+    {
+      "province": "Sulawesi Tenggara",
+      "smk": 177,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 103 / swasta 74)",
+      "confidence": "high"
+    },
+    {
+      "province": "Maluku",
+      "smk": 124,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 84 / swasta 40)",
+      "confidence": "high"
+    },
+    {
+      "province": "Bali",
+      "smk": 162,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 58 / swasta 104)",
+      "confidence": "high"
+    },
+    {
+      "province": "Nusa Tenggara Barat",
+      "smk": 371,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 100 / swasta 271)",
+      "confidence": "high"
+    },
+    {
+      "province": "Nusa Tenggara Timur",
+      "smk": 369,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 184 / swasta 185)",
+      "confidence": "high"
+    },
+    {
+      "province": "Papua",
+      "smk": 49,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 35 / swasta 14)",
+      "confidence": "high"
+    },
+    {
+      "province": "Bengkulu",
+      "smk": 103,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 66 / swasta 37)",
+      "confidence": "high"
+    },
+    {
+      "province": "Maluku Utara",
+      "smk": 153,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 63 / swasta 90)",
+      "confidence": "high"
+    },
+    {
+      "province": "Banten",
+      "smk": 755,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 100 / swasta 655)",
+      "confidence": "high"
+    },
+    {
+      "province": "Kepulauan Bangka Belitung",
+      "smk": 59,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 36 / swasta 23)",
+      "confidence": "high"
+    },
+    {
+      "province": "Gorontalo",
+      "smk": 61,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 40 / swasta 21)",
+      "confidence": "high"
+    },
+    {
+      "province": "Kepulauan Riau",
+      "smk": 110,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 43 / swasta 67)",
+      "confidence": "high"
+    },
+    {
+      "province": "Papua Barat",
+      "smk": 23,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 17 / swasta 6)",
+      "confidence": "high"
+    },
+    {
+      "province": "Sulawesi Barat",
+      "smk": 125,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 60 / swasta 65)",
+      "confidence": "high"
+    },
+    {
+      "province": "Kalimantan Utara",
+      "smk": 34,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 22 / swasta 12)",
+      "confidence": "high"
+    },
+    {
+      "province": "Papua Tengah",
+      "smk": 56,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 17 / swasta 39)",
+      "confidence": "high"
+    },
+    {
+      "province": "Papua Selatan",
+      "smk": 27,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 22 / swasta 5)",
+      "confidence": "high"
+    },
+    {
+      "province": "Papua Pegunungan",
+      "smk": 25,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 12 / swasta 13)",
+      "confidence": "high"
+    },
+    {
+      "province": "Papua Barat Daya",
+      "smk": 40,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "period": "Data Referensi live, read 2026-10-12 (negeri 17 / swasta 23)",
+      "confidence": "high"
+    }
+  ],
+  "hotspot_areas": [
+    {
+      "hotspot_id": "jakarta",
+      "area": "DKI Jakarta province: Jakarta Timur 183 + Jakarta Barat 122 + Jakarta Selatan 121 + Jakarta Utara 76 + Jakarta Pusat 56 + Kep. Seribu 1",
+      "smk": 559,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/010000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "bekasi-karawang",
+      "area": "Kab. Bekasi 193 + Kota Bekasi 136 + Kab. Karawang 118",
+      "smk": 447,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/020000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "bandung",
+      "area": "Kota Bandung 107",
+      "smk": 107,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/020000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "cilegon",
+      "area": "Kota Cilegon 26",
+      "smk": 26,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/280000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "semarang-kendal",
+      "area": "Kota Semarang 86 + Kab. Kendal 49",
+      "smk": 135,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/030000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "yogyakarta",
+      "area": "DI Yogyakarta province: Sleman 57 + Bantul 46 + Gunungkidul 45 + Kulon Progo 30 + Kota Yogyakarta 27",
+      "smk": 205,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/040000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "surabaya-perak",
+      "area": "Kota Surabaya 106",
+      "smk": 106,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/050000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "gresik-jiipe",
+      "area": "Kab. Gresik 62",
+      "smk": 62,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/050000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "malang-singhasari",
+      "area": "Kota Malang 51 + Kab. Malang 143",
+      "smk": 194,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/050000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "medan",
+      "area": "Kota Medan 137",
+      "smk": 137,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/070000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "sei-mangkei-kuala-tanjung",
+      "area": "Kab. Simalungun 44 + Kab. Batu Bara 23",
+      "smk": 67,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/070000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "pekanbaru-riau-palm",
+      "area": "Kota Pekanbaru 65",
+      "smk": 65,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/090000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "palembang",
+      "area": "Kota Palembang 81",
+      "smk": 81,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/110000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "batam",
+      "area": "Kota Batam 70",
+      "smk": 70,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/310000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "balikpapan-ikn",
+      "area": "Kota Balikpapan 35 + Kab. Penajam Paser Utara 11",
+      "smk": 46,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/160000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "makassar",
+      "area": "Kota Makassar 79",
+      "smk": 79,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/190000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    },
+    {
+      "hotspot_id": "denpasar-sanur",
+      "area": "Kota Denpasar 34",
+      "smk": 34,
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/220000/1/jf/15/all",
+      "period": "Live Data Referensi snapshot read 2026-10-12. The page shows no semester label.",
+      "confidence": "high"
+    }
+  ],
+  "relevant_programs": [
+    {
+      "claim": "Indonesia has 14,445 SMK in total (negeri and swasta, SMK form only). This is the sum of the 39 province rows on the official Data Referensi page when it is filtered to Jalur Formal and bentuk SMK. Jawa Barat alone has 2,899 and Jawa Timur has 2,172.",
+      "source_url": "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/all",
+      "confidence": "high (official page, read 2026-10-12; the total is computed by us because the page shows no grand total)"
+    },
+    {
+      "claim": "In August 2022 a Kemendikbudristek official (Saryadi, acting Direktur Kemitraan dan Penyelarasan DUDI, Ditjen Pendidikan Vokasi) said 1,402 SMK had run the SMK Pusat Keunggulan (PK) program in various fields since 2021. In 2022 a cyber-security PK track was piloted at SMK Wikrama Bogor and SMK Negeri 2 Jakarta.",
+      "source_url": "https://megapolitan.antaranews.com/berita/206281/kemendikbudristek-tetapkan-dua-smk-jadi-percontohan-pk-cyber-security",
+      "confidence": "medium (an official quoted by the ANTARA state news agency, not a ministry page; figure dates from 2022)"
+    },
+    {
+      "claim": "Medcom/ANTARA reported in February 2022 that 910 SMK had received guidance through the SMK Pusat Keunggulan program.",
+      "source_url": "https://www.medcom.id/pendidikan/news-pendidikan/9K5XrPlk-910-sekolah-rasakan-manfaat-program-smk-pusat-keunggulan",
+      "confidence": "low (secondary media, older and lower than the 1,402 figure; use only as context)"
+    }
+  ],
+  "notes": [
+    "Source: Kemendikdasmen Pusdatin Data Referensi. The old referensi.data.kemdikbud.go.id domain no longer resolves; the site now lives at referensi.data.kemendikdasmen.go.id. I opened the pages directly (curl) on 2026-10-12. Filter: Jalur Formal, Bentuk Pendidikan = SMK (id 15), Status = all / negeri (s1) / swasta (s2). URLs: .../pendidikan/dikmen/000000/0/jf/15/all, .../jf/15/s1, .../jf/15/s2. National: 14,445 SMK (3,813 negeri + 10,632 swasta, which add up exactly). One of these, a negeri SMK, is listed under 'Luar Negeri' (abroad), so the 38 provinces alone total 14,444 (3,812 negeri + 10,632 swasta). Period caveat: Data Referensi is a live registry and the page shows no semester or cut-off label. Treat it as a snapshot from 12 Oct 2026, not as a named Dapodik semester. Dapodik (dapo.kemendikdasmen.go.id) could not be opened: it returns HTTP 403 behind a bot-detection challenge (SafeLine WAF), which I did not try to bypass. So there is no cross-check against a named Dapodik semester. Definitional caveat: the default 'SMK (Sederajat)' column on the unfiltered page is slightly higher (for example, Jakarta 560 vs 559) because it also counts MAK and similar vocational school types. The numbers here are pure SMK. These are counts of existing registered schools (potential reach), not AIoT partner schools. I did not write any files in the repo; raw HTML is in the scratchpad at /private/tmp/claude-501/-Users-macbook-Documents-GPT-Project-iot-ai-id-public/30b119ae-cf49-43dd-95ad-515a4fa511f3/scratchpad/ref/.",
+    "FINDINGS\n- All 17 hotspot counts come from the official Data Referensi site, filtered to Jalur Formal, bentuk SMK (code 15), all statuses. The counts cover existing SMK only, both public and private. They show potential reach, not partner schools.\n- The old domain referensi.data.kemdikbud.go.id no longer resolves (DNS failure). The data now lives at referensi.data.kemendikdasmen.go.id.\n- URL pattern: /pendidikan/dikmen/{provinceCode}/1/jf/15/all gives a province broken down by kab/kota. The kab/kota drill-down is /pendidikan/dikmen/{kabCode}/2/jf/15/all.\n- Each per-area number is copied directly from the province page. Multi-area hotspots are summed by us; the parts are listed in \"area\".\n\nPERIOD\n- The Data Referensi pages show no semester or date label. They are a live Dapodik-fed snapshot, read on 2026-10-12, and the counts can change slightly over time.\n- If a semester is needed, label it \"Data Referensi Kemendikdasmen, accessed 12 Oct 2026\".\n- dapo.kemendikdasmen.go.id returned HTTP 403, so the counts could not be cross-checked against Dapodik.\n\nSMK VS SMK (SEDERAJAT)\n- The unfiltered dikmen page reports \"SMK (Sederajat)\", which also counts MAK and similar schools. For example, DKI shows 560 there versus 559 for SMK only.\n- The numbers above are SMK only.\n\nROBOTICS / IoT PROGRAM COUNTS\n- I could not find an official national count of SMK offering Teknik Mekatronika, Teknik Elektronika Industri, or TKJ/TJKT. Searches turned up only journals and regional documents.\n- An internal-portal.kemdikbud.go.id PDF that reportedly lists those concentrations could not be text-extracted (no PDF tools available), so it is not cited.\n- I also found no official current total of SMK Pusat Keunggulan schools. A 2025 target of 1,100 + 78 SMK appeared only on a non-official blog (gebrak.id) and was not used.\n- Recommendation: don't put any Mekatronika or TKJ count on the site until it can be pulled from Dapodik or Data Referensi by kompetensi keahlian.\n\nCONTEXT\n- A single headline line works: \"14,445 SMK nationwide\" (official Data Referensi total, computed). The hotspots cover 2,420 SMK in total, which is about 17% of the national figure."
+  ],
+  "verification": "**Result: no errors found.** Every number I re-checked matches the official source exactly. I re-opened the Kemendikdasmen Data Referensi pages live on 2026-10-12 (all returned HTTP 200), with the filter set to Jalur Formal, Bentuk SMK (id 15).\n\n**National total: matches**\n- I opened the `/all`, `/s1` and `/s2` pages under https://referensi.data.kemendikdasmen.go.id/pendidikan/dikmen/000000/0/jf/15/ and added up the 39 rows on each.\n- Totals: 14,445 SMK in all, 3,813 negeri and 10,632 swasta.\n- \"Luar Negeri\" (abroad) has 1 SMK, which is negeri, so the 38 provinces alone total 14,444.\n- The page has no grand total, so 14,445 is our own sum. That needs saying wherever the number is shown.\n\n**Provinces: all 38 match**\n- Every province's total, negeri count and swasta count is identical to the research. This includes DKI 559 (74/485), Jabar 2,899 (293/2,606), Jatim 2,172, Sumut 937, Banten 755 and all four new Papua provinces.\n- The SMK filter really is applied: the page header shows \"Jalur Formal\" and the SMK column.\n\n**Cities: all 17 hotspots match**\nProvince pages used: 010000, 020000, 030000, 040000, 050000, 070000, 090000, 110000, 160000, 190000, 220000, 280000, 310000.\n\n| Hotspot | What the page shows | Count |\n|---|---|---|\n| jakarta | 183 + 122 + 121 + 76 + 56 + 1 | 559 |\n| bekasi-karawang | Kab. Bekasi 193, Kota Bekasi 136, Kab. Karawang 118 | 447 |\n| bandung | Kota Bandung | 107 |\n| cilegon | Kota Cilegon | 26 |\n| semarang-kendal | Kota Semarang 86, Kab. Kendal 49 | 135 |\n| yogyakarta | 57 + 46 + 45 + 30 + 27 | 205 |\n| surabaya-perak | Kota Surabaya | 106 |\n| gresik-jiipe | Kab. Gresik | 62 |\n| malang-singhasari | Kota Malang 51, Kab. Malang 143 | 194 |\n| medan | Kota Medan | 137 |\n| sei-mangkei-kuala-tanjung | Kab. Simalungun 44, Kab. Batu Bara 23 | 67 |\n| pekanbaru-riau-palm | Kota Pekanbaru | 65 |\n| palembang | Kota Palembang | 81 |\n| batam | Kota Batam | 70 |\n| balikpapan-ikn | Kota Balikpapan 35, Kab. Penajam Paser Utara 11 | 46 |\n| makassar | Kota Makassar | 79 |\n| denpasar-sanur | Kota Denpasar | 34 |\n\nThe hotspots add up to 2,420, which is 16.75% of 14,445. Calling that \"about 17%\" is correct.\n\n**Caveats (choices and labels, not errors)**\n1. **Semarang:** the \"semarang-kendal\" count leaves out Kab. Semarang (43 SMK). If the hotspot is meant to cover greater Semarang, the count would be 178. Either way, the label should say which areas are included.\n2. **No data period on the page:** I found no semester or date label anywhere on it. The label \"Data Referensi Kemendikdasmen, accessed 12 Oct 2026\" is accurate. Don't present it as a named Dapodik semester.\n3. **Not re-verified:**\n   - The SMK Pusat Keunggulan figures (1,402 from the ANTARA article, 910 from the Medcom article) come from secondary news reports, so I didn't count them as official data. Rate them medium and low confidence, as in the research.\n   - I did not retry Dapodik, which earlier returned 403 behind a bot-detection challenge, so there is still no cross-check against it.\n\nThe pages I fetched are in `/private/tmp/claude-501/-Users-macbook-Documents-GPT-Project-iot-ai-id-public/30b119ae-cf49-43dd-95ad-515a4fa511f3/scratchpad/verify/`. I made no changes to the repo."
+}

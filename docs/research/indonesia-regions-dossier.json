@@ -1,0 +1,2429 @@
+[
+ {
+  "regions": [
+   {
+    "region": "Sumatra",
+    "facts": [
+     {
+      "claim": "Pertamina Hulu Rokan (Rokan block, Riau) is one of Indonesia's two largest oil producers, at roughly 151,000 bopd as of 10 Nov 2025, just behind ExxonMobil Cepu. National 2025 oil lifting target was 605,000 bopd.",
+      "value": "~151,053 bopd (PHR)",
+      "year": "2025",
+      "source_name": "SKK Migas data via Bisnis.com (secondary press)",
+      "source_url": "https://ekonomi.bisnis.com/read/20251112/44/1928303/skk-migas-bidik-lifting-minyak-capai-607000-bph-pada-akhir-2025",
+      "confidence": "medium"
+     },
+     {
+      "claim": "The Rokan field has a history of operational losses from corroded pipelines and shutdowns of the power units that drive its pumpjacks. This is an ageing-asset problem that suits inspection and predictive-maintenance tech.",
+      "year": "2025",
+      "source_name": "Bisnis.com (secondary press)",
+      "source_url": "https://ekonomi.bisnis.com/read/20251112/44/1928303/skk-migas-bidik-lifting-minyak-capai-607000-bph-pada-akhir-2025",
+      "confidence": "medium"
+     },
+     {
+      "claim": "South Sumatra is a coal exporter, shipping about 31.2 Mt in 2024, well behind East and South Kalimantan.",
+      "value": "31.2 Mt exported",
+      "year": "2024",
+      "source_name": "BPS export data via GoodStats (secondary)",
+      "source_url": "https://data.goodstats.id/statistic/5-provinsi-utama-eksportir-batu-bara-3mmzw",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Indonesia was the world's #2 mined tin producer in 2024 with a 19% share. The Bangka Belitung Islands (off Sumatra) produce most of it; press estimates put their share at up to about 90% of national output (undated).",
+      "value": "19% of world tin (2024)",
+      "year": "2024",
+      "source_name": "USGS National Minerals Information Center, Indonesia profile; Kontan for Bangka share",
+      "source_url": "https://www.usgs.gov/centers/national-minerals-information-center/indonesia",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Sorik Marapi geothermal Unit 5 (~40 MW, North Sumatra) was among the projects ESDM targeted to come online by end-2024. The province is general knowledge and is not stated on the ESDM page.",
+      "value": "~40 MW",
+      "year": "2024",
+      "source_name": "Kementerian ESDM press release 516.Pers/04/SJI/2024",
+      "source_url": "https://esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-kejar-tambahan-90-mw-dari-panas-bumi-",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Batam (Riau Islands) free-trade zone: BP Batam reported 2025 investment realisation of about Rp54.7T. Machinery, electronics, precision and optical instruments and electrical equipment led H1 2025 inflows, and shipbuilding was named as a pillar. Totals vary by source (Rp44T–69T).",
+      "value": "Rp54.7T (one figure; contested)",
+      "year": "2025",
+      "source_name": "BP Batam via Detik / Bisnis.com (secondary press)",
+      "source_url": "https://ekonomi.bisnis.com/read/20250904/47/1908502/realisasi-investasi-di-batam-tembus-rp3372-triliun-semester-i2025",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Sumatra accounted for 22.22% of Indonesia's GDP (current prices), the second-largest island group after Java.",
+      "value": "22.22%",
+      "year": "2025",
+      "source_name": "BPS via GoodStats (secondary)",
+      "source_url": "https://data.goodstats.id/statistic/jawa-sumbang-56-pdrb-nasional-pada-2025-4D0kB",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Mature oilfields (Rokan) are spread out and have corrosion and power-reliability problems, which suits pipeline-inspection crawlers, drones, remote pumpjack monitoring and predictive-maintenance IoT. Offshore and onshore tin mining around Bangka suits underwater and dredge-monitoring sensors. Batam is the closest electronics, precision and shipbuilding cluster to Singapore, a natural test site for factory automation, welding and painting robots in shipyards, and cobots. Geothermal fields (Sorik Marapi) involve high-temperature, H2S-exposed inspection work."
+   },
+   {
+    "region": "Java",
+    "facts": [
+     {
+      "claim": "Kemenperin reported 179 industrial estates (KI) nationwide, 106 of them (59%) on Java. Java holds only 38.76% of total KI land area (39,285 ha of ~101,350 ha). The estates host 11,970 tenants and 2.35M workers.",
+      "value": "106 of 179 KI (59%)",
+      "year": "2026 (29 June hearing with DPR Commission VII)",
+      "source_name": "Kemenperin (Ditjen KPAII) via Detik / Investortrust (secondary press; official release not located)",
+      "source_url": "https://finance.detik.com/industri/d-8551973/kawasan-industri-ri-makin-ramai-investasi-tembus-rp-6-744-triliun",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Java produced 56.93% of Indonesia's GDP at current prices.",
+      "value": "56.93%",
+      "year": "2025",
+      "source_name": "BPS via GoodStats (secondary)",
+      "source_url": "https://data.goodstats.id/statistic/jawa-sumbang-56-pdrb-nasional-pada-2025-4D0kB",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Hyundai–LG's HLI Green Power battery-cell plant in Karawang, West Java (Indonesia's first EV cell plant) began commercial production in April 2024 with 10 GWh capacity and was inaugurated 3 July 2024. Phase 2 to 20 GWh was under way in 2025; completion is unconfirmed.",
+      "value": "10 GWh (phase 1), 20 GWh planned",
+      "year": "2024–2025",
+      "source_name": "Tempo / Investortrust (secondary press)",
+      "source_url": "https://investortrust.id/business/64634/hyundai-lg-consortium-expands-indonesia-battery-cell-plant-to-20-gwh",
+      "confidence": "medium"
+     },
+     {
+      "claim": "The LG-led consortium left the wider ~US$8–9.8B 'Indonesia Grand Package' EV-battery value chain in early 2025, and China's Huayou was named as replacement in April 2025. The reason is contested: LG cited market conditions, while the government said negotiations had dragged on for too long. The Karawang cell JV continues.",
+      "year": "2025",
+      "source_name": "SCMP / Jakarta Globe (secondary press)",
+      "source_url": "https://jakartaglobe.id/business/bahlil-takes-responsibility-for-lgs-exit-from-98b-battery-project",
+      "confidence": "medium"
+     },
+     {
+      "claim": "KEK Gresik (JIIPE, East Java) had absorbed Rp113.4T in cumulative investment and 45,860 workers by Q1 2026. It hosts Freeport's Manyar copper smelter, designed for ~1.7 Mt/yr of concentrate (≈600–650 kt cathode).",
+      "value": "Rp113.4T; ~1.7 Mtpa concentrate",
+      "year": "2026 (Q1)",
+      "source_name": "Kemenko Perekonomian (ekon.go.id) / Pasardana; Mining Weekly for smelter",
+      "source_url": "https://www.ekon.go.id/publikasi/detail/6975/pemerintah-dukung-percepatan-proses-perluasan-kek-gresik-untuk-mendorong-investasi-dan-pertumbuhan-ekonomi",
+      "confidence": "medium"
+     },
+     {
+      "claim": "The Manyar smelter has run far below capacity since the Sept 2025 Grasberg mud rush cut concentrate supply. Freeport targeted resuming Manyar production around September 2026.",
+      "year": "2026",
+      "source_name": "IDN Financials / Mining Weekly (secondary press)",
+      "source_url": "https://www.idnfinancials.com/news/64899/freeport-targets-manyar-smelter-to-resume-operations-in-september-2026",
+      "confidence": "medium"
+     },
+     {
+      "claim": "ExxonMobil Cepu (Central/East Java border) was the top oil producer at ~153,932 bopd as of 10 Nov 2025.",
+      "value": "153,932 bopd",
+      "year": "2025",
+      "source_name": "SKK Migas via Bisnis.com (secondary)",
+      "source_url": "https://ekonomi.bisnis.com/read/20251112/44/1928303/skk-migas-bidik-lifting-minyak-capai-607000-bph-pada-akhir-2025",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Java geothermal projects in ESDM's late-2024 pipeline: Salak Binary 15 MW (West Java) and Blawan Ijen Unit 1, 34 MW (East Java). Provinces are general knowledge.",
+      "value": "15 MW, 34 MW",
+      "year": "2024",
+      "source_name": "Kementerian ESDM press release",
+      "source_url": "https://esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-kejar-tambahan-90-mw-dari-panas-bumi-",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Java has the densest market for factory automation: the Bekasi–Karawang–Purwakarta automotive and electronics belt, the EV battery-cell line in Karawang (cleanroom handling, AGVs/AMRs, vision QC), and East Java's Gresik/JIIPE smelter-port complex (heavy-industry inspection, port automation). Most industrial estates and grid-connected facilities are here, so it is the easiest place for a foreign company's first pilot, distributor tie-up and certification work. The real-world stressors are heat and humidity on the factory floor, not remoteness."
+   },
+   {
+    "region": "Kalimantan",
+    "facts": [
+     {
+      "claim": "Kalimantan produced about 688 Mt of coal, 82% of national output. By province: East Kalimantan 368 Mt, South Kalimantan 237 Mt, Central 39 Mt, North 28 Mt, West 15 Mt.",
+      "value": "688 Mt (82%); Kaltim 368 Mt",
+      "year": "2024",
+      "source_name": "Sekretaris Ditjen Minerba, Kementerian ESDM, quoted by Investortrust / ListrikIndonesia (official figure via press)",
+      "source_url": "https://investortrust.id/business/72085/esdm-selama-dunia-butuh-terang-industri-batu-bara-tak-boleh-padam",
+      "confidence": "medium"
+     },
+     {
+      "claim": "National coal production in 2024 was 836.13 Mt (117.76% of target). About 233 Mt went to domestic use and ~555 Mt was exported. Output fell to ~790 Mt in 2025.",
+      "value": "836.13 Mt (2024); ~790 Mt (2025)",
+      "year": "2024–2025",
+      "source_name": "Laporan Kinerja Ditjen Minerba 2024 (ESDM); Bisnis.com for 2025",
+      "source_url": "https://www.esdm.go.id/assets/media/content/content-laporan-kinerja-ditjen-mineral-dan-batubara-tahun-2024.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "East Kalimantan was the largest coal-exporting province at 221.2 Mt in 2024, with South Kalimantan second at 82.8 Mt.",
+      "value": "221.2 Mt / 82.8 Mt",
+      "year": "2024",
+      "source_name": "BPS via GoodStats (secondary)",
+      "source_url": "https://data.goodstats.id/statistic/5-provinsi-utama-eksportir-batu-bara-3mmzw",
+      "confidence": "medium"
+     },
+     {
+      "claim": "SGAR Mempawah alumina refinery (West Kalimantan, Inalum 60% / Antam 40%) completed Phase I in 2025. It is rated at 1 Mt/yr of alumina from ~3 Mt/yr of bauxite, and a Phase II to 2 Mt/yr is planned.",
+      "value": "1 Mtpa alumina",
+      "year": "2025",
+      "source_name": "Bisnis.com / Alcircle / Indonesia Business Post (secondary)",
+      "source_url": "https://market.bisnis.com/read/20240818/192/1791917/commisioning-smelter-inalum-antam-di-mempawah-bakal-serap-270000-ton-bauksit",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Despite being Indonesia's coal heartland, Kalimantan has had rolling blackouts and areas without reliable electricity, according to press reports.",
+      "year": "2025–2026",
+      "source_name": "Katadata / ListrikIndonesia (secondary press)",
+      "source_url": "https://katadata.co.id/ekonomi-hijau/investasi-hijau/6a4f309b4a96e/pemadaman-bergilir-kalimantan-ironi-krisis-listrik-di-lumbung-batu-bara",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Kalimantan contributed 8.12% of national GDP.",
+      "value": "8.12%",
+      "year": "2025",
+      "source_name": "BPS via GoodStats (secondary)",
+      "source_url": "https://data.goodstats.id/statistic/jawa-sumbang-56-pdrb-nasional-pada-2025-4D0kB",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Large open-pit coal mines in East and South Kalimantan suit autonomous or remote-operated haul trucks, fleet telematics, slope-stability and dust sensors, drone surveying and conveyor and barge-loading inspection along rivers. Dust, heavy tropical rain, mud and unreliable grid power test rugged hardware for real. Bauxite and alumina in West Kalimantan add red-mud and refinery inspection use cases."
+   },
+   {
+    "region": "Sulawesi",
+    "facts": [
+     {
+      "claim": "Indonesia was the world's #1 mined nickel producer: 2.31 Mt in 2024 and an estimated 2.6 Mt in 2025 (≈67% of the 3.9 Mt world total), with reserves of 62 Mt, the world's largest. Production rose ~13% in 2025 as new operations ramped up.",
+      "value": "2.6 Mt (2025e); 62 Mt reserves",
+      "year": "2025",
+      "source_name": "USGS Mineral Commodity Summaries 2026 – Nickel",
+      "source_url": "https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-nickel.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "ESDM's national nickel balance (as of Dec 2024) shows reserves of 5.91 bn t of ore / 62.02 Mt of metal and 2024 ore production of 173.63 Mt. ESDM says nickel is concentrated mainly in Sulawesi and Maluku. Indonesia's claimed share of world reserves is contested: 42–45% per the government vs ~25% per earlier USGS data.",
+      "value": "5.91 bn t ore reserves; 173.63 Mt ore mined",
+      "year": "2024",
+      "source_name": "Kepmen ESDM 228.K/MB.03/MEM.G/2025 (Neraca Sumber Daya & Cadangan), via Bisnis.com",
+      "source_url": "https://ekonomi.bisnis.com/read/20250729/44/1896947/mengintip-data-cadangan-mineral-ri-terbaru-nikel-tembaga-cs-naik",
+      "confidence": "medium"
+     },
+     {
+      "claim": "IMIP (Indonesia Morowali Industrial Park, Central Sulawesi) is Indonesia's first integrated nickel downstreaming hub. It covers ~2,000 ha (expansion planned to 5,000 ha), reports US$34.3B of investment for 2015–2024, more than 83,000 workers and 56 tenants (29 operating) as of July 2024. These are company-reported figures.",
+      "value": "US$34.3B; >83,000 workers",
+      "year": "2024",
+      "source_name": "IMIP figures via Medcom / Detik; Kemenperin statement via Investortrust",
+      "source_url": "https://investortrust.id/business/75719/pacu-hilirisasi-nikel-kemenperin-genjot-produksi-di-kawasan-industri-morowali",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Southeast Sulawesi has the second-largest nickel reserves by province (~1.68 bn t ore / 18.16 Mt metal) and the largest nickel mining concession area (~198,625 ha). Central Sulawesi ranks third (~805 Mt ore / 9.07 Mt metal). The data year is unclear, likely an earlier ESDM/Badan Geologi balance.",
+      "year": "unclear (pre-2024 balance)",
+      "source_name": "Katadata / GoodStats (secondary, citing ESDM)",
+      "source_url": "https://goodstats.id/article/wilayah-penghasil-nikel-terbesar-2024-sulawesi-hingga-maluku-utara-oSJ0f",
+      "confidence": "low"
+     },
+     {
+      "claim": "Other Sulawesi nickel processing: Antam Pomalaa (Kolaka, Southeast Sulawesi, operating since 1976), the Ceria Nugraha Indotama smelter in Kolaka (commissioning targeted 2024), and Vale Indonesia (Sorowako, South Sulawesi), which produced 71,311 t of nickel in matte in 2024.",
+      "value": "71,311 t (Vale, 2024)",
+      "year": "2024",
+      "source_name": "ESDM statements via Bisnis.com; Vale Indonesia figure via press",
+      "source_url": "https://ekonomi.bisnis.com/read/20240705/44/1779587/smelter-raksasa-grup-cni-ditarget-commissioning-sebelum-jokowi-lengser",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Sulawesi was the fastest-growing island group in 2025 (6.23%), driven by nickel downstreaming, and contributed 7.22% of national GDP.",
+      "value": "6.23% growth; 7.22% of GDP",
+      "year": "2025",
+      "source_name": "BPS via GoodStats / press",
+      "source_url": "https://data.goodstats.id/statistic/jawa-sumbang-56-pdrb-nasional-pada-2025-4D0kB",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Kemenperin is pushing to accelerate IMIP output and has trained local smelter workforce through the Morowali Metal Industry Polytechnic and other vocational academies.",
+      "year": "2025",
+      "source_name": "Kemenperin via Investortrust / Industry.co.id",
+      "source_url": "https://investortrust.id/business/75719/pacu-hilirisasi-nikel-kemenperin-genjot-produksi-di-kawasan-industri-morowali",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "This is the world's densest nickel-smelting cluster (RKEF ferronickel, HPAL for battery-grade MHP, stainless steel). It is hot, dusty, corrosive (HPAL acid) and runs captive coal power, which creates demand for furnace-tapping and high-temperature robots, refractory inspection, gas and particulate sensors, worker-safety wearables, autonomous mine haulage and drone surveys of laterite pits. A shortage of skilled labour and frequent safety incidents in the region strengthen the automation case, though that framing is sensitive. Many sites are remote from Java, with limited connectivity, so test edge and offline operation."
+   },
+   {
+    "region": "Maluku",
+    "facts": [
+     {
+      "claim": "North Maluku holds Indonesia's largest provincial nickel reserves, ~1.86 bn t of ore / 19.09 Mt of metal (data year unclear), and ~156,197 ha of nickel concessions with about 44 production permits (IUP OP).",
+      "value": "1.86 bn t ore",
+      "year": "unclear",
+      "source_name": "Katadata / GoodStats (secondary, citing ESDM)",
+      "source_url": "https://katadata.co.id/tags/nikel",
+      "confidence": "low"
+     },
+     {
+      "claim": "IWIP (Indonesia Weda Bay Industrial Park, Central Halmahera) is a Tsingshan (40%), Huayou (30%) and Zhenshi (30%) JV and an integrated nickel mining and smelting hub. Early plans cited a 600 kt/yr ferronickel smelter plus 3 Mt carbon steel and 1 Mt stainless steel. Current capacity is not officially published.",
+      "year": "plan (undated)",
+      "source_name": "Kontan / Business & Human Rights Resource Centre (secondary)",
+      "source_url": "https://www.business-humanrights.org/en/latest-news/indonesia-weda-bay-industrial-park-iwip",
+      "confidence": "low"
+     },
+     {
+      "claim": "Other North Maluku nickel processing: Antam's ferronickel expansion in East Halmahera (targeted 2024) and PT Wanatiara Persada (ferronickel since 2019).",
+      "year": "2024",
+      "source_name": "Kementerian ESDM statements via Bisnis.com",
+      "source_url": "https://ekonomi.bisnis.com/read/20240319/44/1750698/esdm-targetkan-bangun-16-smelter-di-2024-telan-investasi-us116-miliar",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Halmahera's nickel expansion is contested. An advocacy analysis argues it exceeds environmental carrying capacity (deforestation, river contamination, coal-power reliance).",
+      "year": "2025",
+      "source_name": "China Global South Project (advocacy-leaning secondary)",
+      "source_url": "https://chinaglobalsouth.com/analysis/indonesia-weda-bay-nickel-expansion-environmental-limits/",
+      "confidence": "low"
+     },
+     {
+      "claim": "Masela (Abadi) LNG project, Arafura Sea off Maluku, is planned at 9.5 Mtpa. It is not yet producing; PLN, PGN and Tokyo Gas expressed interest as buyers.",
+      "value": "9.5 Mtpa (planned)",
+      "year": "2025",
+      "source_name": "SKK Migas via Enerdata (secondary)",
+      "source_url": "https://www.enerdata.net/publications/daily-energy-news/indonesia-regulator-identifies-potential-buyers-masela-lng-output.html",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Maluku and Papua together contributed only 2.69% of national GDP and grew the slowest of all island groups (1.44%) in 2025.",
+      "value": "2.69%; 1.44% growth",
+      "year": "2025",
+      "source_name": "BPS via GoodStats / press",
+      "source_url": "https://data.goodstats.id/statistic/jawa-sumbang-56-pdrb-nasional-pada-2025-4D0kB",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Remote island nickel operations (Weda Bay, East Halmahera) reached by sea and air are the extreme end of the remoteness test. They suit autonomous mining equipment, satellite-backhauled IoT, environmental monitoring (river turbidity, air quality, sediment), drone mapping and the HPAL battery-chemicals supply chain linked to Huayou. A future offshore LNG project (Masela) adds subsea inspection and offshore-platform robotics."
+   },
+   {
+    "region": "Papua",
+    "facts": [
+     {
+      "claim": "Indonesia mined about 996,000 t of copper (contained) and ~94,000 kg of gold in 2024. Most of it comes from Freeport's Grasberg district in Central Papua (Mimika).",
+      "value": "~996 kt Cu; ~94 t Au",
+      "year": "2024",
+      "source_name": "USGS National Minerals Information Center – Indonesia",
+      "source_url": "https://www.usgs.gov/centers/national-minerals-information-center/indonesia",
+      "confidence": "medium"
+     },
+     {
+      "claim": "On 8 Sept 2025 a mud rush of ~800,000 t of wet material hit the Grasberg Block Cave underground mine. Seven workers died and Freeport declared force majeure.",
+      "year": "2025",
+      "source_name": "Mining Technology / Project Blue (secondary press)",
+      "source_url": "https://www.mining-technology.com/news/freeport-announces-force-majeure-at-grasberg-mine/",
+      "confidence": "high"
+     },
+     {
+      "claim": "Grasberg is in phased recovery at roughly 40–50% of production. Freeport has pushed the full-capacity restart to early 2028 (from end-2027), citing logistics and ore-handling infrastructure work underground.",
+      "year": "2026",
+      "source_name": "Mining.com / Northern Miner (secondary press)",
+      "source_url": "https://www.mining.com/freeport-delays-grasberg-full-restart-to-early-2028/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "bp's Tangguh LNG (Bintuni Bay, West Papua) reached 11.4 Mtpa total capacity with Train 3 (3.8 Mtpa). bp has projected lower Tangguh output for 2026.",
+      "value": "11.4 Mtpa",
+      "year": "2025–2026",
+      "source_name": "Petromindo / SKK Migas reporting (secondary)",
+      "source_url": "https://www.petromindo.com/news/article/bp-projects-lng-production-drop-at-tangguh-in-2026",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Grasberg is one of the world's largest underground block-cave mines, at high altitude with heavy rainfall. The 2025 mud-rush disaster gives a concrete case for remote and teleoperated underground equipment, geotechnical and wet-muck monitoring sensors, robotic inspection after incidents, and automated rail haulage. Tangguh LNG adds plant and marine inspection work. Access, security and permitting are significant constraints; any test programme needs a host operator."
+   },
+   {
+    "region": "Bali & Nusa Tenggara",
+    "facts": [
+     {
+      "claim": "Flores was designated a 'Geothermal Island' by Kepmen ESDM No. 2268 K/30/MEM/2017 (19 June 2017). It has 902 MW of geothermal potential across 16 sites, ~65% of East Nusa Tenggara's potential.",
+      "value": "902 MW potential, 16 sites",
+      "year": "2017 (still active policy, reaffirmed 2025)",
+      "source_name": "Kementerian ESDM – Ditjen EBTKE",
+      "source_url": "https://www.esdm.go.id/id/berita-unit/direktorat-jenderal-ebtke/penetapan-pulau-flores-sebagai-pulau-panas-bumi",
+      "confidence": "high"
+     },
+     {
+      "claim": "Flores geothermal development (e.g., Poco Leok / Ulumbu expansion from 7.5 to 40 MW) faces organised opposition from local, customary and church groups and WALHI NTT, so it is contested.",
+      "year": "2023–2025",
+      "source_name": "Mongabay Indonesia / ListrikIndonesia (secondary)",
+      "source_url": "https://mongabay.co.id/2023/03/08/was-was-panas-bumi-rusak-ruang-hidup-warga-poco-leok/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Bali and Nusa Tenggara contributed 2.82% of national GDP.",
+      "value": "2.82%",
+      "year": "2025",
+      "source_name": "BPS via GoodStats (secondary)",
+      "source_url": "https://data.goodstats.id/statistic/jawa-sumbang-56-pdrb-nasional-pada-2025-4D0kB",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Heavy industry is limited. The main angle is geothermal well and plant inspection on small, weak island grids (Flores), which needs community-sensitive deployment. Copper/gold mining at Batu Hijau and an Amman Mineral smelter in West Nusa Tenggara (Sumbawa) are relevant but were not verified in this pass."
+   }
+  ],
+  "national_facts": [
+   {
+    "claim": "Indonesia was the world's #1 mined nickel producer in 2024 (62% of global output), #2 for tin (19%) and #2 for cobalt (12%).",
+    "value": "Ni 62%, Sn 19%, Co 12%",
+    "year": "2024",
+    "source_name": "USGS National Minerals Information Center – Indonesia",
+    "source_url": "https://www.usgs.gov/centers/national-minerals-information-center/indonesia",
+    "confidence": "high"
+   },
+   {
+    "claim": "Nickel mine production was 2.31 Mt in 2024 and an estimated 2.6 Mt in 2025, out of a 3.9 Mt world total. Reserves are 62 Mt, the world's largest.",
+    "value": "2.6 Mt (2025e)",
+    "year": "2025",
+    "source_name": "USGS Mineral Commodity Summaries 2026 – Nickel",
+    "source_url": "https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-nickel.pdf",
+    "confidence": "high"
+   },
+   {
+    "claim": "Coal production was 836.13 Mt in 2024 (117.76% of target), with ~233 Mt for domestic use. It fell to ~790 Mt in 2025.",
+    "value": "836.13 Mt",
+    "year": "2024",
+    "source_name": "Laporan Kinerja Ditjen Minerba 2024, Kementerian ESDM",
+    "source_url": "https://www.esdm.go.id/assets/media/content/content-laporan-kinerja-ditjen-mineral-dan-batubara-tahun-2024.pdf",
+    "confidence": "high"
+   },
+   {
+    "claim": "Installed geothermal capacity was ~2.6 GW in 2024 (up from 1.4 GW in 2014), about 11% of the 23.6 GW potential across 362 sites. Indonesia aims to become the world's largest geothermal power producer.",
+    "value": "2.6 GW / 23.6 GW",
+    "year": "2024",
+    "source_name": "Kementerian ESDM press release 516.Pers/04/SJI/2024",
+    "source_url": "https://esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-kejar-tambahan-90-mw-dari-panas-bumi-",
+    "confidence": "high"
+   },
+   {
+    "claim": "Oil lifting reached ~606,000 bopd by 10 Nov 2025 against a 605,000 bopd APBN target. Gas production ran above target (~6,820 MMSCFD in June 2025).",
+    "value": "~606,000 bopd",
+    "year": "2025",
+    "source_name": "SKK Migas via Bisnis.com (secondary)",
+    "source_url": "https://ekonomi.bisnis.com/read/20251112/44/1928303/skk-migas-bidik-lifting-minyak-capai-607000-bph-pada-akhir-2025",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Indonesia had 179 industrial estates (59% on Java by count, ~39% by area), with 2.35M workers and Rp6,744.58T cumulative investment.",
+    "value": "179 KI",
+    "year": "2026",
+    "source_name": "Kemenperin via Detik (secondary)",
+    "source_url": "https://finance.detik.com/industri/d-8551973/kawasan-industri-ri-makin-ramai-investasi-tembus-rp-6-744-triliun",
+    "confidence": "medium"
+   },
+   {
+    "claim": "GDP share by island group (current prices) in 2025: Java 56.93%, Sumatra 22.22%, Kalimantan 8.12%, Sulawesi 7.22%, Bali–Nusa Tenggara 2.82%, Maluku–Papua 2.69%.",
+    "year": "2025",
+    "source_name": "BPS via GoodStats (secondary)",
+    "source_url": "https://data.goodstats.id/statistic/jawa-sumbang-56-pdrb-nasional-pada-2025-4D0kB",
+    "confidence": "medium"
+   }
+  ],
+  "caveats": [
+   "Several provincial figures reached me only through press articles quoting ESDM, BPS or Kemenperin. I could not open the primary .go.id tables: MODI per-province output, Kemenperin's KI release, and BPS PDRB by island. The ESDM Minerba LAKIN 2024 PDF is image-based and could not be parsed, though the 836.13 Mt figure appears consistently in press citing it.",
+   "Indonesia's share of world nickel reserves is contested: the government says 42–45%, while USGS reserves of 62 Mt against a world total above 140 Mt imply roughly 40–45% now (earlier USGS editions said ~25%). Do not put a single share on the page without a source label.",
+   "The provincial nickel reserves for North Maluku, Southeast Sulawesi and Central Sulawesi come from secondary sources with no clear data year. Use them qualitatively ('largest reserves in North Maluku and Southeast Sulawesi'), not as precise numbers.",
+   "IMIP and IWIP figures (investment, workforce, capacity) are company-reported or from undated plans, and no official capacity total is available. The environmental and social impacts of Morowali, Weda Bay and Flores geothermal are actively contested; avoid promotional framing.",
+   "The EV battery story changed in 2025: LG left the Grand Package and Huayou was named as replacement. The Karawang cell plant (10 GWh) operates. Whether phase 2 (20 GWh) is complete is unconfirmed as of Oct 2026.",
+   "The Grasberg/Manyar status is moving fast: full-capacity restart now early 2028, and Manyar smelter restart targeted ~Sept 2026. Recheck before publishing.",
+   "Batam's 2025 investment total varies by source (Rp44T–69T). Locations given for the geothermal projects (Salak in West Java, Blawan Ijen in East Java, Sorik Marapi in North Sumatra) are general knowledge and are not stated on the ESDM page.",
+   "No official Indonesia robot-density or installation figure was found (IFR country data is paywalled), so do not claim one. Robotics demand statements in this research are reasoned inferences, not sourced statistics.",
+   "Not covered or verified: Amman Mineral (Sumbawa, West Nusa Tenggara) copper/gold and its smelter, Mahakam gas (East Kalimantan), the IKN/Nusantara build-out, and the Seas & coasts region (offshore oil and gas was only partly covered)."
+  ]
+ },
+ {
+  "regions": [
+   {
+    "region": "Sumatra",
+    "facts": [
+     {
+      "claim": "Riau is Indonesia's largest crude palm oil (CPO) producing province. It contributed 19.06% of national CPO on the 2020-2024 average. North Sumatra (11.05%), South Sumatra (8.30%) and Jambi (5.46%) are also among the seven main producing provinces. Together these four Sumatran provinces give about 43.9% (summed by us from the official shares).",
+      "value": "Riau 19.06%; Sumut 11.05%; Sumsel 8.30%; Jambi 5.46%",
+      "year": "2020-2024 average",
+      "source_name": "Kementan Pusdatin, Outlook Komoditas Kelapa Sawit 2024",
+      "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KELAPA_SAWIT_2024_FINAL.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Riau oil palm area was about 3.40 million ha in 2023, about 21% of the national palm area, and produced about 9.22 million t of CPO. These figures come from BPS Statistik Kelapa Sawit 2023 as quoted by press. bps.go.id blocked automated access, so we could not open the primary table.",
+      "value": "~3.40 M ha; 9.22 Mt CPO",
+      "year": "2023",
+      "source_name": "BPS Statistik Kelapa Sawit Indonesia 2023 (via secondary press citation)",
+      "source_url": "https://www.bps.go.id/id/publication/2024/11/29/d5dcb42ab730df1be4339c34/statistik-kelapa-sawit-indonesia-2023",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Rubber is concentrated in Sumatra. On the 2020-2024 average, South Sumatra was the largest producer with 28.7% (about 764 kt/yr). It was followed by North Sumatra (11.2%), Riau (10.3%) and Jambi (9.0%).",
+      "value": "Sumsel 28.7%; Sumut 11.2%; Riau 10.3%; Jambi 9.0%",
+      "year": "2020-2024 average",
+      "source_name": "Kementan Pusdatin, Outlook Karet 2025",
+      "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KARET_2025_sign.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Sumatra dominates coffee. South Sumatra produced 36.78% of smallholder robusta (avg ~204 kt), Lampung 20.84% and Bengkulu 10.96% (2019-2023). Aceh (32.02%) and North Sumatra (31.98%) together produce about 64% of arabica (2018-2022 average).",
+      "value": "Robusta: Sumsel 36.78%, Lampung 20.84%, Bengkulu 10.96%; Arabica: Aceh 32.02%, Sumut 31.98%",
+      "year": "2018-2023 averages",
+      "source_name": "Kementan Pusdatin, Outlook Kopi 2023",
+      "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/Buku_Outlook_Kopi_2023_lengkap.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Sumatra holds the largest share of Indonesia's peatland, about 5.8 million of the 13.43 million ha in the national 1:50,000 peat map. This is a secondary breakdown (Pantau Gambut citing the BBSDLP map), and estimates vary between mapping editions.",
+      "value": "~5.8 M ha of 13.43 M ha",
+      "year": "2019 map (cited 2025)",
+      "source_name": "BBSDLP national peat map via Pantau Gambut / secondary press",
+      "source_url": "https://lestari.kompas.com/read/2024/07/29/110000486/korporasi-wajib-rawat-lahan-gambut-di-area-konsesinya",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Lampung is a long-standing shrimp aquaculture centre. The Dipasena ponds cover about 6,800 ha. We found no official 2023 province ranking for shrimp.",
+      "value": "~6,800 ha (Dipasena)",
+      "year": "undated secondary",
+      "source_name": "Secondary/academic sources; KKP Satu Data not reachable",
+      "source_url": "https://ejournal-balitbang.kkp.go.id/index.php/ma/article/view/3289",
+      "confidence": "low"
+     },
+     {
+      "claim": "Sumatra also has meaningful cocoa: Lampung 49.5 kt, North Sumatra 36.7 kt, Aceh 36.6 kt and West Sumatra 35.0 kt. These are BPS figures as compiled by Databoks.",
+      "value": "Lampung 49.5 kt; Sumut 36.7 kt; Aceh 36.6 kt; Sumbar 35.0 kt",
+      "year": "2023",
+      "source_name": "BPS via Databoks (secondary)",
+      "source_url": "https://databoks.katadata.co.id/en/agroindustry/statistics/001d3a99c8d75f3/indonesia-produced-641000-tons-of-cocoa-in-2023-these-are-the-largest-producing-provinces",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "This is Indonesia's main estate-crop belt (palm, rubber, coffee) on peat and mineral soils. It suits tests of FFB (fresh fruit bunch) harvesting aids and loose-fruit collection, mechanical in-field transport on soft or peat ground, drone spraying and crop-health and ganoderma detection, rubber-tapping automation (rubber is ~89% smallholder and labour-intensive), and peat water-table and fire-risk IoT sensors in hot, humid, flood-prone conditions with patchy connectivity. Coffee in the highlands of Sumsel, Lampung, Aceh and Sumut suits small-plot picking and sorting tests."
+   },
+   {
+    "region": "Kalimantan",
+    "facts": [
+     {
+      "claim": "Central Kalimantan is the second-largest CPO-producing province (17.60% of national, 2020-2024 average). West Kalimantan has 11.56% and East Kalimantan 8.63%. These three give about 37.8% of national CPO (summed by us).",
+      "value": "Kalteng 17.60%; Kalbar 11.56%; Kaltim 8.63%",
+      "year": "2020-2024 average",
+      "source_name": "Kementan Pusdatin, Outlook Komoditas Kelapa Sawit 2024",
+      "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KELAPA_SAWIT_2024_FINAL.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Palm area: Central Kalimantan has about 2.0-2.2 M ha, West Kalimantan about 1.8-2.1 M ha and East Kalimantan about 1.3-1.5 M ha. The figure depends on whether the source is BPS or Ditjenbun. Contested between sources.",
+      "value": "Kalteng ~2.0-2.2 M ha; Kalbar ~1.8-2.1 M ha; Kaltim ~1.3-1.5 M ha",
+      "year": "2023",
+      "source_name": "BPS / Ditjenbun via secondary compilations",
+      "source_url": "https://www.goodnewsfromindonesia.id/2026/04/24/10-provinsi-dengan-luas-areal-tanaman-perkebunan-sawit-terbesar-di-indonesia-riau-hingga-bengkulu-begini-urutannya",
+      "confidence": "medium"
+     },
+     {
+      "claim": "West Kalimantan (7.7%, ~205 kt/yr) and South Kalimantan (5.7%, ~152 kt/yr) are among the six rubber centres. Those six centres give 72.68% of national output.",
+      "value": "Kalbar 7.7%; Kalsel 5.7%",
+      "year": "2020-2024 average",
+      "source_name": "Kementan Pusdatin, Outlook Karet 2025",
+      "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KARET_2025_sign.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Kalimantan holds about 4.5 M ha of peat. Central Kalimantan alone has about 2.65 M ha, roughly 16.8% of the province. These are secondary figures and earlier maps differ.",
+      "value": "~4.5 M ha (island); ~2.65 M ha Kalteng",
+      "year": "2019 map (cited 2024-2025)",
+      "source_name": "BBSDLP map via Pantau Gambut / academic sources",
+      "source_url": "https://e-journal.upr.ac.id/index.php/JBL/article/download/11735/5517",
+      "confidence": "medium"
+     },
+     {
+      "claim": "North Kalimantan ranked 3rd nationally in seaweed production in 2022 with 788,967 t. East Kalimantan was 14th with 25,629 t.",
+      "value": "Kaltara 788,967 t",
+      "year": "2022",
+      "source_name": "KKP, Profil Pasar Rumput Laut (Satu Data KKP 2023)",
+      "source_url": "https://kkp.go.id/storage/Materi/profil-pasar-rumput-laut66753a465fe09/materi-66753a4696928.pdf",
+      "confidence": "high"
+     }
+    ],
+    "robotics_relevance": "These are very large contiguous company palm estates, so this is the best place to test fleet-scale autonomy: estate logistics, harvest-crew support, mapping, census and yield estimation by drone. Peat subsidence and hydrology sensors and fire-early-warning IoT also fit here, given the large peat domes and recurring fire season. Remote estates with weak grid and cellular coverage make this a strong test for off-grid power and edge computing. North Kalimantan's seaweed farms suit monitoring buoys."
+   },
+   {
+    "region": "Java",
+    "facts": [
+     {
+      "claim": "East Java was the top paddy producer in 2024 with 9.27 Mt GKG (dry unhusked grain), fixed figure. Harvested area was 1.62 M ha, down from 9.71 Mt in 2023. BPS ranks the top producers as East Java, Central Java, West Java, South Sulawesi and South Sumatra.",
+      "value": "Jatim 9.27 Mt GKG; 1.62 M ha harvested",
+      "year": "2024 (ATAP)",
+      "source_name": "BPS Provinsi Jawa Timur press release (accessed via search snippet; site blocks bots)",
+      "source_url": "https://jatim.bps.go.id/en/pressrelease/2025/03/03/1482/luas-panen-dan-produksi-padi-di-provinsi-jawa-timur-2024--angka-tetap-.html",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Central Java (~8.89 Mt) and West Java (~8.63 Mt) were 2nd and 3rd in 2024 paddy output, out of a national total of about 53.14 Mt GKG. Java gives roughly half or more of national paddy. These are BPS figures via secondary compilers.",
+      "value": "Jateng ~8.89 Mt; Jabar ~8.63 Mt; national ~53.14 Mt",
+      "year": "2024",
+      "source_name": "BPS via Databoks / Antara (secondary)",
+      "source_url": "https://databoks.katadata.co.id/en/technology-telecommunications/multiple/9121c8582380b18/rice-production-period-20132024",
+      "confidence": "medium"
+     },
+     {
+      "claim": "East Java is the 5th-largest seaweed producer (666,887 t in 2022). Its ponds, such as Sidoarjo, are also historic shrimp and milkfish centres.",
+      "value": "666,887 t seaweed",
+      "year": "2022",
+      "source_name": "KKP, Profil Pasar Rumput Laut",
+      "source_url": "https://kkp.go.id/storage/Materi/profil-pasar-rumput-laut66753a465fe09/materi-66753a4696928.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "KKP's flagship modern shrimp estate is BUBK Kebumen in Central Java: about 100 ha site, about 24 ha effective pond area. KKP's target is 40 t/ha per cycle, against about 0.6 t/ha in traditional local ponds. KKP's own inspectorate notes the 40 t/ha target is not yet consistently reached.",
+      "value": "Target 40 t/ha vs 0.6 t/ha traditional",
+      "year": "2021-2026",
+      "source_name": "KKP news releases",
+      "source_url": "https://kkp.go.id/news/news-detail/kkp-modeling-tambak-bubk-kebumen-kembali-panen-gnyl.html",
+      "confidence": "high"
+     },
+     {
+      "claim": "East Java was the largest marine capture-fisheries province in BPS 2024 data (619,053 t), ahead of South Sulawesi and Maluku. We could not open the table directly; this is from a search snippet.",
+      "value": "619,053 t",
+      "year": "2024",
+      "source_name": "BPS statistics table (snippet)",
+      "source_url": "https://www.bps.go.id/id/statistics-table/2/MTA1NCMy/produksi-perikanan-tangkap-menurut-provinsi-.html",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Farm labour is ageing. A secondary analysis of ST2023 (Agricultural Census 2023) says the share of older farm operators in Java exceeds 70%. Kementan explicitly promotes rice transplanters and agricultural drones to address labour scarcity.",
+      "value": ">70% older farmers in Java (secondary)",
+      "year": "2023-2025",
+      "source_name": "Katadata analysis of BPS ST2023; Kementan news",
+      "source_url": "https://www.pertanian.go.id/wbs/index.php?show=news&act=view&id=7725",
+      "confidence": "low"
+     }
+    ],
+    "robotics_relevance": "Java is dense smallholder rice country (small plots, irrigated paddies, 2-3 seasons a year). It suits tests of rice transplanters, drone seeding and spraying, small autonomous tractors, pest and water-level IoT, and harvest-timing vision. The government is actively pushing alsintan (farm machinery) and drones through programmes such as Brigade Pangan. Intensive shrimp-estate models (Kebumen) and coastal ponds suit aquaculture sensors, feeders and water-quality automation. Java also has the best logistics and connectivity, so it is the easiest pilot base."
+   },
+   {
+    "region": "Sulawesi",
+    "facts": [
+     {
+      "claim": "Sulawesi is Indonesia's cocoa heartland. In 2023 Central Sulawesi (19.92%), Southeast Sulawesi (16.09%), South Sulawesi (12.62%) and West Sulawesi (10.62%) were the top four. Together that is about 59% of national cocoa (summed by us). Cocoa is about 98.6% smallholder.",
+      "value": "Sulteng 19.92%; Sultra 16.09%; Sulsel 12.62%; Sulbar 10.62%",
+      "year": "2023",
+      "source_name": "Kementan Pusdatin, Outlook Kakao 2025",
+      "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KAKAO_2025_sign_rev.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Cocoa productivity is falling, from 798 kg/ha in 2016 to about 719 kg/ha in 2025 (estimate). That is a -1.12%/yr trend.",
+      "value": "798 to 719 kg/ha",
+      "year": "2016-2025",
+      "source_name": "Kementan Pusdatin, Outlook Kakao 2025",
+      "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KAKAO_2025_sign_rev.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "South Sulawesi is by far the largest seaweed producer: 3,796,882 t of a national 9,282,391 t in 2022, about 41%. Central Sulawesi was 6th (655,453 t), Southeast Sulawesi 7th (313,147 t) and North Sulawesi 9th (183,332 t).",
+      "value": "Sulsel 3.80 Mt (~41%)",
+      "year": "2022",
+      "source_name": "KKP, Profil Pasar Rumput Laut (Satu Data KKP 2023)",
+      "source_url": "https://kkp.go.id/storage/Materi/profil-pasar-rumput-laut66753a465fe09/materi-66753a4696928.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "South Sulawesi produced about 12.27% of national arabica (avg ~25.3 kt, 2018-2022), mostly from the Toraja and Enrekang highlands.",
+      "value": "12.27% of arabica",
+      "year": "2018-2022 average",
+      "source_name": "Kementan Pusdatin, Outlook Kopi 2023",
+      "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/Buku_Outlook_Kopi_2023_lengkap.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "South Sulawesi is the 4th-largest paddy producer nationally and the largest outside Java.",
+      "value": "Rank 4 nationally",
+      "year": "2024",
+      "source_name": "BPS (via BPS Jatim release snippet)",
+      "source_url": "https://jatim.bps.go.id/en/pressrelease/2025/03/03/1482/luas-panen-dan-produksi-padi-di-provinsi-jawa-timur-2024--angka-tetap-.html",
+      "confidence": "medium"
+     },
+     {
+      "claim": "South Sulawesi is the 2nd-largest marine capture province in BPS 2024 data (466,673 t).",
+      "value": "466,673 t",
+      "year": "2024",
+      "source_name": "BPS statistics table (snippet)",
+      "source_url": "https://www.bps.go.id/id/statistics-table/2/MTA1NCMy/produksi-perikanan-tangkap-menurut-provinsi-.html",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Smallholder cocoa with declining yields suits disease and pod-borer detection by vision, pruning and harvesting aids, and low-cost farm IoT for cooperatives. Sulawesi has the world-scale seaweed belt (nearshore longline farms): suited to monitoring drones and buoys, growth and ice-ice disease detection, drying-yard automation and moisture/quality grading. Mixed rice and highland coffee add further use cases. Logistics are harder than Java but Makassar is a workable hub."
+   },
+   {
+    "region": "Bali & Nusa Tenggara",
+    "facts": [
+     {
+      "claim": "East Nusa Tenggara (NTT) is the 2nd-largest seaweed producer (1,403,336 t) and West Nusa Tenggara (NTB) the 4th (744,498 t) in 2022.",
+      "value": "NTT 1.40 Mt; NTB 0.74 Mt",
+      "year": "2022",
+      "source_name": "KKP, Profil Pasar Rumput Laut (Satu Data KKP 2023)",
+      "source_url": "https://kkp.go.id/storage/Materi/profil-pasar-rumput-laut66753a465fe09/materi-66753a4696928.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "KKP launched a 50 ha seaweed pilot ('modeling') in Rote Ndao, NTT, a leading seaweed district.",
+      "value": "50 ha pilot",
+      "year": "2024",
+      "source_name": "KKP via Kontan",
+      "source_url": "https://insight.kontan.co.id/news/kkp-menggarap-proyek-percontohan-rumput-laut",
+      "confidence": "medium"
+     },
+     {
+      "claim": "NTB (especially Sumbawa) is an established vannamei shrimp centre. KKP is building a shrimp estate in Waingapu, East Sumba (NTT). Reported size is about 500 ha completed, with plans of up to 1,800 ha; the figures conflict between reports.",
+      "value": "~500-1,800 ha (contested)",
+      "year": "2024",
+      "source_name": "KKP via Kontan; academic sources",
+      "source_url": "https://industri.kontan.co.id/news/kkp-bakal-buka-tambak-udang-seluas-1800-hektare-di-ntt",
+      "confidence": "low"
+     },
+     {
+      "claim": "NTT produced about 21.1 kt of cocoa and Bali about 4.8 kt in 2023 (BPS via Databoks). Oil palm is essentially absent in Bali and Nusa Tenggara (Kementan Outlook).",
+      "value": "NTT 21.1 kt cocoa",
+      "year": "2023",
+      "source_name": "BPS via Databoks; Kementan Outlook Kelapa Sawit 2024",
+      "source_url": "https://databoks.katadata.co.id/en/agroindustry/statistics/001d3a99c8d75f3/indonesia-produced-641000-tons-of-cocoa-in-2023-these-are-the-largest-producing-provinces",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "This is a dry, semi-arid archipelago with clear water and strong seaweed and shrimp activity. It suits tests of seaweed-farm monitoring, solar-powered water-quality sensors, shrimp-pond automation (aerators, feeders, water-quality IoT) on new estates such as East Sumba, and drought or irrigation sensing. Bali offers an easy logistics and demo base."
+   },
+   {
+    "region": "Maluku",
+    "facts": [
+     {
+      "claim": "Maluku's waters span three fisheries management areas: WPP 714 (Banda Sea), WPP 715 (Seram/Maluku Sea) and WPP 718 (Arafura). Their combined fish potential is about 4.39 Mt/yr: 1,033,979 t, 715,293 t and 2,637,564 t respectively. KKP's 2025-2029 plan says WPP 717/718 are under-fished because of limited access, infrastructure and investment.",
+      "value": "~4.39 Mt/yr potential",
+      "year": "2022 decree / 2025-2029 Renstra",
+      "source_name": "KKP Renstra 2025-2029 (PermenKP 18/2025)",
+      "source_url": "https://ppid.kkp.go.id/media/uploads/document_information_public/PermenKP_18_Tahun_2025_Renstra_KKP_2025-2029.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Maluku is the 3rd-largest marine capture province in BPS 2024 data (~399,143 t). The 'Lumbung Ikan Nasional' (national fish barn) programme is designated but has not been fully realised.",
+      "value": "~399 kt",
+      "year": "2024",
+      "source_name": "BPS table (snippet); Maluku Provincial Government",
+      "source_url": "https://mediacenter.malukuprov.go.id/lin-dan-new-port-ambon-disetujui-pemerintah-pusat-jadi-program-strategis-nasional/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Maluku (267,677 t, 8th) and North Maluku (135,074 t, 10th) are among the 15 seaweed centres, which together produce 99.6% of national output.",
+      "value": "Maluku 267,677 t; Malut 135,074 t",
+      "year": "2022",
+      "source_name": "KKP, Profil Pasar Rumput Laut",
+      "source_url": "https://kkp.go.id/storage/Materi/profil-pasar-rumput-laut66753a465fe09/materi-66753a4696928.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "The Agriculture Minister calls North Maluku and Maluku an epicentre for nutmeg, clove and coconut. Coconut support in North Maluku is being expanded from 10,000 to 15,000 ha.",
+      "value": "Coconut 10,000 to 15,000 ha",
+      "year": "2025",
+      "source_name": "Kementan via Bisnis.com",
+      "source_url": "https://ekonomi.bisnis.com/read/20251028/9/1924140/mentan-genjot-pengembangan-kelapa-di-malut-lewat-keunggulan-komparatif",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Maluku is fisheries-first and under-exploited. It suits tests of catch monitoring, electronic monitoring and vessel-tracking IoT, cold-chain sensors, port and landing automation, and maritime connectivity under very sparse infrastructure. Spice and coconut smallholdings suit post-harvest drying and sorting automation. Logistics and connectivity are the main challenge, which also makes them the selling point for ruggedness testing."
+   },
+   {
+    "region": "Papua",
+    "facts": [
+     {
+      "claim": "Papua holds about 3 M ha of Indonesia's 13.43 M ha of peat (secondary breakdown of the BBSDLP map). Older maps gave higher figures; contested.",
+      "value": "~3 M ha peat",
+      "year": "2019 map (cited 2025)",
+      "source_name": "BBSDLP map via Pantau Gambut (secondary)",
+      "source_url": "https://lestari.kompas.com/read/2024/07/29/110000486/korporasi-wajib-rawat-lahan-gambut-di-area-konsesinya",
+      "confidence": "medium"
+     },
+     {
+      "claim": "South Papua (Merauke and neighbouring regencies) hosts national strategic food and energy projects for rice, sugarcane and bioethanol. About 481,000 ha is planned at Wanam, Merauke, and BPN has issued HGU/HGB land titles for about 328,000 ha. Project figures differ widely, and civil-society groups dispute the impacts on indigenous land and forests.",
+      "value": "~481k ha planned; ~328k ha titled",
+      "year": "2025-2026",
+      "source_name": "Kemenko Pangan / ATR-BPN via Kontan and Investortrust",
+      "source_url": "https://investortrust.id/business/91163/bpn-terbitkan-sk-hguhgb-328000-ha-untuk-swasembada-pangan-di-papua-selatan",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Papua has the world's largest natural sago stands, estimated at about 1.2 M ha. Other estimates range from 0.77 to 4.6 M ha; contested.",
+      "value": "~1.2 M ha (contested)",
+      "year": "various",
+      "source_name": "Academic sources / Mongabay (secondary)",
+      "source_url": "https://mongabay.co.id/2018/06/30/menjaga-sagu-harapan-menuju-kedaulatan-pangan-papua/",
+      "confidence": "low"
+     },
+     {
+      "claim": "KKP's 2025-2029 strategic plan states that WPP 717 and 718 (Papua and Maluku waters, including the Arafura Sea) remain under-fished because of limited access, infrastructure and investment.",
+      "value": "Under-fished",
+      "year": "2025",
+      "source_name": "KKP Renstra 2025-2029",
+      "source_url": "https://ppid.kkp.go.id/media/uploads/document_information_public/PermenKP_18_Tahun_2025_Renstra_KKP_2025-2029.pdf",
+      "confidence": "high"
+     }
+    ],
+    "robotics_relevance": "Papua is a frontier for large-scale mechanised rice and sugarcane in Merauke: autonomous tractors, planting and harvest automation, drone mapping and soil and water sensing on newly opened land with almost no labour pool or connectivity. This is the strongest use case for fully autonomous and off-grid systems. It is politically and environmentally sensitive, and foreign partners need careful due diligence on land and indigenous-rights issues."
+   },
+   {
+    "region": "Seas & coasts (maritime Indonesia)",
+    "facts": [
+     {
+      "claim": "National cultured shrimp production was 941,646 t in 2023 and 1,134,017 t in 2024 (very provisional), growing about 5.91%/yr over 2020-2024. Only 56.67% of the 2024 target was achieved, which KKP attributes to spatial-planning and land overlap and to US export rejections.",
+      "value": "941,646 t (2023); 1,134,017 t (2024 very provisional)",
+      "year": "2023-2024",
+      "source_name": "KKP DJPB Laporan Kinerja 2024",
+      "source_url": "https://www.kkp.go.id/download-pdf-akuntabilitas-kinerja/akuntabilitas-kinerja-pelaporan-kinerja-laporan-kinerja-direktorat-jenderal-perikanan-budi-daya-tahun-2024.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Vannamei made up about 81% (764,238 t) of 2023 shrimp aquaculture output.",
+      "value": "81.16% vannamei",
+      "year": "2023",
+      "source_name": "KKP data cited in academic source",
+      "source_url": "https://ejournal-balitbang.kkp.go.id/index.php/aureliajournal/article/download/14952/9172",
+      "confidence": "medium"
+     },
+     {
+      "claim": "National seaweed production was 9,753,410 t in 2023 and 10,808,845 t in 2024. Fifteen provinces produce 99.6% of it.",
+      "value": "9.75 Mt (2023); 10.81 Mt (2024)",
+      "year": "2023-2024",
+      "source_name": "KKP DJPB documents; KKP Profil Pasar Rumput Laut",
+      "source_url": "https://kkp.go.id/storage/Materi/profil-pasar-rumput-laut66753a465fe09/materi-66753a4696928.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "National marine capture fisheries production was about 7.77 Mt in 2023 (provisional figure in a KKP data release).",
+      "value": "~7.77 Mt",
+      "year": "2023",
+      "source_name": "KKP quarterly data release Q1 2024",
+      "source_url": "https://kkp.go.id/storage/Materi/penyampaian-rilis-data-kelautan-dan-perikanan-triwulan-i-2024664d9c9c0520e/materi-664d9c9c26b42.pdf",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "The maritime layer covers shrimp ponds along the Pantura, Lampung, NTB and Sulawesi coasts, seaweed longlines (Sulsel, NTT, NTB, Kaltara) and capture fisheries (Arafura and Banda). Suited tests include aquaculture water-quality IoT and automated feeders and aerators (with disease and yield risk), seaweed-growth monitoring by drone and underwater vision, vessel and catch electronic monitoring, cold-chain sensors and ruggedised marine robotics in salt, heat and humidity."
+   }
+  ],
+  "national_facts": [
+   {
+    "claim": "Indonesia's oil palm area was 16.83 M ha in 2023 (provisional figure), with CPO production of 46.99 Mt. It is the world's largest producer and holds more than 55% of world palm oil exports.",
+    "value": "16.83 M ha; 46.99 Mt CPO",
+    "year": "2023 (provisional)",
+    "source_name": "Kementan Pusdatin, Outlook Komoditas Kelapa Sawit 2024",
+    "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KELAPA_SAWIT_2024_FINAL.pdf",
+    "confidence": "high"
+   },
+   {
+    "claim": "Seven provinces (Riau, Central Kalimantan, West Kalimantan, North Sumatra, East Kalimantan, South Sumatra, Jambi) produce 81.67% of Indonesian CPO. Private estates produce 60.40%, smallholders 34.44% and state estates 5.15% (2015-2024 average). Oil palm is absent from parts of Java, Bali/Nusa Tenggara, North Sulawesi and North Maluku.",
+    "value": "Top 7 = 81.67%; PBS 60.40%, PR 34.44%, PBN 5.15%",
+    "year": "2015-2024 averages",
+    "source_name": "Kementan Pusdatin, Outlook Komoditas Kelapa Sawit 2024",
+    "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KELAPA_SAWIT_2024_FINAL.pdf",
+    "confidence": "high"
+   },
+   {
+    "claim": "Smallholders hold roughly 40% of oil palm area: 6.21 M ha, or 40.51%, in 2022.",
+    "value": "~40.5%",
+    "year": "2022",
+    "source_name": "Kemenko Perekonomian / Ditjenbun",
+    "source_url": "https://ditjenbun.pertanian.go.id/kementan-kembangkan-kelapa-sawit-rakyat/",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Rubber area was 3.149 M ha in 2024, with production of about 2.26 Mt. About 88.6% of the rubber estate is smallholder.",
+    "value": "3.149 M ha; ~2.26 Mt; 88.6% smallholder",
+    "year": "2024",
+    "source_name": "Kementan Pusdatin, Outlook Karet 2025",
+    "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KARET_2025_sign.pdf",
+    "confidence": "high"
+   },
+   {
+    "claim": "Coffee is about 98.3% smallholder and about 73% robusta. Cocoa is about 98.6% smallholder. Both have very fragmented supply bases.",
+    "value": "Coffee 98.30% PR; cocoa 98.61% PR",
+    "year": "2021 / 2016-2025",
+    "source_name": "Kementan Pusdatin, Outlook Kopi 2023 and Outlook Kakao 2025",
+    "source_url": "https://satudata.pertanian.go.id/assets/docs/publikasi/OUTLOOK_KAKAO_2025_sign_rev.pdf",
+    "confidence": "high"
+   },
+   {
+    "claim": "Agriculture employed 40.76 M people (28% of workers) in 2024. Kementan describes an 'inverted pyramid' age structure and low farmer regeneration as core challenges, with mechanisation as the response.",
+    "value": "40.76 M; 28%",
+    "year": "2024",
+    "source_name": "Kementan Renstra 2025-2029 (draft Permentan 40/2025)",
+    "source_url": "https://bpmsph.ditjenpkh.pertanian.go.id/storage/master/file/57JzbsEr_Renstra_Kementan_2025-2029.pdf",
+    "confidence": "high"
+   },
+   {
+    "claim": "Agricultural Census 2023 (ST2023): millennial farmers aged 19-39 are 21.93% of 28.19 M farmers.",
+    "value": "21.93%",
+    "year": "2023",
+    "source_name": "BPS ST2023 via Investortrust (secondary)",
+    "source_url": "https://investortrust.id/national/1903/petani-milenial-capai-21-93-dari-total-petani-tanah-air",
+    "confidence": "medium"
+   },
+   {
+    "claim": "GAPKI (the palm oil producers' association) says upstream palm operations cannot yet be fully mechanised and remain labour-intensive, with about 5 M workers. Academic studies of estates report harvester shortages and declining youth interest, which push estates towards harvest mechanisation.",
+    "value": "~5 M workers",
+    "year": "2022",
+    "source_name": "GAPKI statement via Jawapos/Medcom; IPB/Instiper theses",
+    "source_url": "https://www.jawapos.com/ekonomi/2211040165/pelaku-industri-sebut-sektor-sawit-berpotensi-serap-tenaga-kerja",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Indonesia has about 13.43 M ha of peat on the national 1:50,000 map (BBSDLP, SNI 7925:2019). The environment ministry (KLH) cited 13.36 M ha in October 2025.",
+    "value": "13.36-13.43 M ha",
+    "year": "2019 map / 2025",
+    "source_name": "BBSDLP (Anda et al. 2021) via academic sources; KLH via Kontan",
+    "source_url": "https://nasional.kontan.co.id/news/kementerian-lh-dorong-pemulihan-ekosistem-gambut-dan-mangrove-lewat-pentahelix",
+    "confidence": "medium"
+   }
+  ],
+  "caveats": [
+   "bps.go.id (including provincial subdomains) returned HTTP 403 to automated fetches. All BPS figures were therefore taken from search snippets or secondary compilers (Databoks, GoodStats, press) and are marked medium. Please verify them manually before publishing.",
+   "Kementan Pusdatin Outlook PDFs (palm, rubber, cocoa, coffee) and KKP PDFs (seaweed market profile, DJPB 2024 performance report) were downloaded and read directly. These are the strongest sources here.",
+   "Palm area by province differs between BPS and Ditjenbun (e.g. Kalbar 1.83 vs 2.13 M ha). Use shares of production from the Kementan Outlook rather than absolute hectares where possible.",
+   "We could not obtain an official 2023 province ranking for shrimp aquaculture. Lampung, East Java and NTB as main centres is based on older and secondary data.",
+   "Peat area and per-island splits vary by mapping edition (13.4 vs 14.9 M ha). Papua sago area estimates range from 0.77 to 4.6 M ha.",
+   "Papua (Merauke) food estate figures are inconsistent across ministries and are politically contested (indigenous land and deforestation). A foreign-facing site should present them neutrally or omit numbers.",
+   "Percentages labelled 'summed by us' are our arithmetic on official per-province shares, not published totals.",
+   "Maluku capture-fisheries potential figures changed between strategic-plan editions (e.g. WPP 718 at 1.12 vs 2.64 Mt). We used the most recent 2025-2029 Renstra."
+  ]
+ },
+ {
+  "national_facts": [
+   {
+    "claim": "Telecom/radio device certification: any Indonesian or foreign party that makes, assembles or imports telecom equipment (which covers radio-equipped robots, sensors and IoT gateways) for sale or use in Indonesia must get a type certificate. A certificate is issued per brand, model and country of manufacture after testing against technical standards. Applications go through OSS, linked to the Directorate General's certification service, and fees are non-tax state revenue (PNBP). Oversight includes label checks. This regulation replaced Permenkominfo 16/2018.",
+    "value": "Permenkominfo 3/2024, promulgated 23 Feb 2024, in force 90 days later",
+    "year": "2024",
+    "source_name": "JDIH Komdigi abstract; peraturan.go.id (title verified)",
+    "source_url": "https://peraturan.go.id/id/permenkominfo-no-3-tahun-2024",
+    "confidence": "high"
+   },
+   {
+    "claim": "The certification function formerly run by Ditjen SDPPI now sits under Komdigi's Directorate General of Digital Infrastructure (the SDPPI news site carries that banner). Kominfo was renamed Komdigi. Foreign marketing copy should say 'Komdigi (formerly Kominfo/SDPPI)'.",
+    "year": "2024-2026",
+    "source_name": "sdppi.kominfo.go.id news page header; infradigital.komdigi.go.id",
+    "source_url": "https://sdppi.kominfo.go.id/berita-produk-hkt-wajib-penuhi-tkdn-35-persen-27-5366",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Local content (TKDN) is tied to device certification for 4G/5G cellular equipment. LTE and IMT-2020 subscriber stations must reach at least 35% TKDN (raised from 30%, six months after the rule took effect), and the official list shows 40% for LTE base stations. A robot or sensor with a built-in 4G/5G modem falls under this rule. Wi-Fi-only or LPWA-only devices fall under different rules.",
+    "value": "35% (subscriber stations); 40% (LTE base stations, per JDIH article listing)",
+    "year": "2021 (Permenkominfo 13/2021)",
+    "source_name": "Kominfo press release 376/HM/KOMINFO/10/2021; peraturan.go.id",
+    "source_url": "https://peraturan.go.id/id/permenkominfo-no-13-tahun-2021",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Unlicensed IoT radio (WLAN, SRD, non-cellular LPWA) runs under a class license (Permenkominfo 1/2019), and the 920-923 MHz band is set aside for non-cellular LPWA. A target of about 30% TKDN for IoT devices has been reported, but no final binding rule was confirmed.",
+    "value": "920-923 MHz LPWA band",
+    "year": "2019",
+    "source_name": "Bureau Veritas summary of PM 1/2019; Bisnis.com; Komdigi draft LPWA technical requirements (public consultation)",
+    "source_url": "https://www.cps.bureauveritas.com/newsroom/indonesia-menkominfo-issued-new-regulation-pm-no-12019-use-radio-spectrum-frequency-based",
+    "confidence": "medium"
+   },
+   {
+    "claim": "In government and state-owned enterprise (BUMN/BUMD) procurement, TKDN is a market-access gate. Products with combined TKDN plus company benefit weight (BMP) of at least 40% take priority. If none are available, buyers must still choose domestic products with at least 25% TKDN. For purely private B2B sales, TKDN is mostly not mandatory, apart from device-certification rules such as 4G/5G.",
+    "value": "TKDN+BMP >= 40% first; fallback TKDN >= 25%",
+    "year": "2025 (Perpres 46/2025, amending Perpres 16/2018)",
+    "source_name": "peraturan.go.id (Perpres 46/2025); Bisnis.com quoting LKPP",
+    "source_url": "https://peraturan.go.id/id/perpres-no-46-tahun-2025",
+    "confidence": "high"
+   },
+   {
+    "claim": "Mandatory SNI (a product certificate called SPPT-SNI) applies to listed product groups, for example audio/video and similar electronics under Permenperin 15/2018. Importers need SPPT-SNI tied to the HS code. Kemenperin seizes non-compliant imports, for example 25,257 speakers in July 2024. Each robot or sensor HS code must be checked against the current mandatory-SNI list, because not all robotics equipment is covered.",
+    "year": "2018 rule; enforcement 2024",
+    "source_name": "Kemenperin enforcement reported by Bisnis.com / Kontan",
+    "source_url": "https://ekonomi.bisnis.com/read/20240720/9/1783913/kemenperin-sita-25257-unit-speaker-aktif-asal-china-tanpa-sertifikat-sni",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Import regime: Permendag 16/2025 is the general import-policy rule and replaces Permendag 36/2023 as amended by 8/2024. Commodity rules are split into eight cluster regulations, with electronics and telematics in Permendag 21/2025. The importer needs an importer ID: API-U for trading or API-P for its own production. API-P holders face limits on reselling imported goods.",
+    "value": "Permendag 16/2025 + 21/2025 (electronics/telematics)",
+    "year": "2025",
+    "source_name": "peraturan.go.id (title verified); Antara; DFDL",
+    "source_url": "https://peraturan.go.id/id/permendag-no-16-tahun-2025",
+    "confidence": "high"
+   },
+   {
+    "claim": "Foreign ownership: under the positive-investment-list approach, all business sectors are open to investment unless closed or reserved, and fully open sectors allow 100% foreign ownership. A foreign-owned company (PT PMA) is classed as a large enterprise with investment above Rp10 billion per 5-digit KBLI per project location, excluding land and buildings.",
+    "value": ">Rp10bn investment per KBLI per location",
+    "year": "2021 (Perpres 10/2021 as amended by Perpres 49/2021)",
+    "source_name": "peraturan.go.id; Hukumonline",
+    "source_url": "https://peraturan.go.id/id/perpres-no-10-tahun-2021",
+    "confidence": "high"
+   },
+   {
+    "claim": "Licensing reform: PP 28/2025 replaced PP 5/2021 on risk-based licensing via OSS. Its implementing BKPM/Investment Ministry rule (5/2025, effective 2 Oct 2025) lowered the minimum paid-up capital of a PT PMA to Rp2.5 billion per company, which must stay deposited for 12 months. The Rp10 billion minimum total investment reportedly still applies. Sources disagree on this.",
+    "value": "Paid-up capital Rp2.5bn (was Rp10bn)",
+    "year": "2025",
+    "source_name": "peraturan.go.id (PP 28/2025); Hukumonline; Prolegal",
+    "source_url": "https://peraturan.go.id/id/pp-no-28-tahun-2025",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Data rules: any electronic-system operator serving Indonesian users must register as a private-scope PSE (via OSS, which issues the TD-PSE registration) before going live. This applies to a cloud dashboard or data platform for field-test datasets. Foreign operators targeting Indonesia are included, and operators must grant data access for supervision and law enforcement.",
+    "year": "2019 / 2020-2021",
+    "source_name": "PP 71/2019 (peraturan.go.id); Permenkominfo 5/2020 as amended by 10/2021",
+    "source_url": "https://peraturan.go.id/id/pp-no-71-tahun-2019",
+    "confidence": "high"
+   },
+   {
+    "claim": "Personal data: the PDP Law (UU 27/2022) has been fully enforceable since October 2024, after a two-year transition. Cross-border transfer of personal data (Art. 56) needs equal or higher protection in the destination country, adequate safeguards, or consent. The implementing government regulation and the supervisory agency were still pending as of mid-2025 reports, and Art. 56 was under Constitutional Court review in 2025. This matters for datasets that capture people, faces, voices or locations.",
+    "year": "2022 law; 2024 enforcement",
+    "source_name": "peraturan.go.id; Hukumonline",
+    "source_url": "https://peraturan.go.id/id/uu-no-27-tahun-2022",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Making Indonesia 4.0 (Kemenperin roadmap, launched 2018) prioritised five sectors at first: food and beverage, textiles and apparel, automotive, chemicals, and electronics. These are the main industrial demand pools for automation and robotics.",
+    "year": "2018",
+    "source_name": "Kontan / Antara reporting Kemenperin (secondary)",
+    "source_url": "https://industri.kontan.co.id/news/kementerian-perindustrian-prioritaskan-5-sektor-ini-dalam-road-map-industri-40",
+    "confidence": "medium"
+   },
+   {
+    "claim": "National AI policy: the National AI Strategy (Stranas KA 2020-2045) was launched by BPPT, now part of BRIN, in August 2020. A Presidential Regulation (Perpres) on a National AI Roadmap and AI Ethics was drafted by Komdigi and repeatedly delayed. As of July 2026 reports it was still in process and had not been confirmed as signed. There is no binding AI-specific law yet, only a circular letter.",
+    "year": "2020; status 2026",
+    "source_name": "OECD.AI; Bisnis.com (Jul 2026); JDIH Komdigi draft",
+    "source_url": "https://teknologi.bisnis.com/read/20260716/84/1988624/peta-jalan-dan-etika-ai-nasional-masih-diproses-menuju-perpres",
+    "confidence": "medium"
+   },
+   {
+    "claim": "R&D super deduction: up to 300% of eligible R&D costs incurred in Indonesia, made up of the normal 100% plus up to 200% extra. Vocational training qualifies for up to 200%. Uptake has been low, according to the Investment Minister.",
+    "value": "300% R&D; 200% vocational",
+    "year": "PP 45/2019; PMK 153/2020; PMK 128/2019",
+    "source_name": "DDTC News; EY Indonesia (secondary summaries of PMK)",
+    "source_url": "https://news.ddtc.co.id/berita/nasional/1802978/djp-ajak-wp-manfaatkan-supertax-deduction-litbang-dan-vokasi",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Pioneer-industry tax holiday (PMK 130/2020 as amended by PMK 69/2024) was extended only to 31 Dec 2025. It needs at least Rp100 billion of new investment, with a 100% corporate income tax cut for Rp500 billion or more. The 15% global minimum tax now applies. The list includes main components for electronics and telematics equipment, but there is no explicit 'robotics' category. Whether it was extended past 2025 is unverified.",
+    "value": "Min Rp100bn; 100% CIT relief at >=Rp500bn",
+    "year": "2024",
+    "source_name": "Pajakku; Bisnis.com; DPR Puslit brief",
+    "source_url": "https://ekonomi.bisnis.com/read/20241103/259/1812821/pemerintah-perpanjang-tax-holiday-tak-berlaku-untuk-perusahaan-asing",
+    "confidence": "low"
+   },
+   {
+    "claim": "Special economic zone (KEK) incentive package, as listed on the official KEK site: tax holiday on main KEK activities; tax allowance for other activities; VAT/luxury tax not collected on certain goods; import duty exemption for zone development; import income tax (PPh 22) not collected on capital goods; 0% inland FTA duty for products with at least 40% TKDN; possible relaxation of import/export restrictions (lartas); foreign-worker plans (RPTKA) valid up to 5 years; KEK visit visa of 30 days extendable 5 times; and automatic spatial approval (PKKPR) via OSS.",
+    "year": "2024-2025 (site data)",
+    "source_name": "Dewan Nasional KEK, kek.go.id Fasilitas dan Kemudahan",
+    "source_url": "https://kek.go.id/id/investment/incentive",
+    "confidence": "high"
+   },
+   {
+    "claim": "KEK totals: cumulative realised investment of Rp294.4 trillion, with Rp40.48 trillion added in H1 2025. There are 187,376 workers and 442 businesses across the zones. KEKs are governed by UU 39/2009 and PP 40/2021.",
+    "value": "Rp294.4tn; 442 businesses",
+    "year": "H1 2025",
+    "source_name": "Kemenko Perekonomian press release, 10 Sep 2025",
+    "source_url": "https://ekon.go.id/publikasi/detail/6554/menjadi-salah-satu-pusat-pertumbuhan-ekonomi-pengembangan-kek-terus-ditingkatkan-agar-berkelanjutan-dan-miliki-daya-saing-global",
+    "confidence": "high"
+   }
+  ],
+  "regions": [
+   {
+    "region": "Sumatra (incl. Riau Islands / Batam)",
+    "robotics_relevance": "Batam is the most natural landing pad for foreign hardware firms. It combines a free-trade zone (FTZ) with zones for a digital park, aero MRO and electronics, and sits next to Singapore. North Sumatra and Aceh suit field tests of agri-processing and heavy-industry robots and sensors in palm oil, rubber and petrochemicals.",
+    "facts": [
+     {
+      "claim": "KEK Nongsa (Batam) is a service-type zone focused on digital technology and creative industries. It was set up under PP 68/2021, covers 166.45 ha and is developed by PT Taman Resor Internet.",
+      "value": "166.45 ha",
+      "year": "2021",
+      "source_name": "kek.go.id KEK Nongsa profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-nongsa",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Nongsa attracted about Rp5.8 trillion from global data-centre companies. A 2024 expansion of Nongsa was approved by the National KEK Council.",
+      "value": "Rp5.8tn",
+      "year": "2025",
+      "source_name": "Kemenko Perekonomian press release",
+      "source_url": "https://ekon.go.id/publikasi/detail/6554/menjadi-salah-satu-pusat-pertumbuhan-ekonomi-pengembangan-kek-terus-ditingkatkan-agar-berkelanjutan-dan-miliki-daya-saing-global",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Batam Aero Technic is an aircraft MRO zone of 30 ha under PP 67/2021, developed by PT Batam Teknik.",
+      "value": "30 ha",
+      "year": "2021",
+      "source_name": "kek.go.id KEK Batam Aero Technic profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-batam-aero-technic",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Tanjung Sauh (Batam-Bintan link) was approved in Nov 2023 and designated by PP 24/2024. Its business plan covers electronic components, assembly, heavy industry and power, including solar. The committed investment is Rp199.6 trillion, with operations targeted for 2027.",
+      "value": "Rp199.6tn committed",
+      "year": "2023-2024",
+      "source_name": "Kemenko Perekonomian press release 30 Nov 2023",
+      "source_url": "https://ekon.go.id/publikasi/detail/5519/dorong-pertumbuhan-ekonomi-inklusif-dewan-nasional-kek-setujui-pembentukan-tiga-kek-baru",
+      "confidence": "high"
+     },
+     {
+      "claim": "Batam, Bintan and Karimun are free trade and free port zones (KPBPB/FTZ), separate from the customs area. Import duty, import VAT, luxury tax and PPh 22 are not charged on qualifying goods. VAT relief on goods shipped in from mainland Indonesia needs paperwork filed through SINSW.",
+      "year": "2019-2022 (secondary)",
+      "source_name": "Republika; aguspajak.com (secondary)",
+      "source_url": "https://ekonomi.republika.co.id/berita/ppe15i383/kek-batam-tawarkan-banyak-insentif-dibandingkan-ftz",
+      "confidence": "medium"
+     },
+     {
+      "claim": "KEK Sei Mangkei (Simalungun, North Sumatra) is a palm-oil and rubber processing zone of 2,002.7 ha under PP 29/2012, developed by PTPN III. It reported Rp6.5 trillion of investment and Rp2.7 trillion of exports in 2024.",
+      "value": "2,002.7 ha; Rp6.5tn investment",
+      "year": "2012 / 2024",
+      "source_name": "kek.go.id profile; Kemenko Perekonomian",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-sei-mangkei",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Arun Lhokseumawe (Aceh) is a manufacturing zone under PP 5/2017, developed by PT Patriot Nusantara Aceh. Its focus is energy, petrochemicals, palm oil and logistics.",
+      "year": "2017",
+      "source_name": "kek.go.id profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-arun-lhokseumawe",
+      "confidence": "high"
+     }
+    ]
+   },
+   {
+    "region": "Java",
+    "robotics_relevance": "Java is the core market for factory automation, AMRs and industrial AI. It has Indonesia's densest manufacturing base, with the electronics, automotive and food-and-beverage clusters prioritised under Making Indonesia 4.0. KEK Kendal and Gresik list electronics outright, and Singhasari is the digital/education zone.",
+    "facts": [
+     {
+      "claim": "KEK Kendal (Central Java), under PP 85/2019 and developed by PT Kawasan Industri Kendal, lists electronics, automotive, food and beverage, and textile/apparel industries. It has its own Kendal port.",
+      "value": "~1,000 ha",
+      "year": "2019",
+      "source_name": "kek.go.id KEK Kendal profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-kendal",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Kendal opened a battery-anode plant with 80,000 tonnes a year of capacity, which the government says can supply about 1.5 million EVs.",
+      "value": "80,000 t/yr",
+      "year": "2025",
+      "source_name": "Kemenko Perekonomian press release",
+      "source_url": "https://ekon.go.id/publikasi/detail/6554/menjadi-salah-satu-pusat-pertumbuhan-ekonomi-pengembangan-kek-terus-ditingkatkan-agar-berkelanjutan-dan-miliki-daya-saing-global",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Gresik (JIIPE, East Java), under PP 71/2021, covers 2,167 ha and is developed by PT Berkah Kawasan Manyar Sejahtera. It lists electronics, basic metals, petrochemicals, digital technology and energy. The Freeport smelter, described as the world's largest single-line copper smelter, is located there.",
+      "value": "2,167 ha",
+      "year": "2021 / 2025",
+      "source_name": "kek.go.id KEK Gresik profile; Kemenko Perekonomian",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-gresik",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Singhasari (Malang, East Java) is a service-type zone of 120.3 ha under PP 68/2019, focused on digital technology and tourism. King's College London started teaching there, and Queen Mary University of London plans to open in Sept 2026.",
+      "value": "120.3 ha",
+      "year": "2019 / 2025",
+      "source_name": "kek.go.id profile; Kemenko Perekonomian",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-singhasari",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Industropolis Batang (Central Java) was designated by PP 12/2025, converting the Batang integrated industrial estate. It covers about 2,887 ha under a China-Indonesia twin-parks scheme, with a planned USD 3.6 billion of investment.",
+      "value": "USD 3.6bn planned",
+      "year": "2025",
+      "source_name": "kek.go.id JDIH (PP 12/2025); Kemenko Perekonomian",
+      "source_url": "https://kek.go.id/id/service/jdih/peraturan-pemerintah-pp-nomor-12-tahun-2025",
+      "confidence": "high"
+     },
+     {
+      "claim": "Banten hosts KEK Tanjung Lesung (tourism) and a newer education, technology and international health KEK. West Java hosts KEK Lido (tourism and creative). These come from a secondary list, so official confirmation is needed for the Banten health/education zone.",
+      "year": "2024-2026",
+      "source_name": "Katadata (secondary) and kek.go.id press 'Resmi Tetapkan Dua KEK Baru'",
+      "source_url": "https://kek.go.id/id/media/press/resmi-tetapkan-dua-kek-baru-dorong-penguatan-sektor-kesehatan-dan-pendidikan-di-indonesia",
+      "confidence": "medium"
+     }
+    ]
+   },
+   {
+    "region": "Kalimantan",
+    "robotics_relevance": "Kalimantan suits tests of mining, plantation and forestry autonomy and remote sensing. The new capital IKN has its own incentive regime and has already hosted autonomous-mobility proofs of concept, making it a showcase site for smart-city robotics.",
+    "facts": [
+     {
+      "claim": "IKN has a dedicated investment regime under PP 12/2023, covering licensing, ease of business and investment facilities. Implementing tax rules were issued in 2024 (PMK 28/2024, reported).",
+      "year": "2023-2024",
+      "source_name": "peraturan.go.id (title verified); Bisnis.com",
+      "source_url": "https://peraturan.go.id/id/pp-no-12-tahun-2023",
+      "confidence": "high"
+     },
+     {
+      "claim": "The IKN tax holiday is reported as 100% corporate income tax relief for up to 25 years for investment made in 2023-2030, with a minimum of Rp10 billion in qualifying sectors. A super deduction of up to 350% for R&D in IKN has also been reported. Sources conflict on the details, with one figure of 30 years.",
+      "value": "Up to 25 yrs (2023-2030 investments)",
+      "year": "2023",
+      "source_name": "DDTC News / Fortune IDN (secondary)",
+      "source_url": "https://news.ddtc.co.id/berita/nasional/46281/wah-tax-holiday-pp-122023-tidak-hanya-diberikan-di-ikn",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Otorita IKN ran smart-transport proofs of concept in 2024, including an autonomous rail tram (Inpres 2/2024) and urban air mobility trials. The Ministry of Transport later said the autonomous tram 'did not function well' after about two months of trials.",
+      "year": "2024",
+      "source_name": "ikn.go.id press release; Bisnis.com; Investortrust",
+      "source_url": "https://ikn.go.id/storage/press-release/2024/20240208.siaran-pers-urban-air-mobility-ikn-akan-diuji-coba-di-bandara-kalimantan-timur.pdf",
+      "confidence": "medium"
+     },
+     {
+      "claim": "KEK Setangga (Tanah Bumbu, South Kalimantan) was approved by the National KEK Council in Nov 2023. It covers 668.3 ha and targets refinery and biodiesel, rubber, nickel smelting, iron and plywood, with a Rp67.69 trillion investment target to 2053.",
+      "value": "668.3 ha; Rp67.69tn target",
+      "year": "2023",
+      "source_name": "Kemenko Perekonomian press release",
+      "source_url": "https://ekon.go.id/publikasi/detail/5519/dorong-pertumbuhan-ekonomi-inklusif-dewan-nasional-kek-setujui-pembentukan-tiga-kek-baru",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Maloy Batuta Trans Kalimantan (MBTK, East Kutai) focuses on palm oil, energy and logistics. In 2023 the council listed it among six stalled zones at risk of revocation.",
+      "year": "2023",
+      "source_name": "Bisnis.com quoting National KEK Council",
+      "source_url": "https://ekonomi.bisnis.com/read/20230412/9/1646079/mandek-6-proyek-kek-terancam-dicabut-statusnya",
+      "confidence": "medium"
+     }
+    ]
+   },
+   {
+    "region": "Sulawesi",
+    "robotics_relevance": "Sulawesi suits tests of nickel and metal-processing automation and inspection robotics (Palu), and of fisheries and coconut processing automation (Bitung). Several of its KEKs have had weak take-up, so for a foreign company the pitch is field testing rather than ready-made industrial parks.",
+    "facts": [
+     {
+      "claim": "KEK Palu (Central Sulawesi) is a manufacturing zone of 1,500 ha under PP 31/2014, focused on basic metal processing and logistics.",
+      "value": "1,500 ha",
+      "year": "2014",
+      "source_name": "kek.go.id KEK Palu profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-palu",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Bitung (North Sulawesi) is a manufacturing zone of 534 ha under PP 32/2014, focused on fisheries, coconut processing and logistics.",
+      "value": "534 ha",
+      "year": "2014",
+      "source_name": "kek.go.id KEK Bitung profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-bitung",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Likupang (North Sulawesi) is a tourism zone of 197.4 ha under PP 84/2019.",
+      "value": "197.4 ha",
+      "year": "2019",
+      "source_name": "kek.go.id KEK Likupang profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-likupang",
+      "confidence": "high"
+     },
+     {
+      "claim": "In April 2023 the National KEK Council said Palu, Bitung and Likupang, along with MBTK, Morotai and Sorong, were not progressing and could lose KEK status. The final outcome was not confirmed, and all still have profiles on kek.go.id as of Oct 2026.",
+      "year": "2023",
+      "source_name": "Bisnis.com",
+      "source_url": "https://ekonomi.bisnis.com/read/20230412/9/1646079/mandek-6-proyek-kek-terancam-dicabut-statusnya",
+      "confidence": "medium"
+     }
+    ]
+   },
+   {
+    "region": "Bali & Nusa Tenggara",
+    "robotics_relevance": "These zones are for health-tech, hospitality and service robotics, not heavy industry. KEK Sanur is Indonesia's first health KEK and suits pilots of medical or hospital robots and AI. The tourism KEKs suit demos of service robots and drones.",
+    "facts": [
+     {
+      "claim": "KEK Sanur (Bali) is Indonesia's first health KEK. It was set up under PP 41/2022, covers 41.26 ha and is developed by PT Hotel Indonesia Natour.",
+      "value": "41.26 ha",
+      "year": "2022",
+      "source_name": "kek.go.id KEK Sanur profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-sanur",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Sanur has realised about Rp4.42 trillion of investment, including Bali International Hospital.",
+      "value": "Rp4.42tn",
+      "year": "2025",
+      "source_name": "Kemenko Perekonomian press release",
+      "source_url": "https://ekon.go.id/publikasi/detail/6554/menjadi-salah-satu-pusat-pertumbuhan-ekonomi-pengembangan-kek-terus-ditingkatkan-agar-berkelanjutan-dan-miliki-daya-saing-global",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Kura-Kura Bali (tourism and creative industries) was designated by PP 23/2023. The KEK site reports Indonesia-China industry and technology collaboration framed around it.",
+      "year": "2023",
+      "source_name": "peraturan.go.id; kek.go.id news",
+      "source_url": "https://peraturan.go.id/id/pp-no-23-tahun-2023",
+      "confidence": "high"
+     },
+     {
+      "claim": "KEK Mandalika (Central Lombok, NTB) is a tourism zone of 1,035.67 ha under PP 52/2014, developed by PT Pengembangan Pariwisata Indonesia (ITDC).",
+      "value": "1,035.67 ha",
+      "year": "2014",
+      "source_name": "kek.go.id KEK Mandalika profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-mandalika",
+      "confidence": "high"
+     }
+    ]
+   },
+   {
+    "region": "Maluku",
+    "robotics_relevance": "Maluku has little formal industrial infrastructure. Its value is remote-island field testing of connectivity gaps, power instability, marine conditions and off-grid IoT. Incentive zones are tourism-oriented and weak.",
+    "facts": [
+     {
+      "claim": "KEK Morotai (North Maluku) is a service/tourism zone of 1,101.76 ha under PP 50/2014, developed by Jababeka Group.",
+      "value": "1,101.76 ha",
+      "year": "2014",
+      "source_name": "kek.go.id KEK Morotai profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-morotai",
+      "confidence": "high"
+     },
+     {
+      "claim": "Morotai was among six KEKs flagged as stalled in 2023 and at risk of revocation. Part of the site was described as unsuitable for development. Its current status after 2023 is unconfirmed.",
+      "year": "2023",
+      "source_name": "Bisnis.com",
+      "source_url": "https://ekonomi.bisnis.com/read/20230412/9/1646079/mandek-6-proyek-kek-terancam-dicabut-statusnya",
+      "confidence": "medium"
+     }
+    ]
+   },
+   {
+    "region": "Papua",
+    "robotics_relevance": "Papua is for extreme-environment, remote-ops and resource-sector testing: nickel, palm oil, sago and forestry. Its only KEK is Sorong, which has had weak take-up. Expect heavy reliance on local partners and logistics.",
+    "facts": [
+     {
+      "claim": "KEK Sorong (Southwest Papua) is a manufacturing zone of 523.7 ha under PP 31/2016, developed by PT Malamoi Olom Wobok. Its focus is nickel processing, palm-oil processing, forest and sago products, and logistics.",
+      "value": "523.7 ha",
+      "year": "2016",
+      "source_name": "kek.go.id KEK Sorong profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-sorong",
+      "confidence": "high"
+     },
+     {
+      "claim": "Sorong was among the six KEKs the council flagged in 2023 as not progressing.",
+      "year": "2023",
+      "source_name": "Bisnis.com",
+      "source_url": "https://ekonomi.bisnis.com/read/20230412/9/1646079/mandek-6-proyek-kek-terancam-dicabut-statusnya",
+      "confidence": "medium"
+     }
+    ]
+   },
+   {
+    "region": "Seas & coasts (maritime Indonesia)",
+    "robotics_relevance": "Maritime drones, autonomous surface/underwater vehicles and coastal sensors need radio certification like any other device. Foreign-led data collection in the field, such as ocean, ecological or other scientific survey data, may need a BRIN foreign research permit with an Indonesian partner, which is relevant when positioning 'real-world datasets'. Bitung (fisheries) and the Batam island zones (bunkering, logistics) are the coastal KEK anchors.",
+    "facts": [
+     {
+      "claim": "KEK Nipa (an outer island in Batam city) was approved by the National KEK Council in Nov 2023 for cargo trading, ship bunkering and ship-to-ship transshipment, with a Rp16.46 trillion investment target. Its final PP designation was not verified.",
+      "value": "Rp16.46tn target",
+      "year": "2023",
+      "source_name": "Kemenko Perekonomian press release",
+      "source_url": "https://ekon.go.id/publikasi/detail/5519/dorong-pertumbuhan-ekonomi-inklusif-dewan-nasional-kek-setujui-pembentukan-tiga-kek-baru",
+      "confidence": "medium"
+     },
+     {
+      "claim": "KEK Bitung's official activity list includes the fishery industry. It is the main fisheries-processing KEK.",
+      "year": "2014",
+      "source_name": "kek.go.id KEK Bitung profile",
+      "source_url": "https://kek.go.id/id/investment/distribution/kek-bitung",
+      "confidence": "high"
+     },
+     {
+      "claim": "Foreign institutions or individuals doing research in Indonesia need a research permit, now administered by BRIN with online ethics clearance. Applications require a cooperation letter from an Indonesian R&D institution or university. Whether this applies to commercial product field tests, as opposed to scientific research, is unclear.",
+      "year": "varies; BRIN era 2021+",
+      "source_name": "detikEdu (citing BRIN); Hukumonline (older rules)",
+      "source_url": "https://www.detik.com/edu/detikpedia/d-5560773/peneliti-amerika-serikat-paling-banyak-ajukan-izin-riset-di-indonesia",
+      "confidence": "low"
+     }
+    ]
+   }
+  ],
+  "caveats": [
+   "The Riau Islands (Batam, Bintan) are counted under Sumatra here. On the map they could also be shown as their own hotspot because they matter so much for foreign hardware firms.",
+   "Most regulatory details come from official titles and abstracts on peraturan.go.id or JDIH, plus secondary legal and press summaries. Full regulation texts were not read article by article. Exact thresholds should be checked by an Indonesian counsel before going on the site as hard claims.",
+   "PT PMA capital: sources disagree on whether the Rp10bn minimum investment still applies alongside the new Rp2.5bn paid-up capital rule (BKPM/Investment Ministry regulation 5/2025).",
+   "The 4G/5G TKDN rule (Permenkominfo 13/2021): peraturan.go.id shows it as in force, but one JDIH listing marks it 'Tidak Berlaku'. It may have been superseded, so the status needs checking.",
+   "Pioneer tax holiday (PMK 69/2024) ran to 31 Dec 2025. No extension beyond that was found, and one report says it excludes foreign companies. Do not advertise it without checking.",
+   "The national AI Perpres (roadmap plus ethics) is not confirmed as signed as of Oct 2026. Describe AI policy as 'Stranas KA 2020-2045 plus a pending AI roadmap/ethics regulation'.",
+   "Sources disagree on the KEK count (from 20 up to 24 or 25 designated, with more proposed). Six eastern and outer zones (Palu, Bitung, Likupang, MBTK, Morotai, Sorong) were flagged as stalled in 2023. They still have kek.go.id profiles, but whether they are actually operating is uncertain.",
+   "The SNI-mandatory scope depends on the HS code. No blanket mandatory SNI for robots was found, so check each product.",
+   "Several official sites (kek.go.id, ekon.go.id) failed TLS checks or rendered client-side. Their data was read from the raw page payloads fetched directly from those domains.",
+   "Whether BRIN's foreign research permit applies to commercial robot field tests is unclear (low confidence). Phrase it as 'may apply' on the site."
+  ]
+ },
+ {
+  "regions": [
+   {
+    "region": "Sumatra",
+    "facts": [
+     {
+      "claim": "A transmission fault on 4 June 2024 (275 kV Lubuklinggau–Lahat line; lightning and a felled tree were the suspected causes) blacked out much of the Sumatra interconnected grid. South Sumatra, Jambi, Bengkulu, Lampung and Bangka Belitung were hit, and West Sumatra and Riau were affected too. Restoration took until early on 5 June in some areas.",
+      "value": "Reported affected customers range from 2.1 million to 4.3 million depending on the source",
+      "year": "2024",
+      "source_name": "Detik Sumbagsel / Fortune IDN / ITERA, citing PLN; ESDM ordered an investigation",
+      "source_url": "https://www.detik.com/sumbagsel/berita/d-7412442/penyebab-blackout-sumatera-4-juni-2024-diselidiki-pihak-eksternal-pln",
+      "confidence": "medium"
+     },
+     {
+      "claim": "North Sumatra is one of the provinces with the most disaster events in 2024. Floods were the most common hazard nationally.",
+      "value": "Top provinces: Sumut, Jateng, Jatim, Jabar, Sulsel, Kalbar",
+      "year": "2024",
+      "source_name": "BNPB Kaleidoskop Bencana 2024 (Abdul Muhari), reported by Investortrust",
+      "source_url": "https://investortrust.id/national/52352/bnpb-jumlah-bencana-di-indonesia-tahun-2024-sebanyak-2107-kali",
+      "confidence": "high"
+     },
+     {
+      "claim": "Internet penetration in Sumatra (APJII 2026 survey). Sumatra accounts for about 21% of all Indonesian users.",
+      "value": "78.24% (contribution 20.74%)",
+      "year": "2026",
+      "source_name": "APJII Profil Internet Indonesia 2026, via Selular.id",
+      "source_url": "https://selular.id/2026/06/penggunan-internet-indonesia-tahun-2026-capai-235-juta-jiwa/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Internet access varies widely within Sumatra. Kepulauan Riau (Batam) had the highest share of people using the internet of any province, while Aceh was among the 10 lowest in 2025.",
+      "value": "Kepri 89.26% (2024); Riau 77.68% (2024); Aceh 70.03% (2025)",
+      "year": "2024-2025",
+      "source_name": "BPS Statistik Telekomunikasi Indonesia 2024/2025, via GoodStats",
+      "source_url": "https://goodstats.id/article/bukan-di-jawa-ini-provinsi-dengan-penetrasi-internet-tertinggi-2024-rHrXY",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Forest and land fires (peat haze) are a recurring dry-season hazard in Riau, Jambi and South Sumatra.",
+      "value": "Burned-area indications to 14 Sep 2026: Riau 19,800 ha; Sumsel 1,926 ha; Jambi 1,879 ha",
+      "year": "2026",
+      "source_name": "BNPB using SiPongi data, via Databoks/Katadata",
+      "source_url": "https://databoks.katadata.co.id/datapublish/2026/09/14/indikasi-lahan-terbakar-di-6-provinsi-prioritas-penanganan-karhutla-14-september-2026",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Sumatra lies on Indonesia's volcanic arc, together with Java, Bali, Nusa Tenggara, Maluku and North Sulawesi.",
+      "value": "127 active volcanoes nationwide",
+      "year": "2024-2025",
+      "source_name": "Badan Geologi / PVMBG, Kementerian ESDM",
+      "source_url": "https://esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-terus-tingkatkan-upaya-mitigasi-bencana-gunung-api-di-indonesia-",
+      "confidence": "high"
+     },
+     {
+      "claim": "One of the SATRIA-1 satellite ground gateways is in Batam.",
+      "value": "11 gateways nationwide, including Batam",
+      "year": "2023-2025",
+      "source_name": "BAKTI/Komdigi, via Antara and Detik",
+      "source_url": "https://bengkulu.antaranews.com/berita/325176/presiden-akan-resmikan-bts-4g-dan-stasiun-bumi-satria-1",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "The 2024 blackout shows that even an interconnected grid can fail across several provinces for half a day or more. Sites here can test UPS and battery ride-through, graceful shutdown and restart, and data buffering during a regional outage. Peat-fire haze and smoke (Riau, Jambi, South Sumatra) suit tests of optical, LiDAR and air-quality sensors, and of drones flying in low visibility. Frequent floods (North Sumatra) suit tests of ingress protection (IP rating) and flood-monitoring IoT. The well-connected Batam and Riau cluster against weaker coverage in rural Aceh lets a company test the same device in strong-network and weak-network conditions on one island."
+   },
+   {
+    "region": "Java",
+    "facts": [
+     {
+      "claim": "Java has the highest regional internet penetration and accounts for most Indonesian internet users.",
+      "value": "85.95% penetration; 58.24% of national users",
+      "year": "2026",
+      "source_name": "APJII Profil Internet Indonesia 2026, via Selular.id",
+      "source_url": "https://selular.id/2026/06/penggunan-internet-indonesia-tahun-2026-capai-235-juta-jiwa/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "DKI Jakarta and DI Yogyakarta are among the provinces with the highest share of people using the internet.",
+      "value": "DKI 87.84%; DIY 80.10%; Jabar 76.62%",
+      "year": "2024",
+      "source_name": "BPS Statistik Telekomunikasi Indonesia 2024, via GoodStats",
+      "source_url": "https://goodstats.id/article/bukan-di-jawa-ini-provinsi-dengan-penetrasi-internet-tertinggi-2024-rHrXY",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Central, East and West Java are among the six provinces with the most disaster events in 2024. Floods dominate nationally: 1,088 of 2,107 events.",
+      "value": "Jabar had 59 events in January 2024 alone",
+      "year": "2024",
+      "source_name": "BNPB Kaleidoskop 2024 and BNPB Info Bencana Januari 2024",
+      "source_url": "https://bnpb.go.id/storage/app/media/Buletin Info Bencana/Buletin Info Bencana Januari 2024.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "In mid-December 2025, Merapi (DIY/Central Java) and Semeru (East Java) were two of three volcanoes at Level III (Siaga). About 15 million people live near volcanoes at alert levels.",
+      "value": "2 of the 3 Level III volcanoes are in Java",
+      "year": "2025",
+      "source_name": "Badan Geologi (ESDM), via CNN Indonesia / Antara",
+      "source_url": "https://www.cnnindonesia.com/nasional/20251220091715-20-1308907/badan-geologi-127-gunung-berapi-di-indonesia-berstatus-aktif",
+      "confidence": "medium"
+     },
+     {
+      "claim": "BMKG recorded 1,321 earthquakes in West Java and its surroundings during 2024.",
+      "value": "1,321",
+      "year": "2024",
+      "source_name": "BMKG, via Antara Jabar",
+      "source_url": "https://jabar.antaranews.com/berita/570022/bmkg-catat-jabar-diguncang-1321-kali-gempa-sepanjang-tahun-2024",
+      "confidence": "medium"
+     },
+     {
+      "claim": "On 4 August 2019 the Java–Bali grid had a major blackout across Jabodetabek and parts of West and Central Java lasting more than 8 hours. The Ombudsman found maladministration by PLN, including poor vegetation management on transmission corridors.",
+      "value": ">8 hours",
+      "year": "2019",
+      "source_name": "Ombudsman RI; CNBC Indonesia",
+      "source_url": "https://ombudsman.go.id/news/download/maladministrasi-pada-peristiwa-blackout-4-agustus-2019",
+      "confidence": "high"
+     },
+     {
+      "claim": "The main SATRIA-1 gateway is in Cikarang (West Java).",
+      "value": "Cikarang gateway",
+      "year": "2023",
+      "source_name": "BAKTI/Komdigi, via Antara",
+      "source_url": "https://bengkulu.antaranews.com/berita/325176/presiden-akan-resmikan-bts-4g-dan-stasiun-bumi-satria-1",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Java is the control environment: dense 4G, the most users and the strongest grid. It suits baseline and benchmark testing, urban and industrial deployments, and cloud-connected fleet robots. It is still not risk-free. Monsoon floods, volcanic ash near Merapi and Semeru, and frequent shallow earthquakes allow tests of ash ingress, flood tolerance and vibration robustness close to logistics hubs. The 2019 blackout is a reminder that grid-backup testing matters even in Java."
+   },
+   {
+    "region": "Kalimantan",
+    "facts": [
+     {
+      "claim": "Kalimantan does not have one unified grid. West Kalimantan runs on the separate 'Sistem Khatulistiwa', which PLN is still working to connect to the interconnected East, South and Central Kalimantan system.",
+      "value": "Kalimantan-wide: 3,334 MW dependable capacity, 2,412 MW peak, about 38% reserve. Kalbar: 591.9 MW capacity vs 481.7 MW peak",
+      "year": "2025 (March)",
+      "source_name": "Kementerian ESDM press release (Wamen ESDM visit to UP2B Pontianak)",
+      "source_url": "https://esdm.go.id/id/media-center/arsip-berita/percepat-keandalan-jelang-lebaran-wamen-esdm-dorong-interkoneksi-listrik-kalimantan",
+      "confidence": "high"
+     },
+     {
+      "claim": "The East and South Kalimantan grids (Mahakam and Barito systems) were linked by a 150 kV line in 2018.",
+      "value": "150 kV interconnection",
+      "year": "2018",
+      "source_name": "Kementerian ESDM",
+      "source_url": "https://esdm.go.id/id/media-center/arsip-berita/terinterkoneksi-listrik-kaltim-dan-kalsel-semakin-andal-",
+      "confidence": "high"
+     },
+     {
+      "claim": "Forest and land fires are concentrated in Kalimantan. West Kalimantan had the largest burned area of any province in the 2026 season to mid-September.",
+      "value": "Kalbar 38,311 ha; Kalteng 15,830 ha; Kalsel 8,020 ha (indications to 14 Sep 2026)",
+      "year": "2026",
+      "source_name": "BNPB using SiPongi (Kemenhut) data, via Databoks",
+      "source_url": "https://databoks.katadata.co.id/datapublish/2026/09/14/indikasi-lahan-terbakar-di-6-provinsi-prioritas-penanganan-karhutla-14-september-2026",
+      "confidence": "medium"
+     },
+     {
+      "claim": "West Kalimantan is among the six provinces with the most disaster events in 2024.",
+      "value": "Top-6 province",
+      "year": "2024",
+      "source_name": "BNPB Kaleidoskop 2024, via Investortrust",
+      "source_url": "https://investortrust.id/national/52352/bnpb-jumlah-bencana-di-indonesia-tahun-2024-sebanyak-2107-kali",
+      "confidence": "high"
+     },
+     {
+      "claim": "Internet penetration in Kalimantan is the second-highest of any region.",
+      "value": "80.40%",
+      "year": "2026",
+      "source_name": "APJII 2026, via Selular.id",
+      "source_url": "https://selular.id/2026/06/penggunan-internet-indonesia-tahun-2026-capai-235-juta-jiwa/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Kalimantan is not on Badan Geologi's list of islands in the active volcanic arc, so volcanic hazard is minimal compared with other regions.",
+      "value": "No active-arc volcanoes listed",
+      "year": "2024",
+      "source_name": "Badan Geologi / Kementerian ESDM",
+      "source_url": "https://esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-terus-tingkatkan-upaya-mitigasi-bencana-gunung-api-di-indonesia-",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Kalimantan has fewer volcanic and seismic hazards. Its challenges are fragmented grids, long distances, haze and peat fires, and river logistics. It suits plantation, mining and forestry robots, fire-detection IoT and drone patrols, smoke and particulate tolerance tests for sensors, and checks of whether solar and battery hybrid power keeps working through haze."
+   },
+   {
+    "region": "Sulawesi",
+    "facts": [
+     {
+      "claim": "Sulawesi has among the lowest regional internet penetration, just above Maluku–Papua.",
+      "value": "72.58% (APJII 2026); 68.35% in the 2024 survey",
+      "year": "2026",
+      "source_name": "APJII Profil Internet Indonesia 2026, via Selular.id",
+      "source_url": "https://selular.id/2026/06/penggunan-internet-indonesia-tahun-2026-capai-235-juta-jiwa/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "South Sulawesi is among the six provinces with the most disaster events in 2024. It ranked third nationally in December 2024 with 23 events.",
+      "value": "Top-6 in 2024",
+      "year": "2024",
+      "source_name": "BNPB Kaleidoskop 2024; BNPB Info Bencana Desember 2024",
+      "source_url": "https://bnpb.go.id/storage/app/media/Buletin Info Bencana/Info Bencana Desember 2024.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "BMKG recorded an M6.7 shallow earthquake near Palu (Central Sulawesi) on 16 June 2026, caused by active fault movement. It did not have tsunami potential. Central Sulawesi seismicity clusters around the Palu–Koro and Matano faults.",
+      "value": "M6.7",
+      "year": "2026",
+      "source_name": "BMKG event report",
+      "source_url": "https://content.bmkg.go.id/wp-content/uploads/Gempabumi-Palu-6.7-16-Juni-2026.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Captive coal power for industrial parks, mostly nickel processing, has grown fastest in the Central Sulawesi (Morowali) and North Maluku hubs. Industrial power there sits largely outside the PLN grid.",
+      "value": "19.3 GW national captive coal operating in 2025",
+      "year": "2025",
+      "source_name": "CREA / Global Energy Monitor (secondary, non-government), via Investortrust",
+      "source_url": "https://investortrust.id/business/92597/pltu-captive-kian-membengkak-capai-19-3-gw-per-2025",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Makassar New Port container terminal was inaugurated in February 2024. It is the largest container port in eastern Indonesia.",
+      "value": "2.5 million TEUs/year capacity; TPK Makassar handled 743,321 TEUs in 2024",
+      "year": "2024",
+      "source_name": "Pelindo / Kemenhub reporting via GNFI and IDX Channel",
+      "source_url": "https://www.goodnewsfromindonesia.id/2024/02/22/makassar-new-port-pelabuhan-terbesar-di-indonesia-timur-senilai-rp5-4-triliun",
+      "confidence": "medium"
+     },
+     {
+      "claim": "A SATRIA-1 ground gateway is located in Desa Matungkas, North Minahasa (North Sulawesi). The Energy Minister set a December 2026 deadline to finish village electrification in North Sulawesi.",
+      "value": "Gateway in Minahasa Utara",
+      "year": "2023-2025",
+      "source_name": "Antara; CNBC Indonesia (Minister Bahlil)",
+      "source_url": "https://www.cnbcindonesia.com/news/20251028151851-4-679958/5700-desa-belum-teraliri-listrik-bahlil-2029-insya-allah-seluruh-ri",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Sulawesi combines heavy industry (nickel smelters on captive power), high seismicity (Palu–Koro) and patchy connectivity. It suits industrial and mining robots, structural-health and vibration IoT, earthquake early-warning sensors, and port automation tests at Makassar. Rural coverage is weaker than in Java, so connected robots need offline-first or edge autonomy."
+   },
+   {
+    "region": "Bali & Nusa Tenggara",
+    "facts": [
+     {
+      "claim": "On 2 May 2025, Bali lost power island-wide after supply from the Java–Bali subsea cable link fell to zero. The exact cause was disputed (subsea cable, a 150 kV fault in East Java, or local plant trips), and ESDM opened an investigation.",
+      "value": "Island-wide blackout",
+      "year": "2025",
+      "source_name": "PLN statements and ESDM (Dirjen Gatrik Jisman Hutajulu), via Metro TV / Listrik Indonesia",
+      "source_url": "https://www.metrotvnews.com/read/b1oCVVML-blackout-bali-2-mei-sklt-diduga-jadi-biang-esdm-lakukan-investigasi",
+      "confidence": "medium"
+     },
+     {
+      "claim": "East Nusa Tenggara (NTT) electrification ratio (households with PLN or non-PLN electricity) is still below the national ~99.8%.",
+      "value": "96.35% (Q4 2024), up from 95.33% (2023) and 92.72% (2022)",
+      "year": "2024",
+      "source_name": "Dinas ESDM Provinsi NTT, SASANDO provincial data portal (nttprov.go.id)",
+      "source_url": "https://sasando.nttprov.go.id/dataset-sektoral/cf3f8495-a465-40d6-9245-a28f5bed71c4/v1/download/pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "NTT is one of the provinces with the lowest share of people using the internet.",
+      "value": "62.91% (2025); 54.84% (2024). National averages 77.63% and 72.78%",
+      "year": "2025",
+      "source_name": "BPS Statistik Telekomunikasi Indonesia 2025, via GoodStats",
+      "source_url": "https://data.goodstats.id/statistic/10-provinsi-dengan-akses-internet-terendah-pada-2025-60JTn",
+      "confidence": "medium"
+     },
+     {
+      "claim": "In mid-December 2025, Lewotobi Laki-laki (Flores, NTT) was one of three volcanoes at Level III (Siaga).",
+      "value": "Level III",
+      "year": "2025",
+      "source_name": "Badan Geologi (ESDM), via CNN Indonesia",
+      "source_url": "https://www.cnnindonesia.com/nasional/20251220091715-20-1308907/badan-geologi-127-gunung-berapi-di-indonesia-berstatus-aktif",
+      "confidence": "medium"
+     },
+     {
+      "claim": "BBMKG Denpasar recorded 582 earthquakes felt or located around Bali in 2024, up from 324 in 2023. The wider Region III recorded 7,728.",
+      "value": "582 (Bali); 7,728 (Region III)",
+      "year": "2024",
+      "source_name": "BMKG (BBMKG Wilayah III Denpasar), via Antara Bali",
+      "source_url": "https://bali.antaranews.com/berita/366558/bbmkg-catat-582-gempa-guncang-bali-selama-2024",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Internet penetration in Bali & Nusa Tenggara. Bali alone is among the top provinces at 77.56% (BPS 2024).",
+      "value": "78.14% (APJII 2026)",
+      "year": "2026",
+      "source_name": "APJII 2026, via Selular.id",
+      "source_url": "https://selular.id/2026/06/penggunan-internet-indonesia-tahun-2026-capai-235-juta-jiwa/",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "This region has a strong contrast within a short distance. Bali has good connectivity and tourism-grade infrastructure but depends on a Java subsea link (the 2025 blackout). NTT is dry, has weaker connectivity, and is still finishing electrification. Good tests here include solar-plus-battery autonomy, low-bandwidth and satellite (SATRIA-1) telemetry, agricultural and water IoT in semi-arid land, and volcanic-ash and seismic robustness near Lewotobi."
+   },
+   {
+    "region": "Maluku",
+    "facts": [
+     {
+      "claim": "Energy Minister Bahlil said 305 villages in Maluku received electricity only 6 hours a day and about 200+ villages only 12 hours, and asked PLN to upgrade them in stages.",
+      "value": "305 villages at 6 h/day; ~200+ at 12 h/day",
+      "year": "2024 (19 Dec)",
+      "source_name": "Menteri ESDM Bahlil Lahadalia, via Investortrust",
+      "source_url": "https://investortrust.id/business/50984/bahlil-jamin-keandalan-listrik-di-indonesia-timur-periode-nataru",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Ambon's power system is about 100 MW installed against a 60–70 MW peak. It relies heavily on a 60 MW barge-mounted plant running on diesel (HSD) or gas.",
+      "value": "~100 MW installed; 60 MW barge plant",
+      "year": "2024",
+      "source_name": "Kementerian ESDM statement, via Investortrust",
+      "source_url": "https://investortrust.id/business/50984/bahlil-jamin-keandalan-listrik-di-indonesia-timur-periode-nataru",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Maluku and North Maluku are among the 10 provinces with the lowest share of people using the internet.",
+      "value": "Maluku Utara 64.97%; Maluku 69.74% (2025). In 2024: 59.17% and 59.96%",
+      "year": "2025",
+      "source_name": "BPS Statistik Telekomunikasi Indonesia 2025, via GoodStats",
+      "source_url": "https://data.goodstats.id/statistic/10-provinsi-dengan-akses-internet-terendah-pada-2025-60JTn",
+      "confidence": "medium"
+     },
+     {
+      "claim": "PLN's de-dieselisation cluster for eastern Indonesia plans solar-plus-battery hybrids to replace diesel at 46 sites, 16 of them in Maluku.",
+      "value": "16 Maluku sites; cluster total ~102 MWp PV / ~252 MWh battery",
+      "year": "2023-2024",
+      "source_name": "PLN / Indika-EMITS consortium, via Kontan",
+      "source_url": "https://industri.kontan.co.id/news/indika-energy-indy-ikut-garap-program-dedieselisasi-pada-tahun-2024",
+      "confidence": "medium"
+     },
+     {
+      "claim": "The Banda Sea is a subduction and megathrust zone. A BMKG analysis of the northern Banda Sea gives reverse-slip rates of 2–16 mm/yr and a potential maximum magnitude of M7.4.",
+      "value": "Mmax ~7.4 (northern Banda Sea structure)",
+      "year": "n/a (BMKG technical article)",
+      "source_name": "BMKG technical article",
+      "source_url": "https://cdn.bmkg.go.id/Web/Artikel-analisa-tektonik-di-laut-banda-utara.pdf",
+      "confidence": "medium"
+     },
+     {
+      "claim": "North Maluku, alongside Central Sulawesi, is a hub of the fast-growing captive coal capacity serving nickel processing.",
+      "value": "Part of 19.3 GW national captive coal (2025)",
+      "year": "2025",
+      "source_name": "CREA / Global Energy Monitor (secondary)",
+      "source_url": "https://investortrust.id/business/92597/pltu-captive-kian-membengkak-capai-19-3-gw-per-2025",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Maluku is the strongest case for testing on intermittent power. Hundreds of villages still run on 6–12 hour diesel schedules, and many sites are reached only by sea. It suits solar, battery and diesel hybrid energy management, low-power and sleep-wake IoT, store-and-forward telemetry over satellite, and fisheries and maritime sensors. Industrial nickel parks in North Maluku add a contrasting heavy-industry environment."
+   },
+   {
+    "region": "Papua",
+    "facts": [
+     {
+      "claim": "At the end of 2023, all 140 villages officially without electricity were in Papua provinces: Papua Pegunungan 56, Papua Tengah 47, Papua Selatan 16, Papua Barat Daya 12, Papua 9.",
+      "value": "140 villages (national electrification ratio 99.78%)",
+      "year": "2023 (released 15 Jan 2024)",
+      "source_name": "Kementerian ESDM press release",
+      "source_url": "https://www.esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-tuntaskan-program-elektrifikasi-di-tahun-2024",
+      "confidence": "high"
+     },
+     {
+      "claim": "Only 22.42% of households in Papua Pegunungan and 45.22% in Papua Tengah use PLN electricity as their main lighting source. Papua Selatan is at 75.22%; Java and Bali are near-universal.",
+      "value": "Papua Pegunungan 22.42%; Papua Tengah 45.22%",
+      "year": "2026 (Susenas March 2026)",
+      "source_name": "BPS Statistik Perumahan 2026 (Susenas), via Katadata",
+      "source_url": "https://katadata.co.id/berita/daerah/6a7dce5cc0978/jomplang-akses-listrik-rumah-papua-pegunungan-22-jawa-bali-hampir-merata",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Papua Pegunungan has by far the lowest share of people using the internet of any province.",
+      "value": "15.40% (2025), up from 6.76% (2024). Papua Tengah 32.64%; Papua Selatan 50.02%",
+      "year": "2025",
+      "source_name": "BPS Statistik Telekomunikasi Indonesia 2024/2025, via GoodStats",
+      "source_url": "https://data.goodstats.id/statistic/10-provinsi-dengan-akses-internet-terendah-pada-2025-60JTn",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Island communities still depend on diesel generators with limited hours. In July 2025, residents of Pulau Owi (Biak Numfor) had 12 hours/day of electricity from a diesel plant (PLTD), and the minister asked PLN to move them to 24 hours.",
+      "value": "12 h/day",
+      "year": "2025",
+      "source_name": "Menteri ESDM Bahlil visit, via detikFinance",
+      "source_url": "https://finance.detik.com/energi/d-8028566/bahlil-minta-listrik-di-pelosok-papua-nyala-24-jam",
+      "confidence": "medium"
+     },
+     {
+      "claim": "SATRIA-1 gateways serving the east are located in Jayapura, Manokwari and Timika. Komdigi planned 118+ new BTS towers in Papua in 2025, targeting about 1,000 remote villages.",
+      "value": "3 Papua gateways; 118+ BTS planned",
+      "year": "2025",
+      "source_name": "BAKTI Komdigi (Fadhilah Mathar) via detikFinance; Menkomdigi via detikInet",
+      "source_url": "https://finance.detik.com/berita-ekonomi-bisnis/d-8252690/duh-komdigi-ungkap-2-121-desa-blankspot-belum-teraliri-internet",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Internet penetration for Maluku & Papua combined is the lowest of any region.",
+      "value": "69.74% (APJII 2026); 2.94% of national users",
+      "year": "2026",
+      "source_name": "APJII 2026, via Selular.id",
+      "source_url": "https://selular.id/2026/06/penggunan-internet-indonesia-tahun-2026-capai-235-juta-jiwa/",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Papua is the extreme frontier. Grid access is below 25% of households in the highlands, cellular coverage is sparse, logistics run by air, and terrain is mountainous. It is ideal for proving fully off-grid, satellite-linked and autonomous systems: solar microgrid robots, remote health and environmental sensors, drones for delivery and survey. A pitch for this region should stress hard-to-reach terrain (and, with care, community engagement), not convenience."
+   },
+   {
+    "region": "Seas & coasts (maritime Indonesia)",
+    "facts": [
+     {
+      "claim": "Indonesia has 17,380 named and coordinate-referenced islands, according to the national geospatial agency (BIG). BPS uses a different method and reports 17,001.",
+      "value": "17,380 (2024)",
+      "year": "2024",
+      "source_name": "Badan Informasi Geospasial (BIG)",
+      "source_url": "https://www.big.go.id/uploads/downloads/Dokumen/Rilis_Jumlah_Pulau.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "The government-subsidised 'Tol Laut' shipping program operated 39 routes with 37 vessels calling at 109 ports in 2024. The separate pioneer-ship (perintis) program ran 107 routes, 54 of them in eastern Indonesia.",
+      "value": "39 routes / 37 ships / 109 ports; perintis 107 routes",
+      "year": "2024",
+      "source_name": "Kemenhub (Dirjen Hubla), via Kontan and Bisnis",
+      "source_url": "https://nasional.kontan.co.id/news/tol-laut-melayani-39-trayek-pada-tahun-2024",
+      "confidence": "medium"
+     },
+     {
+      "claim": "PLN operates about 5,200 diesel generating units at roughly 2,100–2,130 locations, mostly isolated island systems. In 2022 they burned about 2.7 million kilolitres of fuel.",
+      "value": "~5,200 units; ~2,130 sites",
+      "year": "2022-2023",
+      "source_name": "PLN, via Antara / Kontan",
+      "source_url": "https://www.antaranews.com/berita/2777061/pln-dedieselisasi-akan-mereduksi-emisi-dan-meningkatkan-bauran-energi",
+      "confidence": "medium"
+     },
+     {
+      "claim": "BMKG recorded 29,869 earthquakes in Indonesia in 2024, 20 of them damaging, and says the long-term trend is rising.",
+      "value": "29,869 (20 damaging)",
+      "year": "2024",
+      "source_name": "BMKG (Head Dwikorita Karnawati), via IDX Channel / CNBC Indonesia",
+      "source_url": "https://www.idxchannel.com/news/indonesia-diguncang-hampir-30000-gempa-bumi-sepanjang-2024",
+      "confidence": "medium"
+     },
+     {
+      "claim": "BNPB recorded 14 tidal-wave and coastal-abrasion disaster events in 2024.",
+      "value": "14",
+      "year": "2024",
+      "source_name": "BNPB Kaleidoskop 2024",
+      "source_url": "https://investortrust.id/national/52352/bnpb-jumlah-bencana-di-indonesia-tahun-2024-sebanyak-2107-kali",
+      "confidence": "high"
+     }
+    ],
+    "robotics_relevance": "Most remote sites are islands reached by subsidised shipping and powered by diesel, so marine-grade enclosures, salt-fog corrosion, and logistics (spares, RMA, field service by boat) are part of any test. Maritime tests include USVs and AUVs, buoy and coastal sensors, port automation, and fisheries IoT. These need satellite backhaul because coastal cellular coverage falls off quickly offshore."
+   }
+  ],
+  "national_facts": [
+   {
+    "claim": "The national household electrification ratio was 99.78% in 2023 (village electrification 99.83%). 98.32% of households were on PLN and 1.46% on non-PLN sources.",
+    "value": "99.78%",
+    "year": "2023",
+    "source_name": "Kementerian ESDM",
+    "source_url": "https://www.esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-tuntaskan-program-elektrifikasi-di-tahun-2024",
+    "confidence": "high"
+   },
+   {
+    "claim": "ESDM's 2025–2029 rural electrification (Lisdes) program targets 5,758 villages not yet served by PLN, about 1.2 million households, with Rp64.09 trillion of funding needed. This contrasts with the 140 'unelectrified villages' reported for 2023, which suggests a change in definition.",
+    "value": "5,758 villages; ~1.2 million households",
+    "year": "2025",
+    "source_name": "Kementerian ESDM",
+    "source_url": "https://esdm.go.id/id/media-center/arsip-berita/peningkatan-akses-listrik-desa-jadi-prioritas-pemerintah-menjangkau-12-juta-rumah-tangga",
+    "confidence": "high"
+   },
+   {
+    "claim": "In October 2025 Minister Bahlil said the national electrification ratio was 99.12%, but below 90% in 3T (underdeveloped, frontier and outermost) areas.",
+    "value": "99.12%; <90% in 3T areas",
+    "year": "2025",
+    "source_name": "Menteri ESDM, via CNBC Indonesia",
+    "source_url": "https://www.cnbcindonesia.com/news/20251029160853-4-680400/sisa-5700-desa-rasio-elektrifikasi-listrik-ri-capai-9912",
+    "confidence": "medium"
+   },
+   {
+    "claim": "PLN's grid reliability: SAIFI (average number of interruptions per customer per year) fell from 4.27 in 2023 to 3.23 in 2024, and SAIDI (average outage duration) fell 5.29%. The last official ESDM SAIDI figures found were 12.72 h/customer/yr (2020) and 6.62 h for Q3 2021.",
+    "value": "SAIFI 3.23 (2024)",
+    "year": "2024",
+    "source_name": "PLN via CNBC Indonesia; ESDM for 2020/2021",
+    "source_url": "https://www.cnbcindonesia.com/news/20250215121149-4-610879/pln-catat-penurunan-durasi-dan-frekuensi-gangguan-di-2024",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Mobile signal by village/kelurahan: 22.55% very strong, 56.23% strong, 17.52% weak, 3.70% none. 5G/4G/LTE is the dominant network type at 90.21%.",
+    "value": "3.70% of villages have no signal",
+    "year": "2024",
+    "source_name": "BPS (Statistik Telekomunikasi / Podes), via GoodStats",
+    "source_url": "https://data.goodstats.id/statistic/simak-fasilitas-komunikasi-warga-desa-2024-qaueh",
+    "confidence": "medium"
+   },
+   {
+    "claim": "About 2,121 villages in 3T areas are still blankspots with 0% 4G cellular coverage. In July 2025 Menkomdigi had cited about 12,500 villages without adequate signal, using a different scope.",
+    "value": "2,121 villages",
+    "year": "2025 (Dec)",
+    "source_name": "BAKTI Komdigi Director Fadhilah Mathar, via detikFinance",
+    "source_url": "https://finance.detik.com/berita-ekonomi-bisnis/d-8252690/duh-komdigi-ungkap-2-121-desa-blankspot-belum-teraliri-internet",
+    "confidence": "medium"
+   },
+   {
+    "claim": "The SATRIA-1 high-throughput satellite (150 Gbps, 11 gateways, PPP of about Rp6.42T) connected 30,017 public service points (schools, clinics, offices) at up to 10 Mbps each as of 7 Dec 2025.",
+    "value": "30,017 points",
+    "year": "2025",
+    "source_name": "BAKTI Komdigi, via detikFinance",
+    "source_url": "https://finance.detik.com/berita-ekonomi-bisnis/d-8252690/duh-komdigi-ungkap-2-121-desa-blankspot-belum-teraliri-internet",
+    "confidence": "medium"
+   },
+   {
+    "claim": "BAKTI's 4G BTS program had 4,988 sites built in 3T areas by December 2023. 76% of phase-2 coverage is in Nusa Tenggara, Maluku and Papua.",
+    "value": "4,988 BTS (Dec 2023)",
+    "year": "2023",
+    "source_name": "Kominfo/BAKTI, via Tempo / Detik",
+    "source_url": "https://en.tempo.co/read/1814592/jokowi-inaugurates-4g-bts-installed-in-4990-sites-bumi-satria-1-station",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Internet penetration nationally is 81.72% by APJII's measure (235.26 million users). BPS's measure of people using the internet is lower: 72.78% (2024) and 77.63% (2025).",
+    "value": "APJII 81.72% (2026); BPS 77.63% (2025)",
+    "year": "2025-2026",
+    "source_name": "APJII 2026 via Selular.id; BPS via GoodStats",
+    "source_url": "https://selular.id/2026/06/penggunan-internet-indonesia-tahun-2026-capai-235-juta-jiwa/",
+    "confidence": "medium"
+   },
+   {
+    "claim": "BNPB recorded 2,107 disaster events in 2024: floods 1,088, extreme weather 455, forest/land fires 337, drought 54, earthquakes 19, tidal waves/abrasion 14, volcanic eruptions 5. The large drop from about 5,400 in 2023 reflects a new counting method.",
+    "value": "2,107",
+    "year": "2024",
+    "source_name": "BNPB Kaleidoskop Bencana 2024, via Investortrust / Metro TV",
+    "source_url": "https://investortrust.id/national/52352/bnpb-jumlah-bencana-di-indonesia-tahun-2024-sebanyak-2107-kali",
+    "confidence": "high"
+   },
+   {
+    "claim": "Indonesia has 127 active volcanoes (about 13% of the world's). Badan Geologi monitors 69 in real time from 74 observation posts.",
+    "value": "127",
+    "year": "2024-2025",
+    "source_name": "Badan Geologi / PVMBG (ESDM)",
+    "source_url": "https://esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-terus-tingkatkan-upaya-mitigasi-bencana-gunung-api-di-indonesia-",
+    "confidence": "high"
+   }
+  ],
+  "caveats": [
+   "Electrification figures conflict, partly because definitions differ. ESDM reported 140 unelectrified villages (2023, all in Papua). The 2025 Lisdes program targets 5,758 villages and 1.2 million households, and the minister cited 99.12% in October 2025 against 99.83% (PLN) for end-2024. A village can count as 'electrified' while running only 6–12 h/day on diesel. Do not put one headline number on the hero without a footnote.",
+   "I could not find an official PLN or ESDM SAIDI/SAIFI breakdown by region. Only PLN's national SAIFI for 2024 and older ESDM national values (2020–2021) were found. University studies of individual PLN units exist but are not representative.",
+   "Per-province electrification ratios for 2024 were found only for NTT (provincial ESDM portal). Older Papua and Maluku figures (2019–2020) circulate in the press but are outdated. The figure '97.48% Papua 2024' could not be verified.",
+   "Many BPS and APJII figures were read via secondary outlets (GoodStats, Katadata, Selular.id, Bisnis) because the primary PDFs were inaccessible (Bisnis returned 403; the BNPB PDF could not be parsed). The figures are attributed to BPS/APJII but should be spot-checked on bps.go.id and apjii.or.id before publication.",
+   "APJII (survey penetration) and BPS (share of people who used the internet) measure different things and give different numbers. Use one consistently.",
+   "BAKTI tower and satellite counts vary by scope and date: 4,988 / 5,618 / 6,663 / 7,196 BTS; SATRIA-1 18,501 (Oct 2024), 27,858 (Jun 2025), 30,017 (Dec 2025). Always cite with a date.",
+   "Captive coal capacity numbers for Sulawesi and Maluku come from CREA/GEM, which are NGOs, not government sources.",
+   "Causes of the 2024 Sumatra and 2025 Bali blackouts were not finally resolved in the sources found. Describe them as events, not attributed failures.",
+   "The BNPB 2024 disaster count (2,107) uses a new methodology and is not comparable with 2023 (~5,400). Landslide totals for 2024 were not in the summary found.",
+   "The Palu–Koro fault and Banda Sea megathrust descriptions partly rely on academic and BMKG technical articles, not a single official hazard map. The BNPB IRBI 2023/2024 risk index exists but its provincial table could not be retrieved."
+  ]
+ },
+ {
+  "regions": [
+   {
+    "region": "Sumatra",
+    "facts": [
+     {
+      "claim": "Total land area of Sumatra's 10 provinces is about 480,800 km2. This is my own sum of province areas from a list that cites BPS, not a published island total.",
+      "value": "~480,800 km2",
+      "year": "2023-2024",
+      "source_name": "Fortune IDN list of province areas citing bps.go.id (secondary). BPS table is JS-rendered and blocked automated fetch.",
+      "source_url": "https://www.fortuneidn.com/news/surti/provinsi-terluas-di-indonesia",
+      "confidence": "low"
+     },
+     {
+      "claim": "Sumatra has about 5.8 million ha of peatland, the largest share of the national peat area of 13.43 million ha (BBSDLP/Kementan 2019 map at 1:50,000).",
+      "value": "5.8 million ha",
+      "year": "2019 map; split reported 2025",
+      "source_name": "Pantau Gambut analysis (NGO, secondary), reported by Greennetwork",
+      "source_url": "https://greennetwork.id/eksklusif/kerusakan-lahan-gambut-yang-terus-berlanjut-di-kalimantan-tengah/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "BMKG lists Riau, Jambi and South Sumatra (with West and Central Kalimantan) as priority provinces for forest and land fires. In 2026 fire risk rose from July and peaked in August-September under a strong El Nino. Fire on dry peat burns below the surface and is hard to detect.",
+      "value": "Peak Aug-Sep",
+      "year": "2026",
+      "source_name": "BMKG, Berita Utama (28-29 Jul 2026)",
+      "source_url": "https://www.bmkg.go.id/berita/utama/bmkg-perkuat-antisipasi-dampak-el-nino-2026-fokus-jaga-ketersediaan-air-dan-cegah-karhutla",
+      "confidence": "high"
+     },
+     {
+      "claim": "The 2026/2027 rainy season starts first in northern Sumatra and then spreads gradually to the rest of Indonesia. In 2025/26, most of Sumatra's rainfall peak came in November-December.",
+      "value": "Onset begins in N. Sumatra; peak Nov-Dec",
+      "year": "2025-2026",
+      "source_name": "BMKG, Prediksi Musim Hujan 2026/2027; 2025/26 peak timing from media citing BMKG",
+      "source_url": "https://www.bmkg.go.id/iklim/prediksi-musim/prediksi-musim-hujan-2026-2027-di-indonesia",
+      "confidence": "high"
+     },
+     {
+      "claim": "Lake Toba is a supervolcanic caldera lake of about 1,130 km2 (other sources say 1,145 km2) and up to roughly 450-508 m deep. Its last eruption was about 74,000 years ago, and it was designated a UNESCO Global Geopark in 2020.",
+      "value": "~1,130-1,145 km2",
+      "year": "2020-2023",
+      "source_name": "ESDM (Kementerian ESDM) feature, Mongabay",
+      "source_url": "https://www.esdm.go.id/id/media-center/news-archives/pesona-danau-toba-berkah-bentukan-kaldera-terbesar-di-dunia",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Mount Kerinci (Jambi/West Sumatra) is Indonesia's highest volcano at 3,805 m. Sumatra also has active volcanoes such as Marapi, which Badan Geologi monitors.",
+      "value": "3,805 m asl",
+      "source_name": "Secondary (GNFI/CNBC lists). Not confirmed on a .go.id page.",
+      "source_url": "https://www.goodnewsfromindonesia.id/2025/10/10/daftar-puncak-tertinggi-di-indonesia",
+      "confidence": "medium"
+     },
+     {
+      "claim": "In 2024, BMKG Sultan Iskandar Muda station in Banda Aceh had the lowest temperature anomaly of all stations (-0.2 C) while nearly every other station was positive. This shows climate varies within Sumatra.",
+      "value": "-0.2 C anomaly",
+      "year": "2024",
+      "source_name": "BMKG, Anomali Suhu Udara Rata-rata Tahun 2024",
+      "source_url": "https://www.bmkg.go.id/iklim/anomali-suhu-udara/anomali-suhu-udara-rata-rata-tahun-2024",
+      "confidence": "high"
+     }
+    ],
+    "robotics_relevance": "Sumatra gives four distinct test settings: peatland that floods in the wet season and burns in the dry season, a haze season (Jul-Oct) that cuts visibility and coats optics and solar panels with particulate, plantation-scale flat terrain, and volcanic highlands. It suits haze and fire-detection drones, ground robots on soft peat, sensor enclosures that must survive haze, and water-table and peat-moisture IoT."
+   },
+   {
+    "region": "Java",
+    "facts": [
+     {
+      "claim": "Java has about 128,300 km2 of land. The secondary source describes this as a map-based estimate, not an official BPS island total.",
+      "value": "~128,297 km2",
+      "source_name": "Secondary media (detik)",
+      "source_url": "https://www.detik.com/edu/detikpedia/d-5654126/5-pulau-terbesar-di-indonesia-di-antaranya-juga-terluas-di-dunia",
+      "confidence": "low"
+     },
+     {
+      "claim": "About 57% of Indonesia's population lives on Java, compared with 7% on Kalimantan. Bappenas says Jakarta faces flood and earthquake hazards, with land subsidence of 35-50 cm over 2007-2017.",
+      "value": "57% of population; 35-50 cm subsidence",
+      "year": "2021 (pocket book)",
+      "source_name": "Bappenas, Buku Saku Pemindahan Ibu Kota Negara (copy hosted at UGM)",
+      "source_url": "https://luk.staff.ugm.ac.id/atur/ikn/202107Bappenas-BukuSakuIKN.pdf",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Jabodetabek dry-season maximum temperatures typically reach 32-36 C (Soekarno-Hatta and Kemayoran 35 C, Tanjung Perak in Surabaya 35 C). Relative humidity across most of Indonesia was >80-100%. April-May and October-November are statistically hot months in Jabodetabek.",
+      "value": "Tmax 32-36 C; RH >80-100%",
+      "year": "2020",
+      "source_name": "BMKG press release (26 May 2020)",
+      "source_url": "https://www.bmkg.go.id/siaran-pers/udara-terasa-panas-dan-gerah-fenomena-biasa-musim-kemarau-bmkg-himbau-masyarakat-ikuti-tips-dari-bmkg",
+      "confidence": "high"
+     },
+     {
+      "claim": "Java is mainly monsoonal: a wet season of about Oct/Nov-Apr and a dry season of about May-Sep/Oct. In 2025/26 most of Java started its rainy season in October, with the peak in January-February. For 2026/27, all of Central Java and Yogyakarta are forecast to start late (at least three dasarian behind the 1991-2020 normal).",
+      "value": "Wet ~Oct-Apr; peak Jan-Feb",
+      "year": "2025-2026",
+      "source_name": "BMKG (national and Staklim Jateng/Yogya forecasts; 2025/26 via media citing BMKG)",
+      "source_url": "https://staklim-jateng.bmkg.go.id/prediksi_musim_hujan.php",
+      "confidence": "medium"
+     },
+     {
+      "claim": "During long dry spells, Java, Bali and Nusa Tenggara record the longest runs of days without rain (31-60 days, and more than 60 days in extreme cases).",
+      "value": ">60 consecutive dry days in extreme areas",
+      "year": "2018",
+      "source_name": "BMKG press release (23 Aug 2018)",
+      "source_url": "https://www.bmkg.go.id/siaran-pers/musim-kemarau-meluas-bmkg-waspada-potensi-karhutla",
+      "confidence": "high"
+     },
+     {
+      "claim": "Java contains some of Indonesia's most closely watched active volcanoes, including Merapi and Semeru. Counts of active volcanoes on Java vary by definition (about 19 per a UGM expert citing PVMBG in 2019; 35 in another, unsourced count).",
+      "value": "~19-35 (contested)",
+      "year": "2019-2024",
+      "source_name": "Republika citing PVMBG/UGM (secondary)",
+      "source_url": "https://news.republika.co.id/berita/pvdpcx282/127-gunung-api-aktif-di-indonesia-19-di-pulau-jawa",
+      "confidence": "low"
+     }
+    ],
+    "robotics_relevance": "Java is dense, urban and industrial, with hot (34-36 C), humid (>80% RH) conditions plus flooding and subsidence on the coast. It suits warehouse and factory automation, delivery robots in monsoon rain, flood and subsidence monitoring IoT, and volcano-monitoring sensors and drones (Merapi, Semeru). It also has the easiest logistics and power for a first pilot."
+   },
+   {
+    "region": "Kalimantan",
+    "facts": [
+     {
+      "claim": "Kalimantan (Indonesian part, 5 provinces) has a total land area of 534,698.46 km2, making Central Kalimantan one of the largest provinces.",
+      "value": "534,698 km2",
+      "year": "2024",
+      "source_name": "detik citing BPS 2024 (secondary)",
+      "source_url": "https://www.detik.com/kalimantan/berita/d-7818114/5-provinsi-terluas-di-indonesia-kalimantan-juaranya",
+      "confidence": "medium"
+     },
+     {
+      "claim": "East Kalimantan was chosen for the new capital (IKN) partly because the government judged its disaster risk very small (earthquake, volcano, tsunami). Kalimantan has no active volcanoes listed among the main volcanic arcs.",
+      "value": "Low geohazard",
+      "year": "2019-2021",
+      "source_name": "Bappenas Buku Saku IKN; DPR P3DI Info Singkat",
+      "source_url": "https://berkas.dpr.go.id/pusaka/files/info_singkat/Info%20Singkat-XI-16-II-P3DI-Agustus-2019-227.pdf",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Kalimantan has about 4.5 million ha of peat. Central Kalimantan alone has roughly 3 million ha and is a top restoration priority.",
+      "value": "~4.5 million ha (Kalteng ~3 million ha)",
+      "source_name": "Pantau Gambut / BRG-related reporting (secondary)",
+      "source_url": "https://greennetwork.id/eksklusif/kerusakan-lahan-gambut-yang-terus-berlanjut-di-kalimantan-tengah/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Fire and haze season: on 21 Sep 2026 BMKG counted 5,283 hotspots in Central Kalimantan, 1,357 in West Kalimantan, 498 in South Kalimantan and 433 in East Kalimantan. Smoke was reported over all Kalimantan provinces.",
+      "value": "5,283 hotspots (Kalteng)",
+      "year": "2026",
+      "source_name": "BMKG weekly outlook, September 2026",
+      "source_url": "https://www.bmkg.go.id/cuaca/potensi-hujan-sepekan/prakiraan-cuaca-indonesia-sepekan-periode-22-28-september-2026-sebaran-asap-dan-karhutla-masih-menjadi-perhatian-hujan-lebat-masih-terjadi-di-sejumlah-wilayah",
+      "confidence": "high"
+     },
+     {
+      "claim": "In the August 2018 haze, PM10 at the BMKG Mempawah climatology station in West Kalimantan peaked at 356.93 ug/m3 ('hazardous'), and visibility fell below 100 m.",
+      "value": "PM10 356.93 ug/m3; visibility <100 m",
+      "year": "2018",
+      "source_name": "BMKG press release (23 Aug 2018)",
+      "source_url": "https://www.bmkg.go.id/siaran-pers/musim-kemarau-meluas-bmkg-waspada-potensi-karhutla",
+      "confidence": "high"
+     },
+     {
+      "claim": "In 2024, BMKG's warmest temperature anomaly of any station was at Gusti Syamsir Alam, Kotabaru (South Kalimantan): +1.5 C.",
+      "value": "+1.5 C",
+      "year": "2024",
+      "source_name": "BMKG, Anomali Suhu Udara 2024",
+      "source_url": "https://www.bmkg.go.id/iklim/anomali-suhu-udara/anomali-suhu-udara-rata-rata-tahun-2024",
+      "confidence": "high"
+     },
+     {
+      "claim": "Recorded burned area in 2023 (KLHK, to October): South Kalimantan 138,865 ha, West Kalimantan 82,411 ha, Central Kalimantan 68,797 ha, East Kalimantan 14,404 ha.",
+      "value": "see claim",
+      "year": "2023",
+      "source_name": "KLHK data via Medcom/GNFI (secondary)",
+      "source_url": "https://www.medcom.id/nasional/daerah/5b2o8Bak-luas-karhutla-di-kalsel-mencapai-138-865-hektare",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Kalimantan is large, flat, river-laced and low in seismic and volcanic risk, with huge peat areas and a severe haze and fire season (Jul-Oct) that is worst in El Nino years. It suits peat and fire monitoring drones and IoT, long-range LoRa/satellite sensor networks, river-borne and amphibious robots, mining and plantation autonomy, and construction robotics around IKN."
+   },
+   {
+    "region": "Sulawesi",
+    "facts": [
+     {
+      "claim": "Sulawesi has about 174,600 km2 of land. No dated BPS island total was found.",
+      "value": "~174,600 km2",
+      "source_name": "Secondary media (undated)",
+      "source_url": "https://www.goodnewsfromindonesia.id/2025/06/25/mengungkap-5-pulau-terbesar-di-indonesia-cari-tahu-yuk",
+      "confidence": "low"
+     },
+     {
+      "claim": "BMKG describes the Palu-Koro fault as Sulawesi's main active fault. The M7.7 Palu-Donggala earthquake of 28 Sep 2018 triggered a tsunami and liquefaction, with a reported toll of 3,397 dead.",
+      "value": "M7.7; 3,397 dead",
+      "year": "2018",
+      "source_name": "BNPB/BMKG via Republika and Warta Ekonomi (secondary)",
+      "source_url": "https://news.republika.co.id/berita/pft1r4328/bnpb-catat-palu-dan-donggala-rawan-gempa-dan-tsunami",
+      "confidence": "medium"
+     },
+     {
+      "claim": "In June 2026 an M6.7 earthquake hit Palu and Sigi. BMKG linked it to the little-studied Sausu fault, not Palu-Koro.",
+      "value": "M6.7",
+      "year": "2026",
+      "source_name": "Mongabay citing BMKG (secondary)",
+      "source_url": "https://mongabay.co.id/2026/07/05/gempa-sulawesi-tengah-sesar-sausu-masih-minim-kajian/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "West Sulawesi had the highest provincial disaster risk index score in BNPB IRBI 2023 (160.08), just ahead of Maluku (160.03).",
+      "value": "160.08",
+      "year": "2023",
+      "source_name": "BNPB IRBI 2023 via GoodStats (secondary)",
+      "source_url": "https://goodstats.id/article/indeks-risiko-bencana-indonesia-paling-tinggi-di-wilayah-ini-MQcQP",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Central Sulawesi has about 1,572 islands, the third-most of any province.",
+      "value": "1,572",
+      "year": "2024",
+      "source_name": "BPS via GoodStats (secondary)",
+      "source_url": "https://data.goodstats.id/statistic/dari-sabang-sampai-merauke-ini-provinsi-dengan-pulau-terbanyak-u3cSs",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Sulawesi's rainy-season peak is mostly January-February. Central and southeast Sulawesi start their rainy season around November.",
+      "value": "Peak Jan-Feb",
+      "year": "2025-2026",
+      "source_name": "BMKG forecast via media (tirto/Kontan)",
+      "source_url": "https://tirto.id/prakiraan-musim-hujan-2025-di-indonesia-hiV3",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Sulawesi has active volcanoes, for example Ruang in North Sulawesi, which erupted in 2024.",
+      "value": "e.g. G. Ruang",
+      "year": "2024",
+      "source_name": "Badan Geologi via media (secondary)",
+      "source_url": "https://www.cnnindonesia.com/nasional/20251220091715-20-1308907/badan-geologi-127-gunung-berapi-di-indonesia-berstatus-aktif",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Sulawesi is mountainous and narrow, with active faults, volcanoes and strong tsunami and liquefaction exposure, plus long coastlines and nickel mining. It suits structural-health and seismic/landslide IoT, disaster-response drones and robots, mining autonomy and inspection, and coastal and aquaculture monitoring."
+   },
+   {
+    "region": "Bali & Nusa Tenggara",
+    "facts": [
+     {
+      "claim": "In 2021, BMKG reported the longest run of days without rain in Indonesia, 179 days, around Kupang, NTT.",
+      "value": "179 days without rain",
+      "year": "2021",
+      "source_name": "BMKG via Kompas TV (secondary)",
+      "source_url": "https://www.kompas.tv/article/219589/hari-tanpa-hujan-paling-panjang-bmkg-ingatkan-ancaman-kekeringan-di-sejumlah-daerah-ini",
+      "confidence": "medium"
+     },
+     {
+      "claim": "NTT is semi-arid. Coastal annual rainfall is often below 1,000 mm, and the dry season lasts about 7-9 months (April-October). These figures come from an academic source, not BMKG.",
+      "value": "<1,000 mm coastal; 7-9 dry months",
+      "year": "1997 study",
+      "source_name": "Academic document citing Kasiro et al. 1997",
+      "source_url": "https://pablo.academia.edu/ekymanetima",
+      "confidence": "low"
+     },
+     {
+      "claim": "BPBD NTT drought-prone zones, mapped with BMKG: Kupang, TTS, TTU, Belu and Malaka (Timor); East, West and Central Sumba; and Ende, Sikka and Nagekeo (Flores). In 2023 BMKG put East Alor and East Sumba (Kambera) on drought alert.",
+      "value": "see claim",
+      "year": "2023-2024",
+      "source_name": "BPBD NTT / BMKG via detik and Medcom",
+      "source_url": "https://www.detik.com/bali/nusra/d-7365441/antisipasi-kemarau-panjang-bpbd-ntt-petakan-wilayah-rawan-kekeringan",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Most of NTB and NTT start their rainy season around November, later than western Indonesia. Bali and parts of NTB start in October.",
+      "value": "Onset Oct-Nov",
+      "year": "2025-2026",
+      "source_name": "BMKG forecast via media",
+      "source_url": "https://tirto.id/prakiraan-musim-hujan-2025-di-indonesia-hiV3",
+      "confidence": "medium"
+     },
+     {
+      "claim": "The largest year-on-year temperature rise among BMKG stations in 2024 was at Frans Sales Lega, Ruteng (Flores): +1.3 C.",
+      "value": "+1.3 C",
+      "year": "2024",
+      "source_name": "BMKG, Anomali Suhu Udara 2024",
+      "source_url": "https://www.bmkg.go.id/iklim/anomali-suhu-udara/anomali-suhu-udara-rata-rata-tahun-2024",
+      "confidence": "high"
+     },
+     {
+      "claim": "Nusa Tenggara has active volcanoes, including Lewotobi Laki-laki and Ili Lewotolok, both on Badan Geologi's monitoring list.",
+      "value": "e.g. Lewotobi, Ili Lewotolok",
+      "year": "2024",
+      "source_name": "Badan Geologi via media",
+      "source_url": "https://www.cnnindonesia.com/nasional/20251220091715-20-1308907/badan-geologi-127-gunung-berapi-di-indonesia-berstatus-aktif",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Bali and Nusa Tenggara are the opposite of humid western Indonesia: long dry seasons, dust, strong sun and wind, and water scarcity, alongside active volcanoes and island logistics. They suit solar-autonomous sensors, water and irrigation IoT, drought and agriculture robotics, wind and dust endurance tests, and volcano monitoring. Bali adds tourism and service robotics."
+   },
+   {
+    "region": "Maluku",
+    "facts": [
+     {
+      "claim": "About 92.4% of Maluku province is water (658,331.52 km2) and only 7.6% is land (about 54,158 km2).",
+      "value": "92.4% sea",
+      "year": "2022",
+      "source_name": "Pemprov Maluku, LPPD-LKIP 2022",
+      "source_url": "https://malukuprov.go.id/storage/2025/03/LPPD-LKIP-Provinsi-Maluku-Tahun-2022-.pdf",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Maluku has about 1,388 islands (BPS-cited 2024). Other sources say 1,412. North Maluku has about 901 and was one of the provinces where BIG added newly verified islands in 2024.",
+      "value": "1,388 (contested: 1,412)",
+      "year": "2024",
+      "source_name": "BPS via GoodStats/Fortune; BIG release",
+      "source_url": "https://data.goodstats.id/statistic/dari-sabang-sampai-merauke-ini-provinsi-dengan-pulau-terbanyak-u3cSs",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Maluku has 40 seasonal zones (ZOM): 12 monsoonal, 21 equatorial and 7 'local'. The local type is reversed from the monsoon pattern, with peak rain around June-August. For example, Amahai has its wet season in April-September.",
+      "value": "40 ZOM (7 local)",
+      "year": "2022 (ZOM 1991-2020)",
+      "source_name": "BMKG Buku Prakiraan Musim Hujan 2022/2023; academic study for Amahai",
+      "source_url": "https://iklim.bmkg.go.id/publikasi-klimat/ftp/buletin/2022/Buku%20PMH%202022_2023_versi_cetak.pdf",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Maluku scored 160.03 on BNPB IRBI 2023, the second-highest disaster risk index of any province.",
+      "value": "160.03",
+      "year": "2023",
+      "source_name": "BNPB IRBI 2023 via GoodStats",
+      "source_url": "https://goodstats.id/article/indeks-risiko-bencana-indonesia-paling-tinggi-di-wilayah-ini-MQcQP",
+      "confidence": "medium"
+     },
+     {
+      "claim": "The Weber Deep in the Banda Sea, about 7.2 km deep (7,440 m in the 1929-30 Snellius survey), is the deepest point in Indonesian waters and the deepest ocean point on Earth outside a trench.",
+      "value": "~7.2-7.44 km",
+      "source_name": "Pownall, Hall & Lister (peer-reviewed); Snellius expedition record",
+      "source_url": "https://researchportalplus.anu.edu.au/en/publications/rolling-open-earths-deepest-forearc-basin/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "North Maluku has highly active volcanoes, for example Ibu on Halmahera, which Badan Geologi monitors.",
+      "value": "e.g. G. Ibu",
+      "year": "2024",
+      "source_name": "Badan Geologi via media",
+      "source_url": "https://www.cnnindonesia.com/nasional/20251220091715-20-1308907/badan-geologi-127-gunung-berapi-di-indonesia-berstatus-aktif",
+      "confidence": "medium"
+     }
+    ],
+    "robotics_relevance": "Maluku is almost entirely ocean (92%), made of scattered small islands with deep seas, high seismic and volcanic risk, and a rain season reversed from the rest of Indonesia. It suits marine robotics (AUV/ROV, deep-sea), fisheries IoT, inter-island drone logistics, and off-grid, salt-exposed sensors. A country-wide test program can also run here in Indonesia's 'off-season'."
+   },
+   {
+    "region": "Papua",
+    "facts": [
+     {
+      "claim": "The Indonesian part of New Guinea (Papua provinces) covers about 412,000-421,000 km2. Sources disagree, and the province figures do not add up exactly.",
+      "value": "~412,000-421,000 km2",
+      "year": "2024",
+      "source_name": "Media citing BPS (secondary, internally inconsistent)",
+      "source_url": "https://www.detik.com/edu/detikpedia/d-5654126/5-pulau-terbesar-di-indonesia-di-antaranya-juga-terluas-di-dunia",
+      "confidence": "low"
+     },
+     {
+      "claim": "Indonesia's tropical glacier at Puncak Sudirman/Jayawijaya shrank to 0.11-0.16 km2 in Nov 2024, from 0.23 km2 in 2022. About 4 m of ice thickness remained, against 32 m in 2010. BMKG expects it to disappear within a few years.",
+      "value": "0.11-0.16 km2",
+      "year": "2024",
+      "source_name": "BMKG Berita Utama (Dec 2024)",
+      "source_url": "https://www.bmkg.go.id/berita/utama/bmkg-lakukan-monitoring-luasan-gletser-jelang-kepunahan-salju-abadi-pegunungan-jayawijaya",
+      "confidence": "high"
+     },
+     {
+      "claim": "Puncak Jaya (Carstensz Pyramid) is Indonesia's highest peak at 4,884 m asl.",
+      "value": "4,884 m",
+      "source_name": "Secondary (GNFI/CNBC)",
+      "source_url": "https://www.goodnewsfromindonesia.id/2025/10/10/daftar-puncak-tertinggi-di-indonesia",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Southwest Papua has the most islands of any province (about 3,022), and West Papua has about 1,498.",
+      "value": "3,022 islands",
+      "year": "2024",
+      "source_name": "BPS via GoodStats (secondary)",
+      "source_url": "https://data.goodstats.id/statistic/dari-sabang-sampai-merauke-ini-provinsi-dengan-pulau-terbanyak-u3cSs",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Papua has about 3 million ha of peatland, mostly in the southern lowlands.",
+      "value": "~3 million ha",
+      "source_name": "Pantau Gambut via Greennetwork (secondary)",
+      "source_url": "https://greennetwork.id/eksklusif/kerusakan-lahan-gambut-yang-terus-berlanjut-di-kalimantan-tengah/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "In the 2026 El Nino dry season BMKG reported smoke over Papua Pegunungan, Papua Tengah and Papua Selatan. On 13 Sep 2026, Papua and Maluku together had 200 high-confidence hotspots.",
+      "value": "200 hotspots (Papua+Maluku)",
+      "year": "2026",
+      "source_name": "BMKG weekly outlook Sep 2026",
+      "source_url": "https://www.bmkg.go.id/cuaca/potensi-hujan-sepekan/prakiraan-cuaca-indonesia-sepekan-periode-11-17-september-2026-sebaran-asap-masih-bertahan-di-tengah-kemarau-tetap-waspada-peluang-hujan-lokal-di-sebagian-wilayah",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Sentani (Papua) sometimes exceeds 36 C, the highest daily maximum in BMKG's May 2020 heat note.",
+      "value": ">36 C",
+      "year": "2020",
+      "source_name": "BMKG press release (26 May 2020)",
+      "source_url": "https://www.bmkg.go.id/siaran-pers/udara-terasa-panas-dan-gerah-fenomena-biasa-musim-kemarau-bmkg-himbau-masyarakat-ikuti-tips-dari-bmkg",
+      "confidence": "high"
+     }
+    ],
+    "robotics_relevance": "Papua is the most extreme terrain gradient in Indonesia: tropical coast and swamp, lowland peat, and highlands above 4,000 m with Indonesia's only (vanishing) glacier, along with very sparse roads and grid. It suits long-endurance and high-altitude drones, off-grid, satellite-connected sensors, climate and glacier instrumentation, mining autonomy, and remote-logistics robotics."
+   },
+   {
+    "region": "Seas & coasts (maritime Indonesia)",
+    "facts": [
+     {
+      "claim": "BIG counts 17,380 islands in 2024, up from 17,374 in 2023. Only named, coordinate-verified islands are counted, the gazetteer is updated every year, and 63 new islands were added in Bangka Belitung, SE Sulawesi, North Maluku and West Kalimantan. Older figures (17,504; 16,671 registered at the UN) are still widely quoted.",
+      "value": "17,380",
+      "year": "2024",
+      "source_name": "Badan Informasi Geospasial (BIG), Rilis Jumlah Pulau",
+      "source_url": "https://www.big.go.id/uploads/downloads/Dokumen/Rilis_Jumlah_Pulau.pdf",
+      "confidence": "high"
+     },
+     {
+      "claim": "Coastline: the 2018 national territorial reference data (BIG with Pushidrosal TNI AL, launched by Kemenko Maritim on 10 Aug 2018) gives 108,000 km, and the KKP Renstra 2025-2029 uses the same figure. The older BIG/KKP 2017 figure of 99,093 km is still common, and 104,000 km and 110,000 km also appear.",
+      "value": "108,000 km (contested: 99,093 km)",
+      "year": "2018",
+      "source_name": "KKP Renstra Ditjen PDSPKP 2025-2029; Mongabay on the 2018 data release",
+      "source_url": "https://ppid.kkp.go.id/media/uploads/document_information_public/Renstra_PDSPKP_2025-2029_20260226084715_1_compressed_1.pdf",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Under the 2018 reference data, Indonesia's total waters cover about 6.4 million km2: inland plus archipelagic waters 3.11 million, territorial sea 0.29 million, and an EEZ of about 3.0 million. The total territory (land plus water) is about 8.3 million km2, against roughly 1.9 million km2 of land, so sea is about 3x land. A KKP report instead uses 5.8 million km2 of marine waters.",
+      "value": "~6.4 million km2 waters vs ~1.9 million km2 land",
+      "year": "2018",
+      "source_name": "Kemenko Maritim/BIG/Pushidrosal via Mongabay; KKP LKj",
+      "source_url": "https://mongabay.co.id/2018/08/27/pemerintah-keluarkan-data-resmi-wilayah-kelautan-indonesia-apa-saja-yang-terbaru/",
+      "confidence": "medium"
+     },
+     {
+      "claim": "Island-rich provinces are mostly maritime: Southwest Papua about 3,022, Riau Islands about 2,028, Central Sulawesi about 1,572 and Maluku about 1,388.",
+      "value": "see claim",
+      "year": "2024",
+      "source_name": "BPS via GoodStats",
+      "source_url": "https://data.goodstats.id/statistic/dari-sabang-sampai-merauke-ini-provinsi-dengan-pulau-terbanyak-u3cSs",
+      "confidence": "medium"
+     },
+     {
+      "claim": "BIG says islands change through abrasion, sedimentation and merging with other land. Coasts are therefore physically dynamic, and the coastline figure depends on the mapping method.",
+      "value": "qualitative",
+      "year": "2024",
+      "source_name": "BIG release",
+      "source_url": "https://www.big.go.id/uploads/downloads/Dokumen/Rilis_Jumlah_Pulau.pdf",
+      "confidence": "high"
+     }
+    ],
+    "robotics_relevance": "With over 100,000 km of tropical coast, salt spray and high humidity (>80% RH), constant 27-28 C, and three times more sea than land, Indonesia is a natural lab for corrosion and IP-rating endurance, marine and underwater robotics, port automation, aquaculture and fisheries IoT, and inter-island drone and vessel autonomy. Kepri sits next to Singapore, which makes it a convenient maritime test base for foreign firms."
+   }
+  ],
+  "national_facts": [
+   {
+    "claim": "Number of islands (BIG, named and coordinated)",
+    "value": "17,380",
+    "year": "2024",
+    "source_name": "Badan Informasi Geospasial",
+    "source_url": "https://www.big.go.id/uploads/downloads/Dokumen/Rilis_Jumlah_Pulau.pdf",
+    "confidence": "high"
+   },
+   {
+    "claim": "Coastline length per the 2018 national reference data (BIG + Pushidrosal), as used by KKP. Figures differ by source and method.",
+    "value": "~108,000 km (alt. 99,093 km)",
+    "year": "2018",
+    "source_name": "KKP Renstra 2025-2029; Kemenko Maritim release via Mongabay",
+    "source_url": "https://mongabay.co.id/2018/08/27/pemerintah-keluarkan-data-resmi-wilayah-kelautan-indonesia-apa-saja-yang-terbaru/",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Total territory and waters: about 8.3 million km2 total, of which about 6.4 million km2 is water (incl. EEZ ~3.0 million) and about 1.9 million km2 is land. BIG elsewhere gives 1,922,570 km2 of land and 3,257,483 km2 of waters excluding the EEZ.",
+    "value": "~6.4M km2 sea vs ~1.9M km2 land",
+    "year": "2018",
+    "source_name": "BIG/Pushidrosal via Kemenko Maritim (secondary reporting)",
+    "source_url": "https://mongabay.co.id/2018/08/27/pemerintah-keluarkan-data-resmi-wilayah-kelautan-indonesia-apa-saja-yang-terbaru/",
+    "confidence": "medium"
+   },
+   {
+    "claim": "Indonesia has 127 active volcanoes (about 13% of the world's) out of roughly 500 volcanoes. About 45 million people live near active volcanoes, and Badan Geologi runs about 74-75 observation posts.",
+    "value": "127",
+    "year": "2024-2025",
+    "source_name": "Kementerian ESDM press release No. 431.Pers/04/SJI/2024 (7 Aug 2024)",
+    "source_url": "https://esdm.go.id/id/media-center/arsip-berita/kementerian-esdm-terus-tingkatkan-upaya-mitigasi-bencana-gunung-api-di-indonesia-",
+    "confidence": "high"
+   },
+   {
+    "claim": "National mean air temperature was 27.5 C in 2024 (normal 1991-2020: 26.7 C; anomaly +0.8 C; 117 stations), the warmest year since 1981. The 2025 mean was 27.05 C.",
+    "value": "27.5 C (2024)",
+    "year": "2024",
+    "source_name": "BMKG",
+    "source_url": "https://www.bmkg.go.id/iklim/anomali-suhu-udara/anomali-suhu-udara-rata-rata-tahun-2024",
+    "confidence": "high"
+   },
+   {
+    "claim": "Relative humidity is high all year. BMKG cites an average of about 70-90% (April 2025), and >80-100% across most of Indonesia in a May 2020 note.",
+    "value": "70-100% RH",
+    "year": "2020-2025",
+    "source_name": "BMKG press release; BMKG via CNBC",
+    "source_url": "https://www.bmkg.go.id/siaran-pers/udara-terasa-panas-dan-gerah-fenomena-biasa-musim-kemarau-bmkg-himbau-masyarakat-ikuti-tips-dari-bmkg",
+    "confidence": "high"
+   },
+   {
+    "claim": "BMKG defines seasons per seasonal zone (699 ZOM, 1991-2020 normals). The rainy season starts when one dasarian (10 days) has >=50 mm and the next two dasarian also do. Rainfall falls into three regimes: monsoonal (wet ~Nov-Apr), equatorial (two peaks) and local (reversed, wet ~Jun-Aug in parts of Maluku and Papua).",
+    "value": "699 ZOM; >=50 mm/dasarian",
+    "year": "2022-2025",
+    "source_name": "BMKG (BBMKG III glossary; PMH books)",
+    "source_url": "https://bbmkg3.bmkg.go.id/daftar-istilah-musim",
+    "confidence": "high"
+   },
+   {
+    "claim": "2026/2027 outlook: under a very strong El Nino plus a positive IOD, the rainy season is late in 529 ZOM (61.08% of land area) and shorter than normal in 482 ZOM. Onset is mostly November-December 2026, with the peak in December 2026-February 2027.",
+    "value": "529 ZOM late",
+    "year": "2026",
+    "source_name": "BMKG, Prediksi Musim Hujan 2026/2027 (Sep-Oct 2026)",
+    "source_url": "https://www.bmkg.go.id/iklim/prediksi-musim/prediksi-musim-hujan-2026-2027-di-indonesia",
+    "confidence": "high"
+   },
+   {
+    "claim": "National peatland area is 13.43 million ha (BBSDLP/Kementan 2019 map at 1:50,000, SNI 7925:2019). KLH cited 13.36 million ha in 2025, and the older 2011 map gave about 14.9 million ha.",
+    "value": "13.43 million ha",
+    "year": "2019",
+    "source_name": "BBSDLP Kementan via GIZ/UGM summary (secondary)",
+    "source_url": "https://ukdn.geo.ugm.ac.id/product/service-provider-to-develop-and-deliver-capacity-development-on-geographic-information-systems-and-remote-sensing",
+    "confidence": "medium"
+   },
+   {
+    "claim": "The forest and land fire (haze) season usually runs July-October and peaks in August-September, with the worst years under El Nino. BMKG's 2026 priority provinces are Riau, Jambi, South Sumatra, West Kalimantan and Central Kalimantan.",
+    "value": "Peak Aug-Sep",
+    "year": "2026",
+    "source_name": "BMKG",
+    "source_url": "https://www.bmkg.go.id/berita/utama/bmkg-perkuat-antisipasi-dampak-el-nino-2026-fokus-jaga-ketersediaan-air-dan-cegah-karhutla",
+    "confidence": "high"
+   }
+  ],
+  "caveats": [
+   "BPS's land-area and islands-per-province tables (bps.go.id) return 403 to automated fetches or render only with JavaScript, so per-island land areas come from media citing BPS and are low/medium confidence. Before publishing, open BPS 'Luas Daerah dan Jumlah Pulau Menurut Provinsi' (https://www.bps.go.id/id/statistics-table/3/VUZwV01tSlpPVlpsWlRKbmMxcFhhSGhEVjFoUFFUMDkjMw==/luas-daerah-dan-jumlah-pulau-menurut-provinsi.html) in a browser and check them. My Sumatra figure (~480,800 km2) is my own sum of province areas.",
+   "Coastline length is contested: 108,000 km (2018 BIG+Pushidrosal reference, used by KKP), 99,093 km (older BIG/KKP 2017), and also 104,000 or 110,000 km. On the site, say 'about 108,000 km (2018 national reference)' or 'over 99,000 km'.",
+   "Island counts change every year (BIG 17,380 in 2024; 17,504 and 16,671 are older figures). Province island counts differ between BPS-cited sources (Maluku 1,388 vs 1,412).",
+   "Sea area depends on the definition: about 6.4 million km2 including the EEZ (2018 reference), 5.8 million km2 (KKP report), or 3.26 million km2 excluding the EEZ (BIG). Say which one you mean.",
+   "The 127 active volcanoes figure is official (ESDM/Badan Geologi), but I found no official breakdown per island. Do not show per-region volcano counts.",
+   "I found no official per-region climate normals for annual rainfall, humidity or temperature. The BMKG station tables served via BPS were blocked and the BMKG PMH PDFs are scanned images. Region climate claims here are qualitative or event-based. For each region's 'climate' line, pull specific station normals from BMKG Data Online (dataonline.bmkg.go.id) or provincial Staklim bulletins.",
+   "Peat splits by island (Sumatra 5.8, Kalimantan 4.5, Papua 3 million ha) come from the NGO Pantau Gambut, not BBSDLP directly.",
+   "The Puncak Jaya (4,884 m), Kerinci (3,805 m) and Toba area figures come from secondary or ministry-feature sources. Lake Toba's area varies (1,130 vs 1,145 km2), and 'largest caldera in the world' is not supported, so say 'largest volcanic lake in Southeast Asia'.",
+   "Disaster risk index scores (IRBI 2023) are BNPB figures relayed by GoodStats. Check them against the BNPB IRBI 2023 PDF.",
+   "The 2026 data (El Nino, haze, rainy-season delay) is current to early October 2026 and should be refreshed. Present 2026 hotspot counts as examples, not norms.",
+   "No official source gave salt or coastal corrosion exposure as numbers. Describe it only qualitatively (long coastline, high humidity, constant heat)."
+  ]
+ }
+]

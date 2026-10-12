@@ -6,6 +6,7 @@ import {LangToggle,LinkButton,PageHeader} from './ui';
 import {DotMark} from './brand/dot-mark';
 import {rememberRegion} from './region';
 import {isGated,MemberLink,useAccess} from './preview';
+import {useCompany} from './use-company';
 import './site-shell.css';
 
 export const PARTNERSHIP_BRIEF='/partnership-brief.txt';
@@ -79,7 +80,7 @@ export function SiteHeader({overlay,className,...rest}:{overlay?:boolean;classNa
 }
 
 export function SiteFooter({className,...rest}:{className?:string;'data-enter'?:boolean}){
- const{tr}=useLang();const{publicHost,preview,member,can}=useAccess();
+ const{tr}=useLang();const{publicHost,preview,member,can}=useAccess();const company=useCompany();const legal=(['legalName','nib','address'] as const).map(k=>company(k)).filter(Boolean);
  return <footer className={['ds-footer',className].filter(Boolean).join(' ')} {...(rest['data-enter']?{'data-enter':''}:{})}>
   <div className="ds-footer-brand"><Brand/><p>{tr('The real-world gateway for AI robotics in Indonesia.','Gerbang AI robotika ke Indonesia.')}</p></div>
   <nav aria-label={tr('Footer','Footer')}>
@@ -87,6 +88,7 @@ export function SiteFooter({className,...rest}:{className?:string;'data-enter'?:
    <div><span>{tr('Build','Bangun')}</span><Link to="/docs">{tr('Docs','Dokumentasi')}</Link><Link to="/api">API</Link>{/* The public host does not link the release assets: members get the installer from their profile. */}{publicHost&&!preview?(member?<Link to="/profile">{tr('Desktop app (profile)','Aplikasi desktop (profil)')}</Link>:<Link to="/partner">{tr('Desktop app: request access','Aplikasi desktop: minta akses')}</Link>):<a href={RELEASES}>{tr('Desktop app','Aplikasi desktop')}</a>}</div>
    <div><span>{tr('Company','Perusahaan')}</span><Link to="/partner">{tr('Partner with us','Jadi partner')}</Link>{can('/products')&&<Link to="/products">{tr('Tested products','Produk teruji')}</Link>}<a href={PARTNERSHIP_BRIEF} download>{tr('Partnership brief','Partnership brief')}</a><Link to="/research">{tr('Research','Riset')}</Link><a href={REPOSITORY}>GitHub <ArrowUpRightIcon size={12}/></a><Link to="/id" hrefLang="id" onClick={()=>rememberRegion('id')}>{tr('Indonesia: SMK program','Program SMK Indonesia')}</Link><Link to="/mitra">{tr('Lab Mitra portal sign in','Masuk portal mitra')}</Link></div>
   </nav>
+  {legal.length>0&&<p className="ds-footer-legal" data-testid="company-legal">{legal.join(' · ')}</p>}
   <div className="ds-footer-bottom"><span>{tr('TESTED IN INDONESIA. READY FOR INDONESIA.','DIUJI DI LAPANGAN. SIAP DIPASARKAN.')}</span><span>© 2026 AIoT · iot.ai.id</span></div>
  </footer>;
 }
