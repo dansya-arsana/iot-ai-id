@@ -6,6 +6,9 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+### Fixed
+- Blank page after a deploy for visitors with a cached page: hashed `/assets/` files now return 404 when missing instead of `index.html`, are cached as immutable, HTML is revalidated (`Cache-Control: no-cache`), and web deploys keep the previous builds' assets for 30 days.
+
 ## [0.6.0] - 2026-10-12
 
 Business operations and invitation-only access: AIoT rebrand, partner intake and CRM, Lab Mitra commissions with a school portal, multi-provider AI on owner keys, per-person staff logins on admin.iot.ai.id, and invited member accounts on iot.ai.id.
