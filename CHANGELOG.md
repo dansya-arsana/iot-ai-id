@@ -6,16 +6,14 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-12
+
+Business operations and invitation-only access: AIoT rebrand, partner intake and CRM, Lab Mitra commissions with a school portal, multi-provider AI on owner keys, per-person staff logins on admin.iot.ai.id, and invited member accounts on iot.ai.id.
+
 ### Added
 - Public host (iot.ai.id): gated areas (Products, Builders, PhysicalBench, Arena, Build, Sites, Design, the `/id` leaderboard and the Learn start button) are invitation-only ("By invitation" / "Khusus undangan") with Request access, Sign in and WhatsApp actions, and their nav links are hidden from visitors who cannot open them. They are noindex and left out of the sitemap and llms.txt. localhost, the desktop app and admin.iot.ai.id are unaffected.
 - Member accounts (ADR 009 addendum): invited clients, partners and schools sign in at `/masuk` (alias `/login`) and unlock areas by grant (`products`, `bench`, `arena`, `builders`, `installer`). `/profile` (alias `/profil`) shows name, organization, unlocked areas, Request access for locked ones, Sign out, and the installer button only with the `installer` grant. A header Sign in link becomes the member's name. Routes `/ops/v1/member/{activate,login,logout,me,installer}` (cookie `aiot_member`, `X-AIoT-Member` CSRF header), admin routes `/ops/v1/admin/members`, a Members section in the backoffice (`#bo-members`, owner and sales) and nginx locations for the public host. `OPS_INSTALLER_URL` sets the installer redirect.
 - Presentation mode: a signed-in staff member visiting iot.ai.id sees everything unlocked, with a "Presentation mode" pill (view as public, back to admin). Backed by `GET /ops/v1/staff/preview` (name and role only, exact-origin CORS). The backoffice header gets a "Present site" link.
-
-### Changed
-- The public host no longer links the desktop release downloads (footer, pages): members get the installer from their profile and anonymous visitors are pointed to Request access. The GitHub release assets stay public until they are moved to private storage; the gate controls our links only.
-- Tasks are marked paid when their payout batch is marked paid; the per-task "Mark paid" action is removed. Tasks can carry a lead teacher set at assignment.
-
-### Added
 - Staff accounts for the admin host (ADR 009 addendum):
   - `admin.iot.ai.id` replaces HTTP Basic with a landing page and per-person login (owner, sales, ops, viewer): invite activation, password login with lockout, `aiot_admin` session cookie, and a signed-in name, role and Sign out in the backoffice header.
   - Owner-only Team section (`#bo-team`) to add people (one-time invite code), change roles, disable and reset invites; the last active owner is protected.
@@ -48,6 +46,14 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 - Consent-gated conversion tracking (GA4, Meta Pixel). It is inert unless `VITE_GA4_ID` or `VITE_META_PIXEL_ID` is set at build time.
 - The partnership brief points to `/partner` and WhatsApp.
 
+### Changed
+- The public host no longer links the desktop release downloads (footer, pages): members get the installer from their profile and anonymous visitors are pointed to Request access. The GitHub release assets stay public until they are moved to private storage; the gate controls our links only.
+- Tasks are marked paid when their payout batch is marked paid; the per-task "Mark paid" action is removed. Tasks can carry a lead teacher set at assignment.
+- Brand name is now **AIoT**; the domain stays `iot.ai.id`. Header, loader, footer, tab titles, Open Graph and JSON-LD use the new name (`alternateName: iot.ai.id`).
+- Positioning: "The real-world gateway for AI robotics in Indonesia": field testing, localization, distribution and real-world data. New hero copy in EN and ID, footer line "Tested in Indonesia. Ready for Indonesia." (ID: "Diuji di lapangan. Siap dipasarkan."), updated `llms.txt` pitch.
+- WhatsApp prefilled messages on `/id` greet AIoT.
+- `package.json` version is now 0.6.0.
+
 ### Security
 - Cloud AI runs only on owner keys: end-user keys, custom endpoints and CLI providers are refused when `IOT_DEPLOYMENT=cloud`. The vault master key moves to `IOT_VAULT_KEY_FILE` outside the data volume (an identical old copy is removed, a different one aborts startup). AI settings changes are written to an append-only audit log without key material, and cloud AI calls have a daily limit (`IOT_AI_DAILY_LIMIT`, default 300).
 - Public intake:
@@ -55,12 +61,8 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
   - Per-IP and global rate limits, plus an nginx `limit_req` keyed on `CF-Connecting-IP`.
   - Explicit consent and body size caps.
 - Ops admin routes are never served on the public host: `/ops/v1/admin/` returns 404 there. They require a 32+ character owner token compared in constant time, and public proxies strip `Authorization` and `X-Ops-User`.
-- The admin and API gateways forward `X-Remote-User` so roles follow the HTTP Basic login.
-
-### Changed
-- Brand name is now **AIoT**; the domain stays `iot.ai.id`. Header, loader, footer, tab titles, Open Graph and JSON-LD use the new name (`alternateName: iot.ai.id`).
-- Positioning: "The real-world gateway for AI robotics in Indonesia": field testing, localization, distribution and real-world data. New hero copy in EN and ID, footer line "Tested in Indonesia. Ready for Indonesia." (ID: "Diuji di lapangan. Siap dipasarkan."), updated `llms.txt` pitch.
-- WhatsApp prefilled messages on `/id` greet AIoT.
+- The admin gateway authorizes every `/api/` call with `auth_request` against a live staff session and forwards the staff username as `X-Remote-User`; the API host still forwards its HTTP Basic user.
+- Member, staff and school portal sessions are isolated by kind; usernames are unique across all three. A non-HttpOnly `aiot_member_hint` cookie only decides whether the site probes the member API and never grants access.
 
 ## [0.5.0] - 2026-10-11
 
@@ -166,7 +168,8 @@ Initial public snapshot of the hardware workspace.
 ### Security
 - Local API accepts loopback Host/Origin only and requires a session token; physical runs need a human-authorised USB port (20-minute trust window).
 
-[Unreleased]: https://github.com/dansya-arsana/iot-ai-id/compare/7937777...HEAD
+[Unreleased]: https://github.com/dansya-arsana/iot-ai-id/compare/RELEASE_SHA...HEAD
+[0.6.0]: https://github.com/dansya-arsana/iot-ai-id/compare/7937777...RELEASE_SHA
 [0.5.0]: https://github.com/dansya-arsana/iot-ai-id/compare/2bbbaa3...7937777
 [0.4.0]: https://github.com/dansya-arsana/iot-ai-id/compare/6ea1215...2bbbaa3
 [0.3.0]: https://github.com/dansya-arsana/iot-ai-id/compare/eb01b3f...6ea1215
