@@ -168,8 +168,8 @@ Initial public snapshot of the hardware workspace.
 ### Security
 - Local API accepts loopback Host/Origin only and requires a session token; physical runs need a human-authorised USB port (20-minute trust window).
 
-[Unreleased]: https://github.com/dansya-arsana/iot-ai-id/compare/RELEASE_SHA...HEAD
-[0.6.0]: https://github.com/dansya-arsana/iot-ai-id/compare/7937777...RELEASE_SHA
+[Unreleased]: https://github.com/dansya-arsana/iot-ai-id/compare/3c34f75...HEAD
+[0.6.0]: https://github.com/dansya-arsana/iot-ai-id/compare/7937777...3c34f75
 [0.5.0]: https://github.com/dansya-arsana/iot-ai-id/compare/2bbbaa3...7937777
 [0.4.0]: https://github.com/dansya-arsana/iot-ai-id/compare/6ea1215...2bbbaa3
 [0.3.0]: https://github.com/dansya-arsana/iot-ai-id/compare/eb01b3f...6ea1215
