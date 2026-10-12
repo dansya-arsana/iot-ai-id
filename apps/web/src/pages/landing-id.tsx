@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import {ArrowRightIcon,ArrowUpRightIcon,CheckIcon,WhatsappLogoIcon} from '@phosphor-icons/react';
 import {DotMark} from '../brand/dot-mark';
 import {rememberRegion} from '../region';
+import {useAccess} from '../preview';
 import {WA_DISPLAY,waLink} from '../contact';
 import {fetchBoard,idr,type BoardRow} from '../ops-client';
 export {WA_NUMBER,waLink} from '../contact';
@@ -58,7 +59,7 @@ function Wa({kind,children,className='lid-btn lid-btn--dark'}:{kind:keyof typeof
 
 export function LandingID(){
  useEffect(()=>rememberRegion('id'),[]);
- const [board,setBoard]=useState<BoardRow[]>([]);
+ const [board,setBoard]=useState<BoardRow[]>([]);const{locked}=useAccess();const soon=locked;
  useEffect(()=>{let live=true;fetchBoard().then(rows=>{if(live)setBoard(rows);}).catch(()=>{/* Board stays on open slots. */});return()=>{live=false;};},[]);
  const slots=Math.max(0,5-board.length);
  const example=150000;
@@ -111,12 +112,14 @@ export function LandingID(){
     </article>)}</div>
    </section>
 
-   <section id="papan" className="lid-section lid-board" aria-labelledby="lid-board-title">
+   {soon?<section id="papan" className="lid-section lid-board" aria-labelledby="lid-board-title" data-testid="board-invite">
+    <div className="lid-board-head"><p className="lid-eyebrow">PAPAN LAB MITRA 2026 · KHUSUS UNDANGAN</p><h2 id="lid-board-title">Papan Lab Mitra khusus untuk anggota undangan.</h2><p>Kami membuka papan peringkat bertahap untuk sekolah mitra. Sekolah yang bergabung di angkatan pertama punya kesempatan pertama di posisi teratas. Sudah diundang? Masuk untuk melihatnya.</p><Wa kind="lab">Ambil slot sekolah Anda</Wa><p style={{marginTop:"1rem"}}><Link to="/partner?kind=school">Minta akses lewat formulir</Link> · <Link to="/masuk">Masuk</Link></p></div>
+   </section>:<section id="papan" className="lid-section lid-board" aria-labelledby="lid-board-title">
     <div className="lid-board-head"><p className="lid-eyebrow">PAPAN LAB MITRA 2026</p><h2 id="lid-board-title">{board.length?'Lab Mitra yang sudah lulus verifikasi.':'Peringkat pertama masih kosong.'}</h2><p>Papan ini diisi dari record uji yang benar-benar lulus: jumlah tugas, ketepatan, dan honor yang sudah dibayar. Lab yang bergabung di angkatan pertama punya kesempatan pertama menempati posisi teratas.</p><Wa kind="lab">Ambil slot sekolah Anda</Wa></div>
     <div className="lid-table-wrap"><table className="lid-leader"><thead><tr><th scope="col">#</th><th scope="col">Sekolah</th><th scope="col">Kota</th><th scope="col">Tugas lulus</th><th scope="col">Honor dibayar</th></tr></thead>
      <tbody>{board.map((b,i)=><tr key={b.name}><td>{String(i+1).padStart(2,'0')}</td><td><b>{b.name}</b></td><td>{b.city||'—'}</td><td>{b.passed}</td><td>{idr(b.paidIdr)}</td></tr>)}{Array.from({length:slots},(_,n)=><tr key={'slot'+n}><td>{String(board.length+n+1).padStart(2,'0')}</td><td><span className="lid-slot">Slot terbuka</span></td><td>—</td><td>0</td><td>Rp0</td></tr>)}</tbody></table>
      <small>{board.length?'Hanya sekolah aktif yang setuju ditampilkan. Angka dari tugas yang lolos verifikasi.':'Belum ada lab aktif. Papan diperbarui otomatis setelah lab pertama lolos verifikasi.'}</small></div>
-   </section>
+   </section>}
 
    <section id="faq" className="lid-section lid-faq" aria-labelledby="lid-faq-title">
     <div><p className="lid-eyebrow">PERTANYAAN KEPALA SEKOLAH</p><h2 id="lid-faq-title">Yang biasanya ditanyakan dulu.</h2></div>

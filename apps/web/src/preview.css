@@ -1,0 +1,10 @@
+/* Invitation-only block, header sign-in link and the presentation-mode pill (preview.tsx) */
+.invite{display:grid;gap:var(--ds-6)}
+.invite--inline{max-width:640px}
+.invite .ds-actions{display:flex;flex-wrap:wrap;gap:var(--ds-3)}
+.ds-signin{font:500 14px/1 var(--ds-font);color:var(--ds-ink);text-decoration:underline;text-underline-offset:4px;white-space:nowrap;max-width:16ch;overflow:hidden;text-overflow:ellipsis}
+.ds-mobile-foot .ds-signin{max-width:20ch}
+.preview-pill{position:fixed;z-index:60;right:var(--ds-4);bottom:var(--ds-4);display:flex;align-items:center;gap:var(--ds-3);flex-wrap:wrap;padding:var(--ds-2) var(--ds-3);border:1px solid var(--ds-line);border-radius:var(--ds-radius-1);background:var(--ds-surface);color:var(--ds-ink);box-shadow:0 4px 16px var(--ds-line)}
+.preview-pill a{color:var(--ds-ink-2);font-size:.8125rem;text-decoration:underline;text-underline-offset:3px}
+.ds-preview-tag{margin-left:var(--ds-2);font:500 .6875rem/1 var(--ds-mono);letter-spacing:var(--ds-track-label);text-transform:uppercase;color:var(--ds-ink-3)}
+@media (max-width:640px){.preview-pill{left:var(--ds-4);justify-content:space-between}}

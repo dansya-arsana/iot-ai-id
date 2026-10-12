@@ -35,7 +35,7 @@ test('staff activate, me, logout and login: cookie flags, CSRF header, hashed st
  assert.equal((await h.staff('GET','me/')).status,404);assert.equal((await h.staff('GET','')).status,404);assert.equal((await h.staff('GET','me/x')).status,404);
  const reuse=await h.staff('POST','activate',{code:o.made.inviteCode,password:'another long password'});assert.equal(reuse.status,400,'single use');
  const plain=await h.ops.handle({method:'POST',path:'/ops/v1/staff/login',body:{username:'daniel',password:'a long owner password'},ip:'1.1.1.1',headers:{'x-aiot-staff':'1'},plainLoopback:true});
- assert.doesNotMatch(plain!.setCookie!,/Secure/);
+ assert.doesNotMatch(String(plain!.setCookie),/Secure/);
 });
 
 test('invite codes expire after 7 days and short passwords are refused',async()=>{
@@ -137,4 +137,22 @@ test('CLI process: reads OPS_DB and prints only the invite code and expiry',asyn
  const run=(...args:string[])=>{try{return{code:0,out:execFileSync('node',['--import','tsx','services/ops/cli.ts','staff-invite',...args],{env:{...process.env,OPS_DB:db},encoding:'utf8',stdio:['ignore','pipe','pipe']})};}catch(e:any){return{code:e.status as number,out:String(e.stdout)};}};
  const a=run('daniel','owner','Daniel Owner');assert.equal(a.code,0);assert.match(a.out,/^invite: [A-Z2-9]{4}-[A-Z2-9]{10}\nexpires: \d{4}-\d\d-\d\dT[\d:.]+Z\n$/);
  assert.equal(run('rina','owner').code,1);assert.equal(run('rina','owner','--force').code,0);
+});
+
+test('preview: name and role only; CORS headers solely for exact allowlisted origins; trailing slash 404',async()=>{
+ const h=harness();const o=await h.owner();
+ const call=(origin:string|undefined,cookie:string|undefined,loopback=false,path='/ops/v1/staff/preview')=>h.ops.handle({method:'GET',path,ip:'7.7.7.7',headers:{cookie:cookie?`aiot_admin=${cookie}`:undefined,origin},plainLoopback:loopback})as Promise<R>;
+ const ok=await call('https://iot.ai.id',o.session);
+ assert.equal(ok.status,200);assert.deepEqual(ok.data,{name:'Daniel Owner',role:'owner'},'no username, no session id');
+ assert.equal(ok.headers!['Access-Control-Allow-Origin'],'https://iot.ai.id');assert.equal(ok.headers!['Access-Control-Allow-Credentials'],'true');
+ assert.equal(ok.headers!.Vary,'Origin');assert.equal(ok.headers!['Cache-Control'],'no-store');assert.equal(ok.setCookie,undefined);
+ assert.equal((await call('https://www.iot.ai.id',o.session)).headers!['Access-Control-Allow-Origin'],'https://www.iot.ai.id');
+ const anon=await call('https://iot.ai.id',undefined);assert.equal(anon.status,401);assert.equal(anon.headers!['Access-Control-Allow-Origin'],'https://iot.ai.id');
+ for(const evil of ['https://evil.example','https://iot.ai.id.evil.example','http://iot.ai.id','https://admin.iot.ai.id','null','http://iot.admin.localhost:8891',undefined]){
+  const r=await call(evil,o.session);assert.equal(r.headers!['Access-Control-Allow-Origin'],undefined,String(evil));assert.equal(r.headers!['Access-Control-Allow-Credentials'],undefined);assert.equal(r.headers!.Vary,'Origin');
+ }
+ assert.equal((await call('http://iot.admin.localhost:8891',o.session,true)).headers!['Access-Control-Allow-Origin'],'http://iot.admin.localhost:8891','e2e alias only for plain loopback');
+ assert.equal((await call('http://iot.admin.localhost.evil:8891',o.session,true)).headers!['Access-Control-Allow-Origin'],undefined);
+ assert.equal((await call('https://iot.ai.id',o.session,false,'/ops/v1/staff/preview/')).status,404);
+ assert.equal((await h.staff('POST','preview',{})).status,404,'GET only');
 });

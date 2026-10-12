@@ -60,6 +60,8 @@ export class StaffDirectory{
 
 const ok=(data:unknown,status=200):OpsResult=>({status,data});
 const tooMany={status:429,data:{error:'Too many attempts. Please wait a few minutes and try again.'}};
+/** Public site origins that may read the preview answer; the local e2e alias counts only for plain loopback requests (never behind nginx). */
+const PREVIEW_ORIGINS=new Set(['https://iot.ai.id','https://www.iot.ai.id']),LOCAL_PREVIEW=/^http:\/\/iot\.admin\.localhost:\d+$/;
 const me=(s:Staff)=>({username:s.username,name:s.name,role:s.role});
 
 /** Public auth routes under /ops/v1/staff/ plus the internal nginx auth_request target `check`. */
@@ -85,6 +87,12 @@ export async function handleStaff(ops:Ops,call:OpsCall):Promise<OpsResult>{
   return s?start(s):{status:401,data:{error:'Wrong username or password, or the account is locked for 15 minutes.'}};
  }
  if(resource==='logout'&&method==='POST'){if(token)dir.endSession(token);return{...ok({ok:true}),setCookie:cookie('',0)};}
+ // Presentation mode: iot.ai.id asks (credentialed, simple GET) whether a staff session is live. Answers name and role only; CORS only for exact allowlisted origins. Same session lookup as `me`.
+ if(resource==='preview'&&method==='GET'){
+  const origin=headers.origin??'',cors:Record<string,string>={'Cache-Control':'no-store',Vary:'Origin'};
+  if(PREVIEW_ORIGINS.has(origin)||(loopback&&LOCAL_PREVIEW.test(origin))){cors['Access-Control-Allow-Origin']=origin;cors['Access-Control-Allow-Credentials']='true';}
+  const s=dir.session(token);return s?{status:200,data:{name:s.name,role:s.role},headers:cors}:{status:401,data:{error:'Please sign in.'},headers:cors};
+ }
  if(resource==='me'&&method==='GET'){const s=dir.session(token);return s?ok(me(s)):{status:401,data:{error:'Please sign in.'}};}
  return{status:404,data:{error:'Not found'}};
 }

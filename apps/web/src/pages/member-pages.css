@@ -1,0 +1,12 @@
+/* Member sign-in and profile (mp-): reuses the admin landing form pieces (al-tabs, al-form, al-msg). */
+.mp-card{max-width:520px;margin-inline:auto}
+.mp-help a{color:var(--ds-ink);text-underline-offset:3px}
+.mp-section{display:grid;gap:var(--ds-4);margin-top:var(--ds-10)}
+.mp-h{margin:0;font-size:var(--ds-text-h3,1.25rem);font-weight:600;letter-spacing:var(--ds-track-heading)}
+.mp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--ds-4)}
+.mp-card-area{display:grid;gap:var(--ds-3);align-content:start;padding:var(--ds-5);text-decoration:none;color:var(--ds-ink)}
+.mp-card-area h3{margin:0;font-size:var(--ds-text-body);font-weight:600}
+.mp-card-area p{margin:0;font-size:var(--ds-text-small);line-height:1.5;color:var(--ds-ink-2)}
+.mp-card-area .ds-tag{justify-self:start}
+.mp-card-locked{background:var(--ds-sunken)}
+.mp-card-locked .ds-button{justify-self:start}

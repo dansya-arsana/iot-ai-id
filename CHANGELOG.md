@@ -6,7 +6,13 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+### Added
+- Public host (iot.ai.id): gated areas (Products, Builders, PhysicalBench, Arena, Build, Sites, Design, the `/id` leaderboard and the Learn start button) are invitation-only ("By invitation" / "Khusus undangan") with Request access, Sign in and WhatsApp actions, and their nav links are hidden from visitors who cannot open them. They are noindex and left out of the sitemap and llms.txt. localhost, the desktop app and admin.iot.ai.id are unaffected.
+- Member accounts (ADR 009 addendum): invited clients, partners and schools sign in at `/masuk` (alias `/login`) and unlock areas by grant (`products`, `bench`, `arena`, `builders`, `installer`). `/profile` (alias `/profil`) shows name, organization, unlocked areas, Request access for locked ones, Sign out, and the installer button only with the `installer` grant. A header Sign in link becomes the member's name. Routes `/ops/v1/member/{activate,login,logout,me,installer}` (cookie `aiot_member`, `X-AIoT-Member` CSRF header), admin routes `/ops/v1/admin/members`, a Members section in the backoffice (`#bo-members`, owner and sales) and nginx locations for the public host. `OPS_INSTALLER_URL` sets the installer redirect.
+- Presentation mode: a signed-in staff member visiting iot.ai.id sees everything unlocked, with a "Presentation mode" pill (view as public, back to admin). Backed by `GET /ops/v1/staff/preview` (name and role only, exact-origin CORS). The backoffice header gets a "Present site" link.
+
 ### Changed
+- The public host no longer links the desktop release downloads (footer, pages): members get the installer from their profile and anonymous visitors are pointed to Request access. The GitHub release assets stay public until they are moved to private storage; the gate controls our links only.
 - Tasks are marked paid when their payout batch is marked paid; the per-task "Mark paid" action is removed. Tasks can carry a lead teacher set at assignment.
 
 ### Added

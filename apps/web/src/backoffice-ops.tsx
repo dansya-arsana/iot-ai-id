@@ -2,8 +2,8 @@
 import {useCallback,useEffect,useMemo,useState,type FormEvent,type ReactNode} from 'react';
 import {useLang} from './i18n';
 import {Button,Eyebrow,Input,Notice,Select,Stat,StatGrid,Tag,Textarea} from './ui';
-import {idr,opsAdmin,type Commissions as CommissionData,type Me,type PayoutRow,type PersonView,type StaffView,type Summary,type TaskRow} from './ops-client';
-import {CHECK_STATES,INQUIRY_STATUSES,ROLES,LOCALIZATION_ITEMS,ORG_STATUSES,ORG_TYPES,PRODUCT_STATUSES,SCHOOL_PACKAGES,type Inquiry,type Organization,type Product} from '../../../packages/ops-contract/index';
+import {idr,opsAdmin,type Commissions as CommissionData,type Me,type PayoutRow,type MemberView,type PersonView,type StaffView,type Summary,type TaskRow} from './ops-client';
+import {CHECK_STATES,MEMBER_GRANTS,INQUIRY_STATUSES,ROLES,LOCALIZATION_ITEMS,ORG_STATUSES,ORG_TYPES,PRODUCT_STATUSES,SCHOOL_PACKAGES,type Inquiry,type MemberGrant,type Organization,type Product} from '../../../packages/ops-contract/index';
 
 export const opsSections=[
  {hash:'#bo-inquiries',en:'Inquiries',id:'Inquiry'},
@@ -11,10 +11,11 @@ export const opsSections=[
  {hash:'#bo-products',en:'Products',id:'Produk'},
  {hash:'#bo-tasks',en:'Lab tasks',id:'Tugas lab'},
  {hash:'#bo-commissions',en:'Commissions & payouts',id:'Komisi & payout'},
+ {hash:'#bo-members',en:'Members',id:'Anggota'},
  {hash:'#bo-team',en:'Team',id:'Tim'},
 ];
-async function fetchAll():Promise<Data>{const [me,summary,inquiries,orgs,products,tasks,payouts,commissions,people,team]=await Promise.all([opsAdmin.me(),opsAdmin.summary(),opsAdmin.inquiries(),opsAdmin.organizations(),opsAdmin.products(),opsAdmin.tasks(),opsAdmin.payouts(),opsAdmin.commissions(),opsAdmin.people(),opsAdmin.staff().catch(()=>undefined)]);return{me,summary,inquiries,orgs,products,tasks,payouts,commissions,people,team:me.role==='owner'?team:undefined};}
-type Data={me:Me;summary:Summary;inquiries:Inquiry[];orgs:Organization[];products:Product[];tasks:TaskRow[];payouts:{payouts:PayoutRow[];totals:{dueIdr:number;paidIdr:number}};commissions:CommissionData;people:PersonView[];team?:StaffView[]};
+async function fetchAll():Promise<Data>{const [me,summary,inquiries,orgs,products,tasks,payouts,commissions,people,team,members]=await Promise.all([opsAdmin.me(),opsAdmin.summary(),opsAdmin.inquiries(),opsAdmin.organizations(),opsAdmin.products(),opsAdmin.tasks(),opsAdmin.payouts(),opsAdmin.commissions(),opsAdmin.people(),opsAdmin.staff().catch(()=>undefined),opsAdmin.members().catch(()=>undefined)]);return{me,summary,inquiries,orgs,products,tasks,payouts,commissions,people,team:me.role==='owner'?team:undefined,members};}
+type Data={me:Me;summary:Summary;inquiries:Inquiry[];orgs:Organization[];products:Product[];tasks:TaskRow[];payouts:{payouts:PayoutRow[];totals:{dueIdr:number;paidIdr:number}};commissions:CommissionData;people:PersonView[];team?:StaffView[];members?:MemberView[]};
 const when=(iso:string,locale:string)=>new Date(iso).toLocaleString(locale,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 const tone=(status:string):'ok'|'warn'|'error'|'neutral'=>['won','active','available','verified','paid','done'].includes(status)?'ok':['new','submitted','in_progress','testing','localizing','proposal'].includes(status)?'warn':['lost','spam','rejected','ended','discontinued'].includes(status)?'error':'neutral';
 
@@ -51,6 +52,7 @@ export function BusinessOps(){
   <Products data={data} canWrite={write('products')} run={run}/>
   <Tasks data={data} canWrite={write('tasks')} run={run}/>
   <Commissions data={data} canPay={write('tasks')} canPeople={write('organizations')} run={run} locale={locale}/>
+  {data.members&&<Members data={data} members={data.members} run={run} locale={locale}/>}
   {data.team&&<Team data={data} team={data.team} run={run} locale={locale}/>}
  </>;
 }
@@ -243,5 +245,40 @@ function Team({data,team,run,locale}:{data:Data;team:StaffView[];run:Run;locale:
    <td>{status(s)}</td>
    <td><div className="bo-ops-inline">{s.status==='active'&&!self&&<Button size="sm" variant="secondary" onClick={()=>void run(async()=>{const r=await opsAdmin.resetStaffInvite(s.id);reveal(r.staff,r.inviteCode);},tr('New invite code created','Kode undangan baru dibuat'))}>{tr('Reset invite','Reset undangan')}</Button>}<Button size="sm" variant="secondary" onClick={()=>void run(()=>opsAdmin.updateStaff(s.id,{status:s.status==='active'?'disabled':'active'}),s.status==='active'?tr('Person disabled and signed out','Orang dinonaktifkan dan dikeluarkan'):tr('Person enabled','Orang diaktifkan'))}>{s.status==='active'?tr('Disable','Nonaktifkan'):tr('Enable','Aktifkan')}</Button></div></td>
   </tr>;})}</tbody></table></div>
+ </Section>;
+}
+
+const GRANT_LABELS:Record<MemberGrant,[string,string]>={products:['Products','Produk'],bench:['PhysicalBench','PhysicalBench'],arena:['Arena','Arena'],builders:['Builders','Builders'],installer:['Installer download','Unduh installer']};
+/** Owner and sales: member accounts that unlock areas of iot.ai.id. Codes are shown once; accounts are disabled, never deleted. */
+function Members({data,members,run,locale}:{data:Data;members:MemberView[];run:Run;locale:string}){
+ const{tr}=useLang();const [form,setForm]=useState<{username:string;name:string;orgName:string;orgId:string;grants:MemberGrant[]}>({username:'',name:'',orgName:'',orgId:'',grants:[]});
+ const [invite,setInvite]=useState<{name:string;username:string;code:string}>();const [copied,setCopied]=useState(false);const [openId,setOpenId]=useState('');
+ const reveal=(m:MemberView,code:string)=>{setInvite({name:m.name,username:m.username,code});setCopied(false);};
+ const toggle=(grants:MemberGrant[],g:MemberGrant)=>grants.includes(g)?grants.filter(x=>x!==g):[...grants,g];
+ const add=(e:FormEvent)=>{e.preventDefault();void run(async()=>{const r=await opsAdmin.createMember({username:form.username.trim().toLowerCase(),name:form.name.trim(),...(form.orgName.trim()?{orgName:form.orgName.trim()}:{}),...(form.orgId?{orgId:form.orgId}:{}),grants:form.grants});reveal(r.member,r.inviteCode);setForm(f=>({...f,username:'',name:'',orgName:'',orgId:'',grants:[]}));},tr('Member added','Anggota ditambahkan'));};
+ const copy=()=>{if(invite)void navigator.clipboard?.writeText(invite.code).then(()=>setCopied(true));};
+ const status=(m:MemberView)=>m.status==='disabled'?<Tag tone="error">{tr('disabled','nonaktif')}</Tag>:m.activated?<Tag tone="ok">{tr('active','aktif')}</Tag>:m.inviteExpires?<Tag tone="warn">{tr('invite until','undangan s/d')} {new Date(m.inviteExpires).toLocaleDateString(locale,{day:'numeric',month:'short'})}</Tag>:<Tag>{tr('invite expired','undangan kedaluwarsa')}</Tag>;
+ const checks=(id:string,grants:MemberGrant[],onChange:(g:MemberGrant)=>void,disabled?:boolean)=><div className="bo-ops-grants" role="group" aria-label={tr('Grants','Hak akses')}>{MEMBER_GRANTS.map(g=><label key={g} htmlFor={`${id}-${g}`}><input id={`${id}-${g}`} type="checkbox" checked={grants.includes(g)} disabled={disabled} onChange={()=>onChange(g)}/>{tr(...GRANT_LABELS[g])}</label>)}</div>;
+ return <Section id="bo-members" eyebrow={tr('Access','Akses')} title={tr('Members','Anggota')}>
+  <p className="bo-muted">{tr('Invited clients, partners and schools sign in on iot.ai.id with their own username and password. Grants decide which areas they unlock; the installer grant adds the desktop download to their profile. Accounts are disabled, never deleted. Codes are shown once and expire in 7 days.','Klien, mitra, dan sekolah undangan masuk di iot.ai.id dengan nama pengguna dan kata sandi masing-masing. Hak akses menentukan area yang terbuka; hak installer menambahkan unduhan desktop di profil mereka. Akun dinonaktifkan, tidak dihapus. Kode hanya tampil sekali dan kedaluwarsa dalam 7 hari.')}</p>
+  {invite&&<Notice tone="warn" title={tr(`Invite code for ${invite.name}`,`Kode undangan untuk ${invite.name}`)} action={<Button size="sm" variant="secondary" onClick={copy}>{copied?tr('Copied','Tersalin'):tr('Copy code','Salin kode')}</Button>}>
+   <span className="bo-ops-code" data-testid="member-invite-code">{invite.code}</span> · {tr('username','nama pengguna')} <code>{invite.username}</code> <span>{tr('Shown once. Copy it now and hand it to the person; it cannot be displayed again, only replaced with a new code.','Tampil sekali. Salin sekarang dan serahkan ke orangnya; kode tidak dapat ditampilkan lagi, hanya diganti kode baru.')}</span> <Button size="sm" variant="secondary" onClick={()=>setInvite(undefined)}>{tr('I have copied it','Sudah saya salin')}</Button>
+  </Notice>}
+  <form className="bo-ops-form" onSubmit={add} aria-label={tr('Add a member','Tambah anggota')}>
+   <Input id="mb-username" label={tr('Username','Nama pengguna')} hint="a-z 0-9 . _ -" required minLength={3} maxLength={40} autoCapitalize="none" value={form.username} onChange={e=>setForm({...form,username:e.target.value.toLowerCase()})}/>
+   <Input id="mb-name" label={tr('Name','Nama')} required value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
+   <Input id="mb-org" label={tr('Organization name','Nama organisasi')} value={form.orgName} onChange={e=>setForm({...form,orgName:e.target.value})}/>
+   <Select id="mb-orgid" label={tr('Linked organization','Organisasi terhubung')} value={form.orgId} onChange={e=>setForm({...form,orgId:e.target.value})}><option value="">{tr('None','Tidak ada')}</option>{data.orgs.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</Select>
+   {checks('mb-g',form.grants,g=>setForm({...form,grants:toggle(form.grants,g)}))}
+   <Button type="submit" size="sm" disabled={!/^[a-z0-9._-]{3,40}$/.test(form.username)||form.name.trim().length<2}>{tr('Add member','Tambah anggota')}</Button>
+  </form>
+  {!members.length&&<p className="bo-muted">{tr('No members yet.','Belum ada anggota.')}</p>}
+  {members.length>0&&<div className="bo-ops-table"><table><thead><tr><th scope="col">{tr('Name','Nama')}</th><th scope="col">{tr('Username','Nama pengguna')}</th><th scope="col">{tr('Organization','Organisasi')}</th><th scope="col">{tr('Grants','Hak akses')}</th><th scope="col">{tr('Account','Akun')}</th><th scope="col">{tr('Action','Aksi')}</th></tr></thead><tbody>{members.map(m=><tr key={m.id} data-testid={`member-${m.username}`}>
+   <th scope="row">{m.name}</th><td><code>{m.username}</code></td><td>{m.orgName||'—'}</td>
+   <td>{checks(`mb-${m.id}`,m.grants,g=>void run(()=>opsAdmin.updateMember(m.id,{grants:MEMBER_GRANTS.filter(x=>(x===g)!==m.grants.includes(x))}),tr('Grants updated','Hak akses diperbarui')),m.status==='disabled')}</td>
+   <td>{status(m)}</td>
+   <td><div className="bo-ops-inline">{m.status==='active'&&<Button size="sm" variant="secondary" onClick={()=>void run(async()=>{const r=await opsAdmin.resetMemberInvite(m.id);reveal(r.member,r.inviteCode);},tr('New invite code created','Kode undangan baru dibuat'))}>{tr('Reset invite','Reset undangan')}</Button>}<Button size="sm" variant="secondary" onClick={()=>void run(async()=>{const r=await opsAdmin.updateMember(m.id,{status:m.status==='active'?'disabled':'active'});if(r.inviteCode)reveal(r,r.inviteCode);},m.status==='active'?tr('Member disabled and signed out','Anggota dinonaktifkan dan dikeluarkan'):tr('Member enabled','Anggota diaktifkan'))}>{m.status==='active'?tr('Disable','Nonaktifkan'):tr('Enable','Aktifkan')}</Button><Button size="sm" variant="secondary" aria-expanded={openId===m.id} onClick={()=>setOpenId(openId===m.id?'':m.id)}>{tr('History','Riwayat')}</Button></div>
+    {openId===m.id&&<ol className="bo-ops-history">{[...m.history].reverse().map((h,n)=><li key={n}><small>{when(h.at,locale)} · {h.by}</small> {h.action}</li>)}</ol>}</td>
+  </tr>)}</tbody></table></div>}
  </Section>;
 }

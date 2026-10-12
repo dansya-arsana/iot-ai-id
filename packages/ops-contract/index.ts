@@ -181,3 +181,14 @@ export const USERNAME_RE=/^[a-z0-9._-]{3,40}$/;
 export const StaffInputSchema=z.object({username:z.string().trim().toLowerCase().regex(USERNAME_RE,{error:'Username: 3-40 characters, a-z 0-9 . _ -'}),name:text(120).min(2),role:z.enum(ROLES)}).strict();
 export const StaffUpdateSchema=z.object({role:z.enum(ROLES).optional(),status:z.enum(STAFF_STATUSES).optional()}).strict().refine(v=>v.role!==undefined||v.status!==undefined,{error:'Nothing to change'});
 export type Staff={id:string;username:string;name:string;role:Role;status:typeof STAFF_STATUSES[number];createdBy:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
+
+// Members (ADR 009 addendum): invited clients, partners and schools whose account unlocks areas of iot.ai.id. Login and activation share the portal schemas.
+export const MEMBER_GRANTS=['products','bench','arena','builders','installer'] as const;
+export type MemberGrant=typeof MEMBER_GRANTS[number];
+export const MEMBER_STATUSES=['active','disabled'] as const;
+const grantList=z.array(z.enum(MEMBER_GRANTS)).max(MEMBER_GRANTS.length).transform(g=>MEMBER_GRANTS.filter(x=>g.includes(x)));
+export const MemberInputSchema=z.object({username:z.string().trim().toLowerCase().regex(USERNAME_RE,{error:'Username: 3-40 characters, a-z 0-9 . _ -'}),name:text(120).min(2),orgName:text(160).default(''),orgId:z.string().uuid().optional(),grants:grantList.default([])}).strict();
+export const MemberUpdateSchema=z.object({name:text(120).min(2).optional(),orgName:text(160).optional(),orgId:z.string().uuid().nullable().optional(),grants:grantList.optional(),status:z.enum(MEMBER_STATUSES).optional()}).strict().refine(v=>Object.values(v).some(x=>x!==undefined),{error:'Nothing to change'});
+export type Member={id:string;username:string;name:string;orgName:string;orgId?:string;grants:MemberGrant[];status:typeof MEMBER_STATUSES[number];createdBy:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
+/** What a signed-in member may see about themselves: no ids, no session data. */
+export type MemberMe={name:string;org:string;grants:MemberGrant[]};

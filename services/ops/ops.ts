@@ -10,6 +10,7 @@ import {z} from 'zod';
 import {handlePortal} from './portal.js';
 import {Auth} from './auth.js';
 import {StaffDirectory,handleStaff,handleStaffAdmin} from './staff.js';
+import {MemberDirectory,handleMember,handleMemberAdmin} from './members.js';
 import {
  InquiryInputSchema,InquiryUpdateSchema,OrganizationInputSchema,OrganizationUpdateSchema,ProductInputSchema,ProductUpdateSchema,TaskInputSchema,TaskActionSchema,
  SchoolAdminInputSchema,ReasonSchema,PersonUpdateSchema,BatchCreateSchema,BatchPaidSchema,INQUIRY_STATUSES,ORG_TYPES,PRODUCT_STATUSES,TASK_STATUSES,can,permissions,resolveRole,payoutSplit,productErrors,publicProduct,taskTransition,
@@ -17,7 +18,7 @@ import {
 } from '../../packages/ops-contract/index.js';
 
 const UuidSchema=z.string().uuid({error:'Invalid id'});
-const kinds=['inquiries','organizations','products','tasks','people','allocations','batches','staff'] as const;
+const kinds=['inquiries','organizations','products','tasks','people','allocations','batches','staff','members'] as const;
 type Kind=typeof kinds[number];
 type Row={id:string;createdAt:string;updatedAt:string;history:{at:string;by:string;action:string}[]};
 
@@ -34,7 +35,7 @@ export class OpsStore{
 /** `headers` are lowercase request headers (portal cookie and CSRF); `plainLoopback` is true only for plain-http requests straight from this machine. */
 export type OpsCall={method:string;path:string;body?:unknown;ip:string;admin?:{user:string};headers?:Record<string,string|undefined>;plainLoopback?:boolean};
 /** `text` replaces the JSON body (CSV export); `setCookie` is a full Set-Cookie value; `headers` are extra response headers (staff check). */
-export type OpsResult={status:number;data:unknown;setCookie?:string;headers?:Record<string,string>;text?:{type:string;body:string;filename?:string}};
+export type OpsResult={status:number;data:unknown;setCookie?:string|string[];headers?:Record<string,string>;/** 302 target (member installer). */redirect?:string;text?:{type:string;body:string;filename?:string}};
 
 /** Per-IP and global limits for the public form. In memory: a restart resets them, which is acceptable for a contact form. */
 export class RateLimit{
@@ -48,8 +49,8 @@ export class RateLimit{
 }
 
 export class Ops{
- readonly commissions:Commissions;readonly staff:StaffDirectory;readonly loginLimit=new RateLimit(20,10*60_000,2000);readonly activateLimit=new RateLimit(10,10*60_000,500);
- constructor(readonly store:OpsStore,readonly roles=new Map<string,Role>(),readonly limit=new RateLimit(),readonly clock=()=>new Date()){const auth=new Auth(store,clock);this.commissions=new Commissions(store,clock,auth);this.staff=new StaffDirectory(store,clock,auth);}
+ readonly commissions:Commissions;readonly staff:StaffDirectory;readonly members:MemberDirectory;readonly loginLimit=new RateLimit(20,10*60_000,2000);readonly activateLimit=new RateLimit(10,10*60_000,500);
+ constructor(readonly store:OpsStore,readonly roles=new Map<string,Role>(),readonly limit=new RateLimit(),readonly clock=()=>new Date()){const auth=new Auth(store,clock);this.commissions=new Commissions(store,clock,auth);this.staff=new StaffDirectory(store,clock,auth);this.members=new MemberDirectory(store,clock,auth);}
  /** A staff account decides its own role (disabled: none); other users fall back to OPS_ROLES, or single-owner when none are configured (desktop and dev). */
  roleFor(user:string):Role|undefined{const r=this.staff.roleOf(user);return r===undefined?resolveRole(user,this.roles):r??undefined;}
 
@@ -82,6 +83,7 @@ export class Ops{
   if(path==='/ops/v1/labs'&&method==='GET')return{status:200,data:{labs:this.board()}};
   if(path.startsWith('/ops/v1/portal/'))return handlePortal(this,call);
   if(path.startsWith('/ops/v1/staff/'))return handleStaff(this,call);
+  if(path.startsWith('/ops/v1/member/'))return handleMember(this,call);
   if(!path.startsWith('/ops/v1/admin/'))return{status:404,data:{error:'Not found'}};
 
   // Owner side: the caller has already authenticated the gateway user; roles decide what they may do.
@@ -92,6 +94,7 @@ export class Ops{
   const rest=path.slice('/ops/v1/admin/'.length).split('/');const [resource,id,sub]=rest;
 
   if(resource==='staff'){const r=await handleStaffAdmin(this,call,role,by,id,sub);if(r)return r;}
+  if(resource==='members'){const r=await handleMemberAdmin(this,call,role,by,id,sub);if(r)return r;}
   if(resource==='me'&&method==='GET')return{status:200,data:{user:by,role,permissions:permissions(role)}};
   if(resource==='summary'&&method==='GET')return{status:200,data:this.summary()};
 

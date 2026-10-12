@@ -7,6 +7,7 @@ import {AnchorButton,Button,Card,EmptyState,Eyebrow,Input,LinkButton,Notice,Sele
 import {WA_DISPLAY,waLink} from '../contact';
 import {track} from '../analytics';
 import {fetchCatalog,OpsError,submitInquiry} from '../ops-client';
+import {useAccess} from '../preview';
 import {INQUIRY_KINDS,LOCALIZATION_ITEMS,type PublicProduct} from '../../../../packages/ops-contract/index';
 import './partner-page.css';
 
@@ -20,7 +21,7 @@ const kindCopy:Record<Kind,{en:string;id:string;hintEn:string;hintId:string}>={
 const empty={name:'',organization:'',email:'',phone:'',country:'',interest:'',message:'',consent:false,website:''};
 
 export function Partner(){
- const{tr,lang}=useLang();const{search}=useLocation();
+ const{tr,lang}=useLang();const{search}=useLocation();const{can}=useAccess();
  const initial=new URLSearchParams(search).get('kind');
  const [kind,setKind]=useState<Kind>((INQUIRY_KINDS as readonly string[]).includes(initial??'')?initial as Kind:'vendor');
  const [form,setForm]=useState(empty);const [busy,setBusy]=useState(false);
@@ -80,7 +81,7 @@ export function Partner(){
     <Card as="section"><Eyebrow>{tr('Direct contact','Kontak langsung')}</Eyebrow><p className="pt-fine">{tr('Prefer to talk now?','Mau langsung ngobrol?')}</p>
      <AnchorButton href={waLink(lang==='id'?'Halo AIoT, saya ingin berdiskusi soal kerja sama.':'Hello AIoT, I would like to discuss a partnership.')} data-cta="partner-wa" target="_blank" rel="noopener"><WhatsappLogoIcon size={18} aria-hidden="true"/> WhatsApp {WA_DISPLAY}</AnchorButton>
      <a className="pt-link" href={PARTNERSHIP_BRIEF} download data-cta="partner-brief">{tr('Download the partnership brief','Unduh partnership brief')} <ArrowUpRightIcon size={14}/></a>
-     <Link className="pt-link" to="/products">{tr('See tested products','Lihat produk teruji')} <ArrowUpRightIcon size={14}/></Link>
+     {can('/products')&&<Link className="pt-link" to="/products">{tr('See tested products','Lihat produk teruji')} <ArrowUpRightIcon size={14}/></Link>}
     </Card>
    </aside>
   </div>

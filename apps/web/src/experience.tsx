@@ -3,7 +3,9 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {ArrowUpRightIcon, ArrowLeftIcon, DownloadSimpleIcon} from '@phosphor-icons/react';
 import {api, post} from './api';
 import {BuildProgressionGuide} from './build-progression-guide';
+import {isPublicHost} from './host';
 import {useLang} from './i18n';
+import {InvitationOnly} from './preview';
 import {Button, Card, CodeBlock, Eyebrow, Input, Notice, SectionHeader, Select, SpecList, Tag, Textarea, TextLink} from './ui';
 import type {assembleEpisode} from '../../../packages/episodes/index';
 import type {SimulatorCapabilities} from '../../../packages/simulator-client/index';
@@ -51,9 +53,9 @@ export function LearnContent() {
           [tr('Proof', 'Bukti'), tr('Six named runtime checks', 'Enam pemeriksaan runtime bernama')],
         ]}/>
         <label className="xp-check"><input type="checkbox" checked={acknowledged} onChange={e => setAcknowledged(e.target.checked)}/><span>{tr('I understand that AI assistance processes the build goal and machine evidence. I will keep personal and school information out of prompts.', 'Saya memahami bahwa bantuan AI memproses tujuan perakitan dan bukti mesin. Saya tidak akan memasukkan informasi pribadi atau sekolah ke dalam prompt.')}</span></label>
-        <div className="xp-lesson-actions">
+        {isPublicHost() ? <InvitationOnly inline api kind="school" name={['Guided learning', 'Pembelajaran terpandu']} workspace="/learn"/> : <div className="xp-lesson-actions">
           <Button variant="primary" disabled={!acknowledged || busy} onClick={start}>{busy ? tr('Opening challenge…', 'Membuka tantangan…') : tr('Start learning episode', 'Mulai episode belajar')} <ArrowUpRightIcon aria-hidden="true"/></Button>
-        </div>
+        </div>}
         {error && <Notice tone="error">{error}</Notice>}
         <p className="xp-fine">{tr('This notice does not authorize research reuse. Human notes and manual measurements stay local. School and minor participation require a separate reviewed permission process.', 'Pemberitahuan ini tidak mengizinkan penggunaan ulang untuk riset. Catatan manusia dan pengukuran manual tetap lokal. Partisipasi sekolah dan anak di bawah umur memerlukan proses izin terpisah yang ditinjau.')}</p>
       </Card>

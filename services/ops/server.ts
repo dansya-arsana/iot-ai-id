@@ -1,4 +1,4 @@
-/** Ops service (ADR 009, 010): public intake (inquiry form, catalog, Lab Mitra board, school portal at /ops/v1/portal/*, staff login at /ops/v1/staff/*) plus owner-token admin routes for the API proxy. */
+/** Ops service (ADR 009, 010): public intake (inquiry form, catalog, Lab Mitra board, school portal at /ops/v1/portal/*, staff login at /ops/v1/staff/*, member login at /ops/v1/member/*) plus owner-token admin routes for the API proxy. */
 import {createServer} from 'node:http';
 import {timingSafeEqual} from 'node:crypto';
 import {parseRoles} from '../../packages/ops-contract/index.js';
@@ -24,12 +24,14 @@ createServer(async(req,res)=>{
   const ip=String(req.headers['x-real-ip']??req.socket.remoteAddress??'unknown');
   // Plain-http requests straight from this machine (no proxy header) may omit the Secure cookie flag; nginx always sets X-Forwarded-Proto.
   const plainLoopback=!req.headers['x-forwarded-proto']&&/^(127\.|::1$|::ffff:127\.)/.test(req.socket.remoteAddress??'');
-  const headers={cookie:req.headers.cookie,'x-aiot-portal':String(req.headers['x-aiot-portal']??''),'x-aiot-staff':String(req.headers['x-aiot-staff']??'')};
+  const headers={cookie:req.headers.cookie,'x-aiot-portal':String(req.headers['x-aiot-portal']??''),'x-aiot-staff':String(req.headers['x-aiot-staff']??''),'x-aiot-member':String(req.headers['x-aiot-member']??''),origin:req.headers.origin};
   const result=await ops.handle({method:req.method??'GET',path,body,ip,admin:admin?{user:String(req.headers['x-ops-user']??'')}:undefined,headers,plainLoopback});
   if(!result){send(404,{error:'Not found'});return;}
   if(result.text){res.writeHead(result.status,{'Content-Type':result.text.type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...(result.text.filename?{'Content-Disposition':`attachment; filename="${result.text.filename}"`}:{})});res.end(result.text.body);return;}
   if(result.status===204){res.writeHead(204,{'Cache-Control':'no-store',...result.headers});res.end();return;}
+  if(result.redirect){res.writeHead(302,{Location:result.redirect,'Cache-Control':'no-store'});res.end();return;}
   if(result.setCookie)res.setHeader('Set-Cookie',result.setCookie);
+  for(const[k,v]of Object.entries(result.headers??{}))res.setHeader(k,v);
   send(result.status,result.data);
  }catch(error){console.error(error);send(500,{error:'Internal error'});}
 }).listen(port,host,()=>console.log(`ops: listening on ${host}:${port} (admin ${token?'enabled':'disabled'})`));

@@ -1,6 +1,6 @@
 /** Browser client for the ops service: public routes go to /ops/v1, owner routes through the session-guarded /api/ops proxy. */
 import {api,apiDownload,saveBlob} from './api';
-import type {Inquiry,InquiryInput,Organization,Product,LabTask,PublicProduct,Role,Resource,Person,Allocation,Batch,Share,Staff} from '../../../packages/ops-contract/index';
+import type {Inquiry,InquiryInput,Organization,Product,LabTask,PublicProduct,Role,Resource,Person,Allocation,Batch,Share,Staff,Member,MemberMe,MemberGrant} from '../../../packages/ops-contract/index';
 
 export class OpsError extends Error{constructor(message:string,readonly status:number,readonly issues:{path:string;message:string}[]=[]){super(message);}}
 async function publicCall<T>(path:string,init?:RequestInit):Promise<T>{
@@ -39,6 +39,10 @@ export const opsAdmin={
  createStaff:(input:{username:string;name:string;role:Role})=>admin<{staff:StaffView;inviteCode:string}>('staff','POST',input),
  updateStaff:(id:string,changes:{role?:Role;status?:'active'|'disabled'})=>admin<StaffView>(`staff/${id}`,'PATCH',changes),
  resetStaffInvite:(id:string)=>admin<{staff:StaffView;inviteCode:string}>(`staff/${id}/invite`,'POST',{}),
+ members:()=>admin<{members:MemberView[]}>('members').then(d=>d.members),
+ createMember:(input:{username:string;name:string;orgName?:string;orgId?:string;grants:MemberGrant[]})=>admin<{member:MemberView;inviteCode:string}>('members','POST',input),
+ updateMember:(id:string,changes:{name?:string;orgName?:string;orgId?:string|null;grants?:MemberGrant[];status?:'active'|'disabled'})=>admin<MemberView&{inviteCode?:string}>(`members/${id}`,'PATCH',changes),
+ resetMemberInvite:(id:string)=>admin<{member:MemberView;inviteCode:string}>(`members/${id}/invite`,'POST',{}),
  people:()=>admin<{people:PersonView[]}>('people').then(d=>d.people),
  createSchoolAdmin:(input:{orgId:string;name:string})=>admin<{person:PersonView;inviteCode:string}>('people','POST',input),
  resetInvite:(id:string)=>admin<{person:PersonView;inviteCode:string}>(`people/${id}/invite`,'POST',{}),
@@ -101,4 +105,21 @@ export const staffAuth={
  login:(username:string,password:string)=>staffCall<StaffMe>('/login','POST',{username,password}),
  activate:(code:string,password:string)=>staffCall<StaffMe>('/activate','POST',{code,password}),
  logout:()=>staffCall<{ok:true}>('/logout','POST',{}),
+};
+
+// Member accounts on the public host: cookie session (aiot_member), CSRF header on every write. A 401 means signed out.
+export type MemberView=Member&{activated:boolean;inviteExpires?:string};
+export type {MemberMe};
+export const INSTALLER_PATH='/ops/v1/member/installer';
+async function memberCall<T>(path:string,method='GET',body?:unknown):Promise<T>{
+ const response=await fetch('/ops/v1/member'+path,{method,credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json','X-AIoT-Member':'1'},...(body===undefined?{}:{body:JSON.stringify(body)})});
+ const data=await response.json().catch(()=>({error:'The service did not answer'}));
+ if(!response.ok)throw new OpsError(data.error??'Request failed',response.status,data.issues);
+ return data;
+}
+export const memberAuth={
+ me:()=>memberCall<MemberMe>('/me'),
+ login:(username:string,password:string)=>memberCall<MemberMe>('/login','POST',{username,password}),
+ activate:(code:string,password:string)=>memberCall<MemberMe>('/activate','POST',{code,password}),
+ logout:()=>memberCall<{ok:true}>('/logout','POST',{}),
 };

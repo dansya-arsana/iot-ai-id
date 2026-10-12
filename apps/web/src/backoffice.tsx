@@ -110,7 +110,7 @@ export function Backoffice({staff}: {staff?: {me: StaffMe; onSignOut: () => void
   const label = (map: Record<string, Pair>, key: string) => map[key] ? tr(map[key][0], map[key][1]) : key;
   const topbar = (actions?: ReactNode) => <header className="bo-topbar">
     <div className="bo-topbar-brand"><Brand/><Eyebrow as="span" className="bo-topbar-label">{tr('Backoffice','Backoffice')}</Eyebrow></div>
-    <div className="bo-topbar-actions">{staff && <span className="bo-topbar-who" data-testid="staff-who"><span>{staff.me.name}</span><Tag>{staff.me.role}</Tag></span>}<LangToggle/>{actions}{staff && <Button size="sm" variant="secondary" onClick={staff.onSignOut}>{tr('Sign out','Keluar')}</Button>}</div>
+    <div className="bo-topbar-actions">{staff && <span className="bo-topbar-who" data-testid="staff-who"><span>{staff.me.name}</span><Tag>{staff.me.role}</Tag></span>}<LangToggle/>{isAdminHost() && <a className="ds-button ds-button--ghost ds-button--sm" href={PUBLIC_SITE} target="_blank" rel="noopener" data-testid="present-site">{tr('Present site','Presentasikan situs')} <ArrowUpRightIcon size={12} aria-hidden="true"/></a>}{actions}{staff && <Button size="sm" variant="secondary" onClick={staff.onSignOut}>{tr('Sign out','Keluar')}</Button>}</div>
   </header>;
 
   if (!data) return <div className="bo-app">
@@ -156,7 +156,7 @@ export function Backoffice({staff}: {staff?: {me: StaffMe; onSignOut: () => void
       <aside className="bo-sidebar">
         <Eyebrow className="bo-sidebar-label">{tr('Workspace','Ruang kerja')}</Eyebrow>
         <nav aria-label={tr('Backoffice navigation','Navigasi backoffice')}>
-          {sections.filter(s => s.hash !== '#bo-team' || !staff || staff.me.role === 'owner').map(s => <a key={s.hash} href={s.hash} aria-current={activeSection === s.hash ? 'location' : undefined}>{tr(s.en, s.id)}</a>)}
+          {sections.filter(s => (s.hash !== '#bo-team' || !staff || staff.me.role === 'owner') && (s.hash !== '#bo-members' || !staff || staff.me.role === 'owner' || staff.me.role === 'sales')).map(s => <a key={s.hash} href={s.hash} aria-current={activeSection === s.hash ? 'location' : undefined}>{tr(s.en, s.id)}</a>)}
         </nav>
         <Eyebrow className="bo-sidebar-label">{tr('Site','Situs')}</Eyebrow>
         <nav aria-label={tr('Site links','Tautan situs')} className="bo-sidebar-secondary">
