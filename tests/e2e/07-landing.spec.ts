@@ -11,7 +11,7 @@ test('landing has original visual, usable navigation and real destinations',asyn
  await expect(page.locator('.rl-partner').getByRole('link',{name:/Download partnership brief/})).toHaveAttribute('href','/partnership-brief.txt');
  await expect(page.locator('.ds-header').getByRole('link',{name:'Partner with us'})).toHaveAttribute('href','/partner');
  await expect(page.locator('.rl-scenario')).toHaveCount(6);
- await expect(page.locator('.hm-map svg circle').first()).toBeAttached();
+ await expect(page.locator('.hm-g path').first()).toBeAttached();
  await expect(page.locator('.rl-labs li')).toHaveCount(3);
  for(const width of [1440,768,390]){
   await page.setViewportSize({width,height:900});

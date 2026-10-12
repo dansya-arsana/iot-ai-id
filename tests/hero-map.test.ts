@@ -47,3 +47,12 @@ test('placeholders fail closed on unknown hosts',()=>{
 test('every map hotspot id is an accepted inquiry site and vice versa',()=>{
  assert.deepEqual(HOTSPOTS.map(h=>h.id).sort(),[...TEST_SITES].sort());
 });
+test('stat tiles are verbatim figures from their sentence, on hero facts only, never low confidence',()=>{
+ let n=0;
+ for(const r of REGIONS)for(const f of r.facts)if(f.stat){
+  n++;assert.ok(f.hero&&f.conf!=='L',`${r.id}: a tile needs a hero fact of H or M confidence`);
+  for(const tok of `${f.stat.v} ${f.stat.l}`.match(/\d[\d.,]*\d|\d/g)??[])assert.ok(f.t.includes(tok),`${r.id}: "${tok}" is not in "${f.t}"`);
+ }
+ assert.equal(n,27);
+ for(const r of REGIONS)assert.equal(r.facts.filter(f=>f.hero&&f.conf!=='L').slice(0,3).every(f=>f.stat),true,`${r.id}: every region tile has a stat`);
+});

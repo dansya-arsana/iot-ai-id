@@ -248,3 +248,16 @@ Turning lenses on together combines them (AND). There is always a "Clear" action
 - **Mobile:** the map is small at 390 px (no zoom or pan by design); a region chip row and the bottom sheet are the practical tap targets.
 - **`landing-motion.ts`:** the loader no longer waits for the capsule image when the page has none (the map hero).
 - **`tests/e2e/13-landing-id.spec.ts`:** only the assertion about the EN home headline after the "Global site (EN)" link changed; the `/id` page checks are untouched.
+
+### Hero map v2 deviations (docs/research/hero-map-v2-plan.md)
+
+- **Panel placement (supersedes the "right-side column" note above):** the card is absolutely positioned inside the map frame (right, or left for Maluku and Papua), fixed at `min(frame - 32px, 560px)`; the hero is `100svh`. The idle prompt card is bottom-left, 260 px wide (the plan said 300) so it clears West Java at 1280 to 2000 px.
+- **Scroll assist (founder override of the plan, which deleted it):** kept, one-shot and passive, but only when the event did not start over `.hm-stage` (map and card), the drawer or a lens popover, `scrollY < 8` (plus one wheel tick of slack, because the compositor can apply the tick before the main thread sees it) and no card is open. The wheel over the map scrolls the page normally and never zooms. The "Scroll to the gap" button stays.
+- **Labels:** the placer runs in an unscaled overlay positioned from the camera (not counter-scaled children inside the camera), so labels stay crisp. The selected region's own label is not drawn (the card names it). At idle, pin labels appear only with the Access lens (planned labs first); other idle pins are decorative. At 1280 px with Access on, not every Java label fits and the rest stay as dots.
+- **Pin hit areas:** 20 px, shrunk per pin to the distance to its nearest neighbour (minimum 10 px), so two close pins (Surabaya and Gresik) never share a target.
+- **Stat tiles:** `Fact.stat` is filled for the 27 regional hero facts only. Site cards show the hero sentences as clamped text tiles with the same source tag, because a figure per site fact was not curated. `tests/hero-map.test.ts` checks that every number in a tile appears in its sentence.
+- **Not done from the plan:** site tests are not re-sorted by the build lens (there is no per-test fit tag); the 4,659-dot hover highlight uses `data-h` on the region group instead of CSS on `data-hover`; axe was not run (no axe package in the repo), the keyboard and tabs patterns are covered by e2e instead; the optional splash shortening was left alone because the landing component also serves `/id`.
+- **Clicks during the 450 ms zoom are ignored** (`data-zooming`), as the plan's risk list suggests; sea clicks while a region is selected are ignored too, so a stray click in open water never replaces the card with Maritime.
+- **Month stepper:** the arrows cycle Off, Jan to Dec; the 12-cell popover is behind the middle button.
+- **Tests:** `.hm-g circle` selectors became `.hm-g path`; lens tests open the popover first; the old "wheel flick" tests were replaced by one test for the assist (away from the map, no card) and one for the map and card (no jump).
+

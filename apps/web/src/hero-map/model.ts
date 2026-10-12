@@ -6,7 +6,7 @@ export type Stressor=typeof TEST_STRESSORS[number];
 export type Month=typeof TEST_MONTHS[number];
 export type Conf='H'|'M'|'L';
 /** `hero` facts may appear in a panel (H or M only, at most three); everything else lives in the Sources drawer. */
-export type Fact={t:string;src:string;year:string;url:string;conf:Conf;hero?:boolean};
+export type Fact={t:string;src:string;year:string;url:string;conf:Conf;hero?:boolean;/** a figure taken from `t` (may be abbreviated, never a new number; a unit test checks the digits), shown as a tile; the full sentence stays in the Why tab and the Sources drawer */stat?:{v:string;l:string}};
 export type Season='wet'|'dry'|'haze'|'none';
 export type Region={id:RegionId;name:string;/** grid char in hero-map-data */code:string;identity:string;facts:Fact[];tests:string[];fit:Build[];stress:Stressor[];/** 12 months, jan..dec */season:Season[];cta:string;note?:string;/** label anchor, lon/lat */at:[number,number]};
 export type HotspotKind='city'|'industrial'|'agri'|'marine'|'energy-mining'|'special-zone';
