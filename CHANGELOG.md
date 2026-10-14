@@ -6,6 +6,8 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-14
+
 ### Added
 - Global home hero (`/`, English): a full-screen interactive Indonesia test map, "Prove your robot where it actually breaks."
   - Nine areas (Java, Batam & Riau Islands, Sumatra, Kalimantan, Sulawesi, Bali & Nusa Tenggara, Maluku, Papua and the clickable Maritime Indonesia), each with an identity line, at most three H/M-confidence facts with a superscript source and year, test scenarios and a "Get a test plan" CTA that prefills `/partner`.
@@ -194,7 +196,8 @@ Initial public snapshot of the hardware workspace.
 ### Security
 - Local API accepts loopback Host/Origin only and requires a session token; physical runs need a human-authorised USB port (20-minute trust window).
 
-[Unreleased]: https://github.com/dansya-arsana/iot-ai-id/compare/3c34f75...HEAD
+[Unreleased]: https://github.com/dansya-arsana/iot-ai-id/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/dansya-arsana/iot-ai-id/compare/3c34f75...v0.7.0
 [0.6.0]: https://github.com/dansya-arsana/iot-ai-id/compare/7937777...3c34f75
 [0.5.0]: https://github.com/dansya-arsana/iot-ai-id/compare/2bbbaa3...7937777
 [0.4.0]: https://github.com/dansya-arsana/iot-ai-id/compare/6ea1215...2bbbaa3
