@@ -15,7 +15,7 @@ function pinRows(h:PinHistory,pin:UnoPin,s:SimSnapshot):RecordRow[]{
  if(ps.analog!==null&&pin.startsWith('A'))return [{k:pin,v:`ADC ${Math.round(ps.analog)} / 1023`}];
  if(PWM_PINS.includes(pin)&&ps.mode==='output'&&ps.duty>0.01&&ps.duty<0.99)return [{k:`${pin} PWM`,v:`${(ps.duty*100).toFixed(1)}% · ${Math.round(ps.freqHz)} Hz`}];
  const rows:RecordRow[]=[{k:`${pin} toggled`,v:`${m.toggles}×`}];
- if(m.highMs!==null)rows.push({k:'high',v:`${ms1(m.highMs)} (cycle-exact)`});
+ if(m.highMs!==null)rows.push({k:'high',v:`${ms1(m.highMs)} ✓ cycle-exact`});
  if(m.periodMs!==null)rows.push({k:'period',v:`≈${Math.round(m.periodMs)} ms`});
  return rows;
 }
@@ -59,7 +59,7 @@ export function TestRecord({rec,onShowSignals}:{rec:TestRecordData;onShowSignals
  const {tr}=useLang();
  return (
   <div className="lab-record" data-testid="lab-test-record" role="status">
-   <p className="lab-record-line"><span className="lab-pass"><i/>PASS</span><span>{quoteOf(rec.rows).replace(' (cycle-exact)','')}</span></p>
+   <p className="lab-record-line"><span className="lab-pass"><i/>PASS</span><span>{quoteOf(rec.rows).replace(' ✓ cycle-exact','')}</span></p>
    <div className="lab-record-main">
     <header><span className="lab-eyebrow lab-eyebrow--scope">TEST RECORD · LESSON {String(rec.n).padStart(2,'0')}</span><span className="lab-pass"><i/>PASS</span></header>
     <dl>{rec.rows.map((r,i)=><div key={i}><dt>{r.k}</dt><dd>{r.v}</dd></div>)}</dl>

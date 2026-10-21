@@ -5,6 +5,7 @@ import type {PinHistory} from './pin-history';
 export interface SceneExtras{
  setSafeArea(i:{top:number;right:number;bottom:number;left:number}):void;
  contentRect():{x:number;y:number;w:number;h:number}|null;
+ targetRect(target:string):{x:number;y:number;w:number;h:number}|null;
  thumbnails(o:{width:number;height:number;dpr:number;order?:LessonId[];onEach?:(id:LessonId,url:string)=>void}):Promise<Partial<Record<LessonId,string>>>;
  celebrate():void;
 }

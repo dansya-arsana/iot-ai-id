@@ -22,11 +22,11 @@ export function Minimap({scene,api,selected}:{scene:LabSceneV3|null;api:StageApi
   const draw=():void=>{
    const now=performance.now();if(now-last<60)return;last=now;
    const m=scene.minimap();
-   // frame the board and breadboard; parts far off (the obstacle at 60 cm) sit on the edge instead of shrinking the map
+   // frame the board, the breadboard and every floor part (the obstacle, the lamp), so no marker ever sits outside the frame
    let x0=1e9,z0=1e9,x1=-1e9,z1=-1e9;
    for(const r of m.rects)if(r.kind==='uno'||r.kind==='breadboard'){x0=Math.min(x0,r.x0);z0=Math.min(z0,r.z0);x1=Math.max(x1,r.x1);z1=Math.max(z1,r.z1);}
    if(x0>x1){x0=m.bounds.x0;z0=m.bounds.z0;x1=m.bounds.x1;z1=m.bounds.z1;}
-   for(const r of m.rects)if(r.kind==='part'&&r.x1>x0-60&&r.x0<x1+60&&r.z1>z0-60&&r.z0<z1+60){x0=Math.min(x0,r.x0);z0=Math.min(z0,r.z0);x1=Math.max(x1,r.x1);z1=Math.max(z1,r.z1);}
+   for(const r of m.rects)if(r.kind==='part'){x0=Math.min(x0,r.x0);z0=Math.min(z0,r.z0);x1=Math.max(x1,r.x1);z1=Math.max(z1,r.z1);}
    const b={x0,z0,x1,z1};
    const bw=Math.max(40,b.x1-b.x0),bd=Math.max(40,b.z1-b.z0);
    const s=Math.min((W-PAD*2)/bw,(H-PAD*2-8)/bd);
@@ -42,9 +42,9 @@ export function Minimap({scene,api,selected}:{scene:LabSceneV3|null;api:StageApi
     else{
      const sel=r.id===selected;
      g.fillStyle=sel?live:ink;g.globalAlpha=sel?1:0.78;
-     const cx=Math.min(W-6,Math.max(6,x+w/2)),cz=Math.min(H-6,Math.max(6,z+h/2)),off=cx!==x+w/2||cz!==z+h/2;
+     const cx=Math.min(W-PAD,Math.max(PAD,x+w/2)),cz=Math.min(H-PAD,Math.max(PAD,z+h/2)),off=cx!==x+w/2||cz!==z+h/2;
      if(off){g.beginPath();g.arc(cx,cz,3.2,0,Math.PI*2);g.fill();}
-     else g.fillRect(x,z,Math.max(3,w),Math.max(3,h));
+     else{const rw=Math.max(3,w),rh=Math.max(3,h);g.fillRect(Math.min(W-4-rw,Math.max(4,x)),Math.min(H-4-rh,Math.max(4,z)),rw,rh);}
      g.globalAlpha=1;
     }
    }

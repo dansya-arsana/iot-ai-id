@@ -24,6 +24,8 @@ export interface LabSceneV2 extends LabScene{
  setSafeArea(insets:SafeInsets):void;
  /** Projected bbox of the lesson content after the fit, CSS px relative to the canvas. */
  contentRect():ContentRect|null;
+ /** Projected bbox of one part or board feature, CSS px relative to the canvas (null when unknown). */
+ targetRect?(target:string):ContentRect|null;
  thumbnails(o:{width:number;height:number;dpr:number;order?:LessonId[];onEach?:(id:LessonId,url:string)=>void}):Promise<Partial<Record<LessonId,string>>>;
  /** One-shot success ring on the floor (900 ms; a 300 ms fade under reduced motion). */
  celebrate():void;
@@ -264,7 +266,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
   for(const {id,view} of views){
    if(byId.get(id)&&(view.group.userData.kind==='obstacle'||id.startsWith('obs'))){
     const ob=contentBox([view.group]).clone();
-    const lim=view.group.position.z+obstacleMm(60);
+    const lim=view.group.position.z+obstacleMm(250);
     let sh=0;
     if(ob.min.z>lim){sh=ob.min.z-lim;ob.min.z-=sh;ob.max.z-=sh;}
     b.union(ob);pts.push(...contentCorners([view.group],-sh));
@@ -395,6 +397,18 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
   cameraPose():CameraPose{return rig.pose();},
   setSafeArea(i:SafeInsets):void{rig.setSafe(i);},
   contentRect():ContentRect|null{return rig.contentRect();},
+  targetRect(target:string):ContentRect|null{
+   const obj=resolve(target);if(!obj)return null;
+   contentBox([obj],box);if(box.isEmpty())return null;
+   rig.camera.updateMatrixWorld();
+   let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+   for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){
+    vec.set(x,y,z).project(rig.camera);
+    const sx=((vec.x+1)/2)*cssW,sy=((1-vec.y)/2)*cssH;
+    x0=Math.min(x0,sx);x1=Math.max(x1,sx);y0=Math.min(y0,sy);y1=Math.max(y1,sy);
+   }
+   return {x:x0,y:y0,w:x1-x0,h:y1-y0};
+  },
   thumbnails(t){
    return renderThumbnails(renderer,scene.environment as Texture|null,t).finally(()=>{rig.refresh();setLineResolution(cssW,cssH);});
   },
@@ -438,7 +452,8 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
      const cs:Vector3[]=[];
      for(const x of [gb.min.x,gb.max.x])for(const y of [gb.min.y,gb.max.y])for(const zz of [gb.min.z,gb.max.z])cs.push(new Vector3(x,y,zz));
      const fp2=gb.getCenter(new Vector3());
-     rig.focus(fp2,Math.max(1.25,Math.min(1.8,rig.zoomThatFits(cs,fp2))));return;
+     const fit=rig.zoomThatFits(cs,fp2);
+     rig.focus(fp2,Math.max(1.25,Math.min(1.8,Number.isFinite(fit)?fit:1.25)));return;
     }
     rig.focus(box.getCenter(vec).clone(),z);return;
    }

@@ -29,13 +29,17 @@ export function holeZ(row:number):number{return (row-4.5)*PITCH+(row>=5?PITCH:-P
 export const RAIL_Z={'5v-rail':-22.86,'gnd-rail':-20.32} as const;
 export function railX(col:number):number{return holeX(col);}
 
-/** Lamp: 5..150 cm maps to 25..160 mm. Obstacle: 3..250 cm maps to 38..200 mm (38 keeps the box clear of the sensor and breadboard). */
+/** Lamp: 5..150 cm maps to 25..160 mm. Obstacle: 3..250 cm maps to 58..150 mm (58 keeps the box clear of the sensor and breadboard). */
 const lerp=(a:number,b:number,t:number):number=>a+(b-a)*t;
 const clamp=(v:number,lo:number,hi:number):number=>Math.min(hi,Math.max(lo,v));
 export function lampMm(cm:number):number{return lerp(25,160,(clamp(cm,5,150)-5)/145);}
 export function lampCm(mm:number):number{return lerp(5,150,(clamp(mm,25,160)-25)/135);}
-export function obstacleMm(cm:number):number{return lerp(38,200,(clamp(cm,3,250)-3)/247);}
-export function obstacleCm(mm:number):number{return lerp(3,250,(clamp(mm,38,200)-38)/162);}
+/** Nearest the obstacle's facing side may sit (mm from the sensor group): its near face stops about 30 mm in front of the transducers, clear of the breadboard edge. The sim may still report 2-3 cm. */
+export const OBS_NEAR_MM=58;
+export const OBS_FAR_MM=150;
+/** 3..250 cm maps to 58..150 mm on a gentle curve so near distances still read as different. */
+export function obstacleMm(cm:number):number{return lerp(OBS_NEAR_MM,OBS_FAR_MM,Math.pow((clamp(cm,3,250)-3)/247,0.6));}
+export function obstacleCm(mm:number):number{return lerp(3,250,Math.pow((clamp(mm,OBS_NEAR_MM,OBS_FAR_MM)-OBS_NEAR_MM)/(OBS_FAR_MM-OBS_NEAR_MM),1/0.6));}
 
 /** Four-band colour indices: digit, digit, multiplier exponent colour, gold tolerance (10). */
 export function resistorBands(ohms:number):[number,number,number,number]{

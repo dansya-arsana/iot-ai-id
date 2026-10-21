@@ -55,3 +55,10 @@
 .lab--mobile .aib-entry span{display:none}
 .lab--mobile .lab-strip{gap:4px}
 .lab--mobile .aib{scroll-margin-top:64px}
+.lab--mobile .aib-caption,.lab--mobile .aib-rail{scroll-margin-top:64px}
+.lab--mobile .aib-caption{min-height:0}
+.lab--mobile .lab-mobile-title[data-ai=true] .lab-title{font-size:16px;line-height:1.3;font-weight:500}
+/* phones: while the circuit assembles, only the step caption stays above the stage so the build itself is on screen */
+.lab--mobile .aib:is([data-stage=assembling],[data-stage=ready]) :is(.aib-label,.aib-prompt,.aib-chips,.aib-foot,.aib-caption){display:none}
+.lab--mobile .aib[data-stage=assembling] .aib-caption{display:block}
+.lab--mobile .aib:is([data-stage=assembling],[data-stage=ready]) .aib-rail{border-top:0;padding-top:0}

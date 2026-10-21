@@ -61,7 +61,7 @@ export function AiBuilder({scene,onBuilt,onClose,onReveal}:{
   const c=new AbortController();ctl.current=c;
   setStage('assembling');setPhase('assembling');setStep(null);
   const seen=new Set<string>();onReveal?.(new Set(seen));
-  if(window.innerWidth<=760)document.getElementById('lab-sec-board')?.scrollIntoView({block:'start',behavior:reduced?'auto':'smooth'});
+  if(window.innerWidth<=760)document.querySelector('[data-testid="lab-ai"]')?.scrollIntoView({block:'start',behavior:reduced?'auto':'smooth'});
   try{
    await scene.playAssembly(b.spec,{speed:reduced?0:speed,signal:c.signal,onStep:e=>{if(e.phase==='start'){setStep({index:e.index,total:e.total,step:e.step});for(const id of e.step.add.parts??[])seen.add(id);onReveal?.(new Set(seen));}}});
    setStage('ready');onReveal?.(null);

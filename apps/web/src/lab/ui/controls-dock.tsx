@@ -6,7 +6,7 @@ import {Icon} from './icons';
 
 export type Inputs=Record<string,PartInput>;
 
-export function ControlsDock({circuit,inputs,onInput,hideId,visibleIds,fold}:{circuit:Circuit;inputs:Inputs;onInput:(id:string,i:PartInput)=>void;hideId?:string|null;visibleIds?:ReadonlySet<string>|null;fold?:boolean}){
+export function ControlsDock({circuit,inputs,onInput,hideId,visibleIds,fold,mobile,onOpen}:{circuit:Circuit;inputs:Inputs;onInput:(id:string,i:PartInput)=>void;hideId?:string|null;visibleIds?:ReadonlySet<string>|null;fold?:boolean;mobile?:boolean;onOpen?:(id:string)=>void}){
  const {tr}=useLang();
  const items=circuit.parts.filter(p=>p.kind==='button'||p.kind==='potentiometer'||p.kind==='lamp'||p.kind==='obstacle');
  // one source of truth: while the part popover is open, its slider replaces the dock's (kept in the DOM, visually collapsed)
@@ -26,6 +26,14 @@ export function ControlsDock({circuit,inputs,onInput,hideId,visibleIds,fold}:{ci
        <Icon name="button" size={18}/>{tr('Hold to press','Tahan untuk menekan')}
       </button>
      );
+    }
+    // phones: a slider strip would bury the stage, so every analog control is a 32px chip that opens the part's popover sheet
+    if(mobile&&onOpen){
+     const val=p.kind==='potentiometer'?`A0 ${Math.round(cur?.kind==='potentiometer'?cur.value:Number(p.props.value??512))}`
+      :p.kind==='lamp'?`${Math.round(cur?.kind==='lamp'&&cur.distanceCm!==undefined?cur.distanceCm:Number(p.props.distanceCm??40))} cm`
+      :`${Math.round(cur?.kind==='obstacle'?cur.distanceCm:Number(p.props.distanceCm??40))} cm`;
+     const name=p.kind==='potentiometer'?tr('Knob','Kenop'):p.kind==='lamp'?tr('Lamp','Lampu'):tr('Obstacle','Halangan');
+     return <button key={p.id} type="button" className="lab-dockchip" data-folded={folded(p)} data-testid={`lab-control-${p.id}`} aria-label={`${name} ${val}`} onClick={()=>onOpen(p.id)}><Icon name={p.kind==='potentiometer'?'pot':p.kind==='lamp'?'sun':'sonar'} size={16}/><span>{name}</span><output>{val}</output></button>;
     }
     if(p.kind==='potentiometer'){
      const r=INPUT_RANGES.potentiometer,v=cur?.kind==='potentiometer'?cur.value:Number(p.props.value??512);

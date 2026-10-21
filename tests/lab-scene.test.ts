@@ -32,7 +32,7 @@ test('wireCurve keeps endpoints and arcs above both ends',()=>{
 });
 test('input mappings round-trip and clamp',()=>{
  assert.equal(Math.round(lampMm(5)),25);assert.equal(Math.round(lampMm(150)),160);
- assert.equal(Math.round(obstacleMm(3)),38);assert.equal(Math.round(obstacleMm(250)),200);
+ assert.equal(Math.round(obstacleMm(3)),58);assert.equal(Math.round(obstacleMm(250)),150);
  assert.ok(Math.abs(lampCm(lampMm(40))-40)<1e-6);assert.ok(Math.abs(obstacleCm(obstacleMm(60))-60)<1e-6);
  assert.equal(lampMm(999),lampMm(150));
 });

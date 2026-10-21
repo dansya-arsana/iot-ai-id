@@ -463,9 +463,9 @@ function LabInner({id}:{id:LessonId}){
  const showCallouts=settings.labels&&sceneState==='ready';
  const hasDock=(ai?ai.circuit:rt.circuit).parts.some(p=>p.kind==='button'||p.kind==='potentiometer'||p.kind==='lamp'||p.kind==='obstacle');
  useEffect(()=>{
-  safeRef.current={mobile:vp.mobile,callouts:showCallouts};
-  sceneRef.current?.setSafeArea?.(vp.mobile?{top:12,right:12,bottom:hasDock?88:12,left:12}:{top:showCallouts?80:20,right:20,bottom:72,left:20});
- },[vp.mobile,vp.artH,vp.scale,showCallouts,sceneState,id,hasDock]);
+  safeRef.current={mobile:vp.mobile,callouts:true};
+  sceneRef.current?.setSafeArea?.(vp.mobile?{top:12,right:12,bottom:hasDock?88:12,left:12}:{top:80,right:20,bottom:72,left:20}); // the labels toggle never refits: the camera stays where the user left it
+ },[vp.mobile,vp.artH,vp.scale,sceneState,id,hasDock]);
 
  // ---- 3D lesson thumbnails: once after ready, in idle time, cached in sessionStorage ----
  useEffect(()=>{
@@ -562,9 +562,10 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
      <LangToggle/>
     </header>
     {vp.mobile&&(
-     <div className="lab-mobile-title">
-      <span className="lab-eyebrow">( {String(lesson.n).padStart(2,'0')} / 11 ) ——— {tr('LESSON','PELAJARAN')}</span>
-      <div className="lab-title">{lesson.title[lang]}</div>
+     <div className="lab-mobile-title" data-ai={!!ai}>
+      {ai
+       ?<><span className="lab-eyebrow">{tr('AI BUILD','RAKITAN AI')}</span><div className="lab-title">{ai.build.spec.goal?.[lang]??tr('Your circuit','Rangkaianmu')}</div></>
+       :<><span className="lab-eyebrow">( {String(lesson.n).padStart(2,'0')} / 11 ) ——— {tr('LESSON','PELAJARAN')}</span><div className="lab-title">{lesson.title[lang]}</div></>}
      </div>
     )}
     <section className="lab-stage-card" id="lab-sec-board" ref={stageCardRef} data-running={running} data-sticky={vp.mobile&&running}>
@@ -573,14 +574,14 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
       <div className="lab-atmos" aria-hidden="true"><i className="lab-corner lab-corner--tl"/><i className="lab-corner lab-corner--tr"/><i className="lab-corner lab-corner--bl"/><i className="lab-corner lab-corner--br"/></div>
       {sceneState==='loading'&&<div className="lab-loader"><DotMark animated/><div className="lab-loader-bar"><i/></div><span>{tr('Soldering the board…','Menyolder papan…')}</span></div>}
       {sceneState==='unavailable'&&<p className="lab-3d-note" role="status">{tr('3D view unavailable on this device. The simulation still runs.','Tampilan 3D tidak tersedia di perangkat ini. Simulasi tetap berjalan.')}</p>}
-      <Callouts lesson={lesson} api={api} pills={vp.mobile||focusId!==null} show={showCallouts&&!ai} running={running} compact={vp.compact}/>
+      <Callouts lesson={lesson} api={api} pills={vp.mobile||focusId!==null} show={showCallouts&&!ai} running={running} compact={vp.compact} maxPills={vp.mobile?2:undefined} selected={focusId}/>
       {!ai&&<Readouts lessonId={id} api={api}/>}
       {selected&&<Inspector target={selected} lesson={lesson} lessonId={id} circuit={circuit} variantId={rt.variantId} params={rt.params} overCurrent={overCurrent} api={api}
        onClose={()=>setSelected(null)} onParam={changeParam} onVariant={changeVariant} onProps={changeProps} onInput={changeInput} onFocus={t=>sceneRef.current?.focus(t)}/>}
       {pop&&<PopHost pop={pop} circuit={circuit} inputs={inputs} sweep={sweep} params={rt.params} lang={lang} onChange={popChange} onParam={changeParam} onFocus={focusPart} onClose={()=>setPop(null)}/>}
       <div className="lab-bl">
        {focusId&&!vp.mobile&&<Minimap scene={sceneState==='ready'?sceneObj:null} api={api} selected={focusId}/>}
-       <ControlsDock circuit={circuit} inputs={inputs} onInput={changeInput} hideId={pop?.id??null} visibleIds={revealed} fold={flyOpen}/>
+       <ControlsDock circuit={circuit} inputs={inputs} onInput={changeInput} hideId={pop?.id??null} visibleIds={revealed} fold={flyOpen} mobile={vp.mobile} onOpen={openPop}/>
       </div>
       <Viewbar onView={view} used={viewUsed}/>
       {error&&<p className="lab-error" role="alert">{error}</p>}

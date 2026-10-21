@@ -37,8 +37,16 @@ export function CodeView({variant,params,currentLine,running,onRun,onStop,onPara
  useEffect(()=>{
   const b=box.current;if(!b||!running||!currentLine)return;
   const el=b.querySelector<HTMLElement>(`[data-line="${currentLine}"]`);if(!el)return;
+  if(b.scrollHeight<=b.clientHeight+1)return; // everything fits: nothing to scroll
   const top=el.offsetTop-b.scrollTop,h=b.clientHeight;
-  if(top<h/3-10||top>h*2/3)b.scrollTop=Math.max(0,el.offsetTop-h/2);
+  if(top<h/3-10||top>h*2/3){
+   // snap to whole line heights so the first visible line is never cut in half; the top of the file keeps its padding
+   const l1=b.querySelector<HTMLElement>('[data-line="1"]'),l2=b.querySelector<HTMLElement>('[data-line="11"]');
+   const lh=(l1&&l2?(l2.offsetTop-l1.offsetTop)/10:0)||el.offsetHeight||20,pad=(b.querySelector<HTMLElement>('[data-line="1"]')?.offsetTop)??0;
+   const kMax=Math.max(0,Math.floor((b.scrollHeight-h-pad)/lh));
+   const k=Math.min(kMax,Math.max(0,Math.round((el.offsetTop-h/2-pad)/lh)));
+   b.scrollTop=k===0?0:Math.min(Math.floor((b.scrollHeight-h-pad)/lh)*lh+pad,pad+k*lh);
+  }
  },[currentLine,running]);
  const [expanded,setExpanded]=useState(false);
  const [copied,setCopied]=useState(false);
