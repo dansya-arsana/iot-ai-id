@@ -138,6 +138,6 @@ export function freeHoleNear(x:number,z:number):{x:number;z:number}{
 export const LESSON_VIEW:Record<string,{az:number;elev:number;board:boolean}>={
  board:{az:40,elev:38,board:false},
  blink:{az:32,elev:34,board:true},button:{az:32,elev:34,board:true},knob:{az:32,elev:34,board:true},rgb:{az:32,elev:34,board:true},light:{az:32,elev:34,board:true},
- distance:{az:40,elev:38,board:true},parking:{az:40,elev:38,board:true},
+ distance:{az:52,elev:36,board:true},parking:{az:52,elev:36,board:true},
  sound:{az:32,elev:34,board:true},motor:{az:34,elev:34,board:true},servo:{az:34,elev:34,board:true},
 };

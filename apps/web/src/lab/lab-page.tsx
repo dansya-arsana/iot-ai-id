@@ -35,6 +35,7 @@ import {Rail,SettingsPanel} from './ui/rail';
 import {Readouts} from './ui/readouts';
 import {SerialHeader,SerialLog} from './ui/serial-monitor';
 import type {SerialSeg} from './ui/serial-monitor';
+import {HardwarePanel} from './ui/hardware-panel';
 import {RECORDS,quoteOf} from './ui/test-record';
 import type {TestRecordData} from './ui/test-record';
 import {Viewbar} from './ui/viewbar';
@@ -565,7 +566,7 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
      <div className="lab-mobile-title" data-ai={!!ai}>
       {ai
        ?<><span className="lab-eyebrow">{tr('AI BUILD','RAKITAN AI')}</span><div className="lab-title">{ai.build.spec.goal?.[lang]??tr('Your circuit','Rangkaianmu')}</div></>
-       :<><span className="lab-eyebrow">( {String(lesson.n).padStart(2,'0')} / 11 ) ——— {tr('LESSON','PELAJARAN')}</span><div className="lab-title">{lesson.title[lang]}</div></>}
+       :<><span className="lab-eyebrow">( {String(lesson.n).padStart(2,'0')} / {LESSONS.length} ) ——— {tr('LESSON','PELAJARAN')}</span><div className="lab-title">{lesson.title[lang]}</div></>}
      </div>
     )}
     <section className="lab-stage-card" id="lab-sec-board" ref={stageCardRef} data-running={running} data-sticky={vp.mobile&&running}>
@@ -594,6 +595,7 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
     <aside className="lab-side">
      {aiOpen&&<AiBuilder scene={sceneState==='ready'?sceneObj:null} onBuilt={onAiBuilt} onClose={closeAi} onReveal={setRevealed}/>}
      {!ai&&!aiOpen&&<InfoCard lesson={lesson} pins={ui.pins} done={done.includes(id)} quote={quote} variant={variant} report={report} toolchain={labFirmware.toolchain}/>}
+     <HardwarePanel variant={variant} params={ai?{}:rt.params} segs={segs} pins={ui.pins}/>
      <CodeView badge={ai?<AiGeneratedChip build={ai.build} short/>:undefined} variant={variant} params={ai?{}:rt.params} currentLine={ui.currentLine} running={running} runLocked={revealed!==null} onRun={run} onStop={stop} onParam={name=>{if(!ai)setSelected({type:'param',name});}} note={note} log={lastWrote}/>
     </aside>
     {vp.mobile&&(

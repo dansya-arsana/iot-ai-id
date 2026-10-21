@@ -23,6 +23,7 @@ const SUBJECT:Record<LessonId,Item[]|'uno'>={
  sound:[{s:spec('buzzer'),x:0}],
  motor:[{s:spec('motor'),x:0}],
  servo:[{s:spec('servo'),x:0}],
+ dht:[{s:spec('dht22',{tempC:24,humidity:60}),x:0}],
  parking:[{s:spec('hcsr04'),x:0,z:0},{s:spec('obstacle',{shape:'car',distanceCm:30}),x:0,z:34,state:{kind:'obstacle',distanceCm:30}}],
 };
 

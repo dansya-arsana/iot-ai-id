@@ -106,14 +106,14 @@ export function Callouts({lesson,api,pills,show,running,compact,maxPills,selecte
     for(const id of UNO_PARTS)add(scene.targetRect?.(id));
     if(selected)add(scene.targetRect?.(selected));
     // the stage's own controls: camera toolbar, dock card or chips, minimap
-    const sr=stage.getBoundingClientRect();
-    document.querySelectorAll('.lab-viewbar,.lab-dock:not([data-folded=true]),.lab-dockchip:not([data-folded=true]),.lab-minimap').forEach(n=>{const r=n.getBoundingClientRect();if(r.width>0&&r.height>0)add({x:r.left-sr.left,y:r.top-sr.top,w:r.width,h:r.height});});
+    // the art may be CSS-scaled (<1440px): convert screen pixels back to the stage's own layout pixels
+    const sr=stage.getBoundingClientRect(),k=sr.width/W||1;
+    document.querySelectorAll('.lab-viewbar,.lab-dock:not([data-folded=true]),.lab-dockchip:not([data-folded=true]),.lab-minimap').forEach(n=>{const r=n.getBoundingClientRect();if(r.width>0&&r.height>0)add({x:(r.left-sr.left)/k,y:(r.top-sr.top)/k,w:r.width/k,h:r.height/k});});
    }
    const maxCardH=Math.max(0,...vis.map(i=>cards.current[i]?.offsetHeight??0));
    vis.forEach(i=>{
     const el=cards.current[i],pa=paths.current[i],dot=dots.current[i],p=pts[i]!;
     if(!el||!pa||!dot)return;
-    el.style.opacity='1';dot.style.opacity='1';
     dot.setAttribute('transform',`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
     const lv=lives.current[i];
     if(lv&&doLive){const t=liveText(lesson.callouts[i].target,snap,lesson.callouts[i].pin);lv.textContent=t?t.text:'';lv.dataset.tone=t?t.tone:'';lv.parentElement!.dataset.on=t?'true':'false';}
@@ -121,7 +121,8 @@ export function Callouts({lesson,api,pills,show,running,compact,maxPills,selecte
     const pillAt=():boolean=>{
      el.dataset.pill='true';
      const w=el.offsetWidth||120,ph=el.offsetHeight||28;
-     const sides=[Math.max(8,p.x+12+w>W-8?Math.min(W-w-8,p.x-12-w):p.x+12),Math.max(8,Math.min(W-w-8,p.x-12-w))];
+     const fitX=(xx:number)=>Math.max(8,Math.min(W-w-8,xx));
+     const sides=[p.x+12+w>W-8?fitX(p.x-12-w):p.x+12,fitX(p.x-12-w)];
      const hit=(xx:number,yy:number)=>avoid.concat(placed).some(r=>xx<r.x+r.w+4&&xx+w+4>r.x&&yy<r.y+r.h+4&&yy+ph+4>r.y);
      // first free spot near the anchor (-66..+38 px); never fall back to sitting on hardware
      let px=sides[0],py=0,found=false;
@@ -133,7 +134,7 @@ export function Callouts({lesson,api,pills,show,running,compact,maxPills,selecte
       if(found)break;
      }
      if(!found||(maxPills!==undefined&&placed.length>=maxPills)){hide(i);return true;}
-     placed.push({x:px,y:py,w,h:ph});
+     placed.push({x:px,y:py,w,h:ph});el.style.opacity='1';
      el.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
      // straight leader to the dot when the pill sits more than ~20px from its part
      const ex=Math.max(px,Math.min(p.x,px+w)),ey=Math.max(py,Math.min(p.y,py+ph));
@@ -146,7 +147,7 @@ export function Callouts({lesson,api,pills,show,running,compact,maxPills,selecte
     const pos=cardPos(i,{topIdx,botIdx,slots,cxs:[GAP+CW/2,W/2,W-GAP-CW/2]},h);
     if(!pos){hide(i);return;}
     const {x,y,top}=pos;
-    el.dataset.pill='false';
+    el.dataset.pill='false';el.style.opacity='1';dot.style.opacity='1';
     el.style.transform=`translate(${x}px,${y}px)`;
     const cx=Math.round(x+CW/2);
     const y0=top?y+h:y;

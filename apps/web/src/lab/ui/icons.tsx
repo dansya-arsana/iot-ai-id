@@ -11,6 +11,7 @@ const P:Record<string,ReactNode>={
  sound:<><path d="M6 13h4l6-5v16l-6-5H6z"/><path d="M20 12c2 2 2 6 0 8M23 9c4 4 4 10 0 14"/></>,
  motor:<><circle cx="16" cy="16" r="9"/><path d="M16 7v4M16 21v4M7 16h4M21 16h4M10 10l3 3M19 19l3 3"/></>,
  servo:<><rect x="6" y="14" width="14" height="10" rx="2"/><path d="M20 19l7-8"/><circle cx="26" cy="12" r="1.5"/></>,
+ dht:<><rect x="9" y="5" width="14" height="17" rx="2"/><path d="M12 9h8M12 12h8M12 15h8M12 22v5M16 22v5M20 22v5"/></>,
  parking:<><path d="M5 22h22l-2-7H7z"/><circle cx="10" cy="24" r="2"/><circle cx="22" cy="24" r="2"/><path d="M9 11c4-4 10-4 14 0"/></>,
  home:<><path d="M5 15L16 6l11 9"/><path d="M9 13v13h14V13"/></>,
  lessons:<><rect x="5" y="6" width="9" height="9" rx="2"/><rect x="18" y="6" width="9" height="9" rx="2"/><rect x="5" y="19" width="9" height="7" rx="2"/><rect x="18" y="19" width="9" height="7" rx="2"/></>,

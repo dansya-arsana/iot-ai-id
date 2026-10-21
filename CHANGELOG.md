@@ -7,7 +7,7 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 ## [Unreleased]
 
 ### Added
-- Public Arduino lab (`/lab`, `/lab/:lesson`): 11 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
+- Public Arduino lab (`/lab`, `/lab/:lesson`): 12 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
   - "Bench Record" design in the AIoT system (Archivo, IBM Plex Mono, warm-grey bench, one live-green accent). It shows what really runs: a logic analyzer drawn from the emulated chip's pin history (HIGH/LOW, PWM duty and frequency, analog input, TX), a port map, a live cycle counter and speed, callouts with measured values (LED current, ADC reading, PWM), goals checked from chip data ("D8 toggled 4× · high 500.1 ms"), firmware size, and 3D lesson thumbnails.
   - Inspector values are patched into the real firmware bytes (verified against a recompile), line highlighting comes from DWARF line tables, and each lesson has a real success check.
   - The code view is read-only. Only the declared parameters and the pre-compiled variants can change; there is no in-browser compiler.
@@ -16,8 +16,12 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 - Lab v3 direct manipulation: drag the obstacle (snaps to whole cm, Shift for 5 cm) and the lamp in the 3D scene, turn the knob by dragging the 3D knob (relative, no jump), press the button in 3D, hover cursors and rims, keyboard access. Clicking a part with settings opens a popover: obstacle type (car, box, ball, wall), distance, "drive back and forth while running" and "Zoom to it"; the servo and motor have a load slider that slows the horn and the shaft.
 - Lab AI builder ("+ Build with AI" in the lesson strip): describe a circuit, the AI designs the CircuitSpec and the sketch, the 3D scene plays a captioned step-by-step assembly (board drops in, breadboard, each part placed, each wire drawn), then it runs for real on the emulated chip with the generated, compiled firmware. Three curated examples (Parking beeper, Night light, Servo gate) run instantly for everyone. Free typing needs the new `lab-ai` member grant (20 builds a day per member, global daily cap). Keys stay in the owner-only api; ops reaches it over the internal network with `OPS_API_INTERNAL_TOKEN`, and sketches compile in a no-network sandbox container. See docs/adr/011-lab-ai-builder.md.
 - UNO model polish: second ICSP, 16U2 and regulator legs, M7 diode, SMD crystal, "UNO R3-compatible" silkscreen.
+- Lab v4 plugin API: a component is a `PartModule` plus a `DeviceDef` (`sim/devices/<kind>.ts`) discovered automatically, with shared open-drain lines, a lazy I2C bus and a UART tap. All existing parts were ported. `npm run lab:new-part` scaffolds a new one. See docs/lab-extending.md and docs/lab-parts/.
+- Lesson 12, DHT22 temperature and humidity: real one-wire timing (18 ms start pulse, 80/80 us answer, 40 bits, checksum), sliders in the sensor popover, serial prints the readings.
+- Real board panel in the lab (desktop app / 127.0.0.1 only): detect a UNO, authorize the port (20 minutes), upload the exact simulator firmware bytes through arduino-cli, read its serial and compare with the simulator ("behaves the same" or "differs, check wiring on D8"). New routes `/api/lab/hardware/*` sit behind the loopback and session checks and refuse upload and serial without trust. The public site shows a note pointing to the desktop app. See docs/lab-hardware.md.
 
 ### Fixed
+- Lab callout pills are measured in layout pixels, so they no longer cover the power jack below 1440 px; the test record wraps instead of clipping on narrow or short screens; framing of lessons 7 and 11 improved.
 - Lab pin duty is smoothed over time so very short simulation slices do not alias a 490 Hz PWM; LED full brightness is reached at 12 mA.
 
 ## [0.7.0] - 2026-10-14

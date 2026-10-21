@@ -22,8 +22,8 @@ test('lab is public: lesson cards and progress',async({page})=>{
  await page.goto(`${PUBLIC}/lab`);
  await expect(page.locator('.lab')).toBeVisible();
  await expect(page.getByText('Invitation-only')).toHaveCount(0);
- await expect(page.locator('[data-testid^="lab-lesson-"]')).toHaveCount(11);
- await expect(page.getByTestId('lab-progress')).toContainText('/11');
+ await expect(page.locator('[data-testid^="lab-lesson-"]')).toHaveCount(12);
+ await expect(page.getByTestId('lab-progress')).toContainText('/12');
 });
 
 test('blink runs on the emulated UNO and a param edit reaches the firmware',async({page})=>{

@@ -125,8 +125,8 @@ ${h.software.length?`<h2>Software</h2>${list(h.software.map(esc))}`:''}
   jsonld:{'@context':'https://schema.org','@type':'TechArticle',headline:`${h.name} reference specification`,about:{'@type':'Thing',name:h.name,alternateName:h.aliases},description:h.summary,url:`${SITE}/hardware/${h.id}/`,publisher:{'@id':`${SITE}/#org`},citation:h.sources.map(s=>s.url)}});
 }
 render({path:'/learn',title:'Learn | AIoT',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
-render({path:'/lab',title:'Arduino lab: run real Arduino code in your browser | AIoT',description:'Free Arduino UNO lab in your browser: 11 guided lessons run real firmware on an emulated ATmega328P.',
- body:`<main>${nav}<h1>Arduino lab</h1><p>Run real Arduino firmware on an emulated ATmega328P in your browser. 11 guided lessons, free, no sign-in. The code is read-only; you change declared parameters and watch the hardware respond.</p>${list(LESSONS.map(l=>`<a href="/lab/${l.id}">${esc(l.title.en)}</a>: ${esc(l.tagline.en)}`))}</main>`});
+render({path:'/lab',title:'Arduino lab: run real Arduino code in your browser | AIoT',description:'Free Arduino UNO lab in your browser: 12 guided lessons run real firmware on an emulated ATmega328P.',
+ body:`<main>${nav}<h1>Arduino lab</h1><p>Run real Arduino firmware on an emulated ATmega328P in your browser. 12 guided lessons, free, no sign-in. The code is read-only; you change declared parameters and watch the hardware respond.</p>${list(LESSONS.map(l=>`<a href="/lab/${l.id}">${esc(l.title.en)}</a>: ${esc(l.tagline.en)}`))}</main>`});
 for(const l of LESSONS)render({path:`/lab/${l.id}`,title:`${l.seo.title} | AIoT Arduino lab`,description:l.seo.description,body:`<main>${nav}<h1>${esc(l.title.en)}</h1><p>${esc(l.overview.body.en)}</p><p><a href="/lab">All lessons</a></p></main>`});
 render({path:'/docs',title:'Documentation | AIoT',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
 
@@ -173,7 +173,7 @@ iot.ai.id is based in Indonesia and serves robotics, sensor and AI teams worldwi
 - [Partner with us](${SITE}/partner/): inquiry form for device makers, schools and buyers; reply within one working day
 - [Partnership brief](${SITE}/partnership-brief.txt): services, what partners provide, current limits
 - [Program Lab Mitra (Indonesian)](${SITE}/id/): IoT training and paid hardware-testing tasks for Indonesian vocational schools (SMK)
-- [Arduino lab](${SITE}/lab/): free in-browser Arduino UNO lab, 11 guided lessons running real firmware on an emulated ATmega328P
+- [Arduino lab](${SITE}/lab/): free in-browser Arduino UNO lab, 12 guided lessons running real firmware on an emulated ATmega328P
 - [Hardware library](${SITE}/hardware/): ${hardwareLibrary.length} board, sensor and module reference specifications
 - [Full LLM context](${SITE}/llms-full.txt): everything on this site in one plain-text file
 

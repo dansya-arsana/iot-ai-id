@@ -3,6 +3,8 @@ import {useLang} from '../../i18n';
 import {FLASH_WORDS,UNO_PINS} from '../contract';
 import type {FirmwareVariant,LoadReport,PinSample} from '../contract';
 import type {Lesson} from '../lessons';
+import {LESSONS} from '../lessons';
+
 import {Icon} from './icons';
 
 type Tab='overview'|'pinout'|'code'|'specs'|'firmware';
@@ -46,7 +48,7 @@ export function InfoCard({lesson,pins,done,quote,variant,report,toolchain}:{
   <section className="lab-card lab-info" data-expanded={expanded} data-testid="lab-info">
    <header className="lab-info-head">
     <div>
-     <span className="lab-eyebrow">( {String(lesson.n).padStart(2,'0')} / 11 ) ——— {tr('LESSON','PELAJARAN')}</span>
+     <span className="lab-eyebrow">( {String(lesson.n).padStart(2,'0')} / {LESSONS.length} ) ——— {tr('LESSON','PELAJARAN')}</span>
      <h1 className="lab-title">{lesson.title[lang]}</h1><p className="lab-tagline">{lesson.tagline[lang]}</p>
     </div>
     <button type="button" className="lab-iconbtn" aria-label={tr('Expand','Perbesar')} aria-pressed={expanded} onClick={()=>setExpanded(v=>!v)}><Icon name="expand" size={18}/></button>

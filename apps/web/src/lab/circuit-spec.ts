@@ -7,6 +7,8 @@ import {z} from 'zod';
 import type {Circuit,PartKind,PartProps,PartSpec,Wire,WireColor,BoardPin} from './contract';
 import {PART_PINS,UNO_PINS} from './contract';
 import {BB_COLS,BB_ROWS,PIN_COLS} from './scene/layout';
+// side effect: registers every sim/devices/<kind>.ts (pins, holes, copy) so plugin kinds validate with no edit here
+import './sim/devices';
 
 export interface Bilingual{en:string;id:string}
 const BilingualSchema=z.object({en:z.string().trim().min(1).max(300),id:z.string().trim().min(1).max(300)}).strict();
@@ -63,7 +65,8 @@ export interface ValidationResult{ok:boolean;issues:SpecIssue[]}
 /** Minimal part catalog the validator needs. Defaults to PART_PINS + PIN_COLS (kept equal to the scene registry by a test). */
 export interface PartCatalog{kinds:readonly string[];pins(kind:string):readonly string[];holes(kind:string):readonly number[]}
 export const DEFAULT_CATALOG:PartCatalog={
- kinds:Object.keys(PART_PINS),
+ /** Live: includes every registered plugin kind. */
+ get kinds():readonly string[]{return Object.keys(PART_PINS);},
  pins:k=>(PART_PINS as Record<string,readonly string[]>)[k]??[],
  holes:k=>(PIN_COLS as Record<string,readonly number[]|undefined>)[k]??[],
 };

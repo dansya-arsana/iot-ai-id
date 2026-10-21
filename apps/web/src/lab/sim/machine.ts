@@ -1,7 +1,9 @@
-import {AVRADC,AVRIOPort,AVRTimer,AVRUSART,CPU,PinState,adcConfig,avrInstruction,portBConfig,portCConfig,portDConfig,timer0Config,timer1Config,timer2Config,usart0Config} from 'avr8js';
+import {AVRADC,AVRIOPort,AVRTWI,AVRTimer,AVRUSART,CPU,PinState,adcConfig,avrInstruction,portBConfig,portCConfig,portDConfig,timer0Config,timer1Config,timer2Config,twiConfig,usart0Config} from 'avr8js';
 import {PIN_PORT,SIM_CLOCK_HZ,UNO_PINS} from '../contract';
 import type {AvrPort,PinMode,UnoPin} from '../contract';
 import {PinMonitor} from './pins';
+import {TwiBus} from './devices/core/twi';
+import type {I2cSlave} from './devices/types';
 
 /** ATmega328P with timers, GPIO, USART and ADC. Pure: no DOM. */
 export class AvrMachine{
@@ -10,6 +12,10 @@ export class AvrMachine{
  readonly usart:AVRUSART;
  readonly adc:AVRADC;
  readonly monitor:PinMonitor;
+ /** I2C bus; created on first attachI2c so sketches without Wire run exactly as before. */
+ bus:TwiBus|null=null;
+ private lines=new Set<UnoPin>();
+ private ext:Partial<Record<UnoPin,boolean>>={};
  /** 1-based .ino line of the last executed sketch instruction, 0 = none yet. */
  line=0;
  private timers:AVRTimer[];
@@ -26,8 +32,10 @@ export class AvrMachine{
     for(let bit=0;bit<8;bit++){
      if(!(diff&(1<<bit)))continue;
      const pin=PIN_TO_UNO[port][bit];
-     if(pin)this.monitor.record(pin,value&(1<<bit)?1:0,this.cpu.cycles);
+     if(pin&&!this.lines.has(pin))this.monitor.record(pin,value&(1<<bit)?1:0,this.cpu.cycles);
     }
+    // shared lines also change when the MCU releases or takes the pin (DDR write), which does not change the PORT value
+    for(const pin of this.lines){if(PIN_PORT[pin].port===port)this.monitor.record(pin,this.lineLevel(pin),this.cpu.cycles);}
    });
   }
  }
@@ -39,8 +47,23 @@ export class AvrMachine{
  /** Drive an external level onto an input pin. */
  setPin(pin:UnoPin,level:boolean):void{
   const {port,bit}=PIN_PORT[pin];
+  this.ext[pin]=level;
   this.ports[port].setPin(bit,level);
-  this.monitor.record(pin,level?1:0,this.cpu.cycles);
+  this.monitor.record(pin,this.lines.has(pin)?this.lineLevel(pin):level?1:0,this.cpu.cycles);
+ }
+ /** Track a pin as an open-drain line: its level is the MCU's output while it drives, else the external (device or pull-up) level. */
+ watchLine(pin:UnoPin):void{this.lines.add(pin);}
+ /** Effective level of a pin right now. */
+ lineLevel(pin:UnoPin):0|1{
+  const {port,bit}=PIN_PORT[pin];
+  const cfg=PORT_CFG[port];
+  const mask=1<<bit;
+  if(this.cpu.data[cfg.DDR]&mask)return this.cpu.data[cfg.PORT]&mask?1:0;
+  return this.ext[pin]?1:0;
+ }
+ attachI2c(slave:I2cSlave):void{
+  if(!this.bus){const twi=new AVRTWI(this.cpu,twiConfig,SIM_CLOCK_HZ);this.bus=new TwiBus(twi);twi.eventHandler=this.bus;}
+  this.bus.attach(slave);
  }
  setAdc(channel:number,volts:number):void{this.adc.channelValues[channel]=volts;}
  schedule(cycles:number,cb:()=>void):void{this.cpu.addClockEvent(cb,cycles);}
@@ -56,5 +79,6 @@ export class AvrMachine{
  }
 }
 
+const PORT_CFG={B:portBConfig,C:portCConfig,D:portDConfig};
 const PIN_TO_UNO:Record<AvrPort,(UnoPin|undefined)[]>={B:[],C:[],D:[]};
 for(const p of UNO_PINS){const {port,bit}=PIN_PORT[p];PIN_TO_UNO[port][bit]=p;}

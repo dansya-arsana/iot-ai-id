@@ -68,12 +68,19 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
     drop();
     machine=m;serial='';pending='';lastTx=-1;speed=1;
     const dec=new TextDecoder('utf-8');
-    m.usart.onByteTransmit=b=>{const s=dec.decode(new Uint8Array([b]),{stream:true});serial+=s;pending+=s;lastTx=m.cpu.cycles;if(serial.length>SERIAL_KEEP*2)serial=serial.slice(-SERIAL_KEEP);};
+    const taps:((b:number,cycle:number)=>void)[]=[];
+    m.usart.onByteTransmit=b=>{for(const t of taps)t(b,m.cpu.cycles);const s=dec.decode(new Uint8Array([b]),{stream:true});serial+=s;pending+=s;lastTx=m.cpu.cycles;if(serial.length>SERIAL_KEEP*2)serial=serial.slice(-SERIAL_KEEP);};
     models=createModels(circuit,{
      setPin:(p,l)=>m.setPin(p,l),
      setAdc:(ch,v)=>m.setAdc(ch,v),
      schedule:(c,cb)=>m.schedule(c,cb),
      now:()=>m.cpu.cycles,
+     pinLevel:p=>m.lineLevel(p),
+     pinMode:p=>m.pinMode(p),
+     watchLine:p=>m.watchLine(p),
+     attachI2c:sl=>m.attachI2c(sl),
+     tapUart:cb=>{taps.push(cb);},
+     uartSend:b=>{m.usart.writeByte(b);},
     });
     const edgeModels=[...models.values()].filter(x=>x.onEdge);
     m.monitor.onEdge=(pin,level,cycle)=>{for(const x of edgeModels)x.onEdge!(pin,level,cycle);};

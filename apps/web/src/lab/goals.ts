@@ -25,6 +25,11 @@ function range(m:GoalMemory,key:string,v:number):number{
 }
 const pin=(s:SimSnapshot,name:string):PinSample|undefined=>(s.pins as Record<string,PinSample>)[name];
 
+/** The typed state of the DHT22 plugin device, if the circuit has one. */
+function dhtOf(s:SimSnapshot):{tempC:number;humidity:number;readT:number|null;readH:number|null}|null{
+ for(const [,p] of entries(s))if(p.kind==='ext'&&p.type==='dht22')return p.v as unknown as {tempC:number;humidity:number;readT:number|null;readH:number|null};
+ return null;
+}
 export const GOALS:Record<LessonId,(s:SimSnapshot,m:GoalMemory)=>boolean>={
  board:(s,m)=>changes(m,'d13',pin(s,'D13')?.level??0)>=4,
  blink:(s,m)=>{const l=ledById(s,'led1')??byKind(s,'led');return !!l&&changes(m,'on',l.on?1:0)>=4;},
@@ -61,6 +66,7 @@ export const GOALS:Record<LessonId,(s:SimSnapshot,m:GoalMemory)=>boolean>={
  },
  motor:(s)=>{const mo=byKind(s,'motor');return !!mo&&mo.rpm>=0.5*MOTOR_MAX_RPM;},
  servo:(s,m)=>{const v=byKind(s,'servo');return !!v&&range(m,'ang',v.angleDeg)>=90;},
+ dht:(s,m)=>{const d=dhtOf(s);return !!d&&d.readT!==null&&changes(m,'t',d.readT)>=2;},
  parking:(s,m)=>{
   const r=ledById(s,'ledR'),g=ledById(s,'ledG'),h=byKind(s,'hcsr04');
   if(r?.on){m.r=1;if(h?.echoCm!=null&&m.rAt===undefined)m.rAt=h.echoCm;}
@@ -89,6 +95,7 @@ export const READOUTS:Record<LessonId,(s:SimSnapshot)=>{target:string;text:strin
   return m&&id?[pill(id,`${Math.round(m.duty*100)}% · ${Math.round(m.rpm)} rpm`)]:[];
  },
  servo:s=>{const v=byKind(s,'servo'),id=idOf(s,'servo');return v&&id?[pill(id,`${Math.round(v.angleDeg)}°`)]:[];},
+ dht:s=>{const d=dhtOf(s),id=idOf(s,'ext');return d&&id?[pill(id,`${d.tempC.toFixed(1)} °C · ${Math.round(d.humidity)} %RH`)]:[];},
  parking:s=>{
   const h=byKind(s,'hcsr04'),hid=idOf(s,'hcsr04'),l=ledById(s,'ledR');
   const out:{target:string;text:string}[]=[];

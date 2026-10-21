@@ -4,7 +4,7 @@
  */
 
 // ---------- lessons ----------
-export const LESSON_IDS=['board','blink','button','knob','rgb','light','distance','sound','motor','servo','parking'] as const;
+export const LESSON_IDS=['board','blink','button','knob','rgb','light','distance','sound','motor','servo','parking','dht'] as const;
 export type LessonId=typeof LESSON_IDS[number];
 export function isLessonId(s:string|null|undefined):s is LessonId{return !!s&&(LESSON_IDS as readonly string[]).includes(s);}
 
@@ -32,9 +32,11 @@ export type BoardFeatureId=typeof BOARD_FEATURES[number];
 export type TargetId=string;
 
 // ---------- circuit ----------
-export type PartKind='led'|'resistor'|'button'|'potentiometer'|'rgb-led'|'ldr'|'lamp'|'hcsr04'|'obstacle'|'buzzer'|'transistor'|'diode'|'motor'|'servo';
+export type BuiltinPartKind='led'|'resistor'|'button'|'potentiometer'|'rgb-led'|'ldr'|'lamp'|'hcsr04'|'obstacle'|'buzzer'|'transistor'|'diode'|'motor'|'servo';
+/** Any registered kind id. New kinds are added by dropping files into scene/parts and sim/devices (docs/lab-extending.md); they never edit this union. */
+export type PartKind=string;
 /** Physical pins per kind (lamp and obstacle are off-board props). motor.net.DRIVE is logical: the PWM pin behind its driver transistor. */
-export const PART_PINS:Record<PartKind,readonly string[]>={led:['A','C'],resistor:['1','2'],button:['1','2'],potentiometer:['VCC','SIG','GND'],'rgb-led':['R','G','B','K'],ldr:['A','B'],lamp:[],hcsr04:['VCC','TRIG','ECHO','GND'],obstacle:[],buzzer:['+','-'],transistor:['B','C','E'],diode:['A','K'],motor:['+','-'],servo:['SIG','V','GND']};
+export const PART_PINS:Record<string,readonly string[]>={led:['A','C'],resistor:['1','2'],button:['1','2'],potentiometer:['VCC','SIG','GND'],'rgb-led':['R','G','B','K'],ldr:['A','B'],lamp:[],hcsr04:['VCC','TRIG','ECHO','GND'],obstacle:[],buzzer:['+','-'],transistor:['B','C','E'],diode:['A','K'],motor:['+','-'],servo:['SIG','V','GND']};
 export type LedColor='red'|'yellow'|'green'|'blue'|'white';
 /**
  * Props by kind: led {color:LedColor}; resistor {ohms, seriesWith?:partId, role:'series'|'pull-down'|'divider'|'base'};
@@ -67,6 +69,7 @@ export const CIRCUITS:Record<LessonId,Circuit>={
  sound:{parts:[{id:'bz1',kind:'buzzer',net:{'+':'D5','-':'GND'},props:{}}],wires:[w('bz1','+','D5','orange'),w('bz1','-','GND','black')]},
  motor:{parts:[{id:'q1',kind:'transistor',net:{B:'D6',E:'GND'},props:{model:'NPN'}},{id:'rb',kind:'resistor',net:{'1':'D6'},props:{ohms:1000,role:'base'}},{id:'d1',kind:'diode',net:{K:'5V'},props:{}},{id:'m1',kind:'motor',net:{DRIVE:'D6'},props:{}}],wires:[w('rb','1','D6','orange'),...RAILS]},
  servo:{parts:[{id:'sv1',kind:'servo',net:{SIG:'D9',V:'5V',GND:'GND'},props:{}}],wires:[w('sv1','SIG','D9','orange'),w('sv1','V','5V','red'),w('sv1','GND','GND','black')]},
+ dht:{parts:[{id:'dht1',kind:'dht22',net:{VCC:'5V',DATA:'D2',GND:'GND'},props:{tempC:24,humidity:60}},{id:'r1',kind:'resistor',net:{'1':'D2','2':'5V'},props:{ohms:10000,role:'pull-up'}}],wires:[w('dht1','DATA','D2','yellow'),...RAILS]},
  parking:{parts:[...sonar(60,'car'),...ledOn('ledG','D10','green','rG'),...ledOn('ledY','D11','yellow','rY'),...ledOn('ledR','D12','red','rR'),{id:'bz1',kind:'buzzer',net:{'+':'D5','-':'GND'},props:{}}],wires:[...SONAR_WIRES,w('rG','1','D10','green'),w('rY','1','D11','yellow'),w('rR','1','D12','orange'),w('bz1','+','D5','purple'),GND_RAIL]},
 };
 
@@ -88,6 +91,7 @@ export const FIRMWARE_SPEC:Record<LessonId,{variants:VariantSpec[]}>={
  sound:{variants:[{id:'scale',params:[P('noteMs','uint16',300,60,800,20)]},{id:'alarm',params:[P('noteMs','uint16',300,60,800,20)]}]},
  motor:{variants:[{id:'default',params:[P('topSpeed','uint8',200,60,255,5),P('stepMs','uint8',20,5,100,5)]}]},
  servo:{variants:[{id:'default',params:[P('fromDeg','uint8',10,0,90,5),P('toDeg','uint8',170,90,180,5),P('stepMs','uint8',15,2,50,1)]}]},
+ dht:{variants:[{id:'default',params:[P('readEvery','uint16',2000,1000,5000,500)]}]},
  parking:{variants:[{id:'default',params:[P('nearCm','uint16',15,5,50,1),P('farCm','uint16',40,20,150,5)]}]},
 };
 export interface FirmwareParam extends ParamSpec{offset:number;} // byte offset of the little-endian initial value in the flash image
@@ -111,7 +115,9 @@ export type PartInput=
  |{kind:'button';pressed:boolean}
  |{kind:'potentiometer';value:number}
  |{kind:'lamp';distanceCm?:number;on?:boolean}
- |{kind:'obstacle';distanceCm:number};
+ |{kind:'obstacle';distanceCm:number}
+ /** Input of a plugin device (sim/devices): `v` holds the keys of the device's `inputs` schema. */
+ |{kind:'ext';type:string;v:Record<string,number|boolean|string>};
 export type PartState=
  |{kind:'led';brightness:number;on:boolean;currentMa:number;overCurrent:boolean}
  |{kind:'rgb-led';r:number;g:number;b:number}
@@ -124,7 +130,9 @@ export type PartState=
  |{kind:'buzzer';on:boolean;freqHz:number}
  |{kind:'motor';duty:number;rpm:number}
  |{kind:'servo';pulseUs:number;angleDeg:number}
- |{kind:'passive'};
+ |{kind:'passive'}
+ /** State of a plugin device: `type` is the kind id, `v` the device's typed state (read it with extState() from scene/parts/kit). */
+ |{kind:'ext';type:string;v:Record<string,number|boolean|string|null>};
 export interface SimSnapshot{
  status:SimStatus; error:string|null;
  simTimeMs:number;      // emulated time since load

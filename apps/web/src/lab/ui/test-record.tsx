@@ -22,7 +22,7 @@ function pinRows(h:PinHistory,pin:UnoPin,s:SimSnapshot):RecordRow[]{
 const part=<K extends PartState['kind']>(s:SimSnapshot,kind:K)=>Object.values(s.parts).find(p=>p.kind===kind) as Extract<PartState,{kind:K}>|undefined;
 
 const KEY:Record<LessonId,UnoPin[]>={
- board:['D13'],blink:['D8'],button:['D8'],knob:['D9'],rgb:['D9','D10','D11'],light:['A1'],distance:['D7'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D12'],
+ board:['D13'],blink:['D8'],button:['D8'],knob:['D9'],rgb:['D9','D10','D11'],light:['A1'],distance:['D7'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D12'],dht:['D2'],
 };
 const pwmRows=(s:SimSnapshot):RecordRow[]=>{
  const ch=(['D9','D10','D11'] as UnoPin[]).map(p=>`${p} ${Math.round(s.pins[p].duty*100)}%`);
@@ -37,6 +37,8 @@ const generic=(id:LessonId)=>(h:PinHistory,s:SimSnapshot):RecordRow[]=>{
  const b=part(s,'buzzer');if(b&&b.on)rows.push({k:'tone',v:`${Math.round(b.freqHz)} Hz`});
  const m=part(s,'motor');if(m)rows.push({k:'motor',v:`${Math.round(m.rpm)} rpm`});
  const sv=part(s,'servo');if(sv)rows.push({k:'servo',v:`${Math.round(sv.angleDeg)}° · ${Math.round(sv.pulseUs)} µs`});
+ const dh=Object.values(s.parts).find(p=>p.kind==='ext'&&p.type==='dht22');
+ if(dh&&dh.kind==='ext'&&dh.v.readT!==null)rows.push({k:'dht22',v:`${dh.v.readT} °C · ${dh.v.readH} %RH`});
  rows.push({k:'at',v:`t=${fmtTime(s.simTimeMs)} · ${fmtCycles(s.simTimeMs)} cyc`});
  return rows.slice(0,5);
 };
@@ -50,7 +52,7 @@ const parkingRec:Rec=(_h,s,m)=>[
  {k:'lights',v:m.rAt!==undefined&&m.gAt!==undefined?`red at ${Math.round(m.rAt)} cm · green at ${Math.round(m.gAt)} cm`:'red + green seen'},at(s)];
 export const RECORDS:Record<LessonId,Rec>={
  board:generic('board'),blink:generic('blink'),button:generic('button'),knob:generic('knob'),rgb:generic('rgb'),light:generic('light'),
- distance:distanceRec,sound:generic('sound'),motor:generic('motor'),servo:generic('servo'),parking:parkingRec,
+ distance:distanceRec,sound:generic('sound'),motor:generic('motor'),servo:generic('servo'),parking:parkingRec,dht:generic('dht'),
 };
 /** The sentence the Goal row quotes on a pass. */
 export const quoteOf=(rows:RecordRow[])=>rows.filter(r=>r.k!=='at').slice(0,2).map(r=>`${r.k} ${r.v}`).join(' · ');

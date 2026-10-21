@@ -1,12 +1,16 @@
 /** Shared geometry helpers and the definePart adapter for parts/<kind>.ts. */
 import {AdditiveBlending,Box3,BoxGeometry,Group,LatheGeometry,Mesh,MeshBasicMaterial,PlaneGeometry,Sprite,SpriteMaterial,Vector2,type CanvasTexture} from 'three';
 import type {PartKind,PartProps,PartState} from '../../contract';
+import {deviceRegistry,extState} from '../../sim/devices';
+import type {InputSpec} from '../../sim/devices';
 import {PIN_COLS,PITCH,BODY_X,isOnBoardKind} from '../layout';
 import {glowTexture,solid} from '../materials';
 import {contactShadow} from '../decals';
 import {contentBox} from '../bounds';
 import * as C from '../palette';
-import type {Callout,Copy,InteractSpec,PartModule,PinDef} from './types';
+import type {Callout,ControlSpec,Copy,InteractSpec,PartModule,PinDef} from './types';
+
+export {extState};
 
 /** Per-instance runtime returned by a kind's builder; kept on group.userData.rt. */
 export interface Inner{apply(s:PartState,dt:number):void}
@@ -62,6 +66,13 @@ export function footprintOf(kind:PartKind,deskMm?:readonly [number,number]):Part
  return {onBoard:holes.length>0,holes,widthHoles:holes.length?Math.max(...holes)+1:0,...(bodyX?{bodyX}:{}),...(deskMm?{deskMm}:{})};
 }
 
+/** Popover controls generated from a device's typed inputs schema (so the part and the device cannot drift apart). */
+export function controlsFromInputs(inputs:readonly InputSpec[]):ControlSpec[]{
+ return inputs.map((i):ControlSpec=>i.type==='range'?{type:'range',key:i.key,label:i.label,min:i.min,max:i.max,step:i.step,...(i.unit?{unit:i.unit}:{})}
+  :i.type==='toggle'?{type:'toggle',key:i.key,label:i.label}
+  :{type:'choice',key:i.key,label:i.label,options:i.options});
+}
+
 export interface PartDef{
  kind:PartKind;name:Copy;pins:Record<string,PinDef>;callouts?:Callout[];interact?:InteractSpec;
  deskMm?:readonly [number,number];
@@ -69,9 +80,13 @@ export interface PartDef{
 }
 /** Wrap a legacy-style builder (`make(props,group)` returning {apply}) into a PartModule. */
 export function definePart(d:PartDef):PartModule{
+ // a plugin kind without its own controls gets its popover from the device's inputs schema
+ const inputs=deviceRegistry.get(d.kind)?.inputs??[];
+ const interact:InteractSpec|undefined=d.interact?.controls?.length||!inputs.length?d.interact
+  :{...d.interact,controls:controlsFromInputs(inputs)};
  return {
   kind:d.kind,name:d.name,pins:d.pins,callouts:d.callouts??[],
-  ...(d.interact?{interact:d.interact}:{}),
+  ...(interact?{interact}:{}),
   footprint:footprintOf(d.kind,d.deskMm),
   build(props){
    const g=new Group();

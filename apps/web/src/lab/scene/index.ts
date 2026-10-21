@@ -270,6 +270,8 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
     let sh=0;
     if(ob.min.z>lim){sh=ob.min.z-lim;ob.min.z-=sh;ob.max.z-=sh;}
     b.union(ob);pts.push(...contentCorners([view.group],-sh));
+    // the end of the track is part of the picture: the obstacle never leaves the framed area when dragged out
+    for(const x of [ob.min.x,ob.max.x]){const e=new Vector3(x,0,lim);pts.push(e);b.expandByPoint(e);}
    }else{b.union(contentBox([view.group]));pts.push(...contentCorners([view.group]));}
   }
   b.getCenter(centre);radius=Math.max(40,b.getSize(vec).length()/2);

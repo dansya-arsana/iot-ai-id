@@ -15,7 +15,7 @@ export const WINDOW_MS=2000;
 /** Key pin first, so the lane that matters for the lesson is always on top. */
 const KEY:Record<LessonId,string[]>={
  board:['D13'],blink:['D8'],button:['D8','D2'],knob:['D9','A0'],rgb:['D9','D10','D11'],light:['A1','D8'],
- distance:['D7','D6'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D6','D12','D10','D11','D5'],
+ distance:['D7','D6'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D6','D12','D10','D11','D5'],dht:['D2'],
 };
 const LABEL:Partial<Record<string,string>>={D7:'TRIG',D6:'ECHO'};
 export function lanesFor(id:LessonId,livePins:string[],tx:boolean,max:number,ai=false):{lanes:string[];more:number}{

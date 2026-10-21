@@ -2,35 +2,34 @@
 import {Group,Vector3} from 'three';
 import type {PartKind,PartProps,PartSpec,PartState} from '../../contract';
 import {PART_PINS} from '../../contract';
+import '../../sim/devices';
+import {nodeLoad} from '../../sim/devices/core/discover';
+import type {Mods} from '../../sim/devices/core/discover';
 import {PITCH,PIN_COLS} from '../layout';
 import {disposeObject} from '../materials';
-import {led} from './led';
-import {rgbLed} from './rgb-led';
-import {resistor} from './resistor';
-import {diode} from './diode';
-import {button} from './button';
-import {potentiometer} from './potentiometer';
-import {ldr} from './ldr';
-import {buzzer} from './buzzer';
-import {transistor} from './transistor';
-import {hcsr04} from './hcsr04';
-import {obstacle} from './obstacle';
-import {lamp} from './lamp';
-import {motor} from './motor';
-import {servo} from './servo';
 import type {DragHandle,PartModule,PartRegistry} from './types';
 
 export type {Callout,ControlSpec,Copy,DragHandle,DragSpec,Footprint,InteractSpec,PartCtx,PartModule,PartRegistry,PinDef,PinType} from './types';
 /** Handles the picking layer understands. Kept as the old name for scene code. */
 export type Interactive=Exclude<DragHandle,'drag-xz'>;
 
-const MODULES:Record<PartKind,PartModule>={
- led,'rgb-led':rgbLed,resistor,diode,button,potentiometer,ldr,buzzer,transistor,hcsr04,obstacle,lamp,motor,servo,
+/** Auto-discovery: every parts/<file>.ts that exports a PartModule is registered by its kind. No list to edit. */
+const SKIP=['index.ts','kit.ts','types.ts'];
+function load():Mods{
+ try{return import.meta.glob(['./*.ts','!./index.ts','!./kit.ts','!./types.ts'],{eager:true}) as Mods;}
+ catch{return nodeLoad(new URL('./',import.meta.url).href,SKIP);}
+}
+const isPart=(v:unknown):v is PartModule=>{
+ const m=v as Partial<PartModule>|null;
+ return !!m&&typeof m==='object'&&typeof m.kind==='string'&&typeof m.build==='function'&&typeof m.apply==='function'&&!!m.pins;
 };
+const MODULES:Record<string,PartModule>={};
+const mods=load();
+for(const f of Object.keys(mods).sort())for(const v of Object.values(mods[f]!))if(isPart(v))MODULES[v.kind]=v;
 export const registry:PartRegistry={
- get:k=>(MODULES as Record<string,PartModule|undefined>)[k],
+ get:k=>MODULES[k],
  has:k=>Object.prototype.hasOwnProperty.call(MODULES,k),
- kinds:()=>Object.keys(MODULES) as PartKind[],
+ kinds:()=>Object.keys(MODULES),
 };
 export const partModule=(kind:PartKind):PartModule=>MODULES[kind];
 

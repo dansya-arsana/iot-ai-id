@@ -24,7 +24,8 @@
     "agent:run": "tsx scripts/agent-runner.ts",
     "desktop:package": "npm run build && tsx scripts/package-desktop.ts",
     "check:tokens": "tsx scripts/check-design-tokens.ts",
-    "lab:firmware": "tsx scripts/build-lab-firmware.ts"
+    "lab:firmware": "tsx scripts/build-lab-firmware.ts",
+    "lab:new-part": "tsx scripts/lab-new-part.ts"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",
