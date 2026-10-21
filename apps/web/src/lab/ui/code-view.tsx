@@ -1,4 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
+import type {ReactNode} from 'react';
 import {useLang} from '../../i18n';
 import type {FirmwareVariant,ParamValues} from '../contract';
 import {fillTemplate,highlightLines} from './highlight';
@@ -11,7 +12,7 @@ const nf=(n:number)=>n.toLocaleString('en-US');
 
 interface Flash{n:number;lines:number[];params:string[]}
 
-export function CodeView({variant,params,currentLine,running,onRun,onStop,onParam,note,log,hideRun}:{
+export function CodeView({variant,params,currentLine,running,onRun,onStop,onParam,note,log,hideRun,badge}:{badge?:ReactNode;
  variant:FirmwareVariant;params:ParamValues;currentLine:number|null;running:boolean;
  onRun:()=>void;onStop:()=>void;onParam:(name:string)=>void;note:string|null;log:string|null;hideRun?:boolean;
 }){
@@ -53,7 +54,7 @@ export function CodeView({variant,params,currentLine,running,onRun,onStop,onPara
  return (
   <section className="lab-card lab-code-card" id="lab-sec-code" data-expanded={expanded}>
    <header className="lab-code-head">
-    <span className="lab-file">sketch.ino</span>
+    <span className="lab-file">sketch.ino</span>{badge}
     <span className="lab-receipt">{nf(variant.bytes)} B · {(variant.bytes/FLASH_BYTES*100).toFixed(1)}% flash</span>
     <span className="lab-grow"/>
     <button type="button" className="lab-iconbtn" aria-label={copied?tr('Copied','Tersalin'):tr('Copy','Salin')} title={tr('Copy','Salin')} onClick={copy}><Icon name={copied?'check':'copy'} size={18}/></button>

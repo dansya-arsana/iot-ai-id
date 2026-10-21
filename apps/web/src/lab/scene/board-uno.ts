@@ -75,7 +75,14 @@ function silkscreen(pins:Record<string,PinPos>):{tex:CanvasTexture;redraw():void
   g.textAlign='left';
   for(let r=0;r<3;r++)for(let c=0;c<3;c++){g.beginPath();g.arc(px(-4+c*1.3),pz(8.2+r*1.3),0.42*S,0,Math.PI*2);g.fillStyle=r===2&&c===2?hex(C.LIVE):C.SILKSCREEN;g.fill();}
   g.fillStyle=C.SILKSCREEN;g.font=`600 ${4.2*S}px ${SANS}`;g.fillText('AIoT',px(-0.2),pz(9.7));
-  g.font=`500 ${1.6*S}px ${MONO}`;g.fillText('UNO-compatible · ATmega328P-PU',px(-4.2),pz(13));
+  g.font=`500 ${1.6*S}px ${MONO}`;g.fillText('UNO R3-compatible',px(-4.2),pz(13));
+  // section labels, boxed outlines for the crystal / USB / jack, ICSP captions
+  g.textAlign='center';g.font=`600 ${1.7*S}px ${MONO}`;
+  g.fillText('POWER',px(6.5),pz(19.8));g.fillText('ANALOG IN',px(19.8),pz(19.8));
+  g.font=`600 ${1.4*S}px ${MONO}`;g.fillText('ICSP',px(27),pz(11.2));g.fillText('ICSP',px(-12),pz(-9.6));
+  g.fillText('16.000',px(-14),pz(10.2));g.fillText('USB',px(-22.5),pz(-3.2));
+  g.lineWidth=0.18*S;g.strokeRect(px(-19.6),pz(2.9),11.2*S,6.2*S);
+  g.strokeRect(px(-31.2),pz(-3.4),7.4*S,14.2*S);
  };
  redraw();
  const tex=canvasTexture(cv);
@@ -221,7 +228,7 @@ export function buildUno():UnoBuild{
  const smdGeo=new BoxGeometry(1.6,0.6,0.9),smd=new InstancedMesh(smdGeo,toon(C.RESISTOR_BODY),20);
  // clustered like real decoupling parts: around the 16U2, the regulator, the MCU's right end and the reset corner, with varied rotation
  const spots:[number,number,number][]=[
-  [-24.5,-9.6,0],[-23.2,-6,90],[-16.8,-11.4,0],[-15.2,-4.8,90],[-26.8,-12.4,90],
+  [-24.5,-9.6,0],[-23.2,-6,90],[-16.8,-11.4,0],[-18.4,-3.6,90],[-26.8,-12.4,90],
   [-12.2,12.6,0],[-12,15.6,90],[-21.4,16.4,0],[-21.6,12.2,90],[-9.6,17.8,0],
   [24.6,-5.4,90],[24.6,-3,90],[27.6,-4.4,0],[27.4,-8.4,90],
   [-8.4,-17.4,0],[-6.6,-16,90],[-4.8,-17.6,0],
@@ -232,14 +239,33 @@ export function buildUno():UnoBuild{
  smd.userData.noPick=true;smd.castShadow=true;group.add(smd);
  // reset switch: silver frame, dark body, red cap
  const reset=feat('uno.reset');
- reset.add(solid(new BoxGeometry(6.6,2.2,6.6),C.SILVER,{outline:true,pos:[-12,PCB_T+1.1,-14],finish:'metal'}));
+ reset.add(solid(new BoxGeometry(6,2.2,6),C.SILVER,{outline:true,pos:[-12,PCB_T+1.1,-14],finish:'metal'}));
  reset.add(solid(new BoxGeometry(5,1.4,5),C.HEADER_BLACK,{pos:[-12,PCB_T+2.8,-14]}));
- reset.add(solid(new CylinderGeometry(1.8,1.8,1.6,20),C.RED_ALERT,{pos:[-12,PCB_T+4.3,-14]}));
+ reset.add(solid(new CylinderGeometry(1.5,1.5,1.6,20),C.RED_ALERT,{pos:[-12,PCB_T+4.3,-14]}));
  // ICSP
  const icsp=feat('uno.icsp');
  icsp.add(solid(new BoxGeometry(2*PITCH+0.8,2.5,3*PITCH+0.4),C.HEADER_BLACK,{outline:true,edges:true,pos:[27,PCB_T+1.25,6]}));
  const pinGeo=new BoxGeometry(0.64,3.2,0.64);
  for(let i=0;i<3;i++)for(let j=0;j<2;j++)icsp.add(solid(pinGeo,C.GOLD,{pos:[27+(j-0.5)*PITCH,PCB_T+2.5+1.6,6+(i-1)*PITCH],cast:false,finish:'gold'}));
+
+ const icsp2=new Group();icsp2.name='uno.icsp2';group.add(icsp2);
+ icsp2.add(solid(new BoxGeometry(3*PITCH+0.4,2.5,2*PITCH+0.8),C.HEADER_BLACK,{outline:true,edges:true,pos:[-12,PCB_T+1.25,-6]}));
+ for(let i=0;i<3;i++)for(let j=0;j<2;j++)icsp2.add(solid(pinGeo,C.GOLD,{pos:[-12+(i-1)*PITCH,PCB_T+2.5+1.6,-6+(j-0.5)*PITCH],cast:false,finish:'gold'}));
+ // 16U2 gull legs: 8 per side on all four sides
+ const qleg=new InstancedMesh(new BoxGeometry(0.35,0.3,0.9),toon(C.SILVER,'metal'),32);qleg.userData.noPick=true;
+ {let k=0;const m=new Matrix4(),q=new Quaternion(),sc=new Vector3(1,1,1),ps=new Vector3();
+  for(let i=0;i<8;i++)for(const [dx,dz,r] of [[0,-3.4,0],[0,3.4,0],[-3.4,0,90],[3.4,0,90]] as const){
+   const o=(i-3.5)*0.7;
+   ps.set(-20+(dz===0?dx:o),PCB_T+0.2,-8+(dz===0?o:dz));q.setFromAxisAngle(up,r*Math.PI/180);m.compose(ps,q,sc);qleg.setMatrixAt(k++,m);
+  }}
+ chip.add(qleg);
+ // regulator: SOT-223 legs, M7 protection diode, 8 MHz SMD crystal
+ group.add(solid(new BoxGeometry(0.5,0.3,1.2),C.SILVER,{pos:[-18.4,PCB_T+0.15,15.9],cast:false,finish:'metal'}));
+ group.add(solid(new BoxGeometry(0.5,0.3,1.2),C.SILVER,{pos:[-17,PCB_T+0.15,15.9],cast:false,finish:'metal'}));
+ group.add(solid(new BoxGeometry(0.5,0.3,1.2),C.SILVER,{pos:[-15.6,PCB_T+0.15,15.9],cast:false,finish:'metal'}));
+ group.add(solid(new BoxGeometry(4.2,1.4,2.4),C.HEADER_BLACK,{outline:true,pos:[-24,PCB_T+0.7,19.4]}));
+ group.add(solid(new BoxGeometry(0.7,1.45,2.45),C.SILVER,{pos:[-22.4,PCB_T+0.72,19.4],cast:false,finish:'metal'}));
+ group.add(solid(new BoxGeometry(3.4,1,2.6),C.SILVER,{outline:true,pos:[-14,PCB_T+0.5,-10],finish:'metal'}));
 
  // status LEDs (SMD)
  const smdLed=new BoxGeometry(3,0.9,1.6);

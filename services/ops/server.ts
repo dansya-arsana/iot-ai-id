@@ -17,7 +17,7 @@ createServer(async(req,res)=>{
   if(path==='/health'&&req.method==='GET'){send(200,{status:'ok',admin:token?'enabled':'disabled'});return;}
   const admin=path.startsWith('/ops/v1/admin/');
   if(admin&&!bearer(req.headers.authorization)){send(token?401:503,{error:token?'Admin authorization required':'Admin routes are disabled: OPS_OWNER_TOKEN is not set'});return;}
-  let text='';for await(const chunk of req){text+=chunk;if(text.length>20_000){send(413,{error:'Request too large'});return;}}
+  let text='';for await(const chunk of req){text+=chunk;if(text.length>(path.startsWith('/ops/v1/lab/')||path.startsWith('/ops/v1/member/lab/')?64_000:20_000)){send(413,{error:'Request too large'});return;}}
   let body:unknown;try{body=text?JSON.parse(text):undefined;}catch{send(400,{error:'Invalid JSON'});return;}
   // X-Real-IP is trusted only because this service binds to the internal docker network or loopback behind nginx. Never publish OPS_HOST: a direct caller could forge the header and dodge the per-IP limits.
   // nginx sets X-Real-IP from Cloudflare's CF-Connecting-IP; the socket address is the fallback for direct access.

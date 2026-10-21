@@ -4,7 +4,7 @@ import type {BoardPin,Circuit,CreateLabScene,LabScene,LessonId,PartKind,PartProp
 import {BB_COLS,BB_CX,BB_D,BB_TOP,BB_W,LESSON_VIEW,holeX,freeHoleNear,layoutCircuit,obstacleMm} from './layout';
 import {buildUno} from './board-uno';
 import {buildBreadboard} from './breadboard';
-import {buildPart,type PartView} from './parts';
+import {buildPart,type PartView} from './parts/index';
 import {buildWires,disposeWireTextures,type WireBuild} from './wires';
 import {CameraRig,type ContentRect,type SafeInsets} from './camera';
 import {createPicking,type PickEntry} from './picking';
@@ -13,6 +13,9 @@ import {boxCorners,contentBox,contentCorners} from './bounds';
 import {disposeDecals} from './decals';
 import {renderThumbnails} from './thumbnails';
 import * as C from './palette';
+import {specToCircuit,type CircuitSpec,type SpecStep} from '../circuit-spec';
+import {createAssemblyController,installAssemblyDemo,type AssemblyControl} from './assembly';
+import {EXAMPLE_CLOSE_ALARM} from '../circuit-examples';
 
 export type {ContentRect,SafeInsets};
 export interface LabSceneV2 extends LabScene{
@@ -23,6 +26,44 @@ export interface LabSceneV2 extends LabScene{
  thumbnails(o:{width:number;height:number;dpr:number;order?:LessonId[];onEach?:(id:LessonId,url:string)=>void}):Promise<Partial<Record<LessonId,string>>>;
  /** One-shot success ring on the floor (900 ms; a 300 ms fade under reduced motion). */
  celebrate():void;
+}
+
+// ---------- v3 scene API (stubs: the scene builders replace the bodies, never the signatures) ----------
+export interface AssemblyStepEvent{
+ /** 0-based step index and total steps (after stepsOf(spec): explicit steps or derived defaults). */
+ index:number;total:number;step:SpecStep;
+ /** 'start' fires when the step's animation begins (show the caption), 'end' when it settled. */
+ phase:'start'|'end';
+}
+export interface PlayAssemblyOptions{
+ onStep?(e:AssemblyStepEvent):void;
+ /** 1 = normal pace (about 1.2 s per step), 2 = twice as fast, 0 or reducedMotion = jump to the final state per step with no tween. */
+ speed?:number;
+ /** Abort to stop early; the scene then shows the fully built circuit and the promise rejects with AbortError. */
+ signal?:AbortSignal;
+}
+/** What the user did directly in the 3D scene. The HUD turns these into sim inputs and prop edits. */
+export interface InteractiveHandlers{
+ /** Continuous edit by dragging: obstacle distance, lamp distance, knob value. `value` is in the prop's own unit (cm, 0..1023). */
+ onDrag?(partId:string,prop:string,value:number,phase:'start'|'move'|'end'):void;
+ /** Button-like press/release, or a lamp switch click. */
+ onPress?(partId:string,pressed:boolean):void;
+ /** Click on a part that has interact.controls: open the generic popover anchored at `at` (CSS px). */
+ onOpenControls?(partId:string,at:ScreenPoint):void;
+ /** Hover enter/leave for affordance styling in the HUD (cursor is set by the scene). */
+ onHoverPart?(partId:string|null,at:ScreenPoint|null):void;
+}
+export interface LabSceneV3 extends LabSceneV2{
+ /** Pause/resume/skip the running assembly (no-ops when idle). */
+ assembly:AssemblyControl;
+ /** Replace the scene content with a CircuitSpec (board, breadboard, parts at spec.place, wires). Stub: lays out via layoutCircuit and ignores spec.place until the loader lands. */
+ loadCircuit(spec:CircuitSpec):void;
+ /** Play the step-by-step assembly: board drops in, breadboard, each part placed, each wire drawn, one caption per step. Resolves when the circuit is fully built. Stub: fires onStep on a timer without animating. */
+ playAssembly(spec:CircuitSpec,o?:PlayAssemblyOptions):Promise<void>;
+ /** Turn direct manipulation on (pass handlers) or off (null). Off by default so lessons and the assembly are not disturbed. */
+ setInteractive(handlers:InteractiveHandlers|null):void;
+ /** "Zoom to it": tween the camera onto a part. Resolves when the camera arrived. Unknown ids resolve immediately. */
+ focusPart(id:string):Promise<void>;
 }
 
 const POWER_PINS=new Set(['5V','3V3','GND','VIN']);
@@ -52,7 +93,7 @@ function floorDots():Mesh{
  return mesh;
 }
 
-export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
+export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
  const canvas=o.canvas;
  let renderer:WebGLRenderer;
  try{renderer=new WebGLRenderer({canvas,antialias:true,alpha:true});}
@@ -110,6 +151,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
 
  const rimMat=makeHullMaterial(C.LIVE,2,0.85);
  let rims:Mesh[]=[];let hlTarget:string|null=null;let hlT=0;
+ let hoverHl:string|null=null; // direct-manipulation hover/keyboard rim; the lesson highlight wins when set
 
  const resolve=(id:string):Object3D|null=>{
   const v=byId.get(id);if(v)return v.group;
@@ -161,8 +203,9 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
  const clearRims=():void=>{for(const r of rims)r.parent?.remove(r);rims=[];};
  const applyHighlight=():void=>{
   clearRims();
-  if(!hlTarget)return;
-  const obj=resolve(hlTarget);if(!obj)return;
+  const hl=hlTarget??hoverHl;
+  if(!hl)return;
+  const obj=resolve(hl);if(!obj)return;
   const meshes:Mesh[]=[];
   obj.traverse(c=>{
    const m=c as Mesh;
@@ -178,11 +221,16 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
   views=[];byId.clear();entries=[];wires=null;
  };
 
+ const interactive:{handlers:InteractiveHandlers|null}={handlers:null};
+ const assembly=createAssemblyController(()=>settings.reducedMotion);
  const picking=createPicking({
   canvas,rig,entries:()=>entries,
   partState:id=>lastSnap?.parts[id],
   project:projectObject,
   onSelect:o.onSelect,onHover:o.onHover,onInput:o.onInput,
+  handlers:()=>interactive.handlers,
+  module:id=>byId.get(id)?.module,
+  hoverHighlight:id=>{hoverHl=id;applyHighlight();},
  });
 
  const centre=new Vector3(48,0,0);let radius=100;let fitMaxX=holeX(BB_COLS-1);
@@ -219,9 +267,10 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
 
  const setPr=(v:number):void=>{pr=v;renderer.setPixelRatio(v);renderer.setSize(cssW,cssH,false);};
 
- const scene_:LabSceneV2={
+ const scene_:LabSceneV3={
   ready,
   setLesson(lesson:LessonId,circuit:Circuit):void{
+   assembly.cancel();
    disposeLesson();occ.clear();
    const place=layoutCircuit(circuit);
    fitMaxX=Math.max(holeX(12),...Object.values(place).flatMap(p=>p.onBoard?[p.x,...(p.holes??[]).map(h=>holeX(h[0]))]:[]));
@@ -255,13 +304,13 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
    ];
    fitLesson(lesson,!built);
    if(!built){built=true;canvas.dataset.ready='1';resolveReady();}
-   if(hlTarget)applyHighlight();
+   if(hlTarget||hoverHl)applyHighlight();
   },
   setPartProps(id:string,props:PartProps):void{
    const v=byId.get(id);if(!v)return;
-   if(hlTarget===id)clearRims();
+   if((hlTarget??hoverHl)===id)clearRims();
    v.setProps(props);
-   if(hlTarget===id)applyHighlight();
+   if((hlTarget??hoverHl)===id)applyHighlight();
   },
   update(snap:SimSnapshot,dtMs:number):void{
    lastSnap=snap;
@@ -271,9 +320,10 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
    // real machine state on the hardware: LEDs, socket indicators, wires, chip decal
    uno.setLeds({l:snap.pins.D13.duty,tx:snap.txActive,on:true});
    uno.setLive(snap,dtMs);
+   assembly.tick(dtMs);
    wires?.update(snap,dtMs);
    rig.update(dtMs);
-   if(hlTarget){hlT+=dtMs;rimMat.uniforms.uOp!.value=0.65+0.25*Math.sin(hlT*0.006);}
+   if(hlTarget||hoverHl){hlT+=dtMs;rimMat.uniforms.uOp!.value=0.65+0.25*Math.sin(hlT*0.006);}
    if(ringT>=0){
     ringT+=dtMs;
     const dur=settings.reducedMotion?300:900,k=Math.min(1,ringT/dur);
@@ -295,6 +345,22 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
    cssW=Math.max(1,w);cssH=Math.max(1,h);baseDpr=Math.max(0.5,dpr);
    if(adaptive)pr=Math.min(2,Math.max(1.25,baseDpr));else pr=baseDpr;
    renderer.setPixelRatio(pr);renderer.setSize(cssW,cssH,false);rig.resize(cssW,cssH);setLineResolution(cssW,cssH);
+  },
+  loadCircuit(spec:CircuitSpec):void{scene_.setLesson('blink',specToCircuit(spec));},
+  assembly,
+  async playAssembly(spec:CircuitSpec,po:PlayAssemblyOptions={}):Promise<void>{
+   scene_.loadCircuit(spec);
+   return assembly.play(spec,{speed:po.speed,onStep:po.onStep,signal:po.signal},{
+    root:scene,uno:uno.group,breadboard:bb.group,wiresRoot,part:id=>byId.get(id)?.group,
+    focus:(p2,z)=>{if(p2)rig.focus(p2,z);else rig.reset();},
+    fitSize:()=>radius*2,
+   });
+  },
+  setInteractive(h:InteractiveHandlers|null):void{interactive.handlers=h;},
+  focusPart(id:string):Promise<void>{
+   if(!byId.has(id))return Promise.resolve();
+   scene_.focus(id);
+   return new Promise<void>(r=>setTimeout(r,settings.reducedMotion?0:500));
   },
   setSafeArea(i:SafeInsets):void{rig.setSafe(i);},
   contentRect():ContentRect|null{return rig.contentRect();},
@@ -338,6 +404,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
   },
   zoomLevel():number{return rig.zoomLevel();},
   dispose():void{
+   interactive.handlers=null;assembly.cancel();
    picking.dispose();
    disposeLesson();
    uno.dispose();bb.dispose();
@@ -348,5 +415,6 @@ export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
    delete canvas.dataset.ready;
   },
  };
+ installAssemblyDemo(scene_,EXAMPLE_CLOSE_ALARM);
  return scene_;
 };

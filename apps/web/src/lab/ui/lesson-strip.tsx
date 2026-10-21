@@ -1,4 +1,5 @@
 import {useEffect,useRef} from 'react';
+import type {ReactNode} from 'react';
 import {useLang} from '../../i18n';
 import {LESSONS} from '../lessons';
 import type {LessonId} from '../contract';
@@ -8,7 +9,7 @@ const CONCEPT:Record<LessonId,string>={
  board:'BOARD',blink:'OUTPUT',button:'INPUT',knob:'ADC',rgb:'PWM',light:'LDR',distance:'PULSEIN',sound:'TONE',motor:'TRANSISTOR',servo:'SERVO',parking:'PROJECT',
 };
 
-export function LessonStrip({active,done,celebrate,thumbs,reduced,onPick}:{active:LessonId;done:LessonId[];celebrate:LessonId|null;thumbs:Partial<Record<LessonId,string>>;reduced:boolean;onPick:(id:LessonId)=>void}){
+export function LessonStrip({active,done,celebrate,thumbs,reduced,onPick,extra}:{extra?:ReactNode;active:LessonId;done:LessonId[];celebrate:LessonId|null;thumbs:Partial<Record<LessonId,string>>;reduced:boolean;onPick:(id:LessonId)=>void}){
  const {tr,lang}=useLang();
  const scroller=useRef<HTMLDivElement>(null);
  const by=(d:number)=>scroller.current?.scrollBy({left:d*456,behavior:reduced?'auto':'smooth'});
@@ -22,6 +23,7 @@ export function LessonStrip({active,done,celebrate,thumbs,reduced,onPick}:{activ
  },[active,reduced]);
  return (
   <div className="lab-strip" id="lab-sec-lessons">
+   {extra}
    <button type="button" className="lab-strip-arrow" aria-label={tr('Previous lessons','Pelajaran sebelumnya')} onClick={()=>by(-1)}><Icon name="chevron" size={18} className="lab-flip"/></button>
    <div className="lab-strip-scroll" ref={scroller} role="list">
     {LESSONS.map(l=>{

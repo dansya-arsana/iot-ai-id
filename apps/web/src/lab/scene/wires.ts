@@ -33,11 +33,12 @@ export function buildWires(wires:Wire[],unoAnchor:(w:Wire)=>Vector3,end:(w:Wire,
  for(const w of wires)total[headerOf(w.boardPin)]=(total[headerOf(w.boardPin)]??0)+1;
  const live=new Color(C.LIVE);
  const dyn:{mat:MeshStandardMaterial;ov:MeshBasicMaterial|null;pin:string;pwm:boolean}[]=[];
- for(const w of wires){
+ for(const [wi,w] of wires.entries()){
   const railKey=w.componentId==='bb'?w.pin:'';
   const idx=railKey?(rails[railKey]=(rails[railKey]??-1)+1):0;
   const b=end(w,idx);
   if(!b)continue;
+  const first=g.children.length;
   const a=unoAnchor(w);
   const hk=headerOf(w.boardPin),n=seen[hk]=(seen[hk]??-1)+1;
   const fan=(n-((total[hk]??1)-1)/2)*1.6;
@@ -65,6 +66,8 @@ export function buildWires(wires:Wire[],unoAnchor:(w:Wire)=>Vector3,end:(w:Wire,
    ov.userData.own=true;
    const o=new Mesh(new TubeGeometry(curve,96,R+0.08,12,false),ov);o.userData.noPick=true;o.userData.noInk=true;g.add(o);
   }
+  // assembly animation handles: wire index, end A (board side: first 3 objects), end B (next 3), the rest are tubes
+  for(let c=first;c<g.children.length;c++){const o=g.children[c]!;o.userData.wireIdx=wi;o.userData.wirePart=c-first<3?'a':c-first<6?'b':'tube';}
   dyn.push({mat,ov,pin:w.boardPin,pwm});
  }
  return {

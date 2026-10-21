@@ -1,0 +1,365 @@
+{
+ "exampleId": "close-alarm",
+ "prompt": {
+  "en": "Parking beeper: beep faster as something gets closer than 20 cm",
+  "id": "Pengingat parkir: berbunyi makin cepat saat ada benda lebih dekat dari 20 cm"
+ },
+ "spec": {
+  "board": "uno",
+  "parts": [
+   {
+    "id": "us1",
+    "kind": "hcsr04",
+    "props": {},
+    "place": {
+     "breadboard": {
+      "col": 21,
+      "row": 9
+     }
+    }
+   },
+   {
+    "id": "obs1",
+    "kind": "obstacle",
+    "props": {
+     "target": "us1",
+     "distanceCm": 40,
+     "shape": "box"
+    },
+    "place": {
+     "free": {
+      "x": 100,
+      "z": 20
+     }
+    }
+   },
+   {
+    "id": "led1",
+    "kind": "led",
+    "props": {
+     "color": "red"
+    },
+    "place": {
+     "breadboard": {
+      "col": 8,
+      "row": 2
+     }
+    }
+   },
+   {
+    "id": "r1",
+    "kind": "resistor",
+    "props": {
+     "ohms": 220
+    },
+    "place": {
+     "breadboard": {
+      "col": 9,
+      "row": 3
+     }
+    }
+   },
+   {
+    "id": "bz1",
+    "kind": "buzzer",
+    "props": {},
+    "place": {
+     "breadboard": {
+      "col": 14,
+      "row": 2
+     }
+    }
+   }
+  ],
+  "wires": [
+   {
+    "id": "w-vcc",
+    "from": "us1.VCC",
+    "to": "5V",
+    "color": "red"
+   },
+   {
+    "id": "w-trig",
+    "from": "us1.TRIG",
+    "to": "D7",
+    "color": "yellow"
+   },
+   {
+    "id": "w-echo",
+    "from": "us1.ECHO",
+    "to": "D6",
+    "color": "green"
+   },
+   {
+    "id": "w-ugnd",
+    "from": "us1.GND",
+    "to": "GND",
+    "color": "black"
+   },
+   {
+    "id": "w-led",
+    "from": "D8",
+    "to": "led1.A",
+    "color": "orange"
+   },
+   {
+    "id": "w-rgnd",
+    "from": "r1.2",
+    "to": "GND",
+    "color": "black"
+   },
+   {
+    "id": "w-bz",
+    "from": "D9",
+    "to": "bz1.+",
+    "color": "purple"
+   },
+   {
+    "id": "w-bzg",
+    "from": "bz1.-",
+    "to": "GND",
+    "color": "black"
+   }
+  ],
+  "sketch": {
+   "source": "// Parking beeper: the closer something gets (under 20 cm), the faster it beeps.\nconst int TRIG = 7;\nconst int ECHO = 6;\nconst int LED = 8;\nconst int BUZZER = 9;\nconst int NEAR_CM = 20;\n\nvoid setup() {\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n  pinMode(LED, OUTPUT);\n  pinMode(BUZZER, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  long us = pulseIn(ECHO, HIGH, 30000);\n  int cm = us / 58;\n  Serial.print(cm);\n  Serial.println(\" cm\");\n  if (cm > 0 && cm < NEAR_CM) {\n    tone(BUZZER, 1000);            // short beep and red light\n    digitalWrite(LED, HIGH);\n    delay(40);\n    noTone(BUZZER);\n    digitalWrite(LED, LOW);\n    delay(30 + cm * 15);           // closer = shorter pause = faster beeps\n  } else {\n    noTone(BUZZER);\n    digitalWrite(LED, LOW);\n    delay(60);\n  }\n}\n"
+  },
+  "steps": [
+   {
+    "caption": {
+     "en": "The distance sensor goes on the breadboard.",
+     "id": "Sensor jarak dipasang di breadboard."
+    },
+    "add": {
+     "parts": [
+      "us1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "Power the sensor from 5V and ground.",
+     "id": "Beri daya sensor dari 5V dan ground."
+    },
+    "add": {
+     "wires": [
+      "w-vcc",
+      "w-ugnd"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "Trigger and echo wires carry the ping and its return.",
+     "id": "Kabel trigger dan echo membawa ping dan pantulannya."
+    },
+    "add": {
+     "wires": [
+      "w-trig",
+      "w-echo"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "Something to measure: an obstacle in front of the sensor.",
+     "id": "Sesuatu untuk diukur: halangan di depan sensor."
+    },
+    "add": {
+     "parts": [
+      "obs1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "A red LED with its resistor.",
+     "id": "LED merah beserta resistornya."
+    },
+    "add": {
+     "parts": [
+      "led1",
+      "r1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "Pin 8 lights the LED; the resistor returns to ground.",
+     "id": "Pin 8 menyalakan LED; resistor kembali ke ground."
+    },
+    "add": {
+     "wires": [
+      "w-led",
+      "w-rgnd"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "The buzzer sits next to it.",
+     "id": "Buzzer dipasang di sebelahnya."
+    },
+    "add": {
+     "parts": [
+      "bz1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "Pin 9 makes the sound.",
+     "id": "Pin 9 membuat suara."
+    },
+    "add": {
+     "wires": [
+      "w-bz",
+      "w-bzg"
+     ]
+    }
+   }
+  ],
+  "goal": {
+   "en": "Beep faster and faster as something gets closer than 20 cm.",
+   "id": "Berbunyi makin cepat saat ada benda mendekat di bawah 20 cm."
+  }
+ },
+ "build": {
+  "sha256": "2a32e2403bc230fea46e38937503235deabed0e8623d19d871847803e653b744",
+  "flashBase64": "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",
+  "bytes": 4750,
+  "lines": [
+   [
+    210,
+    213,
+    9
+   ],
+   [
+    214,
+    217,
+    10
+   ],
+   [
+    218,
+    221,
+    11
+   ],
+   [
+    222,
+    225,
+    12
+   ],
+   [
+    235,
+    238,
+    16
+   ],
+   [
+    239,
+    242,
+    17
+   ],
+   [
+    243,
+    246,
+    18
+   ],
+   [
+    247,
+    250,
+    19
+   ],
+   [
+    251,
+    254,
+    20
+   ],
+   [
+    255,
+    258,
+    21
+   ],
+   [
+    259,
+    266,
+    22
+   ],
+   [
+    267,
+    273,
+    23
+   ],
+   [
+    274,
+    280,
+    24
+   ],
+   [
+    281,
+    286,
+    25
+   ],
+   [
+    287,
+    290,
+    26
+   ],
+   [
+    291,
+    298,
+    27
+   ],
+   [
+    299,
+    302,
+    28
+   ],
+   [
+    303,
+    308,
+    29
+   ],
+   [
+    309,
+    311,
+    30
+   ],
+   [
+    312,
+    315,
+    31
+   ],
+   [
+    316,
+    327,
+    32
+   ],
+   [
+    328,
+    331,
+    38
+   ],
+   [
+    332,
+    333,
+    36
+   ],
+   [
+    334,
+    336,
+    34
+   ],
+   [
+    337,
+    340,
+    35
+   ],
+   [
+    341,
+    345,
+    36
+   ]
+  ],
+  "toolchain": "arduino-cli 1.5.1 · arduino:avr 1.8.8 · avr-gcc 7.3.0 · -fno-lto"
+ }
+}

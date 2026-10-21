@@ -1,0 +1,22 @@
+/* Part popover (lab v3 interaction): bench design, 1px lines, r12, shadow-1. Tokens only. */
+.lab-pop{position:absolute;z-index:6;width:272px;max-width:calc(100% - 20px);background:var(--lab-card);border:var(--lab-bw) solid var(--lab-line);border-radius:var(--lab-r-lg);box-shadow:var(--lab-shadow-1);color:var(--lab-ink);font-family:var(--lab-sans);font-size:13px;animation:lab-pop-in var(--lab-d2) var(--lab-ease-out) both}
+.lab-pop[data-side=left]{transform-origin:right center}
+.lab-pop[data-side=right]{transform-origin:left center}
+@keyframes lab-pop-in{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.lab-pop-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:12px 8px 8px 14px;border-bottom:var(--lab-bw) solid var(--lab-line)}
+.lab-pop-head h2{margin:2px 0 0;font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.lab-pop-body{display:flex;flex-direction:column;gap:14px;padding:12px 14px 14px}
+.lab-pop-field{display:flex;flex-direction:column;gap:8px}
+.lab-pop-field>label{display:flex;justify-content:space-between;align-items:baseline;color:var(--lab-ink-2)}
+.lab-pop-field output{font-family:var(--lab-mono);font-size:12px;color:var(--lab-ink)}
+.lab-pop-label{color:var(--lab-ink-2)}
+.lab-pop-field input[type=range]{width:100%}
+.lab-pop-chips{display:flex;flex-wrap:wrap;gap:6px}
+.lab-pop-chip{height:30px;padding:0 12px;border:var(--lab-bw) solid var(--lab-line-strong);border-radius:999px;background:var(--lab-raised);color:var(--lab-ink-2);font-weight:600;font-size:12px;cursor:pointer;transition:background var(--lab-d1) var(--lab-ease),color var(--lab-d1) var(--lab-ease)}
+.lab-pop-chip:hover{background:var(--lab-paper-deep);color:var(--lab-ink)}
+.lab-pop-chip[aria-pressed=true]{background:var(--lab-ink);border-color:var(--lab-ink);color:var(--lab-paper)}
+.lab-pop-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--lab-ink-2);cursor:pointer}
+.lab-pop-action{width:100%}
+.lab-pop :focus-visible,.lab-canvas:focus-visible{outline:2px solid var(--lab-ink);outline-offset:2px}
+.lab-canvas:focus-visible{outline-offset:-3px}
+@media (prefers-reduced-motion:reduce){.lab-pop{animation:none}.lab-pop-chip{transition:none}}

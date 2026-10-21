@@ -1,0 +1,219 @@
+{
+ "exampleId": "night-light",
+ "prompt": {
+  "en": "Night light: LED turns on when it gets dark",
+  "id": "Lampu malam: LED menyala saat gelap"
+ },
+ "spec": {
+  "board": "uno",
+  "parts": [
+   {
+    "id": "ldr1",
+    "kind": "ldr",
+    "props": {
+     "fixedOhms": 10000
+    },
+    "place": {
+     "breadboard": {
+      "col": 4,
+      "row": 2
+     }
+    }
+   },
+   {
+    "id": "r2",
+    "kind": "resistor",
+    "props": {
+     "ohms": 10000,
+     "role": "divider"
+    },
+    "place": {
+     "breadboard": {
+      "col": 6,
+      "row": 3
+     }
+    }
+   },
+   {
+    "id": "lamp1",
+    "kind": "lamp",
+    "props": {
+     "target": "ldr1",
+     "distanceCm": 40,
+     "on": true
+    },
+    "place": {
+     "free": {
+      "x": 61,
+      "z": 58
+     }
+    }
+   },
+   {
+    "id": "led1",
+    "kind": "led",
+    "props": {
+     "color": "yellow"
+    },
+    "place": {
+     "breadboard": {
+      "col": 14,
+      "row": 2
+     }
+    }
+   },
+   {
+    "id": "r1",
+    "kind": "resistor",
+    "props": {
+     "ohms": 220
+    },
+    "place": {
+     "breadboard": {
+      "col": 15,
+      "row": 3
+     }
+    }
+   }
+  ],
+  "wires": [
+   {
+    "id": "w-5v",
+    "from": "5V",
+    "to": "ldr1.A",
+    "color": "red"
+   },
+   {
+    "id": "w-a0",
+    "from": "A0",
+    "to": "ldr1.B",
+    "color": "green"
+   },
+   {
+    "id": "w-div",
+    "from": "r2.2",
+    "to": "GND",
+    "color": "black"
+   },
+   {
+    "id": "w-led",
+    "from": "D8",
+    "to": "led1.A",
+    "color": "orange"
+   },
+   {
+    "id": "w-rgnd",
+    "from": "r1.2",
+    "to": "GND",
+    "color": "black"
+   }
+  ],
+  "sketch": {
+   "source": "// Night light: the LED turns on when the room gets dark.\nconst int LDR_PIN = A0;\nconst int LED = 8;\nconst int DARK_BELOW = 400;   // 0..1023, lower = darker\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n}\n\nvoid loop() {\n  int level = analogRead(LDR_PIN);\n  digitalWrite(LED, level < DARK_BELOW ? HIGH : LOW);\n  delay(50);\n}\n"
+  },
+  "steps": [
+   {
+    "caption": {
+     "en": "A light sensor (LDR) goes on the breadboard.",
+     "id": "Sensor cahaya (LDR) dipasang di breadboard."
+    },
+    "add": {
+     "parts": [
+      "ldr1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "A 10k resistor next to it forms a light divider.",
+     "id": "Resistor 10k di sebelahnya membentuk pembagi cahaya."
+    },
+    "add": {
+     "parts": [
+      "r2"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "5V feeds the sensor, A0 reads the middle point, the resistor returns to ground.",
+     "id": "5V memberi daya sensor, A0 membaca titik tengah, resistor kembali ke ground."
+    },
+    "add": {
+     "wires": [
+      "w-5v",
+      "w-a0",
+      "w-div"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "A desk lamp to play with the light level.",
+     "id": "Lampu meja untuk mengubah tingkat cahaya."
+    },
+    "add": {
+     "parts": [
+      "lamp1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "A yellow LED with its resistor.",
+     "id": "LED kuning beserta resistornya."
+    },
+    "add": {
+     "parts": [
+      "led1",
+      "r1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "Pin 8 lights the LED; the resistor returns to ground.",
+     "id": "Pin 8 menyalakan LED; resistor kembali ke ground."
+    },
+    "add": {
+     "wires": [
+      "w-led",
+      "w-rgnd"
+     ]
+    }
+   }
+  ],
+  "goal": {
+   "en": "Turn an LED on when it gets dark.",
+   "id": "Nyalakan LED saat gelap."
+  }
+ },
+ "build": {
+  "sha256": "c3d1ba506a6deef2b6c89afdbea7e7140fbcaed4da186ff1fefc2b65ae79e059",
+  "flashBase64": "DJRcAAyUeQAMlHkADJR5AAyUeQAMlHkADJR5AAyUeQAMlHkADJR5AAyUeQAMlHkADJR5AAyUeQAMlHkADJR5AAyUoAAMlHkADJR5AAyUeQAMlHkADJR5AAyUeQAMlHkADJR5AAyUeQAAAAAIAAIBAAADBAcAAAAAAAAAAAECBAgQIECAAQIECBAgAQIECBAgBAQEBAQEBAQCAgICAgIDAwMDAwMAAAAAJQAoACsAAAAAACQAJwAqABEkH77P79jg3r/NvxHgoOCx4Ojm9OACwAWQDZKiMLEH2fch4KLgseABwB2SqzCyB+H3DpSRAAyUMgIMlAAAYeCI4AyUxwGO4A6UgwFh4IA5kUAM8GDgiOAOlAMCYuNw4IDgkOAMlA8BCJUOlEgBDpSQAA6UewDA4NDgDpR/ACCX4fMOlAAA+c8fkg+SD7YPkhEkL5M/k4+Tn5Ovk7+TgJEDAZCRBAGgkQUBsJEGATCRAgEj4CMPLTdY9QGWoR2xHSCTAgGAkwMBkJMEAaCTBQGwkwYBgJEHAZCRCAGgkQkBsJEKAQGWoR2xHYCTBwGQkwgBoJMJAbCTCgG/ka+Rn5GPkT+RL5EPkA++D5AfkBiVJugjDwKWoR2xHdLPP7f4lICRBwGQkQgBoJEJAbCRCgEmtaibBcAvPxnwAZahHbEdP7+6L6kvmC+IJ7wBzQFiD3EdgR2RHULgZg93H4gfmR9KldH3CJWPkp+Sr5K/ks+S35Lvkv+SawF8AQ6U6gBLAVwBwRTRBOEE8QTp8A6UMQIOlOoAaBl5CYoJmwloPnNAgQWRBXDzIeDCGtEI4QjxCIjuiA6D4JgeoRyxHMEU0QThBPEEKff/kO+Q35DPkL+Qr5CfkI+QCJV4lIS1gmCEvYS1gWCEvYW1gmCFvYW1gWCFve7m8OCAgYFggIPh6PDgEIKAgYJggIOAgYFggIPg6PDggIGBYICD4evw4ICBhGCAg+Dr8OCAgYFggIPq5/DggIGEYICDgIGCYICDgIGBYICDgIGAaICDEJLBAAiVjjAI8I5QIJEAAZDkKZ+QAREkh3CCK4CTfACAkXoAgGSAk3oAgJF6AIb9/M+AkXgAkJF5AAiVgzCB8Cj0gTCZ8IIwqfAIlYcwqfCIMMnwhDCx9ICRgACPfQPAgJGAAI93gJOAAAiVhLWPd4S9CJWEtY99+8+AkbAAj3eAk7AACJWAkbAAj335z8+T35OQ4PwB5Fj/TySRgFefT/wBhJGII8nwkOCID5kf/AHiVf9PpZG0kfwB7FX/T8WR1JFhEQ3An7f4lIyRIJWCI4yTiIEoIyiDn7/fkc+RCJViMFH0n7f4lDyRgi+AlYMjjJPogS4r78+Pt/iU7JEuKyyTj7/qzx+Tz5PfkygvMOD5AehZ/0+EkfkB5Fj/T9SR+QHgV/9PxJHMI6nwFi+BEQ6UngHsL/Dg7g//H+xV/0+lkbSRj7f4lOyREREIwNCV3iPck4+/35HPkR+RCJXeK/jPCJX4lP/PAQA=",
+  "bytes": 1130,
+  "lines": [
+   [
+    123,
+    126,
+    7
+   ],
+   [
+    127,
+    129,
+    11
+   ],
+   [
+    130,
+    137,
+    12
+   ],
+   [
+    138,
+    143,
+    13
+   ]
+  ],
+  "toolchain": "arduino-cli 1.5.1 · arduino:avr 1.8.8 · avr-gcc 7.3.0 · -fno-lto"
+ }
+}

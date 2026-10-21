@@ -13,6 +13,9 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
   - The code view is read-only. Only the declared parameters and the pre-compiled variants can change; there is no in-browser compiler.
   - Firmware is built offline with `npm run lab:firmware` (arduino-cli, Docker fallback); see docs/lab-firmware.md. Images include ArduinoCore-avr and Servo (LGPL-2.1), noted in THIRD_PARTY_NOTICES.md.
   - Lab link in the main nav and footer, a public card on Learn, and prerendered SEO pages for each lesson.
+- Lab v3 direct manipulation: drag the obstacle (snaps to whole cm, Shift for 5 cm) and the lamp in the 3D scene, turn the knob by dragging the 3D knob (relative, no jump), press the button in 3D, hover cursors and rims, keyboard access. Clicking a part with settings opens a popover: obstacle type (car, box, ball, wall), distance, "drive back and forth while running" and "Zoom to it"; the servo and motor have a load slider that slows the horn and the shaft.
+- Lab AI builder ("+ Build with AI" in the lesson strip): describe a circuit, the AI designs the CircuitSpec and the sketch, the 3D scene plays a captioned step-by-step assembly (board drops in, breadboard, each part placed, each wire drawn), then it runs for real on the emulated chip with the generated, compiled firmware. Three curated examples (Parking beeper, Night light, Servo gate) run instantly for everyone. Free typing needs the new `lab-ai` member grant (20 builds a day per member, global daily cap). Keys stay in the owner-only api; ops reaches it over the internal network with `OPS_API_INTERNAL_TOKEN`, and sketches compile in a no-network sandbox container. See docs/adr/011-lab-ai-builder.md.
+- UNO model polish: second ICSP, 16U2 and regulator legs, M7 diode, SMD crystal, "UNO R3-compatible" silkscreen.
 
 ### Fixed
 - Lab pin duty is smoothed over time so very short simulation slices do not alias a 490 Hz PWM; LED full brightness is reached at 12 mA.

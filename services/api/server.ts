@@ -19,6 +19,8 @@ import {Engine,id,now,safeError} from './engine.js';
 import {JevProvider,cliAvailability} from '../orchestrator/provider.js';
 import {terminateActiveProcesses} from '../orchestrator/process.js';
 import {FixtureAgent} from '../orchestrator/fixture.js';
+import {fixtureGenerator,handleInternalLabSpec,providerGenerator,type SpecGenerator} from './lab-spec.js';
+import {INTERNAL_SPEC_PATH} from '../../packages/ops-contract/index.js';
 import {components,esp32Devkit} from '../../packages/component-catalog/index.js';
 import {challengeReference,publicChallenges,getChallenge,judgeChallenge} from '../../packages/challenge-catalog/index.js';
 const port=Number(process.env.API_PORT??8787),webPort=Number(process.env.WEB_PORT??5173),bindHost=process.env.API_BIND??'127.0.0.1';
@@ -36,12 +38,14 @@ const auditUser=(req:IncomingMessage)=>String(req.headers['x-remote-user']||'loc
 const catalogSeed=store.seedHardwareLibrary(hardwareLibrary);
 const fixture=process.env.IOT_AGENT_PROVIDER==='fixture';
 async function providerAvailability():Promise<{status:string;available:boolean;active?:{id:string;label:string;model:string};error?:string}>{if(fixture)return{status:'fixture' as const,available:true};try{const active=await agent.preflight();return{status:'configured' as const,available:true,active};}catch(error){return{status:'unavailable' as const,available:false,error:safeError(error)};}}
+// Lab AI builder (ADR 011): prompt -> CircuitSpec with the owner's provider. Reached by ops in-process (desktop/dev) or via the internal endpoint (cloud).
+const labSpec:SpecGenerator=fixture?fixtureGenerator():providerGenerator((prompt,schema)=>agent.frontier(prompt,schema),()=>agent.preflight());
 const engine=new Engine(store,fixture?new FixtureAgent():agent);
 reconcileRemoteJobs(engine);
 const sites=new SiteEngine(store);
 let opsLocal:Ops|undefined;
 /** Desktop/dev: business ops run in-process next to the workspace DB. Cloud sets OPS_URL and proxies to the ops service. */
-const localOps=()=>opsLocal??=new Ops(new OpsStore(process.env.OPS_DB??resolve(dirname(process.env.IOT_DB_PATH??resolve('.data/iot.sqlite')),'ops.sqlite')),parseRoles(process.env.OPS_ROLES));
+const localOps=()=>opsLocal??=new Ops(new OpsStore(process.env.OPS_DB??resolve(dirname(process.env.IOT_DB_PATH??resolve('.data/iot.sqlite')),'ops.sqlite')),parseRoles(process.env.OPS_ROLES),undefined,undefined,{llm:{available:()=>fixture||deployment==='local'||!!process.env.OPS_API_INTERNAL_TOKEN,call:labSpec}});
 type OpsOut={status:number;data:unknown;redirect?:string;setCookie?:string|string[];headers?:Record<string,string>;text?:{type:string;body:string;filename?:string}};
 /** Writes an ops result: JSON by default, raw text for CSV exports, plus an optional portal session header. */
 function sendOps(res:ServerResponse,result:OpsOut|undefined){
@@ -69,6 +73,7 @@ const createSchema=z.object({goal:z.string().trim().min(8).max(2000),entryPoint:
 const runSchema=z.object({mode:z.enum(['simulation','physical']),fault:z.enum(['none','sda']).default('none'),port:z.string().optional(),parentId:z.string().uuid().optional(),repairConfirmed:z.boolean().optional(),backend:z.enum(['template-model','wokwi-cli']).default('template-model')});
 const server=createServer(async(req,res)=>{try{
  const path=new URL(req.url??'/',`http://127.0.0.1:${port}`).pathname;
+ if(path===INTERNAL_SPEC_PATH){await handleInternalLabSpec(req,res,labSpec,json);return;}// Before the Host check: ops reaches this by its docker hostname. Token-gated; nginx never routes it.
  // `admin.localhost` (Chromium resolves it to loopback) stands in for admin.iot.ai.id in e2e: only for the static page and the staff login routes, never for /api or the other /ops paths.
  const adminAlias=!path.startsWith('/api')&&(!path.startsWith('/ops/v1/')||path.startsWith('/ops/v1/staff/'));
  // `iot.admin.localhost` stands in for iot.ai.id: static files plus the member routes (no /api, no other /ops), so invitation-only mode, member sign-in and presentation mode can be tested.

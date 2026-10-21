@@ -30,3 +30,16 @@ The images contain object code of ArduinoCore-avr (LGPL-2.1, github.com/arduino/
 1. Add the lesson/variant and its params to `FIRMWARE_SPEC` in `apps/web/src/lab/contract.ts`.
 2. Write `sketches/<lesson>-<variant>/<lesson>-<variant>.ino`: `Serial.begin(9600)`, a ready line in `setup`, each param declared once as a non-zero, non-const global (`byte` for uint8, `unsigned int` for uint16) equal to its default.
 3. Run `npm run lab:firmware` and `npx tsx --test tests/lab-firmware.test.ts`.
+
+## AI-generated firmware (Lab AI builder)
+
+The AI builder compiles sketches at request time, not at build time, so the committed `generated.ts` is not involved. Sketches go through `services/ops/lab-compile.ts`, which runs `arduino-cli` in a one-shot sandbox container (`aiot-avr-sandbox:1.8.8`, built from `scripts/lab-firmware/Dockerfile.sandbox` on top of `aiot-avr:1.8.8`): no network, read-only root, tmpfs work dir, unprivileged user, pids/memory/cpu limits, 20 s timeout, 20 KB source cap. The result has the same shape as a `FirmwareVariant` (base64 flash, sha256, DWARF line map), so the runner and the code view use it unchanged.
+
+The three curated examples under `apps/web/src/lab/ai/examples/*.json` are precompiled with `npx tsx scripts/build-lab-examples.ts` (needs the sandbox image; never hand-edit the JSON). Rebuild them after changing a sketch in that script or in `circuit-examples.ts`.
+
+Simulator note for generated sketches: a button is wired pin 1 to 5V, pin 2 to the digital pin with a 10k pull-down, read with plain `INPUT`; `INPUT_PULLUP` buttons do not work in the simulator.
+
+### Deploy needs (owner)
+- The ops image needs the Docker CLI plus a restricted socket proxy (never mount the host socket directly), or a compiler wrapper (`OPS_LAB_DOCKER`). The images are built on that host (commands in ADR 011, owner checklist). Without it only the examples work and builds answer 503 `compiler not configured`.
+- Env: `OPS_API_INTERNAL_TOKEN` (same value in the ops and api env files), `IOT_API_INTERNAL_URL`, optional `OPS_LAB_IMAGE`, `OPS_LAB_AI_MEMBER_QUOTA`, `OPS_LAB_AI_GLOBAL_CAP`. The api and ops must share the `ops` docker network (already so).
+- nginx: add the rate-limited `/ops/v1/lab/` and `/ops/v1/member/lab/` locations (GET and POST). `/internal` is never proxied; `/api` stays 403 on iot.ai.id.

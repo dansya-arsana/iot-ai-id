@@ -1,0 +1,16 @@
+# Compile sandbox for the Lab AI builder (ADR 011). Built on top of the pinned toolchain image (see Dockerfile).
+# Same toolchain, but readable and runnable by an unprivileged user on a read-only root filesystem:
+# the SDK moves out of /root (mode 700) and every path the compiler may write to is redirected to the tmpfs given at `docker run`.
+#   docker build -t aiot-avr:1.8.8 scripts/lab-firmware
+#   docker build -f scripts/lab-firmware/Dockerfile.sandbox -t aiot-avr-sandbox:1.8.8 scripts/lab-firmware
+FROM aiot-avr:1.8.8
+RUN mkdir -p /opt/arduino \
+ && cp -a /root/.arduino15 /opt/arduino/data && cp -a /root/Arduino /opt/arduino/user \
+ && rm -rf /opt/arduino/data/staging /opt/arduino/data/tmp \
+ && chmod -R a+rX /opt/arduino \
+ && ln -s "$(ls -d /opt/arduino/data/packages/arduino/tools/avr-gcc/*/bin)/avr-objdump" /usr/local/bin/avr-objdump
+ENV ARDUINO_DIRECTORIES_DATA=/opt/arduino/data \
+    ARDUINO_DIRECTORIES_DOWNLOADS=/work/dl ARDUINO_UPDATER_ENABLE_NOTIFICATION=false \
+    ARDUINO_DIRECTORIES_USER=/opt/arduino/user
+USER 65534:65534
+WORKDIR /work

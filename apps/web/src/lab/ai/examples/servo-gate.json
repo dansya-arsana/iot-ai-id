@@ -1,0 +1,204 @@
+{
+ "exampleId": "servo-gate",
+ "prompt": {
+  "en": "Servo gate: button opens a gate for 3 seconds",
+  "id": "Gerbang servo: tombol membuka gerbang selama 3 detik"
+ },
+ "spec": {
+  "board": "uno",
+  "parts": [
+   {
+    "id": "btn1",
+    "kind": "button",
+    "props": {
+     "pull": "down"
+    },
+    "place": {
+     "breadboard": {
+      "col": 8,
+      "row": 2
+     }
+    }
+   },
+   {
+    "id": "r1",
+    "kind": "resistor",
+    "props": {
+     "ohms": 10000,
+     "role": "pull-down"
+    },
+    "place": {
+     "breadboard": {
+      "col": 10,
+      "row": 3
+     }
+    }
+   },
+   {
+    "id": "sv1",
+    "kind": "servo",
+    "props": {},
+    "place": {
+     "free": {
+      "x": 88,
+      "z": 62
+     }
+    }
+   }
+  ],
+  "wires": [
+   {
+    "id": "w-b5v",
+    "from": "5V",
+    "to": "btn1.1",
+    "color": "red"
+   },
+   {
+    "id": "w-btn",
+    "from": "D2",
+    "to": "btn1.2",
+    "color": "yellow"
+   },
+   {
+    "id": "w-bgnd",
+    "from": "r1.2",
+    "to": "GND",
+    "color": "black"
+   },
+   {
+    "id": "w-sig",
+    "from": "D9",
+    "to": "sv1.SIG",
+    "color": "orange"
+   },
+   {
+    "id": "w-sv5",
+    "from": "5V",
+    "to": "sv1.V",
+    "color": "red"
+   },
+   {
+    "id": "w-sgnd",
+    "from": "GND",
+    "to": "sv1.GND",
+    "color": "black"
+   }
+  ],
+  "sketch": {
+   "source": "// Servo gate: press the button and the gate opens for 3 seconds.\n#include <Servo.h>\n\nconst int BUTTON = 2;\nconst int SERVO_PIN = 9;\nconst int CLOSED_DEG = 0;\nconst int OPEN_DEG = 90;\nconst unsigned long OPEN_MS = 3000;\n\nServo gate;\n\nvoid setup() {\n  pinMode(BUTTON, INPUT);          // pressed reads HIGH (pull-down resistor keeps it LOW)\n  gate.attach(SERVO_PIN);\n  gate.write(CLOSED_DEG);\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON) == HIGH) {\n    gate.write(OPEN_DEG);\n    delay(OPEN_MS);\n    gate.write(CLOSED_DEG);\n    delay(400);\n  }\n}\n"
+  },
+  "steps": [
+   {
+    "caption": {
+     "en": "A push button goes on the breadboard, with a 10k resistor that keeps the pin low until you press.",
+     "id": "Tombol tekan dipasang di breadboard, dengan resistor 10k yang menjaga pin tetap rendah sampai ditekan."
+    },
+    "add": {
+     "parts": [
+      "btn1",
+      "r1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "5V to the button, pin 2 listens, the resistor returns to ground. Pressing makes pin 2 high.",
+     "id": "5V ke tombol, pin 2 mendengarkan, resistor kembali ke ground. Saat ditekan, pin 2 menjadi tinggi."
+    },
+    "add": {
+     "wires": [
+      "w-b5v",
+      "w-btn",
+      "w-bgnd"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "The servo is the gate arm.",
+     "id": "Servo adalah lengan palang gerbang."
+    },
+    "add": {
+     "parts": [
+      "sv1"
+     ]
+    }
+   },
+   {
+    "caption": {
+     "en": "Servo signal on pin 9, power from 5V and ground.",
+     "id": "Sinyal servo di pin 9, daya dari 5V dan ground."
+    },
+    "add": {
+     "wires": [
+      "w-sig",
+      "w-sv5",
+      "w-sgnd"
+     ]
+    }
+   }
+  ],
+  "goal": {
+   "en": "Open a gate for 3 seconds when a button is pressed.",
+   "id": "Buka palang gerbang selama 3 detik saat tombol ditekan."
+  }
+ },
+ "build": {
+  "sha256": "ff916bb935f63e680551b08540b7e15e270afa5230791484870a16d0bd5df07d",
+  "flashBase64": "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",
+  "bytes": 2614,
+  "lines": [
+   [
+    140,
+    143,
+    13
+   ],
+   [
+    144,
+    149,
+    14
+   ],
+   [
+    150,
+    155,
+    15
+   ],
+   [
+    156,
+    160,
+    19
+   ],
+   [
+    161,
+    166,
+    20
+   ],
+   [
+    167,
+    172,
+    21
+   ],
+   [
+    173,
+    178,
+    22
+   ],
+   [
+    179,
+    184,
+    23
+   ],
+   [
+    185,
+    185,
+    25
+   ],
+   [
+    186,
+    189,
+    10
+   ]
+  ],
+  "toolchain": "arduino-cli 1.5.1 · arduino:avr 1.8.8 · avr-gcc 7.3.0 · -fno-lto"
+ }
+}

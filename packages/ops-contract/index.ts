@@ -1,5 +1,6 @@
 /** Business operations contract (ADR 009): inquiries, organizations, distributor products, Lab Mitra tasks, payouts and roles. */
 import {z} from 'zod';
+import {CircuitSpecSchema,type SpecIssue} from '../../apps/web/src/lab/circuit-spec';
 
 const text=(max:number)=>z.string().trim().max(max);
 const slug=z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).min(3).max(80);
@@ -195,7 +196,7 @@ export const StaffUpdateSchema=z.object({role:z.enum(ROLES).optional(),status:z.
 export type Staff={id:string;username:string;name:string;role:Role;status:typeof STAFF_STATUSES[number];createdBy:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
 
 // Members (ADR 009 addendum): invited clients, partners and schools whose account unlocks areas of iot.ai.id. Login and activation share the portal schemas.
-export const MEMBER_GRANTS=['products','bench','arena','builders','installer'] as const;
+export const MEMBER_GRANTS=['products','bench','arena','builders','installer','lab-ai'] as const;
 export type MemberGrant=typeof MEMBER_GRANTS[number];
 export const MEMBER_STATUSES=['active','disabled'] as const;
 const grantList=z.array(z.enum(MEMBER_GRANTS)).max(MEMBER_GRANTS.length).transform(g=>MEMBER_GRANTS.filter(x=>g.includes(x)));
@@ -204,3 +205,88 @@ export const MemberUpdateSchema=z.object({name:text(120).min(2).optional(),orgNa
 export type Member={id:string;username:string;name:string;orgName:string;orgId?:string;grants:MemberGrant[];status:typeof MEMBER_STATUSES[number];createdBy:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
 /** What a signed-in member may see about themselves: no ids, no session data. */
 export type MemberMe={name:string;org:string;grants:MemberGrant[]};
+
+// Lab AI builder (ADR 011): prompt -> CircuitSpec + sketch -> compiled hex. Routes under /ops/v1/lab/. The LLM never runs in ops: ops calls the api container (INTERNAL_SPEC_PATH) with a dedicated token.
+export {CircuitSpecSchema} from '../../apps/web/src/lab/circuit-spec';
+export type {CircuitSpec,SpecIssue} from '../../apps/web/src/lab/circuit-spec';
+
+export const LAB_AI_LANGS=['en','id'] as const;
+export const LAB_AI_EXAMPLE_IDS=['close-alarm','night-light','servo-gate'] as const;
+export type LabAiExampleId=typeof LAB_AI_EXAMPLE_IDS[number];
+export const LAB_AI_DAILY_MEMBER_QUOTA=20;
+export const LAB_AI_DAILY_GLOBAL_CAP=500;
+export const LAB_AI_PROMPT_MAX=600;
+/** Compiled sketch in the same shape as FirmwareVariant (contract.ts) minus lesson-only fields: `lines` = [firstWord,lastWord,inoLine1Based] from DWARF. */
+export const LabBuildArtifactSchema=z.object({
+ sha256:z.string().regex(/^[a-f0-9]{64}$/),
+ flashBase64:z.string().max(120_000),
+ bytes:z.number().int().min(1).max(32_768),
+ lines:z.array(z.tuple([z.number().int(),z.number().int(),z.number().int()])).max(8000),
+ toolchain:z.string().max(80),
+}).strict();
+export type LabBuildArtifact=z.infer<typeof LabBuildArtifactSchema>;
+export const LabDiagnosticSchema=z.object({line:z.number().int().min(0),message:z.string().max(400)}).strict();
+export type LabDiagnostic=z.infer<typeof LabDiagnosticSchema>;
+
+/** POST /ops/v1/lab/build. Anonymous callers may only send `exampleId` (no LLM, precomputed). Members with the lab-ai grant and staff send `prompt`. */
+export const LabBuildRequestSchema=z.object({
+ prompt:text(LAB_AI_PROMPT_MAX).min(8).optional(),
+ exampleId:z.enum(LAB_AI_EXAMPLE_IDS).optional(),
+ lang:z.enum(LAB_AI_LANGS).default('en'),
+}).strict().refine(v=>!!v.prompt!==!!v.exampleId,{error:'Send either a prompt or an exampleId'});
+export type LabBuildRequest=z.infer<typeof LabBuildRequestSchema>;
+/** `limit` 0 = no per-person limit (staff); the global daily cap still applies. */
+export const LabQuotaSchema=z.object({usedToday:z.number().int().min(0),limit:z.number().int().min(0),resetsAt:z.string()}).strict();
+export type LabQuota=z.infer<typeof LabQuotaSchema>;
+export const LabBuildResponseSchema=z.object({
+ buildId:z.string().uuid().or(z.string().regex(/^ex-[a-z-]+$/)),
+ source:z.enum(['llm','example','cache']),
+ spec:CircuitSpecSchema,
+ build:LabBuildArtifactSchema,
+ /** Warnings that did not block (errors are returned as LabBuildErrorSchema instead). */
+ issues:z.array(z.object({code:z.string(),severity:z.enum(['error','warning']),en:z.string(),id:z.string(),ref:z.string().optional()}).strict()),
+ /** The spec was repaired once after the first model answer failed validation. */
+ repaired:z.boolean(),
+ quota:LabQuotaSchema.optional(),
+}).strict();
+export type LabBuildResponse=z.infer<typeof LabBuildResponseSchema>;
+/** Error bodies. `kind`: validation (spec stayed invalid after one repair), compile (arduino-cli rejected the sketch), quota (member or global cap), forbidden (no lab-ai grant), unavailable (api/provider down), bad-request. */
+export const LAB_BUILD_ERROR_KINDS=['validation','compile','quota','forbidden','unavailable','bad-request'] as const;
+export const LabBuildErrorSchema=z.object({
+ error:z.string(),
+ kind:z.enum(LAB_BUILD_ERROR_KINDS),
+ issues:z.array(z.object({code:z.string(),severity:z.enum(['error','warning']),en:z.string(),id:z.string(),ref:z.string().optional()}).strict()).optional(),
+ diagnostics:z.array(LabDiagnosticSchema).optional(),
+ quota:LabQuotaSchema.optional(),
+}).strict();
+export type LabBuildError=z.infer<typeof LabBuildErrorSchema>;
+
+/** GET /ops/v1/lab/examples (public): the 3 curated prompts with committed specs and hex. No LLM call. */
+export const LabExamplesResponseSchema=z.object({examples:z.array(z.object({exampleId:z.enum(LAB_AI_EXAMPLE_IDS),prompt:z.object({en:z.string(),id:z.string()}).strict(),spec:CircuitSpecSchema,build:LabBuildArtifactSchema}).strict()).max(3)}).strict();
+export type LabExamplesResponse=z.infer<typeof LabExamplesResponseSchema>;
+
+/** POST /ops/v1/lab/compile: edit-and-recompile of a sketch (same access as build, counts toward the global cap, not the member quota). */
+export const LabCompileRequestSchema=z.object({source:z.string().min(1).max(20_000)}).strict();
+export const LabCompileResponseSchema=z.object({build:LabBuildArtifactSchema,cached:z.boolean()}).strict();
+export type LabCompileResponse=z.infer<typeof LabCompileResponseSchema>;
+
+/** GET /ops/v1/lab/history: the member's own past builds, newest first. Prompt and output are logged server-side per ADR 011. */
+export const LabHistoryItemSchema=z.object({buildId:z.string(),at:z.string(),prompt:z.string(),ok:z.boolean(),repaired:z.boolean(),sha256:z.string().optional()}).strict();
+export type LabHistoryItem=z.infer<typeof LabHistoryItemSchema>;
+export const LabHistoryResponseSchema=z.object({items:z.array(LabHistoryItemSchema).max(100),quota:LabQuotaSchema}).strict();
+
+/**
+ * Internal only (ops -> api over the docker network, header `x-aiot-internal: <OPS_API_INTERNAL_TOKEN>`; never routed by nginx).
+ * The api container owns the provider keys. It must answer with JSON that parses as CircuitSpec, forced via the provider's structured-output mode.
+ */
+export const INTERNAL_SPEC_PATH='/internal/lab/spec';
+export const InternalSpecRequestSchema=z.object({
+ prompt:text(LAB_AI_PROMPT_MAX).min(8),
+ lang:z.enum(LAB_AI_LANGS),
+ /** Present on the single repair attempt: the previous spec JSON and the validator issues to fix. */
+ repair:z.object({previous:z.unknown(),issues:z.array(z.object({code:z.string(),en:z.string(),ref:z.string().optional()}).strict()).max(20)}).strict().optional(),
+}).strict();
+export type InternalSpecRequest=z.infer<typeof InternalSpecRequestSchema>;
+export const InternalSpecResponseSchema=z.object({spec:z.unknown(),provider:z.string().max(40),model:z.string().max(80)}).strict();
+export type InternalSpecResponse=z.infer<typeof InternalSpecResponseSchema>;
+export type {SpecIssue as LabSpecIssue};

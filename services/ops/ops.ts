@@ -11,6 +11,7 @@ import {handlePortal} from './portal.js';
 import {Auth} from './auth.js';
 import {StaffDirectory,handleStaff,handleStaffAdmin} from './staff.js';
 import {MemberDirectory,handleMember,handleMemberAdmin} from './members.js';
+import {LabAi,handleLab,type LabDeps} from './lab-ai.js';
 import {
  InquiryInputSchema,InquiryUpdateSchema,OrganizationInputSchema,OrganizationUpdateSchema,ProductInputSchema,ProductUpdateSchema,TaskInputSchema,TaskActionSchema,
  SchoolAdminInputSchema,ReasonSchema,PersonUpdateSchema,BatchCreateSchema,BatchPaidSchema,INQUIRY_STATUSES,ORG_TYPES,PRODUCT_STATUSES,TASK_STATUSES,can,permissions,resolveRole,payoutSplit,productErrors,publicProduct,taskTransition,
@@ -49,8 +50,8 @@ export class RateLimit{
 }
 
 export class Ops{
- readonly commissions:Commissions;readonly staff:StaffDirectory;readonly members:MemberDirectory;readonly loginLimit=new RateLimit(20,10*60_000,2000);readonly activateLimit=new RateLimit(10,10*60_000,500);
- constructor(readonly store:OpsStore,readonly roles=new Map<string,Role>(),readonly limit=new RateLimit(),readonly clock=()=>new Date()){const auth=new Auth(store,clock);this.commissions=new Commissions(store,clock,auth);this.staff=new StaffDirectory(store,clock,auth);this.members=new MemberDirectory(store,clock,auth);}
+ readonly commissions:Commissions;readonly staff:StaffDirectory;readonly members:MemberDirectory;readonly labAi:LabAi;readonly loginLimit=new RateLimit(20,10*60_000,2000);readonly activateLimit=new RateLimit(10,10*60_000,500);
+ constructor(readonly store:OpsStore,readonly roles=new Map<string,Role>(),readonly limit=new RateLimit(),readonly clock=()=>new Date(),labDeps:Partial<LabDeps>={}){const auth=new Auth(store,clock);this.commissions=new Commissions(store,clock,auth);this.staff=new StaffDirectory(store,clock,auth);this.members=new MemberDirectory(store,clock,auth);this.labAi=new LabAi(this,labDeps);}
  /** A staff account decides its own role (disabled: none); other users fall back to OPS_ROLES, or single-owner when none are configured (desktop and dev). */
  roleFor(user:string):Role|undefined{const r=this.staff.roleOf(user);return r===undefined?resolveRole(user,this.roles):r??undefined;}
 
@@ -83,6 +84,7 @@ export class Ops{
   if(path==='/ops/v1/labs'&&method==='GET')return{status:200,data:{labs:this.board()}};
   if(path.startsWith('/ops/v1/portal/'))return handlePortal(this,call);
   if(path.startsWith('/ops/v1/staff/'))return handleStaff(this,call);
+  if(path.startsWith('/ops/v1/lab/')||path.startsWith('/ops/v1/member/lab/'))return handleLab(this,call);// Lab AI builder (ADR 011); the member/ alias is where the member cookie is sent.
   if(path.startsWith('/ops/v1/member/'))return handleMember(this,call);
   if(!path.startsWith('/ops/v1/admin/'))return{status:404,data:{error:'Not found'}};
 

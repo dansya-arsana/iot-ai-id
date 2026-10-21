@@ -2,7 +2,7 @@ import {Box3,DirectionalLight,Group,HemisphereLight,OrthographicCamera,Scene,SRG
 import type {LessonId,PartKind,PartSpec,PartState} from '../contract';
 import {LESSON_IDS} from '../contract';
 import {buildUno} from './board-uno';
-import {buildPart} from './parts';
+import {buildPart} from './parts/index';
 import {contentBox} from './bounds';
 import {setLineResolution,setMmPerPx} from './materials';
 import * as C from './palette';

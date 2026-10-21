@@ -39,7 +39,7 @@ export type LedColor='red'|'yellow'|'green'|'blue'|'white';
 /**
  * Props by kind: led {color:LedColor}; resistor {ohms, seriesWith?:partId, role:'series'|'pull-down'|'divider'|'base'};
  * button {pull:'down'} (pressed=HIGH); potentiometer {value 0..1023}; ldr {fixedOhms}; lamp {target:ldrId, distanceCm 5..150, on};
- * obstacle {target:hcsr04Id, distanceCm 3..250, shape:'box'|'car'}; transistor {model:'NPN'}; others {}.
+ * obstacle {target:hcsr04Id, distanceCm 3..250, shape:'box'|'car'|'ball'|'wall'}; transistor {model:'NPN'}; others {}.
  */
 export type PartProps=Record<string,string|number|boolean>;
 /** net: part pin -> board pin it is electrically tied to (through series resistors / driver). The simulator reads only this. */
@@ -54,7 +54,7 @@ const w=(componentId:string,pin:string,boardPin:BoardPin,color:WireColor):Wire=>
 const GND_RAIL=w('bb','gnd-rail','GND','black');
 const RAILS:Wire[]=[w('bb','5v-rail','5V','red'),GND_RAIL];
 const ledOn=(id:string,pin:UnoPin,color:LedColor,rId:string):PartSpec[]=>[{id,kind:'led',net:{A:pin,C:'GND'},props:{color}},{id:rId,kind:'resistor',net:{'1':pin},props:{ohms:220,seriesWith:id,role:'series'}}];
-const sonar=(distanceCm:number,shape:'box'|'car'):PartSpec[]=>[{id:'us1',kind:'hcsr04',net:{VCC:'5V',TRIG:'D7',ECHO:'D6',GND:'GND'},props:{}},{id:'obs1',kind:'obstacle',net:{},props:{target:'us1',distanceCm,shape}}];
+const sonar=(distanceCm:number,shape:'box'|'car'|'ball'|'wall'):PartSpec[]=>[{id:'us1',kind:'hcsr04',net:{VCC:'5V',TRIG:'D7',ECHO:'D6',GND:'GND'},props:{}},{id:'obs1',kind:'obstacle',net:{},props:{target:'us1',distanceCm,shape}}];
 const SONAR_WIRES:Wire[]=[w('us1','VCC','5V','red'),w('us1','TRIG','D7','yellow'),w('us1','ECHO','D6','green'),w('us1','GND','GND','black')];
 export const CIRCUITS:Record<LessonId,Circuit>={
  board:{parts:[],wires:[]},

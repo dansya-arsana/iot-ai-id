@@ -67,7 +67,7 @@ function offBoard(p:PartSpec,all:Record<string,Placement>):Placement{
 /** First free column per lane: parts sit mid-board (cols 8+), the sonar at the far end, never near the Uno. */
 export const LANE_START:Record<number,number>={2:8,7:8,9:21};
 /** X extent (mm, relative to the first pin) of the physical part body, for the clearance check. */
-const BODY_X:Partial<Record<PartKind,[number,number]>>={hcsr04:[-19,27]};
+export const BODY_X:Partial<Record<PartKind,[number,number]>>={hcsr04:[-19,27]};
 export const UNO_CLEARANCE=10;
 /** Ids of on-board parts whose body comes within UNO_CLEARANCE mm of the Uno bbox (must be empty for every lesson). */
 export function unoOverlaps(place:Record<string,Placement>,circuit:Circuit):string[]{
