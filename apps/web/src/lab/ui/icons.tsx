@@ -45,9 +45,15 @@ const P:Record<string,ReactNode>={
  note:<><path d="M12 24V8l12-3v16"/><circle cx="9" cy="24" r="3"/><circle cx="21" cy="21" r="3"/></>,
  gear:<><circle cx="16" cy="16" r="4"/><path d="M16 4v4M16 24v4M4 16h4M24 16h4M8 8l3 3M21 21l3 3M24 8l-3 3M11 21l-3 3"/></>,
  ruler:<><rect x="4" y="11" width="24" height="10" rx="2"/><path d="M9 11v4M14 11v3M19 11v4M24 11v3"/></>,
+ resistor:<><path d="M3 16h5l2-5 4 10 4-10 2 5h9"/></>,
+ pot:<><circle cx="16" cy="16" r="9"/><path d="M16 16l4-5M6 26h20"/></>,
+ scope:<><rect x="4" y="6" width="24" height="20" rx="3"/><path d="M7 19h4v-6h5v6h4v-6h5"/></>,
+ sonar:<><rect x="4" y="12" width="4" height="8" rx="1"/><path d="M13 12a6 6 0 0 1 0 8M18 9a10 10 0 0 1 0 14M23 6a14 14 0 0 1 0 20"/></>,
+ horn:<><circle cx="12" cy="20" r="4"/><path d="M12 20L24 9"/><circle cx="25" cy="8" r="2"/></>,
+ port:<><rect x="5" y="11" width="22" height="10" rx="2"/><path d="M9 15v2M13 15v2M17 15v2M21 15v2"/></>,
  reset:<><circle cx="16" cy="16" r="10"/><path d="M16 8v8l5 3"/></>,
 };
 
 export function Icon({name,size=20,className}:{name:string;size?:number;className?:string}){
- return <svg className={className} width={size} height={size} viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{P[name]??P.chip}</svg>;
+ return <svg className={className} width={size} height={size} viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth={Math.max(1.5,1.5*32/size)} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{P[name]??P.chip}</svg>;
 }

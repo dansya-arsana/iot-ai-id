@@ -67,7 +67,8 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
     const m=new AvrMachine(toProgramWords(bytes),buildLineIndex(variant.lines));
     drop();
     machine=m;serial='';pending='';lastTx=-1;speed=1;
-    m.usart.onByteTransmit=b=>{const s=String.fromCharCode(b);serial+=s;pending+=s;lastTx=m.cpu.cycles;if(serial.length>SERIAL_KEEP*2)serial=serial.slice(-SERIAL_KEEP);};
+    const dec=new TextDecoder('utf-8');
+    m.usart.onByteTransmit=b=>{const s=dec.decode(new Uint8Array([b]),{stream:true});serial+=s;pending+=s;lastTx=m.cpu.cycles;if(serial.length>SERIAL_KEEP*2)serial=serial.slice(-SERIAL_KEEP);};
     models=createModels(circuit,{
      setPin:(p,l)=>m.setPin(p,l),
      setAdc:(ch,v)=>m.setAdc(ch,v),

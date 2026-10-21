@@ -1,18 +1,16 @@
-import {useEffect,useState} from 'react';
 import {useLang} from '../../i18n';
 import {LESSONS} from '../lessons';
+import type {LessonId} from '../contract';
 
-export function Progress({count}:{count:number}){
+export function Progress({done,active,popped}:{done:LessonId[];active:LessonId;popped:LessonId|null}){
  const {tr}=useLang();
- const [now,setNow]=useState(()=>new Date());
- useEffect(()=>{const t=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(t);},[]);
  const total=LESSONS.length;
  return (
-  <div className="lab-progress" data-testid="lab-progress" data-count={count}>
-   <span className="lab-label">{tr('ARDUINO TRACK','JALUR ARDUINO')}</span>
-   <div className="lab-progress-bar" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={count}><i style={{width:`${(count/total)*100}%`}}/></div>
-   <span className="lab-progress-n">{count}/{total}</span>
-   <time className="lab-clock" dateTime={now.toISOString()}>{now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</time>
+  <div className="lab-progress" data-testid="lab-progress" data-count={done.length} role="progressbar" aria-label={tr('Lesson progress','Progres pelajaran')} aria-valuemin={0} aria-valuemax={total} aria-valuenow={done.length}>
+   <span className="lab-ticks" aria-hidden="true">
+    {LESSONS.map(l=><i key={l.id} data-done={done.includes(l.id)} data-current={l.id===active} data-pop={popped===l.id}/>)}
+   </span>
+   <span className="lab-progress-n">{done.length}/{total}</span>
   </div>
  );
 }

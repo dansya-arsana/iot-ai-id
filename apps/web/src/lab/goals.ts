@@ -76,7 +76,7 @@ export const READOUTS:Record<LessonId,(s:SimSnapshot)=>{target:string;text:strin
  board:()=>[],
  blink:()=>[],
  button:()=>[],
- knob:s=>{const p=byKind(s,'potentiometer'),id=idOf(s,'potentiometer');return p&&id?[pill(id,`A0 ${Math.round(p.value)} → ${Math.round(p.value/4)}`)]:[];},
+ knob:s=>{const p=byKind(s,'potentiometer'),id=idOf(s,'potentiometer');return p&&id?[pill(id,`A0 ${Math.round(p.value)} → PWM ${Math.round(p.value/4)} (${Math.round(p.value/1023*100)}%)`)]:[];},
  rgb:s=>{
   const r=byKind(s,'rgb-led'),id=idOf(s,'rgb-led');
   return r&&id?[pill(id,`R ${Math.round(r.r*255)} · G ${Math.round(r.g*255)} · B ${Math.round(r.b*255)}`)]:[];

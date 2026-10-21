@@ -1,16 +1,32 @@
-import {Box3,BufferAttribute,BufferGeometry,CanvasTexture,DirectionalLight,Group,HemisphereLight,InstancedMesh,LineBasicMaterial,LineSegments,Mesh,MeshBasicMaterial,type Object3D,PCFShadowMap,PlaneGeometry,REVISION,Scene,ShadowMaterial,SRGBColorSpace,Sprite,Vector3,WebGLRenderer,BackSide} from 'three';
+import {Box3,Color,DirectionalLight,Group,HemisphereLight,Mesh,MeshBasicMaterial,type Object3D,NeutralToneMapping,PCFShadowMap,PlaneGeometry,PMREMGenerator,Raycaster,REVISION,RingGeometry,Scene,ShaderMaterial,ShadowMaterial,SRGBColorSpace,Sprite,Vector2,Vector3,WebGLRenderer,type InstancedMesh,type Texture} from 'three';
+import {RoomEnvironment} from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type {BoardPin,Circuit,CreateLabScene,LabScene,LessonId,PartKind,PartProps,PartSpec,PartState,SceneSettings,ScreenPoint,SimSnapshot,ViewCommand} from '../contract';
-import {BB_CX,BB_TOP,layoutCircuit} from './layout';
+import {BB_COLS,BB_CX,BB_D,BB_TOP,BB_W,LESSON_VIEW,holeX,freeHoleNear,layoutCircuit,obstacleMm} from './layout';
 import {buildUno} from './board-uno';
 import {buildBreadboard} from './breadboard';
 import {buildPart,type PartView} from './parts';
-import {buildWires} from './wires';
-import {CameraRig} from './camera';
+import {buildWires,disposeWireTextures,type WireBuild} from './wires';
+import {CameraRig,type ContentRect,type SafeInsets} from './camera';
 import {createPicking,type PickEntry} from './picking';
-import {addOutline,disposeMaterialCache,disposeObject} from './materials';
+import {addOutline,disposeMaterialCache,disposeObject,makeHullMaterial,setLineResolution,setMaxAnisotropy} from './materials';
+import {boxCorners,contentBox,contentCorners} from './bounds';
+import {disposeDecals} from './decals';
+import {renderThumbnails} from './thumbnails';
 import * as C from './palette';
 
+export type {ContentRect,SafeInsets};
+export interface LabSceneV2 extends LabScene{
+ /** Refit the lesson framing to the canvas minus these CSS-px insets (tween 500ms, 0 if reduced motion). */
+ setSafeArea(insets:SafeInsets):void;
+ /** Projected bbox of the lesson content after the fit, CSS px relative to the canvas. */
+ contentRect():ContentRect|null;
+ thumbnails(o:{width:number;height:number;dpr:number;order?:LessonId[];onEach?:(id:LessonId,url:string)=>void}):Promise<Partial<Record<LessonId,string>>>;
+ /** One-shot success ring on the floor (900 ms; a 300 ms fade under reduced motion). */
+ celebrate():void;
+}
+
 const POWER_PINS=new Set(['5V','3V3','GND','VIN']);
+const OFF_BOARD=new Set<PartKind>(['lamp','obstacle','motor','servo']);
 
 function initialState(s:PartSpec):PartState|null{
  const p=s.props;
@@ -22,50 +38,60 @@ function initialState(s:PartSpec):PartState|null{
  }
 }
 
-function watermark():CanvasTexture{
- const cv=document.createElement('canvas');cv.width=1024;cv.height=256;
- const g=cv.getContext('2d')!;
- g.fillStyle=C.WATERMARK;g.textAlign='center';g.textBaseline='middle';
- g.font='700 170px "Barlow", system-ui, sans-serif';g.fillText('iot.ai.id',512,128);
- const t=new CanvasTexture(cv);t.colorSpace=SRGBColorSpace;return t;
-}
-function gridLines():LineSegments{
- const pts:number[]=[];
- for(let v=-420;v<=420;v+=20){pts.push(v,0,-420,v,0,420,-420,0,v,420,0,v);}
- const geo=new BufferGeometry();geo.setAttribute('position',new BufferAttribute(new Float32Array(pts),3));
- const m=new LineBasicMaterial({color:C.GRID_LINE,transparent:true,opacity:0.08,depthWrite:false});
- const l=new LineSegments(geo,m);l.position.y=0.05;l.userData.noPick=true;return l;
+/** Floor: 10 mm ink dot grid (7%) fading out radially from the content centre, 160 to 320 mm. */
+function floorDots():Mesh{
+ const m=new ShaderMaterial({
+  transparent:true,depthWrite:false,toneMapped:false,
+  uniforms:{uC:{value:new Vector2()},uInk:{value:new Color(C.INK)}},
+  vertexShader:'varying vec2 vP;void main(){vec4 w=modelMatrix*vec4(position,1.0);vP=w.xz;gl_Position=projectionMatrix*viewMatrix*w;}',
+  fragmentShader:'varying vec2 vP;uniform vec2 uC;uniform vec3 uInk;void main(){vec2 q=vP/10.0;vec2 f=fract(q)-0.5;float w=fwidth(q.x)*1.2;float d=length(f);float dotv=1.0-smoothstep(0.07,0.07+w+0.02,d);float a=dotv*0.07*(1.0-smoothstep(160.0,320.0,distance(vP,uC)));if(a<0.002)discard;gl_FragColor=vec4(uInk,a);}',
+ });
+ m.userData.own=true;
+ const mesh=new Mesh(new PlaneGeometry(900,900),m);
+ mesh.rotation.x=-Math.PI/2;mesh.position.y=0.04;mesh.userData.noPick=true;mesh.userData.noInk=true;mesh.renderOrder=0;
+ return mesh;
 }
 
-export const createLabScene:CreateLabScene=(o):LabScene=>{
+export const createLabScene:CreateLabScene=(o):LabSceneV2=>{
  const canvas=o.canvas;
  let renderer:WebGLRenderer;
  try{renderer=new WebGLRenderer({canvas,antialias:true,alpha:true});}
  catch{throw new Error('webgl-unavailable');}
  canvas.dataset.engine='three.js r'+REVISION;
  renderer.setClearAlpha(0);
+ renderer.outputColorSpace=SRGBColorSpace;
+ renderer.toneMapping=NeutralToneMapping;renderer.toneMappingExposure=1.0;
  renderer.shadowMap.enabled=true;renderer.shadowMap.type=PCFShadowMap;
+ setMaxAnisotropy(renderer.capabilities.getMaxAnisotropy());
 
  const settings:SceneSettings={...o.settings};
  const scene=new Scene();
  const rig=new CameraRig();
  rig.reducedMotion=settings.reducedMotion;rig.autoRotate=settings.autoRotate;
 
- scene.add(new HemisphereLight(C.FLOOR_SKY,C.FLOOR_GROUND,1.7));
- const sun=new DirectionalLight(C.WHITE,2.3);
- sun.position.set(150,260,190);sun.target.position.set(50,0,20);
- sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.radius=4;sun.shadow.bias=-0.0004;sun.shadow.normalBias=0.4;
- Object.assign(sun.shadow.camera,{left:-290,right:290,top:290,bottom:-290,near:10,far:800});
- sun.shadow.camera.updateProjectionMatrix();
- scene.add(sun,sun.target);
+ const pmrem=new PMREMGenerator(renderer);
+ const roomEnv=new RoomEnvironment();
+ const envRT=pmrem.fromScene(roomEnv,0.04);
+ scene.environment=envRT.texture;scene.environmentIntensity=0.55;
+ roomEnv.dispose();pmrem.dispose();
 
- const ground=new Mesh(new PlaneGeometry(2400,2400),new ShadowMaterial({color:C.INK,opacity:0.16}));
+ scene.add(new HemisphereLight(C.FLOOR_SKY,C.FLOOR_GROUND,0.6));
+ const sun=new DirectionalLight(C.WHITE,2.0);
+ const SUN_OFF=new Vector3(-140,300,40);
+ sun.position.copy(SUN_OFF);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.radius=4;sun.shadow.bias=-0.0002;sun.shadow.normalBias=0.25;
+ scene.add(sun,sun.target);
+ const fill=new DirectionalLight(C.FILL,0.35);fill.position.set(200,120,220);scene.add(fill);
+
+ const ground=new Mesh(new PlaneGeometry(2400,2400),new ShadowMaterial({color:C.SHADOW,opacity:0.22}));
  ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.userData.noPick=true;scene.add(ground);
  ground.material.userData.own=true;
- const grid=gridLines();(grid.material as LineBasicMaterial).userData.own=true;grid.visible=settings.grid;scene.add(grid);
- const wm=new Mesh(new PlaneGeometry(170,42.5),new MeshBasicMaterial({map:watermark(),transparent:true,opacity:0.08,depthWrite:false}));
- wm.material.userData.own=true;
- wm.rotation.x=-Math.PI/2;wm.position.set(BB_CX-20,0.06,105);wm.userData.noPick=true;scene.add(wm);
+ const dots=floorDots();dots.visible=settings.grid;scene.add(dots);
+
+ // celebrate ring
+ const ringMat=new MeshBasicMaterial({color:C.LIVE,transparent:true,opacity:0,depthWrite:false,toneMapped:false});ringMat.userData.own=true;
+ const ring=new Mesh(new RingGeometry(0.97,1,96),ringMat);
+ ring.rotation.x=-Math.PI/2;ring.position.y=0.08;ring.visible=false;ring.userData.noPick=true;ring.userData.noInk=true;scene.add(ring);
+ let ringT=-1,ringR=100;
 
  const uno=buildUno();scene.add(uno.group);
  const bb=buildBreadboard();scene.add(bb.group);
@@ -73,14 +99,16 @@ export const createLabScene:CreateLabScene=(o):LabScene=>{
 
  let views:{id:string;view:PartView}[]=[];
  const byId=new Map<string,PartView>();
+ let wires:WireBuild|null=null;
  let entries:PickEntry[]=[];
  let lastSnap:SimSnapshot|null=null;
- let cssW=1,cssH=1;
+ let cssW=1,cssH=1,baseDpr=1,pr=1,adaptive=true;
  let built=false;
  let resolveReady:()=>void=()=>undefined;
  const ready=new Promise<void>(r=>{resolveReady=r;});
+ const frames:number[]=[];
 
- const rimMat=new MeshBasicMaterial({color:C.TEAL,side:BackSide,transparent:true,opacity:0.85});
+ const rimMat=makeHullMaterial(C.LIVE,2,0.85);
  let rims:Mesh[]=[];let hlTarget:string|null=null;let hlT=0;
 
  const resolve=(id:string):Object3D|null=>{
@@ -96,8 +124,38 @@ export const createLabScene:CreateLabScene=(o):LabScene=>{
   out.visible=v.x>=-1&&v.x<=1&&v.y>=-1&&v.y<=1&&v.z>=-1&&v.z<=1;
   return out;
  };
+ /** Hotspot on the visible top surface: top-centre of the real geometry (D13 socket for the digital header). */
+ const hotspot=(id:string,obj:Object3D,into:Vector3):Vector3=>{
+  if(id==='uno.digital-header')return into.copy(uno.pinAnchor('D13'));
+  contentBox([obj],box);
+  return box.isEmpty()?into.setFromMatrixPosition(obj.matrixWorld):into.set((box.min.x+box.max.x)/2,box.max.y,(box.min.z+box.max.z)/2);
+ };
  const projectObject=(obj:Object3D,out:ScreenPoint):ScreenPoint=>{
-  box.setFromObject(obj);box.getCenter(vec);return toScreen(vec,out);
+  contentBox([obj],box);box.getCenter(vec);return toScreen(vec,out);
+ };
+
+ // occlusion test for project(): cached briefly per target
+ const ray=new Raycaster();const ndc=new Vector2();
+ const occ=new Map<string,{t:number;hidden:boolean}>();
+ const occluded=(p:Vector3,own:Object3D|null,key:string):boolean=>{
+  const now=performance.now(),c=occ.get(key);
+  if(c&&now-c.t<150)return c.hidden;
+  const q=p.clone().project(rig.camera);ndc.set(q.x,q.y);
+  ray.setFromCamera(ndc,rig.camera);
+  const dTarget=vec.copy(p).sub(ray.ray.origin).dot(ray.ray.direction);
+  let hidden=false;
+  const hits=ray.intersectObjects([uno.group,bb.group,partsRoot,wiresRoot],true);
+  for(const h of hits){
+   const ob=h.object;
+   {let w:Object3D|null=ob;let isWire=false;while(w){if(w===wiresRoot){isWire=true;break;}w=w.parent;}if(isWire)continue;}
+   if(ob.userData.noPick||ob.userData.hull||ob.userData.noInk||ob.visible===false||(ob as Sprite).isSprite)continue;
+   let n:Object3D|null=ob,mine=false;
+   while(n){if(n===own){mine=true;break;}n=n.parent;}
+   if(!mine&&h.distance<dTarget-1.5)hidden=true;
+   break;
+  }
+  occ.set(key,{t:now,hidden});
+  return hidden;
  };
 
  const clearRims=():void=>{for(const r of rims)r.parent?.remove(r);rims=[];};
@@ -108,16 +166,16 @@ export const createLabScene:CreateLabScene=(o):LabScene=>{
   const meshes:Mesh[]=[];
   obj.traverse(c=>{
    const m=c as Mesh;
-   if(m.isMesh&&!(m as unknown as InstancedMesh).isInstancedMesh&&!c.userData.noPick&&!c.userData.hull&&!(c as unknown as Sprite).isSprite)meshes.push(m);
+   if(m.isMesh&&!(m as unknown as InstancedMesh).isInstancedMesh&&!c.userData.noPick&&!c.userData.hull&&!c.userData.noInk&&!(c as unknown as Sprite).isSprite)meshes.push(m);
   });
-  for(const m of meshes.slice(0,60))rims.push(addOutline(m,0.8,rimMat));
+  for(const m of meshes.slice(0,60))rims.push(addOutline(m,1,rimMat));
  };
 
  const disposeLesson=():void=>{
   clearRims();
   for(const c of [...partsRoot.children]){partsRoot.remove(c);disposeObject(c);}
   for(const c of [...wiresRoot.children]){wiresRoot.remove(c);disposeObject(c);}
-  views=[];byId.clear();entries=[];
+  views=[];byId.clear();entries=[];wires=null;
  };
 
  const picking=createPicking({
@@ -127,32 +185,75 @@ export const createLabScene:CreateLabScene=(o):LabScene=>{
   onSelect:o.onSelect,onHover:o.onHover,onInput:o.onInput,
  });
 
- const scene_:LabScene={
+ const centre=new Vector3(48,0,0);let radius=100;let fitMaxX=holeX(BB_COLS-1);
+ const fitLesson=(lesson:LessonId,instant:boolean):void=>{
+  const lv=LESSON_VIEW[lesson]??LESSON_VIEW.blink!;
+  bb.group.visible=lv.board;
+  // frame the Uno, the wires and only the populated stretch of the breadboard (not its empty far end)
+  const roots:Object3D[]=[uno.group,wiresRoot];
+  const b=contentBox(roots).clone();
+  const pts=contentCorners(roots);
+  if(lv.board){
+   const x0=BB_CX-BB_W/2,x1=Math.min(BB_CX+BB_W/2,fitMaxX+8);
+   const z=BB_D/2;
+   for(const x of [x0,x1])for(const y of [0,BB_TOP])for(const zz of [-z,z]){pts.push(new Vector3(x,y,zz));b.expandByPoint(pts[pts.length-1]!);}
+  }
+  for(const {id,view} of views){
+   if(byId.get(id)&&(view.group.userData.kind==='obstacle'||id.startsWith('obs'))){
+    const ob=contentBox([view.group]).clone();
+    const lim=view.group.position.z+obstacleMm(60);
+    let sh=0;
+    if(ob.min.z>lim){sh=ob.min.z-lim;ob.min.z-=sh;ob.max.z-=sh;}
+    b.union(ob);pts.push(...contentCorners([view.group],-sh));
+   }else{b.union(contentBox([view.group]));pts.push(...contentCorners([view.group]));}
+  }
+  b.getCenter(centre);radius=Math.max(40,b.getSize(vec).length()/2);
+  dots.position.set(centre.x,0.04,centre.z);(dots.material as ShaderMaterial).uniforms.uC!.value.set(centre.x,centre.z);
+  // shadow frustum + light follow the content (+25 mm)
+  const R=radius+25;
+  sun.position.copy(centre).add(SUN_OFF);sun.target.position.copy(centre);sun.target.updateMatrixWorld();
+  Object.assign(sun.shadow.camera,{left:-R,right:R,top:R,bottom:-R,near:10,far:900});
+  sun.shadow.camera.updateProjectionMatrix();
+  rig.setContent(pts.length?pts:boxCorners(b),lv.az,lv.elev,instant);
+ };
+
+ const setPr=(v:number):void=>{pr=v;renderer.setPixelRatio(v);renderer.setSize(cssW,cssH,false);};
+
+ const scene_:LabSceneV2={
   ready,
   setLesson(lesson:LessonId,circuit:Circuit):void{
-   disposeLesson();
+   disposeLesson();occ.clear();
    const place=layoutCircuit(circuit);
+   fitMaxX=Math.max(holeX(12),...Object.values(place).flatMap(p=>p.onBoard?[p.x,...(p.holes??[]).map(h=>holeX(h[0]))]:[]));
+   const usedPins=new Set<string>();
    for(const spec of circuit.parts){
     const pl=place[spec.id];if(!pl)continue;
     const view=buildPart(spec);
     view.group.position.set(pl.x,pl.onBoard?BB_TOP:0,pl.z);view.group.rotation.y=pl.rotY;
     partsRoot.add(view.group);views.push({id:spec.id,view});byId.set(spec.id,view);
+    if(spec.kind==='obstacle')view.group.userData.kind='obstacle';
     const st=initialState(spec);if(st)view.apply(st,0);
+    for(const v of Object.values(spec.net))if(v&&/^(D\d+|A\d)$/.test(v))usedPins.add(v);
    }
    partsRoot.updateMatrixWorld(true);
-   wiresRoot.add(buildWires(circuit.wires,
+   const wb=buildWires(circuit.wires,
     w=>uno.pinAnchor(w.boardPin as BoardPin),
     (w,idx)=>{
      if(w.componentId==='bb'){return bb.railAnchor(w.pin==='5v-rail'?'5v-rail':'gnd-rail',idx*2);}
      const v=byId.get(w.componentId);if(!v)return null;
-     return v.group.localToWorld(v.pinAnchor(w.pin));
-    }));
-   void POWER_PINS;
+     const p=v.group.localToWorld(v.pinAnchor(w.pin));
+     const spec=circuit.parts.find(s=>s.id===w.componentId);
+     if(spec&&!OFF_BOARD.has(spec.kind)){const h=freeHoleNear(p.x,p.z);return new Vector3(h.x,BB_TOP,h.z);}
+     return p;
+    });
+   wires=wb;wiresRoot.add(wb.group);
+   for(const w of circuit.wires)if(/^(D\d+|A\d)$/.test(w.boardPin))usedPins.add(w.boardPin);
+   uno.setUsedPins(usedPins);
    entries=[
     ...views.map(({id,view})=>({id,object:view.group,interactive:view.interactive})),
     ...Object.entries(uno.features).map(([id,object])=>({id,object})),
    ];
-   rig.setPreset(lesson,!built);
+   fitLesson(lesson,!built);
    if(!built){built=true;canvas.dataset.ready='1';resolveReady();}
    if(hlTarget)applyHighlight();
   },
@@ -167,20 +268,54 @@ export const createLabScene:CreateLabScene=(o):LabScene=>{
    for(let i=0;i<views.length;i++){
     const e=views[i]!;const st=snap.parts[e.id];if(st)e.view.apply(st,dtMs);
    }
+   // real machine state on the hardware: LEDs, socket indicators, wires, chip decal
    uno.setLeds({l:snap.pins.D13.duty,tx:snap.txActive,on:true});
+   uno.setLive(snap,dtMs);
+   wires?.update(snap,dtMs);
    rig.update(dtMs);
-   if(hlTarget){hlT+=dtMs;rimMat.opacity=0.65+0.25*Math.sin(hlT*0.006);}
+   if(hlTarget){hlT+=dtMs;rimMat.uniforms.uOp!.value=0.65+0.25*Math.sin(hlT*0.006);}
+   if(ringT>=0){
+    ringT+=dtMs;
+    const dur=settings.reducedMotion?300:900,k=Math.min(1,ringT/dur);
+    ring.visible=true;ring.position.x=centre.x;ring.position.z=centre.z;
+    if(settings.reducedMotion){ring.scale.setScalar(ringR);ringMat.opacity=0.35*(1-k);}
+    else{ring.scale.setScalar(ringR*(0.5+0.9*(1-(1-k)**3)));ringMat.opacity=0.35*(1-k);}
+    if(k>=1){ringT=-1;ring.visible=false;}
+   }
    renderer.render(scene,rig.camera);
+   if(adaptive&&dtMs>0){
+    frames.push(dtMs);
+    if(frames.length>=60){
+     const med=[...frames].sort((a,b)=>a-b)[30]!;frames.length=0;
+     if(med>22&&pr>baseDpr){adaptive=false;setPr(baseDpr);}
+    }
+   }
   },
   resize(w:number,h:number,dpr:number):void{
-   cssW=Math.max(1,w);cssH=Math.max(1,h);
-   renderer.setPixelRatio(dpr);renderer.setSize(cssW,cssH,false);rig.resize(cssW,cssH);
+   cssW=Math.max(1,w);cssH=Math.max(1,h);baseDpr=Math.max(0.5,dpr);
+   if(adaptive)pr=Math.min(2,Math.max(1.25,baseDpr));else pr=baseDpr;
+   renderer.setPixelRatio(pr);renderer.setSize(cssW,cssH,false);rig.resize(cssW,cssH);setLineResolution(cssW,cssH);
   },
+  setSafeArea(i:SafeInsets):void{rig.setSafe(i);},
+  contentRect():ContentRect|null{return rig.contentRect();},
+  thumbnails(t){
+   return renderThumbnails(renderer,scene.environment as Texture|null,t).finally(()=>{rig.refresh();setLineResolution(cssW,cssH);});
+  },
+  celebrate():void{ringT=0;ringR=Math.max(40,radius*0.9);},
   project(target:string):ScreenPoint|null{
    const out:ScreenPoint={x:0,y:0,visible:false};
    const obj=resolve(target);
-   if(obj)return projectObject(obj,out);
-   if(POWER_PINS.has(target)||/^(D\d+|A\d)$/.test(target))return toScreen(uno.pinAnchor(target as BoardPin),out);
+   const p=new Vector3();
+   if(obj){
+    hotspot(target,obj,p);toScreen(p.clone(),out);
+    if(out.visible&&occluded(p,obj,target))out.visible=false;
+    return out;
+   }
+   if(POWER_PINS.has(target)||/^(D\d+|A\d)$/.test(target)){
+    p.copy(uno.pinAnchor(target as BoardPin));toScreen(p.clone(),out);
+    if(out.visible&&occluded(p,uno.group,target))out.visible=false;
+    return out;
+   }
    return null;
   },
   view(cmd:ViewCommand):void{
@@ -193,23 +328,22 @@ export const createLabScene:CreateLabScene=(o):LabScene=>{
   focus(target:string|null):void{
    if(!target){rig.focus(null);return;}
    const obj=resolve(target);
-   if(obj){box.setFromObject(obj);rig.focus(box.getCenter(vec).clone());return;}
+   if(obj){contentBox([obj],box);rig.focus(box.getCenter(vec).clone());return;}
    if(POWER_PINS.has(target)||/^(D\d+|A\d)$/.test(target))rig.focus(uno.pinAnchor(target as BoardPin),2);
   },
   highlight(target:string|null):void{hlTarget=target;applyHighlight();},
   setSettings(s:Partial<SceneSettings>):void{
    Object.assign(settings,s);
-   grid.visible=settings.grid;rig.autoRotate=settings.autoRotate;rig.reducedMotion=settings.reducedMotion;
+   dots.visible=settings.grid;rig.autoRotate=settings.autoRotate;rig.reducedMotion=settings.reducedMotion;
   },
   zoomLevel():number{return rig.zoomLevel();},
   dispose():void{
    picking.dispose();
    disposeLesson();
    uno.dispose();bb.dispose();
-   disposeObject(ground);disposeObject(grid);
-   wm.material.map?.dispose();disposeObject(wm);
-   rimMat.dispose();sun.shadow.map?.dispose();
-   disposeMaterialCache();
+   disposeObject(ground);disposeObject(dots);ring.geometry.dispose();disposeObject(ring);
+   rimMat.dispose();sun.shadow.map?.dispose();envRT.dispose();
+   disposeWireTextures();disposeDecals();disposeMaterialCache();
    renderer.dispose();renderer.forceContextLoss();
    delete canvas.dataset.ready;
   },

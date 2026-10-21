@@ -3,13 +3,17 @@ import {useLang} from '../../i18n';
 import type {FirmwareVariant,ParamValues} from '../contract';
 import {fillTemplate,highlightLines} from './highlight';
 import {diffText} from './line-diff';
+import {FLASH_WORDS} from '../contract';
 import {Icon} from './icons';
+
+const FLASH_BYTES=FLASH_WORDS*2-512;
+const nf=(n:number)=>n.toLocaleString('en-US');
 
 interface Flash{n:number;lines:number[];params:string[]}
 
-export function CodeView({variant,params,currentLine,running,onRun,onStop,onParam,note}:{
+export function CodeView({variant,params,currentLine,running,onRun,onStop,onParam,note,log,hideRun}:{
  variant:FirmwareVariant;params:ParamValues;currentLine:number|null;running:boolean;
- onRun:()=>void;onStop:()=>void;onParam:(name:string)=>void;note:string|null;
+ onRun:()=>void;onStop:()=>void;onParam:(name:string)=>void;note:string|null;log:string|null;hideRun?:boolean;
 }){
  const {tr}=useLang();
  const template=variant.template;
@@ -29,8 +33,13 @@ export function CodeView({variant,params,currentLine,running,onRun,onStop,onPara
   if(!flash.lines.length)return;
   box.current?.querySelector(`[data-line="${flash.lines[0]+1}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'});
  },[flash]);
+ useEffect(()=>{
+  const b=box.current;if(!b||!running||!currentLine)return;
+  const el=b.querySelector<HTMLElement>(`[data-line="${currentLine}"]`);if(!el)return;
+  const top=el.offsetTop-b.scrollTop,h=b.clientHeight;
+  if(top<h/3-10||top>h*2/3)b.scrollTop=Math.max(0,el.offsetTop-h/2);
+ },[currentLine,running]);
  const [expanded,setExpanded]=useState(false);
- const [info,setInfo]=useState(false);
  const [copied,setCopied]=useState(false);
  const copy=()=>{
   try{void navigator.clipboard.writeText(text).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),1200);},()=>undefined);}catch{/* clipboard unavailable */}
@@ -44,19 +53,19 @@ export function CodeView({variant,params,currentLine,running,onRun,onStop,onPara
  return (
   <section className="lab-card lab-code-card" id="lab-sec-code" data-expanded={expanded}>
    <header className="lab-code-head">
-    <span className="lab-label">{tr('TRY IT','COBA SENDIRI')}</span>
-    <button type="button" className="lab-iconbtn" aria-expanded={info} aria-label={tr('About this code','Tentang kode ini')} onClick={()=>setInfo(v=>!v)}><Icon name="info" size={16}/></button>
+    <span className="lab-file">sketch.ino</span>
+    <span className="lab-receipt">{nf(variant.bytes)} B · {(variant.bytes/FLASH_BYTES*100).toFixed(1)}% flash</span>
     <span className="lab-grow"/>
-    <button type="button" className="lab-iconbtn" aria-label={copied?tr('Copied','Tersalin'):tr('Copy','Salin')} title={tr('Copy','Salin')} onClick={copy}><Icon name={copied?'check':'copy'} size={16}/></button>
-    <button type="button" className="lab-iconbtn" aria-label={tr('Download .ino','Unduh .ino')} title={tr('Download .ino','Unduh .ino')} onClick={download}><Icon name="download" size={16}/></button>
-    <button type="button" className="lab-iconbtn" aria-label={tr('Expand','Perbesar')} title={tr('Expand','Perbesar')} aria-pressed={expanded} onClick={()=>setExpanded(v=>!v)}><Icon name="expand" size={16}/></button>
-    <button type="button" className="lab-run" data-running={running} data-testid="lab-run" aria-label={running?tr('Stop','Hentikan'):tr('Run','Jalankan')} title={running?tr('Stop','Hentikan'):tr('Run','Jalankan')} onClick={running?onStop:onRun}>
-     <Icon name={running?'stop':'play'} size={16}/>
+    <button type="button" className="lab-iconbtn" aria-label={copied?tr('Copied','Tersalin'):tr('Copy','Salin')} title={tr('Copy','Salin')} onClick={copy}><Icon name={copied?'check':'copy'} size={18}/></button>
+    <button type="button" className="lab-iconbtn" aria-label={tr('Download .ino','Unduh .ino')} title={tr('Download .ino','Unduh .ino')} onClick={download}><Icon name="download" size={18}/></button>
+    <button type="button" className="lab-iconbtn" aria-label={tr('Expand','Perbesar')} title={tr('Expand','Perbesar')} aria-pressed={expanded} onClick={()=>setExpanded(v=>!v)}><Icon name="expand" size={18}/></button>
+    <button type="button" className="lab-run" data-running={running} data-hide={hideRun} data-testid="lab-run" aria-label={running?tr('Stop','Hentikan'):tr('Run','Jalankan')} title={running?tr('Stop','Hentikan'):tr('Run','Jalankan')} onClick={running?onStop:onRun}>
+     {running
+      ?<svg key="s" className="lab-run-glyph" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect width="12" height="12" rx="2" fill="currentColor"/></svg>
+      :<svg key="p" className="lab-run-glyph" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 1.2v11.6a.6.6 0 0 0 .9.5l9.2-5.8a.6.6 0 0 0 0-1L3.4.7a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>}
+     <span className="lab-run-label">{running?tr('Stop','Henti'):tr('Run','Jalan')}</span>
     </button>
    </header>
-   {info&&<p className="lab-popover" role="note">{tr(
-    'This is real firmware. avr-gcc built this sketch and it runs on an emulated ATmega328P (avr8js) at 16 MHz. Values you change are written into the firmware bytes, the same result as recompiling. Free code editing needs a compiler and is not in the browser yet.',
-    'Ini firmware sungguhan. avr-gcc mengompilasi sketsa ini dan berjalan di ATmega328P tiruan (avr8js) pada 16 MHz. Nilai yang kamu ubah ditulis langsung ke byte firmware, hasilnya sama seperti kompilasi ulang. Mengedit kode bebas butuh kompiler dan belum tersedia di browser.')}</p>}
    <div className="lab-code" ref={box} data-testid="lab-code" data-current-line={currentLine??''} data-sketch={variant.sketch}>
     <pre>
      {lines.map((toks,i)=>{
@@ -64,7 +73,7 @@ export function CodeView({variant,params,currentLine,running,onRun,onStop,onPara
       const cur=currentLine===ln;
       const ch=changed.has(i);
       return (
-       <div key={`${i}-${ch?flash.n:0}`} className={`lab-line${cur?' is-current':''}${ch?' is-changed':''}`} data-line={ln} data-current={cur?'true':undefined}>
+       <div key={`${i}-${ch?flash.n:0}`} className={`lab-line${cur?' is-current':''}${ch?' is-changed':''}`} data-line={ln} data-current={cur?'true':undefined} title={cur?tr(`L${ln} · mapped from the program counter`,`L${ln} · dipetakan dari program counter`):undefined}>
         <span className="lab-ln">{ln}</span>
         <code>{toks.map((t,k)=>t.kind==='param'&&t.param
          ?<button key={`${k}-${flash.params.includes(t.param)?flash.n:0}`} type="button" className={`lab-chip${flash.params.includes(t.param)?' is-flash':''}`} data-param={t.param} onClick={()=>onParam(t.param!)}>{params[t.param]??t.text}</button>
@@ -75,7 +84,7 @@ export function CodeView({variant,params,currentLine,running,onRun,onStop,onPara
     </pre>
    </div>
    {note&&<p className="lab-note" role="status">{note}</p>}
-   <p className="lab-code-foot">{tr('Read-only. Click a highlighted value to change it.','Hanya baca. Klik nilai yang disorot untuk mengubahnya.')}</p>
+   <p className="lab-code-foot" data-log={!!log}>{log?<>{log}</>:tr('Click a highlighted value to change it.','Klik nilai yang disorot untuk mengubahnya.')}</p>
   </section>
  );
 }

@@ -18,7 +18,7 @@ export interface PickingOptions{
 export interface Picking{dispose():void}
 
 const DRAG_PX=4;
-const SIN_ELEV=Math.sin((35*Math.PI)/180);
+
 
 export function createPicking(o:PickingOptions):Picking{
  const {canvas,rig}=o;
@@ -63,7 +63,7 @@ export function createPicking(o:PickingOptions):Picking{
     const r=canvas.getBoundingClientRect();
     o.project(d.entry.object,sp);
     // knob centre = projected centre; unsquash the isometric tilt
-    const dx=e.clientX-r.left-sp.x,dy=(e.clientY-r.top-sp.y)/SIN_ELEV;
+    const dx=e.clientX-r.left-sp.x,dy=(e.clientY-r.top-sp.y)/Math.sin(rig.elev);
     let a=(Math.atan2(dx,-dy)*180)/Math.PI;
     a=Math.max(-135,Math.min(135,a));
     o.onInput(d.id!,{kind:'potentiometer',value:Math.round(((a+135)/270)*INPUT_RANGES.potentiometer.max)});

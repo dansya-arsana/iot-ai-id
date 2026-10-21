@@ -9,14 +9,14 @@ export interface Lesson{
  pinout:{pin:string;to:Copy;does:Copy}[];
  walkthrough:Copy[];
  specs:{k:Copy;v:Copy}[];
- callouts:{target:string;title:Copy;body:Copy;side:Side}[];
+ callouts:{target:string;pin?:string;title:Copy;body:Copy;side:Side}[];
  params:Record<string,{label:Copy;unit:string;hint:Copy}>;
  variants?:Record<string,Copy>;
  goal:{text:Copy;hint:Copy};
  seo:{title:string;description:string};
 }
 const c=(en:string,id:string):Copy=>({en,id});
-const co=(target:string,side:Side,te:string,ti:string,be:string,bi:string)=>({target,side,title:c(te,ti),body:c(be,bi)});
+const co=(target:string,side:Side,te:string,ti:string,be:string,bi:string,pin?:string)=>({target,side,title:c(te,ti),body:c(be,bi),...(pin?{pin}:{})});
 const pin=(p:string,te:string,ti:string,de:string,di:string)=>({pin:p,to:c(te,ti),does:c(de,di)});
 const sp=(ke:string,ki:string,v:string,vi:string=v)=>({k:c(ke,ki),v:c(v,vi)});
 const b=(icon:string,en:string,id:string)=>({icon,text:c(en,id)});
@@ -38,7 +38,7 @@ export const LESSONS:Lesson[]=[
  pinout:[pin('D8','LED anode via resistor','Anoda LED lewat resistor','Output that powers the LED.','Output yang menyalakan LED.'),pin('GND','LED cathode','Katoda LED','Completes the circuit.','Melengkapi rangkaian.')],
  walkthrough:[c('pinMode makes pin 8 an output.','pinMode menjadikan pin 8 output.'),c('digitalWrite HIGH turns the LED on.','digitalWrite HIGH menyalakan LED.'),c('The first delay keeps it on for onTime ms.','delay pertama menahannya menyala selama onTime ms.'),c('LOW and the second delay keep it off for offTime ms.','LOW dan delay kedua menahannya mati selama offTime ms.')],
  specs:[sp('LED current','Arus LED','~15 mA'),sp('Resistor','Resistor','220 ohm'),sp('Pin','Pin','D8')],
- callouts:[co('led1','right','LED','LED','Longer leg to the resistor side.','Kaki panjang ke sisi resistor.'),co('r1','left','Resistor','Resistor','Limits current. Try other values.','Membatasi arus. Coba nilai lain.'),co('uno.digital-header','top','Pin 8','Pin 8','The output that switches the LED.','Output yang menyalakan LED.')],
+ callouts:[co('led1','right','LED','LED','Longer leg to the resistor side.','Kaki panjang ke sisi resistor.'),co('r1','left','Resistor','Resistor','Limits current. Try other values.','Membatasi arus. Coba nilai lain.'),co('uno.digital-header','top','Pin 8','Pin 8','The output that switches the LED.','Output yang menyalakan LED.','D8'),co('uno.power-header','top','GND','GND','Return path back to the chip.','Jalur kembali ke chip.','GND')],
  params:{onTime:{label:c('On time','Waktu nyala'),unit:'ms',hint:c('How long the LED stays on.','Berapa lama LED menyala.')},offTime:{label:c('Off time','Waktu mati'),unit:'ms',hint:c('How long the LED stays off.','Berapa lama LED mati.')}},
  goal:{text:c('See the LED blink 4 times.','Lihat LED berkedip 4 kali.'),hint:c('Press Run.','Tekan Jalankan.')},
  seo:{title:'Blink an LED on Arduino UNO',description:'Blink an LED with real Arduino firmware running in an ATmega328P emulator. Change the on and off times and watch the rhythm change.'}},
@@ -48,7 +48,7 @@ export const LESSONS:Lesson[]=[
  pinout:[pin('D2','Button','Tombol','Input with internal pull-up.','Input dengan pull-up internal.'),pin('D8','LED via resistor','LED lewat resistor','Output.','Output.'),pin('GND','Button other side','Sisi lain tombol','Pulls the pin LOW when pressed.','Menarik pin ke LOW saat ditekan.')],
  walkthrough:[c('The button pin uses the internal pull-up resistor.','Pin tombol memakai resistor pull-up internal.'),c('digitalRead returns LOW while pressed.','digitalRead bernilai LOW saat ditekan.'),c('Hold mode copies the button to the LED.','Mode tahan menyalin tombol ke LED.'),c('Toggle mode flips the LED once per press.','Mode toggle membalik LED sekali per tekan.')],
  specs:[sp('Input','Input','INPUT_PULLUP'),sp('Idle level','Level diam','HIGH'),sp('Pressed level','Level ditekan','LOW')],
- callouts:[co('btn1','left','Button','Tombol','Hold it down with the Hold control.','Tahan dengan kontrol Tahan.'),co('led1','right','LED','LED','Reacts to the button.','Bereaksi pada tombol.'),co('uno.digital-header','top','Pin 2','Pin 2','Reads the button state.','Membaca status tombol.')],
+ callouts:[co('btn1','left','Button','Tombol','Hold it down with the Hold control.','Tahan dengan kontrol Tahan.'),co('led1','right','LED','LED','Reacts to the button.','Bereaksi pada tombol.'),co('uno.digital-header','top','Pin 2','Pin 2','Reads the button state.','Membaca status tombol.','D2')],
  params:{debounceMs:{label:c('Debounce','Debounce'),unit:'ms',hint:c('Ignore changes shorter than this.','Abaikan perubahan lebih singkat dari ini.')}},
  variants:{hold:c('Hold','Tahan'),toggle:c('Toggle','Toggle')},
  goal:{text:c('Light the LED with the button, then let it go dark.','Nyalakan LED dengan tombol, lalu biarkan padam.'),hint:c('Run, hold the button, then release.','Jalankan, tahan tombol, lalu lepas.')},
@@ -59,7 +59,7 @@ export const LESSONS:Lesson[]=[
  pinout:[pin('A0','Knob wiper','Wiper kenop','Analog input.','Input analog.'),pin('D9','LED via resistor','LED lewat resistor','PWM output.','Output PWM.'),pin('5V','Knob end','Ujung kenop','Top of the voltage range.','Ujung atas rentang tegangan.')],
  walkthrough:[c('analogRead(A0) returns 0-1023.','analogRead(A0) mengembalikan 0-1023.'),c('map scales it to 0-255.','map menskalakannya ke 0-255.'),c('analogWrite sets the PWM duty.','analogWrite mengatur duty PWM.'),c('Serial prints the value every few loops.','Serial mencetak nilai setiap beberapa putaran.')],
  specs:[sp('ADC','ADC','10 bit'),sp('PWM','PWM','8 bit, ~490 Hz'),sp('Baud','Baud','9600')],
- callouts:[co('pot1','left','Knob','Kenop','Drag the knob or use the slider.','Putar kenop atau pakai slider.'),co('led1','right','LED','LED','Brightness follows the knob.','Kecerahan mengikuti kenop.'),co('uno.analog-header','top','Pin A0','Pin A0','Analog input.','Input analog.')],
+ callouts:[co('pot1','left','Knob','Kenop','Drag the knob or use the slider.','Putar kenop atau pakai slider.'),co('led1','right','LED','LED','Brightness follows the knob.','Kecerahan mengikuti kenop.'),co('uno.analog-header','top','Pin A0','Pin A0','Analog input.','Input analog.','A0')],
  params:{printEvery:{label:c('Print every','Cetak tiap'),unit:'loops',hint:c('Loops between serial lines.','Jumlah putaran antar baris serial.')}},
  goal:{text:c('Sweep the knob and see the LED change brightness.','Putar kenop dan lihat kecerahan LED berubah.'),hint:c('Run, then drag the knob across its range.','Jalankan, lalu geser kenop di seluruh rentangnya.')},
  seo:{title:'Dim an LED with a knob',description:'Read a potentiometer with analogRead and dim an LED with PWM on a real emulated Arduino UNO. Watch live values in the serial monitor.'}},
@@ -69,7 +69,7 @@ export const LESSONS:Lesson[]=[
  pinout:[pin('D9','Red channel','Kanal merah','PWM.','PWM.'),pin('D10','Green channel','Kanal hijau','PWM.','PWM.'),pin('D11','Blue channel','Kanal biru','PWM.','PWM.')],
  walkthrough:[c('Three constants hold the colour levels.','Tiga konstanta menyimpan level warna.'),c('analogWrite sends each level to its pin.','analogWrite mengirim tiap level ke pinnya.'),c('Change a value to mix a new colour.','Ubah nilai untuk mencampur warna baru.')],
  specs:[sp('Channels','Kanal','3'),sp('Range','Rentang','0-255'),sp('Type','Jenis','Common cathode','Katoda bersama')],
- callouts:[co('rgb1','right','RGB LED','LED RGB','Three LEDs in one.','Tiga LED dalam satu.'),co('uno.digital-header','left','Pin 9','Pin 9','Red PWM.','PWM merah.'),co('uno.digital-header','top','Pin 11','Pin 11','Blue PWM.','PWM biru.')],
+ callouts:[co('rgb1','right','RGB LED','LED RGB','Three LEDs in one.','Tiga LED dalam satu.'),co('uno.digital-header','left','Pin 9','Pin 9','Red PWM.','PWM merah.','D9'),co('uno.digital-header','top','Pin 11','Pin 11','Blue PWM.','PWM biru.','D11')],
  params:{red:{label:c('Red','Merah'),unit:'/255',hint:c('Red level.','Level merah.')},green:{label:c('Green','Hijau'),unit:'/255',hint:c('Green level.','Level hijau.')},blue:{label:c('Blue','Biru'),unit:'/255',hint:c('Blue level.','Level biru.')}},
  goal:{text:c('Light the RGB LED.','Nyalakan LED RGB.'),hint:c('Press Run and let it run for a second.','Tekan Jalankan dan biarkan sedetik.')},
  seo:{title:'Mix colours with an RGB LED',description:'Mix any colour with three PWM channels on an RGB LED, driven by real firmware in an emulated Arduino UNO that you can tweak live.'}},
@@ -89,7 +89,7 @@ export const LESSONS:Lesson[]=[
  pinout:[pin('D7','TRIG','TRIG','Output: 10 microsecond pulse.','Output: pulsa 10 mikrodetik.'),pin('D6','ECHO','ECHO','Input: pulse width is the distance.','Input: lebar pulsa adalah jarak.'),pin('5V / GND','Sensor power','Daya sensor','Powers the module.','Memberi daya modul.')],
  walkthrough:[c('Trig goes HIGH for 10 microseconds.','Trig HIGH selama 10 mikrodetik.'),c('pulseIn waits for the echo pulse.','pulseIn menunggu pulsa gema.'),c('Divide by 58 to get centimetres.','Bagi 58 untuk mendapat sentimeter.'),c('The value is printed to serial.','Nilainya dicetak ke serial.')],
  specs:[sp('Range','Jangkauan','2-400 cm'),sp('Supply','Daya','5 V'),sp('Speed of sound','Kecepatan suara','343 m/s')],
- callouts:[co('us1','left','HC-SR04','HC-SR04','Two eyes: one speaks, one listens.','Dua mata: satu bicara, satu mendengar.'),co('obs1','right','Obstacle','Halangan','Slide it nearer or farther.','Geser lebih dekat atau jauh.'),co('uno.digital-header','top','Trig pin','Pin Trig','Starts each ping.','Memulai tiap ping.')],
+ callouts:[co('us1','left','HC-SR04','HC-SR04','Two eyes: one speaks, one listens.','Dua mata: satu bicara, satu mendengar.'),co('obs1','right','Obstacle','Halangan','Slide it nearer or farther.','Geser lebih dekat atau jauh.'),co('uno.digital-header','top','Trig pin','Pin Trig','Starts each ping.','Memulai tiap ping.','D7')],
  params:{interval:{label:c('Interval','Interval'),unit:'ms',hint:c('Time between measurements.','Waktu antar pengukuran.')}},
  goal:{text:c('Measure two different distances.','Ukur dua jarak berbeda.'),hint:c('Run, then move the obstacle.','Jalankan, lalu geser halangan.')},
  seo:{title:'Measure distance with HC-SR04',description:'Measure distance with an ultrasonic HC-SR04 sensor on a real emulated Arduino UNO. Move an obstacle and read centimetres on serial.'}},
@@ -99,7 +99,7 @@ export const LESSONS:Lesson[]=[
  pinout:[pin('D5','Buzzer','Buzzer','Square wave output.','Output gelombang persegi.'),pin('GND','Buzzer return','Kembali buzzer','Ground.','Ground.')],
  walkthrough:[c('tone(pin, freq) starts a square wave.','tone(pin, freq) memulai gelombang persegi.'),c('delay keeps each note for noteMs.','delay menahan tiap nada selama noteMs.'),c('noTone() silences the pin.','noTone() membisukan pin.')],
  specs:[sp('Type','Jenis','Passive buzzer','Buzzer pasif'),sp('Range','Rentang','~200-2000 Hz'),sp('Pin','Pin','D5')],
- callouts:[co('bz1','right','Buzzer','Buzzer','Hear it with sound on.','Dengarkan dengan suara aktif.'),co('uno.digital-header','left','Pin 5','Pin 5','Timer-driven output.','Output yang digerakkan timer.'),co('uno.mcu','top','Timer','Timer','Makes the frequency.','Menghasilkan frekuensi.')],
+ callouts:[co('bz1','right','Buzzer','Buzzer','Hear it with sound on.','Dengarkan dengan suara aktif.'),co('uno.digital-header','left','Pin 5','Pin 5','Timer-driven output.','Output yang digerakkan timer.','D5'),co('uno.mcu','top','Timer','Timer','Makes the frequency.','Menghasilkan frekuensi.')],
  params:{noteMs:{label:c('Note length','Panjang nada'),unit:'ms',hint:c('How long each note plays.','Berapa lama tiap nada.')}},
  variants:{scale:c('Scale','Tangga nada'),alarm:c('Alarm','Alarm')},
  goal:{text:c('Hear two different notes.','Dengar dua nada berbeda.'),hint:c('Run and enable sound in settings.','Jalankan dan aktifkan suara di pengaturan.')},
@@ -110,7 +110,7 @@ export const LESSONS:Lesson[]=[
  pinout:[pin('D6','Transistor base','Basis transistor','PWM output.','Output PWM.'),pin('5V','Motor supply','Daya motor','Power for the motor.','Daya untuk motor.')],
  walkthrough:[c('The motor speed ramps up toward topSpeed.','Kecepatan motor naik menuju topSpeed.'),c('analogWrite sets the PWM duty.','analogWrite mengatur duty PWM.'),c('Each step waits stepMs.','Tiap langkah menunggu stepMs.')],
  specs:[sp('Control','Kontrol','PWM'),sp('Pin','Pin','D6'),sp('Protection','Proteksi','Flyback diode','Dioda flyback')],
- callouts:[co('m1','right','Motor','Motor','Spins faster with more duty.','Berputar lebih cepat dengan duty lebih besar.'),co('uno.digital-header','left','Pin 6','Pin 6','PWM to the transistor.','PWM ke transistor.'),co('uno.mcu','top','Chip','Chip','Generates the PWM.','Menghasilkan PWM.')],
+ callouts:[co('m1','right','Motor','Motor','Spins faster with more duty.','Berputar lebih cepat dengan duty lebih besar.'),co('uno.digital-header','left','Pin 6','Pin 6','PWM to the transistor.','PWM ke transistor.','D6'),co('uno.mcu','top','Chip','Chip','Generates the PWM.','Menghasilkan PWM.')],
  params:{topSpeed:{label:c('Top speed','Kecepatan puncak'),unit:'/255',hint:c('Final PWM level.','Level PWM akhir.')},stepMs:{label:c('Step time','Waktu langkah'),unit:'ms',hint:c('Delay between speed steps.','Jeda antar langkah kecepatan.')}},
  goal:{text:c('Spin the motor up to speed.','Putar motor hingga kencang.'),hint:c('Run and wait for the ramp.','Jalankan dan tunggu kecepatan naik.')},
  seo:{title:'Drive a DC motor with PWM',description:'Drive a DC motor through a transistor with PWM on an emulated Arduino UNO. Tune top speed and ramp time and watch the rpm.'}},
@@ -120,7 +120,7 @@ export const LESSONS:Lesson[]=[
  pinout:[pin('D9','Signal','Sinyal','Pulse output.','Output pulsa.'),pin('5V','Power','Daya','Servo supply.','Daya servo.'),pin('GND','Ground','Ground','Return.','Kembali.')],
  walkthrough:[c('servo.attach binds the pin.','servo.attach mengikat pin.'),c('servo.write sets the angle.','servo.write mengatur sudut.'),c('The loop steps from fromDeg to toDeg and back.','Putaran melangkah dari fromDeg ke toDeg dan kembali.')],
  specs:[sp('Pulse','Pulsa','1000-2000 us'),sp('Period','Periode','20 ms'),sp('Pin','Pin','D9')],
- callouts:[co('sv1','right','Servo','Servo','The arm follows the pulse.','Lengan mengikuti pulsa.'),co('uno.digital-header','left','Pin 9','Pin 9','Signal wire.','Kabel sinyal.'),co('uno.mcu','top','Chip','Chip','Times the pulses.','Menghitung waktu pulsa.')],
+ callouts:[co('sv1','right','Servo','Servo','The arm follows the pulse.','Lengan mengikuti pulsa.'),co('uno.digital-header','left','Pin 9','Pin 9','Signal wire.','Kabel sinyal.','D9'),co('uno.mcu','top','Chip','Chip','Times the pulses.','Menghitung waktu pulsa.')],
  params:{fromDeg:{label:c('From','Dari'),unit:'deg',hint:c('Start angle.','Sudut awal.')},toDeg:{label:c('To','Ke'),unit:'deg',hint:c('End angle.','Sudut akhir.')},stepMs:{label:c('Step time','Waktu langkah'),unit:'ms',hint:c('Wait per degree.','Jeda per derajat.')}},
  goal:{text:c('Sweep the servo through at least 90 degrees.','Sapu servo minimal 90 derajat.'),hint:c('Run and wait.','Jalankan dan tunggu.')},
  seo:{title:'Sweep a servo with Arduino',description:'Sweep a hobby servo with the Servo library on a real emulated Arduino UNO. Set the start, end and speed and watch the arm move.'}},

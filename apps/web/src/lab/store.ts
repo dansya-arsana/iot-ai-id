@@ -40,3 +40,9 @@ export function setLastLesson(id:LessonId){write(K.last,id);}
 
 export function loadSerialHeight():number{const v=read<number>(K.serial,160);return typeof v==='number'&&v>=80?v:160;}
 export function saveSerialHeight(h:number){write(K.serial,h);}
+
+const THUMBS_KEY='iot-lab:thumbs:v2';
+export function loadThumbs():Partial<Record<LessonId,string>>{
+ try{const raw=sessionStorage.getItem(THUMBS_KEY);const v=raw?JSON.parse(raw) as unknown:null;return v&&typeof v==='object'?v as Partial<Record<LessonId,string>>:{};}catch{return {};}
+}
+export function saveThumbs(t:Partial<Record<LessonId,string>>){try{sessionStorage.setItem(THUMBS_KEY,JSON.stringify(t));}catch{/* storage unavailable or full */}}

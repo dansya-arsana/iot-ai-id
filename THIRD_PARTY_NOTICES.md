@@ -9,8 +9,6 @@ The product uses npm packages through pinned releases and package-lock.json. Kee
 | [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) | 1.32.1 | MIT | Local MCP client transport |
 | [three.js](https://github.com/mrdoob/three.js) | 0.186.1 | MIT | 3D board scene in the lazy-loaded /lab chunk |
 | [avr8js](https://github.com/wokwi/avr8js) | 0.21.1 | MIT | ATmega328P emulation in the /lab chunk |
-| [Barlow, Barlow Semi Condensed](https://github.com/jpt/barlow) via @fontsource | 5.3.0 | OFL-1.1 | /lab typography |
-| [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) via @fontsource | 5.3.0 | OFL-1.1 | /lab code and serial text |
 | [OpenViking](https://github.com/volcengine/OpenViking) | 0.4.23 | AGPL-3.0 | Separate, unmodified local HTTP knowledge service |
 
 Arduino MCP Server and Wokwi license texts are retained in docs/licenses. Other dependency licenses remain in installed packages. A future distribution should generate a complete transitive notices bundle from its lockfile.

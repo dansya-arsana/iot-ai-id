@@ -1,17 +1,12 @@
 import './lab.css';
-import '@fontsource/barlow/400.css';
-import '@fontsource/barlow/500.css';
-import '@fontsource/barlow-semi-condensed/600.css';
-import '@fontsource/barlow-semi-condensed/700.css';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {Link,Navigate,useNavigate,useParams} from 'react-router-dom';
 import {DotMark} from '../brand/dot-mark';
+import {LabGlyph} from './ui/lab-glyph';
 import {useLang} from '../i18n';
 import {LangToggle} from '../ui';
 import {CIRCUITS,UNO_PINS,isLessonId} from './contract';
-import type {Circuit,FirmwareVariant,LabRunner,LabScene,LessonId,ParamValues,PartInput,PartProps,PinSample,SimSnapshot,ViewCommand} from './contract';
+import type {Circuit,FirmwareVariant,LabRunner,LessonId,LoadReport,ParamValues,PartInput,PartProps,PinSample,SimSnapshot,ViewCommand} from './contract';
 import {labFirmware} from './firmware';
 import {GOALS} from './goals';
 import type {GoalMemory} from './goals';
@@ -22,21 +17,26 @@ import type {LabSettings} from './store';
 import {Artboard,useViewport} from './ui/artboard';
 import {createBuzzerAudio} from './ui/audio';
 import type {BuzzerAudio} from './ui/audio';
+import {Analyzer} from './ui/analyzer';
 import {Callouts} from './ui/callouts';
+import {ChipPill} from './ui/chip-pill';
 import {CodeView} from './ui/code-view';
 import {ControlsDock} from './ui/controls-dock';
 import type {Inputs} from './ui/controls-dock';
-import type {StageApi} from './ui/frame';
+import type {SceneV2,StageApi} from './ui/frame';
 import {Icon} from './ui/icons';
 import {InfoCard} from './ui/info-card';
 import {Inspector} from './ui/inspector';
 import type {InspectTarget} from './ui/inspector';
 import {LessonStrip} from './ui/lesson-strip';
+import {createPinHistory} from './ui/pin-history';
 import {Progress} from './ui/progress';
 import {Rail,SettingsPanel} from './ui/rail';
 import {Readouts} from './ui/readouts';
-import {SerialMonitor} from './ui/serial-monitor';
+import {SerialHeader,SerialLog} from './ui/serial-monitor';
 import type {SerialSeg} from './ui/serial-monitor';
+import {RECORDS,quoteOf} from './ui/test-record';
+import type {TestRecordData} from './ui/test-record';
 import {Viewbar} from './ui/viewbar';
 
 interface Runtime{id:LessonId;variantId:string;params:ParamValues;props:Record<string,PartProps>;inputs:Inputs;circuit:Circuit}
@@ -68,6 +68,8 @@ function openLesson(id:LessonId):Runtime{
  const props=stored?.props??{};
  return {id,variantId:v.id,params:paramsFor(v,stored?.params),props,inputs:stored?.inputs??{},circuit:buildCircuit(id,props)};
 }
+const nf=(n:number)=>n.toLocaleString('en-US');
+const gcc=/avr-gcc [\d.]+/.exec(labFirmware.toolchain)?.[0]??labFirmware.toolchain;
 const hex=(n:number)=>'0x'+n.toString(16).toUpperCase().padStart(4,'0');
 
 export function LabPage(){
@@ -80,6 +82,8 @@ export function LabPage(){
 export default LabPage;
 
 function LabInner({id}:{id:LessonId}){
+ const idRef=useRef<LessonId>(id);
+ useEffect(()=>{idRef.current=id;},[id]);
  const {tr,lang}=useLang();
  const navigate=useNavigate();
  const vp=useViewport();
@@ -92,8 +96,12 @@ function LabInner({id}:{id:LessonId}){
  const [ui,setUi]=useState<UiSnap>(EMPTY_UI);
  const [selected,setSelected]=useState<InspectTarget|null>(null);
  const [segs,setSegs]=useState<SerialSeg[]>([]);
- const [serialOpen,setSerialOpen]=useState(true);
- const [serialH,setSerialH]=useState(store.loadSerialHeight);
+ const [report,setReport]=useState<LoadReport|null>(null);
+ const [lastWrote,setLastWrote]=useState<string|null>(null);
+ const [record,setRecord]=useState<TestRecordData|null>(null);
+ const [showRecord,setShowRecord]=useState(false);
+ const [thumbs,setThumbs]=useState(store.loadThumbs);
+ const [sheet,setSheet]=useState(false);
  const [sceneState,setSceneState]=useState<SceneState>('loading');
  const [celebrate,setCelebrate]=useState<LessonId|null>(null);
  const [note,setNote]=useState<string|null>(null);
@@ -102,7 +110,10 @@ function LabInner({id}:{id:LessonId}){
  const [error,setError]=useState<string|null>(null);
 
  const runnerRef=useRef<LabRunner|null>(null);
- const sceneRef=useRef<LabScene|null>(null);
+ const sceneRef=useRef<SceneV2|null>(null);
+ const historyRef=useRef(createPinHistory());
+ const stageCardRef=useRef<HTMLElement>(null);
+ const safeRef=useRef({mobile:vp.mobile,callouts:true});
  const audioRef=useRef<BuzzerAudio|null>(null);
  const canvasRef=useRef<HTMLCanvasElement>(null);
  const stageRef=useRef<HTMLDivElement>(null);
@@ -122,7 +133,7 @@ function LabInner({id}:{id:LessonId}){
 
  const pushSeg=useCallback((sys:boolean,text:string)=>{
   const a=segsRef.current;
-  a.push({sys,text});
+  a.push({sys,text,t:runnerRef.current?.snapshot().simTimeMs??0});
   if(a.length>500)a.splice(0,a.length-500);
   dirtyRef.current=true;
  },[]);
@@ -134,6 +145,7 @@ function LabInner({id}:{id:LessonId}){
   getScene:()=>sceneRef.current,
   stage:()=>stageRef.current,
   snapshot:()=>snapRef.current,
+  history:()=>historyRef.current,
  }),[]);
 
  // ---- runtime helpers ----
@@ -143,6 +155,7 @@ function LabInner({id}:{id:LessonId}){
   const v=variantOf(r.id,r.variantId);
   try{
    const rep=runner.load(v,r.params,r.circuit,labFirmware.toolchain);
+   historyRef.current.reset();setReport(rep);
    for(const [pid,inp] of Object.entries(r.inputs))runner.setInput(pid,inp);
    setError(null);
    return rep;
@@ -159,7 +172,7 @@ function LabInner({id}:{id:LessonId}){
   pushSeg(true,`› Firmware ${rep.sketch}.hex · ${rep.bytes} bytes · ${rep.toolchain}\n`);
   for(const p of rep.patched){
    const def=v.params.find(x=>x.name===p.name)?.defaultValue;
-   if(def!==p.value)pushSeg(true,`› Wrote ${p.name} = ${p.value} at ${hex(p.offset)}\n`);
+   if(def!==p.value){pushSeg(true,`› Wrote ${p.name} = ${p.value} at ${hex(p.offset)}\n`);setLastWrote(`Wrote ${p.name} = ${p.value} at ${hex(p.offset)} · reset`);}
   }
   pushSeg(true,'› Reset ATmega328P @ 16 MHz · running\n');
  },[pushSeg]);
@@ -168,12 +181,14 @@ function LabInner({id}:{id:LessonId}){
   const runner=runnerRef.current;if(!runner)return;
   audioRef.current??=createBuzzerAudio();
   segsRef.current=[];memRef.current={};speedNote.current=false;
+  setRecord(null);setShowRecord(false);setLastWrote(null);
   const r=rtRef.current;
   const rep=loadCurrent(r);
   if(!rep)return;
   printLoad(r,rep);
   runner.start();
   syncUi();
+  if(window.innerWidth<=760||window.innerHeight<=560)stageCardRef.current?.scrollIntoView({block:'start',behavior:settingsRef.current.reducedMotion?'auto':'smooth'});
  },[loadCurrent,printLoad,syncUi]);
  const stop=useCallback(()=>{runnerRef.current?.stop();syncUi();},[syncUi]);
 
@@ -184,7 +199,7 @@ function LabInner({id}:{id:LessonId}){
   if(rep&&wasRunning){
    if(restartMsg)pushSeg(true,'› Values changed, restarted\n');
    const v=variantOf(next.id,next.variantId);
-   for(const p of rep.patched){if(v.params.find(x=>x.name===p.name)?.defaultValue!==p.value)pushSeg(true,`› Wrote ${p.name} = ${p.value} at ${hex(p.offset)}\n`);}
+   for(const p of rep.patched){if(v.params.find(x=>x.name===p.name)?.defaultValue!==p.value){pushSeg(true,`› Wrote ${p.name} = ${p.value} at ${hex(p.offset)}\n`);setLastWrote(`Wrote ${p.name} = ${p.value} at ${hex(p.offset)} · reset`);}}
    runnerRef.current?.start();
   }
   syncUi();
@@ -244,6 +259,7 @@ function LabInner({id}:{id:LessonId}){
    const dt=Math.min(100,t-last);last=t;
    const snap=runner.tick(dt);
    snapRef.current=snap;
+   historyRef.current.push(snap);
    sceneRef.current?.update(snap,dt);
    for(const cb of subsRef.current)cb();
    const running=snap.status==='running';
@@ -252,6 +268,13 @@ function LabInner({id}:{id:LessonId}){
     if(!doneRef.current.includes(rts.id)&&GOALS[rts.id](snap,memRef.current)){
      const nd=store.markDone(rts.id);doneRef.current=nd;setDone(nd);setCelebrate(rts.id);
      timers.current.push(window.setTimeout(()=>setCelebrate(null),1600));
+     const v=variantOf(rts.id,rts.variantId);
+     const n=LESSONS.find(l=>l.id===rts.id)?.n??0;
+     setRecord({lesson:rts.id,n,tMs:snap.simTimeMs,rows:RECORDS[rts.id](historyRef.current,snap),firmware:`${v.sketch} · ${nf(v.bytes)} B · ${gcc}`});
+     if(settingsRef.current.reducedMotion)setShowRecord(true);
+     else timers.current.push(window.setTimeout(()=>setShowRecord(true),700));
+     sceneRef.current?.celebrate?.();
+     if(settingsRef.current.sound)audioRef.current?.click(settingsRef.current.volume);
     }
     if(!speedNote.current&&snap.simTimeMs>600&&snap.speed<0.9){
      speedNote.current=true;pushSeg(true,`› Simulation at ${Math.round(snap.speed*100)}% speed\n`);
@@ -276,11 +299,11 @@ function LabInner({id}:{id:LessonId}){
 
  // ---- lazy 3D scene ----
  useEffect(()=>{
-  let cancelled=false;let sc:LabScene|null=null;
+  let cancelled=false;let sc:SceneV2|null=null;
   import('./scene').then(m=>{
    const canvas=canvasRef.current;
    if(cancelled||!canvas)return;
-   let made:LabScene;
+   let made:SceneV2;
    try{
     made=m.createLabScene({
      canvas,settings:{grid:settingsRef.current.grid,autoRotate:settingsRef.current.autoRotate,reducedMotion:settingsRef.current.reducedMotion},
@@ -308,6 +331,35 @@ function LabInner({id}:{id:LessonId}){
 
  useEffect(()=>{sceneRef.current?.setSettings({grid:settings.grid,autoRotate:settings.autoRotate,reducedMotion:settings.reducedMotion});},[settings.grid,settings.autoRotate,settings.reducedMotion,sceneState]);
 
+ // ---- safe area for the auto-fit camera (feature-detected) ----
+ const showCallouts=settings.labels&&sceneState==='ready';
+ useEffect(()=>{
+  safeRef.current={mobile:vp.mobile,callouts:showCallouts};
+  sceneRef.current?.setSafeArea?.(vp.mobile?{top:12,right:12,bottom:12,left:12}:{top:showCallouts?80:20,right:20,bottom:44,left:20});
+ },[vp.mobile,vp.artH,vp.scale,showCallouts,sceneState,id]);
+
+ // ---- 3D lesson thumbnails: once after ready, in idle time, cached in sessionStorage ----
+ useEffect(()=>{
+  if(sceneState!=='ready')return;
+  const sc=sceneRef.current;
+  if(!sc?.thumbnails)return;
+  const have=store.loadThumbs();
+  if(LESSONS.every(l=>have[l.id]))return;
+  let dead=false;
+  const go=()=>{
+   // neighbours of the open lesson first, then the rest; each thumbnail lands as soon as it is drawn
+   const ids=LESSONS.map(l=>l.id),at=Math.max(0,ids.indexOf(idRef.current));
+   const order=[...ids].sort((a,b)=>Math.abs(ids.indexOf(a)-at)-Math.abs(ids.indexOf(b)-at));
+   sc.thumbnails?.({width:72,height:60,dpr:Math.min(2,window.devicePixelRatio||1),order,onEach:(tid,url)=>{
+    if(dead)return;
+    const all={...store.loadThumbs(),[tid]:url};store.saveThumbs(all);setThumbs(all);
+   }}).catch(()=>undefined);
+  };
+  const ric=(window as unknown as {requestIdleCallback?:(f:()=>void,o?:{timeout:number})=>number}).requestIdleCallback;
+  const h=ric?ric(go,{timeout:600}):window.setTimeout(go,300);
+  return()=>{dead=true;if(!ric)clearTimeout(h);};
+ },[sceneState]);
+
  // ---- open lesson ----
  useEffect(()=>{
   if(!ready)return;
@@ -316,7 +368,7 @@ function LabInner({id}:{id:LessonId}){
   loadCurrent(r);
   sceneRef.current?.setLesson(r.id,r.circuit);
   store.setLastLesson(r.id);
-  const stop0=window.setTimeout(()=>{setSelected(null);setNote(null);syncUi();},0);
+  const stop0=window.setTimeout(()=>{setSelected(null);setNote(null);setRecord(null);setShowRecord(false);setLastWrote(null);syncUi();},0);
   return()=>clearTimeout(stop0);
  },[id,ready,loadCurrent,syncUi]);
 
@@ -350,54 +402,78 @@ function LabInner({id}:{id:LessonId}){
   return [...set];
  },[rt.circuit,rt.id]);
  const overCurrent=Object.values(ui.parts).some(p=>p.kind==='led'&&p.overCurrent);
- const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollIntoView({behavior:settings.reducedMotion?'auto':'smooth',block:'start'});
- const showCallouts=settings.labels&&sceneState==='ready';
-
- const serial=(
-  <SerialMonitor segments={segs} running={running} open={serialOpen} height={serialH}
-   onHeight={h=>{setSerialH(h);store.saveSerialHeight(h);}} onClear={()=>{segsRef.current=[];setSegs([]);}} onOpen={()=>setSerialOpen(true)} onClose={()=>setSerialOpen(false)}/>
- );
+const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollIntoView({behavior:settings.reducedMotion?'auto':'smooth',block:'start'});
+ const clearSerial=()=>{segsRef.current=[];setSegs([]);};
+ const lanePins=livePins;
+ const usesSerial=segs.some(x=>!x.sys);
+ const receipt=`${variant.sketch} · ${nf(variant.bytes)} B · ${gcc}`;
+ const quote=record&&record.lesson===id?quoteOf(record.rows):null;
 
  return (
   <div className={`lab${vp.mobile?' lab--mobile':''}${settings.reducedMotion?' lab--reduced':''}`} data-lesson={id} data-sim-status={ui.status} data-sim-ms={Math.round(ui.simTimeMs)} data-scene={sceneState}>
    <Artboard vp={vp}>
     {!vp.mobile&&<Rail lesson={id} done={done} settings={settings} onSettings={changeSettings} onLesson={goLesson} onResetProgress={resetProgress}/>}
-    <header className="lab-brand">
-     <Link to="/" className="lab-brand-mark" aria-label={tr('iot.ai.id home','Beranda iot.ai.id')}><DotMark/></Link>
-     <div className="lab-brand-text"><span className="lab-brand-title">{tr('ARDUINO LAB','LAB ARDUINO')}</span><span className="lab-brand-sub">{tr('READ · RUN · TINKER','BACA · JALANKAN · OPREK')}</span></div>
+    <header className="lab-header">
+     <Link to="/" className="lab-wordmark" aria-label={tr('iot.ai.id home','Beranda iot.ai.id')}><LabGlyph/><span>Lab</span></Link>
+     <i className="lab-divider" aria-hidden="true"/>
+     <span className="lab-sub">UNO · {tr('EMULATED ATMEGA328P','ATMEGA328P TIRUAN')}</span>
      <span className="lab-grow"/>
-     <Progress count={done.length}/>
+     <ChipPill running={running} speed={ui.speed} simTimeMs={ui.simTimeMs} compact={vp.mobile}/>
+     <Progress done={done} active={id} popped={celebrate}/>
      <LangToggle/>
     </header>
-    <section className="lab-stage-card" id="lab-sec-board">
+    {vp.mobile&&(
+     <div className="lab-mobile-title">
+      <span className="lab-eyebrow">( {String(lesson.n).padStart(2,'0')} / 11 ) ——— {tr('LESSON','PELAJARAN')}</span>
+      <div className="lab-title">{lesson.title[lang]}</div>
+     </div>
+    )}
+    <section className="lab-stage-card" id="lab-sec-board" ref={stageCardRef} data-running={running} data-sticky={vp.mobile&&running}>
      <div className="lab-stage" ref={stageRef}>
-      <canvas ref={canvasRef} className="lab-canvas" aria-label={tr('3D view of the Arduino board','Tampilan 3D papan Arduino')} role="img"/>
+      <canvas ref={canvasRef} className="lab-canvas" aria-label={tr('3D view of the board','Tampilan 3D papan')} role="img"/>
+      <div className="lab-atmos" aria-hidden="true"><i className="lab-corner lab-corner--tl"/><i className="lab-corner lab-corner--tr"/><i className="lab-corner lab-corner--bl"/><i className="lab-corner lab-corner--br"/></div>
       {sceneState==='loading'&&<div className="lab-loader"><DotMark animated/><div className="lab-loader-bar"><i/></div><span>{tr('Soldering the board…','Menyolder papan…')}</span></div>}
       {sceneState==='unavailable'&&<p className="lab-3d-note" role="status">{tr('3D view unavailable on this device. The simulation still runs.','Tampilan 3D tidak tersedia di perangkat ini. Simulasi tetap berjalan.')}</p>}
-      <Callouts lesson={lesson} api={api} pills={vp.mobile} show={showCallouts}/>
+      <Callouts lesson={lesson} api={api} pills={vp.mobile} show={showCallouts} running={running} compact={vp.compact}/>
       <Readouts lessonId={id} api={api}/>
       {selected&&<Inspector target={selected} lesson={lesson} lessonId={id} circuit={rt.circuit} variantId={rt.variantId} params={rt.params} overCurrent={overCurrent} api={api}
        onClose={()=>setSelected(null)} onParam={changeParam} onVariant={changeVariant} onProps={changeProps} onInput={changeInput} onFocus={t=>sceneRef.current?.focus(t)}/>}
+      <ControlsDock circuit={rt.circuit} inputs={rt.inputs} onInput={changeInput}/>
       <Viewbar onView={view} used={viewUsed}/>
       {error&&<p className="lab-error" role="alert">{error}</p>}
-      {!vp.mobile&&serial}
      </div>
-     <ControlsDock circuit={rt.circuit} inputs={rt.inputs} onInput={changeInput}/>
+     <Analyzer api={api} lessonId={id} lanePins={lanePins} tx={usesSerial} status={ui.status} simTimeMs={ui.simTimeMs} speed={ui.speed} pins={ui.pins}
+      segs={segs} onClear={clearSerial} record={record&&record.lesson===id?record:null} showRecord={showRecord} onShowSignals={()=>setShowRecord(false)} marker={record&&record.lesson===id?record.tMs:null}
+      receipt={receipt} compact={vp.compact} mobile={vp.mobile} reduced={settings.reducedMotion}/>
     </section>
-    <LessonStrip active={id} done={done} celebrate={celebrate} onPick={goLesson}/>
+    <LessonStrip active={id} done={done} celebrate={celebrate} thumbs={thumbs} reduced={settings.reducedMotion} onPick={goLesson}/>
     <aside className="lab-side">
-     <InfoCard lesson={lesson} livePins={livePins} pins={ui.pins} done={done.includes(id)}/>
-     <CodeView variant={variant} params={rt.params} currentLine={ui.currentLine} running={running} onRun={run} onStop={stop} onParam={name=>setSelected({type:'param',name})} note={note}/>
+     <InfoCard lesson={lesson} pins={ui.pins} done={done.includes(id)} quote={quote} variant={variant} report={report} toolchain={labFirmware.toolchain}/>
+     <CodeView variant={variant} params={rt.params} currentLine={ui.currentLine} running={running} onRun={run} onStop={stop} onParam={name=>setSelected({type:'param',name})} note={note} log={lastWrote}/>
     </aside>
-    {vp.mobile&&serial}
-    {vp.mobile&&<section className="lab-card lab-settings-card" id="lab-sec-settings"><SettingsPanel settings={settings} onSettings={changeSettings} onResetProgress={resetProgress}/></section>}
+    {vp.mobile&&(
+     <section className="lab-card lab-serial-card" id="lab-sec-serial">
+      <SerialHeader running={running} onClear={clearSerial}/>
+      <SerialLog segments={segs}/>
+     </section>
+    )}
    </Artboard>
    {vp.mobile&&(
-    <nav className="lab-tabbar" aria-label={tr('Sections','Bagian')}>
-     {([['lessons','lessons',tr('Lessons','Pelajaran')],['board','board',tr('Board','Papan')],['code','code',tr('Code','Kode')],['serial','serial',tr('Serial','Serial')],['settings','settings',tr('Settings','Pengaturan')]] as const).map(([sec,icon,label])=>(
-      <button key={sec} type="button" onClick={()=>{if(sec==='serial')setSerialOpen(true);scrollTo(sec);}}><Icon name={icon} size={22}/><span>{label}</span></button>
-     ))}
-    </nav>
+    <>
+     {sheet&&<div className="lab-scrim" onClick={()=>setSheet(false)}/>}
+     {sheet&&(
+      <div className="lab-sheet" role="dialog" aria-label={tr('Settings','Setelan')}>
+       <div className="lab-sheet-head"><strong>{tr('Settings','Setelan')}</strong><button type="button" className="lab-iconbtn" aria-label={tr('Close','Tutup')} onClick={()=>setSheet(false)}><Icon name="close" size={18}/></button></div>
+       <SettingsPanel settings={settings} onSettings={changeSettings} onResetProgress={resetProgress}/>
+      </div>
+     )}
+     <nav className="lab-tabbar" aria-label={tr('Sections','Bagian')}>
+      {([['lessons','lessons',tr('Lessons','Pelajaran')],['board','board',tr('Board','Papan')],['code','code',tr('Code','Kode')],['serial','serial',tr('Serial','Serial')]] as const).map(([sec,icon,label])=>(
+       <button key={sec} type="button" onClick={()=>scrollTo(sec)}><Icon name={icon} size={22}/><span>{label}</span></button>
+      ))}
+      <button type="button" data-testid="lab-rail-settings" aria-expanded={sheet} aria-label={tr('Settings','Setelan')} onClick={()=>setSheet(v=>!v)}><Icon name="settings" size={22}/><span>{tr('Settings','Setelan')}</span></button>
+     </nav>
+    </>
    )}
   </div>
  );

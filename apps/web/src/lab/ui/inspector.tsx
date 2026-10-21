@@ -27,7 +27,7 @@ export function Inspector({target,lesson,lessonId,circuit,variantId,params,overC
   if(!el||!stage)return;
   const SW=stage.clientWidth,SH=stage.clientHeight,h=el.offsetHeight;
   const p=targetId&&scene?scene.project(targetId):null;
-  let x=SW-W-24,y=90;
+  let x=SW-W-16,y=16;
   if(p&&p.visible){x=Math.min(SW-W-12,Math.max(12,p.x+44));y=Math.min(SH-h-12,Math.max(12,p.y-h/2));}
   el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
   const ln=line.current;
@@ -51,7 +51,7 @@ export function Inspector({target,lesson,lessonId,circuit,variantId,params,overC
   <>
    <svg className="lab-leaders lab-leaders-insp" aria-hidden="true"><line ref={line} className="lab-leader" opacity="0"/></svg>
    <div ref={card} className="lab-inspector" role="dialog" aria-label={title} data-testid="lab-inspector" data-target={targetId??`param:${target.type==='param'?target.name:''}`} style={{width:W}}>
-    <header><strong>{title}</strong><button type="button" className="lab-x" aria-label={tr('Close','Tutup')} onClick={onClose}><Icon name="close" size={14}/></button></header>
+    <header><span className="lab-tile lab-tile--lg"><Icon name={target.type==='param'?'code':({led:'led',resistor:'resistor',potentiometer:'pot',hcsr04:'sonar',servo:'horn',buzzer:'note',button:'button',ldr:'sun',lamp:'sun','rgb-led':'rgb',motor:'motor'} as Record<string,string>)[part?.kind??'']??'chip'} size={18}/></span><strong>{title}</strong><button type="button" className="lab-x" aria-label={tr('Close','Tutup')} onClick={onClose}><Icon name="close" size={14}/></button></header>
     <p>{desc}</p>
     {paramNames.map(n=>{
      const ps=spec.params.find(p=>p.name===n);if(!ps)return null;

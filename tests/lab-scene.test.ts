@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {CIRCUITS,LESSON_IDS} from '../apps/web/src/lab/contract.js';
-import {BB_COLS,layoutCircuit,lampCm,lampMm,obstacleCm,obstacleMm,resistorBands,wireCurve} from '../apps/web/src/lab/scene/layout.js';
+import {BB_COLS,layoutCircuit,unoOverlaps,lampCm,lampMm,obstacleCm,obstacleMm,resistorBands,wireCurve} from '../apps/web/src/lab/scene/layout.js';
 
 for(const id of LESSON_IDS){
  test(`layout ${id}: placements are complete, hole-disjoint, bounded and deterministic`,()=>{
@@ -17,6 +17,7 @@ for(const id of LESSON_IDS){
     const k=`${col},${row}`;assert.ok(!seen.has(k),`hole ${k} reused`);seen.add(k);
    }
   }
+  assert.deepEqual(unoOverlaps(a,c),[],'no part body within 10 mm of the Uno');
   assert.deepEqual(layoutCircuit(c),a);
  });
 }

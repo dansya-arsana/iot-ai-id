@@ -64,6 +64,21 @@ function offBoard(p:PartSpec,all:Record<string,Placement>):Placement{
  }
 }
 
+/** First free column per lane: parts sit mid-board (cols 8+), the sonar at the far end, never near the Uno. */
+export const LANE_START:Record<number,number>={2:8,7:8,9:21};
+/** X extent (mm, relative to the first pin) of the physical part body, for the clearance check. */
+const BODY_X:Partial<Record<PartKind,[number,number]>>={hcsr04:[-19,27]};
+export const UNO_CLEARANCE=10;
+/** Ids of on-board parts whose body comes within UNO_CLEARANCE mm of the Uno bbox (must be empty for every lesson). */
+export function unoOverlaps(place:Record<string,Placement>,circuit:Circuit):string[]{
+ const limit=UNO_W/2+UNO_CLEARANCE;
+ return circuit.parts.filter(p=>{
+  const pl=place[p.id];if(!pl||!pl.onBoard)return false;
+  const [a]=BODY_X[p.kind]??[-1,WIDTH(p.kind)*PITCH];
+  return pl.x+a<limit;
+ }).map(p=>p.id);
+}
+
 export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
  const out:Record<string,Placement>={};
  const cursor:Record<number,number>={};
@@ -72,8 +87,8 @@ export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
   const w=WIDTH(p.kind);
   const lanes:number[]=p.kind==='hcsr04'?[SENSOR_ROW]:[...LANES];
   let lane=lanes[lanes.length-1]!;
-  let col=cursor[lane]??0;
-  for(const l of lanes){const c=cursor[l]??0;if(c+w<=BB_COLS){lane=l;col=c;break;}}
+  let col=cursor[lane]??LANE_START[lane]??0;
+  for(const l of lanes){const c=cursor[l]??LANE_START[l]??0;if(c+w<=BB_COLS){lane=l;col=c;break;}}
   if(col+w>BB_COLS)col=Math.max(0,BB_COLS-w);
   cursor[lane]=col+w+1;
   out[p.id]={x:holeX(col),z:holeZ(lane),rotY:0,onBoard:true,holes:pinHoleOffsets(p.kind).map(d=>[col+d,lane] as [number,number])};
@@ -82,25 +97,37 @@ export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
  return out;
 }
 
-/** Arc between two points; apex height = 8 + 0.25 * distance mm above the chord. */
-export function wireCurve(a:[number,number,number],b:[number,number,number]):[number,number,number][]{
- const n=32;
+/** Cubic Bezier through vertical lead-outs; apex h = 10 + 0.3 * distance. `fan`/`lift` spread wires that share a header. */
+export function wireCurve(a:[number,number,number],b:[number,number,number],fan=0,lift=0):[number,number,number][]{
+ const n=96;
  const dist=Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2]);
- const h=8+0.25*dist;
+ const h=10+0.3*dist+lift;
+ const p0=a,p3=b;
+ const p1:[number,number,number]=[a[0],a[1]+h,a[2]+fan],p2:[number,number,number]=[b[0],b[1]+h,b[2]+fan];
  const pts:[number,number,number][]=[];
  for(let i=0;i<n;i++){
-  const t=i/(n-1);
-  pts.push([lerp(a[0],b[0],t),lerp(a[1],b[1],t)+4*t*(1-t)*h,lerp(a[2],b[2],t)]);
+  const t=i/(n-1),m=1-t;
+  const k0=m*m*m,k1=3*m*m*t,k2=3*m*t*t,k3=t*t*t;
+  pts.push([k0*p0[0]+k1*p1[0]+k2*p2[0]+k3*p3[0],k0*p0[1]+k1*p1[1]+k2*p2[1]+k3*p3[1],k0*p0[2]+k1*p1[2]+k2*p2[2]+k3*p3[2]]);
  }
- pts[0]=[a[0],a[1],a[2]];pts[n-1]=[b[0],b[1],b[2]];
  return pts;
 }
 
-/** Lesson camera presets. */
-export const PRESETS:Record<string,{target:[number,number,number];zoom:number}>={
- board:{target:[0,4,0],zoom:1.7},
- blink:{target:[48,5,0],zoom:0.95},button:{target:[48,5,0],zoom:0.95},knob:{target:[48,5,0],zoom:0.95},
- rgb:{target:[48,5,0],zoom:0.95},sound:{target:[48,5,0],zoom:0.95},
- light:{target:[55,5,18],zoom:0.85},motor:{target:[55,5,18],zoom:0.85},servo:{target:[55,5,18],zoom:0.85},
- distance:{target:[62,0,70],zoom:0.55},parking:{target:[66,0,80],zoom:0.5},
+/** Nearest free hole in the same 5-hole strip as the part leg at (x,z): same column, other row. */
+export function freeHoleNear(x:number,z:number):{x:number;z:number}{
+ const col=Math.round((x-holeX(0))/PITCH);
+ let row=0,best=1e9;
+ for(let r=0;r<BB_ROWS;r++){const d=Math.abs(holeZ(r)-z);if(d<best){best=d;row=r;}}
+ const top=row<5;
+ const cand=(top?[0,1,3,4]:[5,6,8,9]).filter(r=>r!==row);
+ const pick=cand[0]!;
+ return {x:holeX(Math.max(0,Math.min(BB_COLS-1,col))),z:holeZ(pick)};
+}
+
+/** Per-lesson camera angles (degrees) and whether the breadboard is part of the framing. */
+export const LESSON_VIEW:Record<string,{az:number;elev:number;board:boolean}>={
+ board:{az:40,elev:38,board:false},
+ blink:{az:32,elev:34,board:true},button:{az:32,elev:34,board:true},knob:{az:32,elev:34,board:true},rgb:{az:32,elev:34,board:true},light:{az:32,elev:34,board:true},
+ distance:{az:40,elev:38,board:true},parking:{az:40,elev:38,board:true},
+ sound:{az:32,elev:34,board:true},motor:{az:34,elev:34,board:true},servo:{az:34,elev:34,board:true},
 };
