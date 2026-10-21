@@ -1,0 +1,1 @@
+export {labFirmware} from './generated';

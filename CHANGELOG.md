@@ -6,6 +6,16 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+### Added
+- Public Arduino lab (`/lab`, `/lab/:lesson`): 11 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
+  - Inspector values are patched into the real firmware bytes (verified against a recompile), line highlighting comes from DWARF line tables, and each lesson has a real success check.
+  - The code view is read-only. Only the declared parameters and the pre-compiled variants can change; there is no in-browser compiler.
+  - Firmware is built offline with `npm run lab:firmware` (arduino-cli, Docker fallback); see docs/lab-firmware.md. Images include ArduinoCore-avr and Servo (LGPL-2.1), noted in THIRD_PARTY_NOTICES.md.
+  - Lab link in the main nav and footer, a public card on Learn, and prerendered SEO pages for each lesson.
+
+### Fixed
+- Lab pin duty is smoothed over time so very short simulation slices do not alias a 490 Hz PWM; LED full brightness is reached at 12 mA.
+
 ## [0.7.0] - 2026-10-14
 
 ### Added

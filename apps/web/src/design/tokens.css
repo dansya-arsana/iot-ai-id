@@ -60,6 +60,15 @@
  --ds-base:250ms;
  --ds-slow:600ms;
 
+ /* Arduino lab (/lab) */
+ --lab-paper:#f6eddd;--lab-paper-deep:#efe3d1;--lab-rail:#e9dcca;--lab-card:#f9f2e5;--lab-card-soft:#faf4e9f7;--lab-code-bg:#f8f0e3;
+ --lab-line:#cec0ad;--lab-line-soft:#e2d7c7;--lab-navy:#18213d;--lab-navy-2:#24304a;--lab-ink:#4f535b;--lab-muted:#696d74;--lab-faint:#ada293;
+ --lab-teal:#1aa3a1;--lab-teal-deep:#3f7f8e;--lab-teal-tint:#1aa3a11f;--lab-trace:#d3bea3;--lab-track:#e3d8ca;
+ --lab-kw:#2a56a3;--lab-kw-tint:#2a56a314;--lab-fn:#c0652d;--lab-str:#5d7f3a;--lab-comment:#9a8f80;--lab-gutter:#aaa59d;--lab-stop:#d9534a;
+ --lab-flash:#f0a53a47;--lab-param-flash:#1aa3a18c;--lab-glow:#fffaf08c;--lab-shadow:#3c2d1480;--lab-shadow-navy:#18213d40;--lab-highlight:#ffffffb3;
+ --lab-cond:'Barlow Semi Condensed',var(--ds-font);--lab-sans:Barlow,var(--ds-font);--lab-mono:'JetBrains Mono',var(--ds-mono);
+ --lab-ease:cubic-bezier(.2,.8,.2,1);--lab-spring:cubic-bezier(.3,1.6,.5,1);--lab-radius:9px;--lab-bw:1.5px;
+
  color-scheme:light;
 }
 @media(max-width:767px){:root{--ds-gutter:6%}}

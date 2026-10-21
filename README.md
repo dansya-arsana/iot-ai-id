@@ -127,6 +127,7 @@ Job flow: the node leases a `detect`, `simulate` or `physical` job and posts it 
 - `packages/runtime-client` and `runtime/local-bridge/mcp-executor.ts`: isolated adapter to pinned MIT Arduino MCP server. Upstream owns board discovery, CLI wrapping, upload, safety preflight and serial capture.
 - `runtime/local-bridge/node-client.ts`: outbound node that syncs contract summaries, leases coordinator jobs and drives the local API within explicit project scope.
 - `docs/adr/002-integrate-first.md`: integration decisions and license boundaries.
+- `docs/lab-firmware.md`: how the /lab Arduino firmware images are built, patched and verified.
 
 SQLite lives under `.data`; build artifacts under `.runtime`. Contracts, agent runs, firmware, observations, failures, repairs and verifications are append-only. Project and experiment status can change. Startup terminates orphan planning/running state without automatically flashing. A project lock and a port lock prevent overlapping operations.
 

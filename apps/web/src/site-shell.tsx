@@ -19,6 +19,7 @@ const primary:NavItem[]=[
  {to:'/hardware',en:'Hardware',id:'Hardware'},
  {to:'/products',en:'Products',id:'Produk'},
  {to:'/learn',en:'Learn',id:'Belajar'},
+ {to:'/lab',en:'Lab',id:'Lab'},
  {to:'/docs',en:'Docs',id:'Dokumentasi'},
 ];
 const groups:{en:string;id:string;items:NavItem[]}[]=[
@@ -84,7 +85,7 @@ export function SiteFooter({className,...rest}:{className?:string;'data-enter'?:
  return <footer className={['ds-footer',className].filter(Boolean).join(' ')} {...(rest['data-enter']?{'data-enter':''}:{})}>
   <div className="ds-footer-brand"><Brand/><p>{tr('The real-world gateway for AI robotics in Indonesia.','Gerbang AI robotika ke Indonesia.')}</p></div>
   <nav aria-label={tr('Footer','Footer')}>
-   <div><span>{tr('Explore','Jelajahi')}</span><Link to="/#scenarios">{tr('Scenarios','Skenario')}</Link><Link to="/hardware">{tr('Hardware library','Pustaka hardware')}</Link><Link to="/learn">{tr('Learn','Belajar')}</Link></div>
+   <div><span>{tr('Explore','Jelajahi')}</span><Link to="/#scenarios">{tr('Scenarios','Skenario')}</Link><Link to="/hardware">{tr('Hardware library','Pustaka hardware')}</Link><Link to="/learn">{tr('Learn','Belajar')}</Link><Link to="/lab">{tr('Arduino lab','Lab Arduino')}</Link></div>
    <div><span>{tr('Build','Bangun')}</span><Link to="/docs">{tr('Docs','Dokumentasi')}</Link><Link to="/api">API</Link>{/* The public host does not link the release assets: members get the installer from their profile. */}{publicHost&&!preview?(member?<Link to="/profile">{tr('Desktop app (profile)','Aplikasi desktop (profil)')}</Link>:<Link to="/partner">{tr('Desktop app: request access','Aplikasi desktop: minta akses')}</Link>):<a href={RELEASES}>{tr('Desktop app','Aplikasi desktop')}</a>}</div>
    <div><span>{tr('Company','Perusahaan')}</span><Link to="/partner">{tr('Partner with us','Jadi partner')}</Link>{can('/products')&&<Link to="/products">{tr('Tested products','Produk teruji')}</Link>}<a href={PARTNERSHIP_BRIEF} download>{tr('Partnership brief','Partnership brief')}</a><Link to="/research">{tr('Research','Riset')}</Link><a href={REPOSITORY}>GitHub <ArrowUpRightIcon size={12}/></a><Link to="/id" hrefLang="id" onClick={()=>rememberRegion('id')}>{tr('Indonesia: SMK program','Program SMK Indonesia')}</Link><Link to="/mitra">{tr('Lab Mitra portal sign in','Masuk portal mitra')}</Link></div>
   </nav>
