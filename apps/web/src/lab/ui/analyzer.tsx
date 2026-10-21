@@ -1,7 +1,7 @@
 import {useEffect,useRef} from 'react';
 import type {MutableRefObject} from 'react';
 import {useLang} from '../../i18n';
-import {PWM_PINS} from '../contract';
+import {CIRCUITS,PWM_PINS} from '../contract';
 import type {LessonId,PinSample,UnoPin} from '../contract';
 import {fmtCycles,fmtTime} from './chip-pill';
 import type {StageApi} from './frame';
@@ -15,9 +15,16 @@ export const WINDOW_MS=2000;
 /** Key pin first, so the lane that matters for the lesson is always on top. */
 const KEY:Record<LessonId,string[]>={
  board:['D13'],blink:['D8'],button:['D8','D2'],knob:['D9','A0'],rgb:['D9','D10','D11'],light:['A1','D8'],
- distance:['D7','D6'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D6','D12','D10','D11','D5'],dht:['D2'],
+ distance:['D7','D6'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D6','D12','D10','D11','D5'],dht:['D2'],oled:['D2','A4','A5'],motion:['D2','D7'],plant:['A0','D8'],remote:['D2','D3','D4'],
 };
-const LABEL:Partial<Record<string,string>>={D7:'TRIG',D6:'ECHO'};
+const SONAR_LABEL:Partial<Record<string,string>>={D7:'TRIG',D6:'ECHO'};
+/** Lane caption: the part pin wired to this board pin in the lesson's circuit (sonar lessons keep TRIG/ECHO). */
+export function pinLabel(id:LessonId,pin:string,ai=false):string|undefined{
+ if(ai)return undefined;
+ if(id==='distance'||id==='parking')return SONAR_LABEL[pin];
+ const wire=CIRCUITS[id]?.wires.find(w=>w.boardPin===pin&&w.boardPin!=='5V'&&w.boardPin!=='GND');
+ return wire?.pin;
+}
 export function lanesFor(id:LessonId,livePins:string[],tx:boolean,max:number,ai=false):{lanes:string[];more:number}{
  const key=ai?[]:KEY[id];
  const all=[...new Set([...key,...livePins.filter(p=>p!=='D1'&&p!=='D0')])].filter(p=>(!ai&&id==='parking')||key.includes(p)||livePins.includes(p));
@@ -174,7 +181,7 @@ export function Analyzer(p:AnalyzerProps){
        <div className="lab-lanes">
         {lanes.map(pin=>(
          <div key={pin} className="lab-lane" data-lane={pin}>
-          <span className="lab-lane-label"><b>{pin}</b><em>{LABEL[pin]??modeGlyph(pin)}</em></span>
+          <span className="lab-lane-label"><b>{pin}</b><em>{pinLabel(p.lessonId,pin,p.ai)??modeGlyph(pin)}</em></span>
           <Lane pin={pin} api={p.api} reduced={p.reduced} markerRef={markerRef} txRef={txRef}/>
           <span className="lab-lane-val">[ {valueOf(pin)} ]</span>
          </div>

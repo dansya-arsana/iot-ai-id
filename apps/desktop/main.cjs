@@ -1,7 +1,10 @@
-const {app, BrowserWindow, dialog} = require('electron');
+const {app, BrowserWindow, dialog, ipcMain} = require('electron');
+const {randomBytes} = require('node:crypto');
+const {askConsent} = require('./consent.cjs');
 const {createWriteStream, mkdirSync, chmodSync} = require('node:fs');
 const {join} = require('node:path');
 const {PORT, startBackend, waitReady, stopBackend} = require('./lifecycle.cjs');
+const consentSecret = randomBytes(32).toString('hex');
 let backend, window, log, stopping = false;
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
@@ -18,11 +21,15 @@ else {
     log = createWriteStream(join(userData, 'backend.log'), {flags: 'a', mode: 0o600});
     const resources = process.resourcesPath;
     try {
-      backend = startBackend(resources, userData, log);
+      backend = startBackend(resources, userData, log, consentSecret);
       await waitReady(backend);
       const url = `http://127.0.0.1:${PORT}`;
+      ipcMain.handle('aiot:consent', (event, port) => {
+        if (!window || event.sender !== window.webContents || new URL(event.senderFrame.url).origin !== url) return null;
+        return askConsent(dialog, window, consentSecret, port);
+      });
       window = new BrowserWindow({width: 1440, height: 960, minWidth: 1000, minHeight: 650,
-        title: 'AIoT', webPreferences: {nodeIntegration: false, contextIsolation: true, sandbox: true}});
+        title: 'AIoT', webPreferences: {nodeIntegration: false, contextIsolation: true, sandbox: true, preload: join(app.getAppPath(), 'preload.cjs')}});
       window.webContents.setWindowOpenHandler(() => ({action: 'deny'}));
       window.webContents.on('will-navigate', (event, target) => {if (new URL(target).origin !== url) event.preventDefault();});
       window.webContents.on('will-redirect', (event, target) => {if (new URL(target).origin !== url) event.preventDefault();});

@@ -6,7 +6,7 @@ import type {LessonId} from '../contract';
 import {Icon} from './icons';
 
 const CONCEPT:Record<LessonId,string>={
- board:'BOARD',blink:'OUTPUT',button:'INPUT',knob:'ADC',rgb:'PWM',light:'LDR',distance:'PULSEIN',sound:'TONE',motor:'TRANSISTOR',servo:'SERVO',parking:'PROJECT',dht:'ONE-WIRE',
+ board:'BOARD',blink:'OUTPUT',button:'INPUT',knob:'ADC',rgb:'PWM',light:'LDR',distance:'PULSEIN',sound:'TONE',motor:'TRANSISTOR',servo:'SERVO',parking:'PROJECT',dht:'ONE-WIRE',oled:'I2C',motion:'RELAY',plant:'I2C + ADC',remote:'NEC IR',
 };
 
 export function LessonStrip({active,done,celebrate,thumbs,reduced,onPick,extra}:{extra?:ReactNode;active:LessonId|null;done:LessonId[];celebrate:LessonId|null;thumbs:Partial<Record<LessonId,string>>;reduced:boolean;onPick:(id:LessonId)=>void}){

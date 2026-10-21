@@ -5,7 +5,13 @@ The `/lab` page shows a "Real board" panel only when it runs on the local API (t
 ## Flow
 
 1. `GET /api/lab/hardware/detect` lists UNO boards (`arduino-cli board list`, FQBN `arduino:avr:uno` or UNO/CH340/FTDI VID:PID).
-2. The human clicks "Authorize this port for 20 minutes" -> `POST /api/lab/hardware/trust`. This writes the same trusted-port map that `POST /api/runtime/trust` uses, but accepts UNO ports (the existing route only accepts the ESP32 candidates). Nothing is uploaded or read without it.
+2. The human clicks "Authorize this port for 20 minutes". In the desktop app the Electron main process then shows a native `dialog.showMessageBox` ("Allow AIoT Lab to upload firmware to UNO on <port>? [Allow for 20 min] [Cancel]"); only "Allow" mints a consent token and hands it to the page through the preload bridge (`window.aiotDesktop.requestConsent`). The page then calls `POST /api/lab/hardware/trust` with that token. This writes the same trusted-port map that `POST /api/runtime/trust` uses, but accepts UNO ports (the existing route only accepts the ESP32 candidates). Nothing is uploaded or read without it, and upload/serial need the trusted port.
+
+### Native consent
+
+- `main.cjs` generates a random secret per launch and passes it to the backend as `AIOT_CONSENT_SECRET` at spawn. The page never sees it.
+- Token `v1.<payload>.<hmac>`: HMAC-SHA256 over `{port, exp (60 s), nonce}` (`apps/desktop/consent.cjs`). `services/api/lab-consent.ts` checks the HMAC, expiry, port match and single use (nonce), else `403 consent_required`.
+- Without the desktop app (plain browser on `127.0.0.1`), `/trust` is refused with a clear message unless the backend runs with `AIOT_LAB_DEV_CONSENT=1` (development only; same behaviour as before).
 3. "Upload" sends the exact flash bytes the simulator runs (base firmware plus patched params). The server converts them to Intel HEX and runs `arduino-cli upload --input-file`, with no recompile, so sim and board run identical bytes.
 4. Serial at 9600 is read with `arduino-cli monitor` and polled by the page. Sim and board lines are shown side by side with timestamps.
 5. The match indicator compares the last 8 lines: same line shapes, then same period (median gap, +-10%) or same value (+-10%). It reports "behaves the same" or "differs: ... check wiring on D8".
@@ -14,8 +20,8 @@ Errors (busy port, unplugged board, missing arduino-cli or AVR core, upload fail
 
 ## Automated tests
 
-- `tests/lab-hardware.test.ts`: server route with a fake bridge (trust gate, expiry, hex bytes, error mapping, serial, board-list parsing, match logic).
-- `tests/e2e/25-lab-hardware.spec.ts`: mocked bridge responses, detection to match, plus the public-host check.
+- `tests/lab-hardware.test.ts`: server route with a fake bridge (trust gate, consent token: forged, replayed, expired, wrong port, dev flag; expiry, hex bytes, error mapping, serial, board-list parsing, match logic).
+- `tests/e2e/25-lab-hardware.spec.ts`: mocked bridge responses (dev fallback sends no token, desktop bridge sends one), detection to match, plus the public-host check.
 
 ## Manual checklist (needs a real UNO)
 

@@ -62,8 +62,14 @@ export class AvrMachine{
   return this.ext[pin]?1:0;
  }
  attachI2c(slave:I2cSlave):void{
-  if(!this.bus){const twi=new AVRTWI(this.cpu,twiConfig,SIM_CLOCK_HZ);this.bus=new TwiBus(twi);twi.eventHandler=this.bus;}
+  if(!this.bus){const twi=new AVRTWI(this.cpu,twiConfig,SIM_CLOCK_HZ);this.bus=new TwiBus(twi);twi.eventHandler=this.bus;this.bus.onActivity=()=>{this.pulseLine('A4');this.pulseLine('A5');};}
   this.bus.attach(slave);
+ }
+ /** A short low pulse (10 us) on an idle-high line, so SDA/SCL show the transaction-level I2C traffic. */
+ pulseLine(pin:UnoPin):void{
+  if(this.monitor.level(pin)!==1)return;
+  this.monitor.record(pin,0,this.cpu.cycles);
+  this.cpu.addClockEvent(()=>this.monitor.record(pin,1,this.cpu.cycles),160);
  }
  setAdc(channel:number,volts:number):void{this.adc.channelValues[channel]=volts;}
  schedule(cycles:number,cb:()=>void):void{this.cpu.addClockEvent(cb,cycles);}

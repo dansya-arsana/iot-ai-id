@@ -23,7 +23,7 @@ Numeric params are top-level non-const globals with a literal initialiser. With 
 
 ## Licensing
 
-The images contain object code of ArduinoCore-avr (LGPL-2.1, github.com/arduino/ArduinoCore-avr) and the Servo library (LGPL-2.1, github.com/arduino-libraries/Servo). Our sketches and the build script are in the repo, so anyone can rebuild and relink the images. arduino-cli is a build-time tool only; no GPL code is in the web bundle.
+The images contain object code of ArduinoCore-avr, including its `Wire` library used by lessons 13 and 15 (LGPL-2.1, github.com/arduino/ArduinoCore-avr) and the Servo library (LGPL-2.1, github.com/arduino-libraries/Servo). Our sketches and the build script are in the repo, so anyone can rebuild and relink the images. arduino-cli is a build-time tool only; no GPL code is in the web bundle.
 
 ## Add a lesson or variant
 

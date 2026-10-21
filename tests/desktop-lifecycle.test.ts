@@ -25,3 +25,7 @@ test('shutdown stops backend and its detached runtime group',async()=>{
 });
 
 test('Windows environment uses executable suffix and PATH delimiter',()=>{const env=backendEnvironment('C:/App/resources','C:/Users/test/AppData',{PATH:'C:/Windows/System32'},'win32');assert.match(env.ARDUINO_CLI_PATH,/arduino-cli\.exe$/);assert.match(env.PATH,/;C:\/Windows\/System32$/);assert.ok(!env.PATH.includes('/opt/homebrew'));});
+test('desktop passes the consent secret to the backend only when given',()=>{
+ assert.equal(backendEnvironment('/r','/u',{PATH:'/usr/bin'},'darwin','abc').AIOT_CONSENT_SECRET,'abc');
+ assert.equal(backendEnvironment('/r','/u',{PATH:'/usr/bin'},'darwin').AIOT_CONSENT_SECRET,undefined);
+});

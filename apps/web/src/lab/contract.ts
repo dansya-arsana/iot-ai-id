@@ -4,7 +4,7 @@
  */
 
 // ---------- lessons ----------
-export const LESSON_IDS=['board','blink','button','knob','rgb','light','distance','sound','motor','servo','parking','dht'] as const;
+export const LESSON_IDS=['board','blink','button','knob','rgb','light','distance','sound','motor','servo','parking','dht','oled','motion','plant','remote'] as const;
 export type LessonId=typeof LESSON_IDS[number];
 export function isLessonId(s:string|null|undefined):s is LessonId{return !!s&&(LESSON_IDS as readonly string[]).includes(s);}
 
@@ -58,6 +58,7 @@ const RAILS:Wire[]=[w('bb','5v-rail','5V','red'),GND_RAIL];
 const ledOn=(id:string,pin:UnoPin,color:LedColor,rId:string):PartSpec[]=>[{id,kind:'led',net:{A:pin,C:'GND'},props:{color}},{id:rId,kind:'resistor',net:{'1':pin},props:{ohms:220,seriesWith:id,role:'series'}}];
 const sonar=(distanceCm:number,shape:'box'|'car'|'ball'|'wall'):PartSpec[]=>[{id:'us1',kind:'hcsr04',net:{VCC:'5V',TRIG:'D7',ECHO:'D6',GND:'GND'},props:{}},{id:'obs1',kind:'obstacle',net:{},props:{target:'us1',distanceCm,shape}}];
 const SONAR_WIRES:Wire[]=[w('us1','VCC','5V','red'),w('us1','TRIG','D7','yellow'),w('us1','ECHO','D6','green'),w('us1','GND','GND','black')];
+const SEG_PINS:UnoPin[]=['D3','D4','D5','D6','D7','D8','D9'];
 export const CIRCUITS:Record<LessonId,Circuit>={
  board:{parts:[],wires:[]},
  blink:{parts:[...ledOn('led1','D8','red','r1')],wires:[w('r1','1','D8','orange'),GND_RAIL]},
@@ -70,6 +71,10 @@ export const CIRCUITS:Record<LessonId,Circuit>={
  motor:{parts:[{id:'q1',kind:'transistor',net:{B:'D6',E:'GND'},props:{model:'NPN'}},{id:'rb',kind:'resistor',net:{'1':'D6'},props:{ohms:1000,role:'base'}},{id:'d1',kind:'diode',net:{K:'5V'},props:{}},{id:'m1',kind:'motor',net:{DRIVE:'D6'},props:{}}],wires:[w('rb','1','D6','orange'),...RAILS]},
  servo:{parts:[{id:'sv1',kind:'servo',net:{SIG:'D9',V:'5V',GND:'GND'},props:{}}],wires:[w('sv1','SIG','D9','orange'),w('sv1','V','5V','red'),w('sv1','GND','GND','black')]},
  dht:{parts:[{id:'dht1',kind:'dht22',net:{VCC:'5V',DATA:'D2',GND:'GND'},props:{tempC:24,humidity:60}},{id:'r1',kind:'resistor',net:{'1':'D2','2':'5V'},props:{ohms:10000,role:'pull-up'}}],wires:[w('dht1','DATA','D2','yellow'),...RAILS]},
+ oled:{parts:[{id:'dht1',kind:'dht22',net:{VCC:'5V',DATA:'D2',GND:'GND'},props:{tempC:24,humidity:60}},{id:'r1',kind:'resistor',net:{'1':'D2','2':'5V'},props:{ohms:10000,role:'pull-up'}},{id:'oled1',kind:'oled-ssd1306',net:{VCC:'5V',SDA:'A4',SCL:'A5',GND:'GND'},props:{}}],wires:[w('dht1','DATA','D2','yellow'),w('oled1','SDA','A4','blue'),w('oled1','SCL','A5','purple'),...RAILS]},
+ motion:{parts:[{id:'rel1',kind:'relay-module',net:{VCC:'5V',GND:'GND',IN:'D7'},props:{trigger:'low'}},{id:'pir1',kind:'pir-hc-sr501',net:{VCC:'5V',OUT:'D2',GND:'GND'},props:{warmupS:2,holdS:1,retrigger:'H'}},{id:'bulb1',kind:'load-lamp',net:{},props:{target:'rel1'}}],wires:[w('pir1','OUT','D2','yellow'),w('rel1','IN','D7','orange'),...RAILS]},
+ plant:{parts:[{id:'lcd1',kind:'lcd1602-i2c',net:{GND:'GND',VCC:'5V',SDA:'A4',SCL:'A5'},props:{}},{id:'soil1',kind:'soil-moisture',net:{VCC:'5V',SIG:'A0',GND:'GND'},props:{wetness:55}},...ledOn('led1','D8','red','r1')],wires:[w('soil1','SIG','A0','yellow'),w('lcd1','SDA','A4','blue'),w('lcd1','SCL','A5','purple'),w('r1','1','D8','orange'),...RAILS]},
+ remote:{parts:[{id:'ir1',kind:'ir-receiver',net:{OUT:'D2',GND:'GND',VCC:'5V'},props:{}},{id:'seg1',kind:'seven-segment',net:{a:'D3',b:'D4',c:'D5',d:'D6',e:'D7',f:'D8',g:'D9',COM:'GND'},props:{color:'red',seriesOhms:220}}],wires:[w('ir1','OUT','D2','yellow'),...SEG_PINS.map((p,i)=>w('seg1','abcdefg'[i]!,p,(['orange','green','blue','purple','white','yellow','orange'] as WireColor[])[i]!)),...RAILS]},
  parking:{parts:[...sonar(60,'car'),...ledOn('ledG','D10','green','rG'),...ledOn('ledY','D11','yellow','rY'),...ledOn('ledR','D12','red','rR'),{id:'bz1',kind:'buzzer',net:{'+':'D5','-':'GND'},props:{}}],wires:[...SONAR_WIRES,w('rG','1','D10','green'),w('rY','1','D11','yellow'),w('rR','1','D12','orange'),w('bz1','+','D5','purple'),GND_RAIL]},
 };
 
@@ -92,6 +97,10 @@ export const FIRMWARE_SPEC:Record<LessonId,{variants:VariantSpec[]}>={
  motor:{variants:[{id:'default',params:[P('topSpeed','uint8',200,60,255,5),P('stepMs','uint8',20,5,100,5)]}]},
  servo:{variants:[{id:'default',params:[P('fromDeg','uint8',10,0,90,5),P('toDeg','uint8',170,90,180,5),P('stepMs','uint8',15,2,50,1)]}]},
  dht:{variants:[{id:'default',params:[P('readEvery','uint16',2000,1000,5000,500)]}]},
+ oled:{variants:[{id:'default',params:[P('readEvery','uint16',2000,1000,5000,500)]}]},
+ motion:{variants:[{id:'default',params:[P('holdMs','uint16',3000,500,10000,500)]}]},
+ plant:{variants:[{id:'default',params:[P('dryBelow','uint8',30,5,90,5)]}]},
+ remote:{variants:[{id:'default',params:[]}]},
  parking:{variants:[{id:'default',params:[P('nearCm','uint16',15,5,50,1),P('farCm','uint16',40,20,150,5)]}]},
 };
 export interface FirmwareParam extends ParamSpec{offset:number;} // byte offset of the little-endian initial value in the flash image

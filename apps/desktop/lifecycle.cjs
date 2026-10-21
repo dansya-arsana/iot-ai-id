@@ -2,15 +2,15 @@ const {spawn} = require('node:child_process');
 const {join, delimiter} = require('node:path');
 const {homedir} = require('node:os');
 const PORT = 8788;
-function backendEnvironment(resources, userData, inherited = process.env, platform = process.platform) {
-  return {...inherited, API_PORT: String(PORT), API_BIND: '127.0.0.1', WEB_PORT: String(PORT),
+function backendEnvironment(resources, userData, inherited = process.env, platform = process.platform, consentSecret = '') {
+  return {...inherited, ...(consentSecret ? {AIOT_CONSENT_SECRET: consentSecret} : {}), API_PORT: String(PORT), API_BIND: '127.0.0.1', WEB_PORT: String(PORT),
     IOT_DB_PATH: join(userData, 'iot.sqlite'), IOT_RUNTIME_BUILDS_PATH: join(userData, 'runtime', 'builds'),
     ARDUINO_CLI_PATH: join(resources, 'bin', platform === 'win32' ? 'arduino-cli.exe' : 'arduino-cli'),
     PATH: [join(resources, 'bin'), ...(platform === 'win32' ? [] : ['/opt/homebrew/bin', '/usr/local/bin']), join(homedir(), '.local/bin'), inherited.PATH || ''].join(platform === 'win32' ? ';' : delimiter)};
 }
-function startBackend(resources, userData, log) {
+function startBackend(resources, userData, log, consentSecret = '') {
   const child = spawn(join(resources, 'bin', process.platform === 'win32' ? 'node.exe' : 'node'), ['--import', 'tsx', 'services/api/server.ts'], {
-    cwd: join(resources, 'runtime'), env: backendEnvironment(resources, userData),
+    cwd: join(resources, 'runtime'), env: backendEnvironment(resources, userData, process.env, process.platform, consentSecret),
     detached: process.platform !== 'win32', stdio: ['ignore', 'pipe', 'pipe']});
   child.stdout.on('data', data => log.write(data));
   child.stderr.on('data', data => log.write(data));

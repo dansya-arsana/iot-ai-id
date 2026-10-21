@@ -7,7 +7,7 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 ## [Unreleased]
 
 ### Added
-- Public Arduino lab (`/lab`, `/lab/:lesson`): 12 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
+- Public Arduino lab (`/lab`, `/lab/:lesson`): 16 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
   - "Bench Record" design in the AIoT system (Archivo, IBM Plex Mono, warm-grey bench, one live-green accent). It shows what really runs: a logic analyzer drawn from the emulated chip's pin history (HIGH/LOW, PWM duty and frequency, analog input, TX), a port map, a live cycle counter and speed, callouts with measured values (LED current, ADC reading, PWM), goals checked from chip data ("D8 toggled 4× · high 500.1 ms"), firmware size, and 3D lesson thumbnails.
   - Inspector values are patched into the real firmware bytes (verified against a recompile), line highlighting comes from DWARF line tables, and each lesson has a real success check.
   - The code view is read-only. Only the declared parameters and the pre-compiled variants can change; there is no in-browser compiler.
@@ -19,6 +19,11 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 - Lab v4 plugin API: a component is a `PartModule` plus a `DeviceDef` (`sim/devices/<kind>.ts`) discovered automatically, with shared open-drain lines, a lazy I2C bus and a UART tap. All existing parts were ported. `npm run lab:new-part` scaffolds a new one. See docs/lab-extending.md and docs/lab-parts/.
 - Lesson 12, DHT22 temperature and humidity: real one-wire timing (18 ms start pulse, 80/80 us answer, 40 bits, checksum), sliders in the sensor popover, serial prints the readings.
 - Real board panel in the lab (desktop app / 127.0.0.1 only): detect a UNO, authorize the port (20 minutes), upload the exact simulator firmware bytes through arduino-cli, read its serial and compare with the simulator ("behaves the same" or "differs, check wiring on D8"). New routes `/api/lab/hardware/*` sit behind the loopback and session checks and refuse upload and serial without trust. The public site shows a note pointing to the desktop app. See docs/lab-hardware.md.
+- Lab parts wave (17 new kinds, all auto-registered): ESP32-DevKitC (38-pin map, model only), Arduino Nano-style board (model only), 9 V battery, 4xAA holder, capacitor (real RC charge and leak), BME280 (I2C 0x76/0x77, real registers, Bosch compensation), OLED SSD1306 (I2C 0x3C, 128x64 buffer from the command and data stream), LCD1602 with PCF8574 backpack (4-bit HD44780), soil moisture, water level, PIR HC-SR501 (settling, hold, jumper), MQ-2 gas (warm-up, DO comparator), IR receiver (NEC), 7-segment, relay module, L298N, and a 12 V load lamp.
+- Lessons 13 to 16 with real compiled firmware: OLED dashboard, Motion light (PIR, relay, lamp), Plant monitor (soil to LCD and alert LED), Remote control (NEC IR to 7-segment).
+- Parts gallery at `/lab/parts` and `/lab/parts/<kind>` (every registered kind rendered with its default props).
+- `DeviceDef.runtime: 'not-emulated'` with an honest "Model only" badge in the gallery and the part popover (ESP32, Nano).
+- Desktop app native consent: authorizing a board for upload opens an OS dialog; the backend only accepts a one-time HMAC token (60 s, one port). Local dev needs `AIOT_LAB_DEV_CONSENT=1`. See docs/lab-hardware.md.
 
 ### Fixed
 - Lab callout pills are measured in layout pixels, so they no longer cover the power jack below 1440 px; the test record wraps instead of clipping on narrow or short screens; framing of lessons 7 and 11 improved.

@@ -2,6 +2,7 @@ import {Link} from 'react-router-dom';
 import {useLang} from '../../i18n';
 import type {LessonId,PartState,SimSnapshot,UnoPin} from '../contract';
 import {PWM_PINS} from '../contract';
+import {oledLitPixels} from '../goals';
 import {fmtCycles,fmtTime} from './chip-pill';
 import type {PinHistory} from './pin-history';
 
@@ -22,7 +23,7 @@ function pinRows(h:PinHistory,pin:UnoPin,s:SimSnapshot):RecordRow[]{
 const part=<K extends PartState['kind']>(s:SimSnapshot,kind:K)=>Object.values(s.parts).find(p=>p.kind===kind) as Extract<PartState,{kind:K}>|undefined;
 
 const KEY:Record<LessonId,UnoPin[]>={
- board:['D13'],blink:['D8'],button:['D8'],knob:['D9'],rgb:['D9','D10','D11'],light:['A1'],distance:['D7'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D12'],dht:['D2'],
+ board:['D13'],blink:['D8'],button:['D8'],knob:['D9'],rgb:['D9','D10','D11'],light:['A1'],distance:['D7'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D12'],dht:['D2'],oled:['D2'],motion:['D2','D7'],plant:['A0','D8'],remote:['D2'],
 };
 const pwmRows=(s:SimSnapshot):RecordRow[]=>{
  const ch=(['D9','D10','D11'] as UnoPin[]).map(p=>`${p} ${Math.round(s.pins[p].duty*100)}%`);
@@ -48,11 +49,28 @@ const distanceRec:Rec=(_h,s,m)=>{
  const e=part(s,'hcsr04');
  return [{k:'echo',v:m.first!==undefined&&m.lastEcho!==undefined?`${Math.round(m.first)} cm → ${Math.round(m.lastEcho)} cm`:`${Math.round(e?.echoCm??0)} cm`},at(s)];
 };
+const extOf=(s:SimSnapshot,t:string)=>{const p=Object.values(s.parts).find(q=>q.kind==='ext'&&q.type===t);return p&&p.kind==='ext'?p.v:null;};
+const oledRec:Rec=(_h,s)=>{
+ const o=extOf(s,'oled-ssd1306'),d=extOf(s,'dht22');
+ return [{k:'oled',v:o?`${oledLitPixels(String(o.fb))} px lit over I2C 0x3C`:'no screen'},...(d&&d.readT!==null?[{k:'dht22',v:`${d.readT} °C · ${d.readH} %RH`}]:[]),at(s)];
+};
+const motionRec:Rec=(_h,s)=>{
+ const r=extOf(s,'relay-module'),p=extOf(s,'pir-hc-sr501');
+ return [{k:'relay',v:r?(r.energized===true?'COM → NO (closed)':'COM → NC (open)'):'none'},{k:'PIR OUT',v:p&&p.out===true?'HIGH (motion)':'LOW'},{k:'clicks',v:`${r?.clicks??0}`},at(s)];
+};
+const plantRec:Rec=(_h,s)=>{
+ const l=extOf(s,'lcd1602-i2c'),so=extOf(s,'soil-moisture');
+ return [{k:'lcd',v:l?`${String(l.line1).trim()} · ${String(l.line2).trim()}`:'no screen'},...(so?[{k:'soil',v:`${so.wetness} % wet · ${so.volts} V`}]:[]),at(s)];
+};
+const remoteRec:Rec=(_h,s)=>{
+ const ir=extOf(s,'ir-receiver'),g=extOf(s,'seven-segment');
+ return [{k:'NEC',v:ir&&Number(ir.frames)>0?`0x${Number(ir.command).toString(16).toUpperCase().padStart(2,'0')} · ${ir.frames} frames`:'waiting'},{k:'7-seg',v:g&&g.glyph!==''?`digit ${String(g.glyph)}`:'blank'},at(s)];
+};
 const parkingRec:Rec=(_h,s,m)=>[
  {k:'lights',v:m.rAt!==undefined&&m.gAt!==undefined?`red at ${Math.round(m.rAt)} cm · green at ${Math.round(m.gAt)} cm`:'red + green seen'},at(s)];
 export const RECORDS:Record<LessonId,Rec>={
  board:generic('board'),blink:generic('blink'),button:generic('button'),knob:generic('knob'),rgb:generic('rgb'),light:generic('light'),
- distance:distanceRec,sound:generic('sound'),motor:generic('motor'),servo:generic('servo'),parking:parkingRec,dht:generic('dht'),
+ distance:distanceRec,sound:generic('sound'),motor:generic('motor'),servo:generic('servo'),parking:parkingRec,dht:generic('dht'),oled:oledRec,motion:motionRec,plant:plantRec,remote:remoteRec,
 };
 /** The sentence the Goal row quotes on a pass. */
 export const quoteOf=(rows:RecordRow[])=>rows.filter(r=>r.k!=='at').slice(0,2).map(r=>`${r.k} ${r.v}`).join(' · ');

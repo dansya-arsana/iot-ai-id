@@ -4,6 +4,7 @@ import {mkdtemp,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {z} from 'zod';
+import {createConsentVerifier} from './lab-consent.js';
 import {BridgeError,type SerialHandle,type UnoBridge} from '../../runtime/local-bridge/uno.js';
 export const UNO_FLASH_MAX=32256;
 export const TRUST_MS=20*60000;
@@ -21,7 +22,7 @@ export function toIntelHex(bytes:Uint8Array):string{
  }
  rows.push(':00000001FF');return rows.join('\n')+'\n';
 }
-const trustSchema=z.object({port:z.string().min(1).max(200),authorize:z.literal(true)}).strict();
+const trustSchema=z.object({port:z.string().min(1).max(200),authorize:z.literal(true),consent:z.string().max(1000).optional()}).strict();
 const uploadSchema=z.object({port:z.string().min(1).max(200),flashBase64:z.string().min(8).max(43008).regex(/^[A-Za-z0-9+/]+={0,2}$/)}).strict();
 const portSchema=z.object({port:z.string().min(1).max(200)}).strict();
 const fail=(status:number,code:string,message:string):HwResult=>({status,data:{error:message,code}});
@@ -32,8 +33,13 @@ const errorResult=(error:unknown):HwResult=>{
  }
  return fail(500,'upload_failed',error instanceof Error?error.message:'Hardware error');
 };
-export function createHardware(options:{bridge:UnoBridge;trusted:Map<string,number>;now?:()=>number}){
+export function createHardware(options:{bridge:UnoBridge;trusted:Map<string,number>;now?:()=>number;consentSecret?:string;devConsent?:boolean}){
  const {bridge,trusted}=options;const now=options.now??Date.now;
+ const secret=options.consentSecret??process.env.AIOT_CONSENT_SECRET??'';
+ // the secret lives in this closure only: remove it from the environment so arduino-cli and other children never inherit it
+ if(options.consentSecret===undefined)delete process.env.AIOT_CONSENT_SECRET;
+ const devConsent=options.devConsent??process.env.AIOT_LAB_DEV_CONSENT==='1';
+ const consent=createConsentVerifier(secret,now);
  let serial:SerialSession|null=null;let serialTimer:ReturnType<typeof setTimeout>|undefined;let busy=false;
  const stopSerial=()=>{if(serial){clearTimeout(serialTimer);serial.handle.close();serial.open=false;serial=null;}};
  async function detectedUno(port:string){const found=await bridge.detect();return{found,board:found.boards.find(b=>b.port===port)};}
@@ -45,9 +51,15 @@ export function createHardware(options:{bridge:UnoBridge;trusted:Map<string,numb
     return{status:200,data:{toolchain:found.toolchain,boards:found.boards,trusted:trust}};
    }
    if(path==='/api/lab/hardware/trust'&&method==='POST'){
-    const input=trustSchema.parse(await readBody());const {board,found}=await detectedUno(input.port);
+    const input=trustSchema.parse(await readBody());
+    // board checks run first so a failed detect does not burn the one-time consent token
+    const {board,found}=await detectedUno(input.port);
     if(!found.toolchain)return fail(424,'toolchain','Arduino toolchain missing');
     if(!board)return fail(404,'no_board','No detected UNO on that port');
+    if(secret){
+     const v=consent.verify(input.consent,input.port);
+     if(v!=='ok')return fail(403,'consent_required',v==='wrong_port'?'Consent was given for a different port':'Approve the upload in the desktop app dialog first');
+    }else if(!devConsent)return fail(403,'consent_required','Board access needs the AIoT desktop app (native approval). For local development set AIOT_LAB_DEV_CONSENT=1');
     const expires=now()+TRUST_MS;trusted.set(input.port,expires);
     return{status:200,data:{trusted:true,port:input.port,expiresAt:new Date(expires).toISOString()}};
    }

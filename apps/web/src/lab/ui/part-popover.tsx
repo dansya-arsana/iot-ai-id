@@ -3,6 +3,7 @@ import type {CSSProperties} from 'react';
 import {useLang} from '../../i18n';
 import type {ControlSpec,PartModule} from '../scene/parts/types';
 import {PARTS_COPY} from '../parts-copy';
+import {deviceRegistry} from '../sim/devices';
 import './part-popover.css';
 
 export type PopoverValue=string|number|boolean;
@@ -71,7 +72,7 @@ export function PartPopover({partId,module,controls:override,title,desc,values,b
   <div ref={ref} className="lab-pop" role="dialog" aria-labelledby={titleId} data-testid={`lab-popover-${partId}`} 
    data-dock="top-left" style={{left:MARGIN,top:MARGIN,maxHeight:Math.max(160,bounds.height-MARGIN*2)}} onKeyDown={onKey}>
    <header className="lab-pop-head">
-    <div><h2 id={titleId}>{title??module.name[lang]}</h2>{line&&<p className="lab-pop-desc">{line}</p>}</div>
+    <div><h2 id={titleId}>{title??module.name[lang]}</h2>{line&&<p className="lab-pop-desc">{line}</p>}{deviceRegistry.get(module.kind)?.runtime==='not-emulated'&&<p className="lab-pop-desc" data-badge="not-emulated"><b>{tr('Model only · not emulated','Model saja · tidak diemulasi')}</b></p>}</div>
     <button type="button" className="lab-x" aria-label={tr('Close','Tutup')} onClick={onClose}>
      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none"/></svg>
     </button>

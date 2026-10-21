@@ -60,7 +60,7 @@ Read user edits from `ctx.props` lazily (when you need the value), not at create
 
 Typed state in the scene: `extState<MyState>(state,'<kind>')` (from `parts/kit`) narrows a `PartState` to your device's state or returns `undefined`.
 
-Footprint: `holes` gives the breadboard column offset of each pin, in pin order (omit for a desk prop); `bodyX` is the body's x extent in mm when it is wider than the legs.
+Footprint: `holes` gives the breadboard column offset of each pin, in pin order (omit for a desk prop); `bodyX` is the body's x extent in mm when it is wider than the legs. The layout reserves breadboard columns for a body that reaches more than 5 mm left or 6 mm right of its legs (PIR, relay, LCD...), so neighbours never hide it; a body wider than the free lanes goes to the back lane. Two lanes only: a lesson can hold about four wide modules, so fold per-pin resistors into a popover input instead of seven resistor parts (see the seven-segment `seriesOhms`).
 
 ## Add a new component (recommended: scaffold)
 
@@ -98,7 +98,9 @@ A lesson is data plus a sketch; unlike a kind it does touch the tables that inde
 3. `lessons.ts`: the lesson text, English and Indonesian (the test checks 3-5 callouts and walkthrough steps, and a 50-160 character SEO description). `goals.ts`: `GOALS` and `READOUTS`.
 4. The per-lesson records the compiler will ask for: `ui/lesson-strip.tsx` (concept chip), `ui/analyzer.tsx` and `ui/test-record.tsx` (key pins), `scene/thumbnails.ts` (card subject), `ui/icons.tsx` (card icon).
 5. `npm run lab:firmware` (needs Docker image `aiot-avr:1.8.8`, colima running) and commit the changed `generated.ts`.
-6. Tests: `tests/lab-lessons.test.ts` count, an integration test that runs the real firmware (see `tests/lab-dht22.test.ts`), and an e2e spec.
+6. Tests: `tests/lab-lessons.test.ts` count, an integration test that runs the real firmware (see `tests/lab-dht22.test.ts`, and `tests/lab-lessons-13-16.test.ts` for I2C displays, a relay and an IR remote read from the real device state), and an e2e spec (`tests/e2e/27-lab-lessons-13-16.spec.ts` shows how to read part states from the live snapshot by wrapping `window.__labScene.update`).
+
+Lessons 13-16 (OLED dashboard, motion light, plant monitor, remote control) are worked examples: the sketches carry their own SSD1306, PCF8574 LCD and NEC drivers on top of `Wire` only, and the goals read the OLED frame buffer, the relay contact, the LCD text and the 7-segment glyph.
 
 ## Testing
 

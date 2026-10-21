@@ -61,6 +61,7 @@ function offBoard(p:PartSpec,all:Record<string,Placement>):Placement{
  const target=typeof p.props.target==='string'?all[p.props.target]:undefined;
  switch(p.kind){
   case 'lamp':return {x:target?target.x:BB_CX,z:58,rotY:0,onBoard:false};
+  case 'load-lamp':return {x:target?target.x-32:BB_CX-32,z:(target?target.z:62)+8,rotY:0,onBoard:false};
   case 'obstacle':return {x:target?target.x+1.5*PITCH:BB_CX,z:target?target.z+14:60,rotY:0,onBoard:false};
   case 'motor':return {x:BB_CX-10,z:62,rotY:0,onBoard:false};
   case 'servo':return {x:BB_CX,z:62,rotY:0,onBoard:false};
@@ -95,12 +96,20 @@ export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
  for(const p of circuit.parts){
   if(!isOnBoardKind(p.kind))continue;
   const w=WIDTH(p.kind);
+  // A module much wider than its legs (PIR, relay, LCD...) reserves columns for its body so neighbours do not hide it.
+  // Small overhangs (the DHT22) and the sonar keep the old tight spacing, so existing lessons lay out exactly as before.
+  const bx=p.kind==='hcsr04'?undefined:BODY_X[p.kind];
+  const lead=bx&&-bx[0]>5?Math.ceil(-bx[0]/PITCH):0;
+  const span=bx&&bx[1]-(w-1)*PITCH>6?Math.ceil(bx[1]/PITCH)+1:w;
   const lanes:number[]=p.kind==='hcsr04'?[SENSOR_ROW]:order(p.kind);
   let lane=lanes[lanes.length-1]!;
-  let col=cursor[lane]??start[lane]??0;
-  for(const l of lanes){const c=cursor[l]??start[l]??0;if(c+w<=BB_COLS&&(!sonar||p.kind==='hcsr04'||c+w<=18||l===lanes[lanes.length-1])){lane=l;col=c;break;}}
+  let col=(cursor[lane]??start[lane]??0)+lead;
+  let fit=false;
+  for(const l of lanes){const c=(cursor[l]??start[l]??0)+lead;if(c+w<=BB_COLS&&c+span<=BB_COLS+2&&(!sonar||p.kind==='hcsr04'||c+w<=18||l===lanes[lanes.length-1])){lane=l;col=c;fit=true;break;}}
+  // a body wider than the free lanes (the 80 mm LCD) goes to the back lane, centred on the board, so the front lane stays free for small parts
+  if(!fit&&span>w){lane=lanes[0]!;col=Math.max(lead,Math.min(col,BB_COLS+2-span));}
   if(col+w>BB_COLS)col=Math.max(0,BB_COLS-w);
-  cursor[lane]=col+w+1;
+  cursor[lane]=col+Math.max(w,span)+1;
   out[p.id]={x:holeX(col),z:holeZ(lane),rotY:0,onBoard:true,holes:pinHoleOffsets(p.kind).map(d=>[col+d,lane] as [number,number])};
  }
  for(const p of circuit.parts){if(!isOnBoardKind(p.kind))out[p.id]=offBoard(p,out);}

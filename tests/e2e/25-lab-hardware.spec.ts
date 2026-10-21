@@ -69,3 +69,17 @@ test('the public host shows only the desktop-app note and cannot reach the hardw
  const res=await page.request.get(`http://iot.admin.localhost:${port}/api/lab/hardware/detect`);
  expect(res.status()).toBe(403);
 });
+
+test('trust sends the native consent token when the desktop bridge exists, none in a plain browser',async({page,baseURL})=>{
+ const bodies:string[]=[];
+ await page.addInitScript(()=>{if(new URLSearchParams(location.search).has('desk'))(window as unknown as {aiotDesktop:unknown}).aiotDesktop={requestConsent:async()=>'v1.p.sig'};});
+ const state=fresh();await mockBridge(page,state);
+ page.on('request',r=>{if(r.url().endsWith('/api/lab/hardware/trust'))bodies.push(r.postData()??'');});
+ await page.goto(`${baseURL}/lab/blink`);await page.getByTestId('lab-run').first().click();
+ await page.getByTestId('hw-authorize').click();await expect(page.getByTestId('hw-trusted')).toBeVisible();
+ expect(JSON.parse(bodies[0]).consent).toBeUndefined();
+ const state2=fresh();await mockBridge(page,state2);
+ await page.goto(`${baseURL}/lab/blink?desk=1`);await page.getByTestId('lab-run').first().click();
+ await page.getByTestId('hw-authorize').click();await expect(page.getByTestId('hw-trusted')).toBeVisible();
+ expect(JSON.parse(bodies[1]).consent).toBe('v1.p.sig');
+});

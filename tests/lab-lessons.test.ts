@@ -17,8 +17,8 @@ function snap(parts:Record<string,PartState>,o:Partial<SimSnapshot>={}):SimSnaps
 const led=(on:boolean,brightness=on?1:0):PartState=>({kind:'led',on,brightness,currentMa:on?10:0,overCurrent:false});
 const run=(id:typeof LESSON_IDS[number],frames:SimSnapshot[])=>{const m:GoalMemory={};let ok=false;for(const f of frames)ok=GOALS[id](f,m);return ok;};
 
-test('12 lessons in order with en+id copy everywhere',()=>{
- assert.equal(LESSONS.length,12);
+test('16 lessons in order with en+id copy everywhere',()=>{
+ assert.equal(LESSONS.length,16);
  assert.deepEqual(LESSONS.map(l=>l.id),[...LESSON_IDS]);
  const check=(v:unknown,path:string)=>{
   if(v&&typeof v==='object'){

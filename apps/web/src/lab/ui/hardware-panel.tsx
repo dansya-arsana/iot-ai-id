@@ -100,6 +100,8 @@ function LocalPanel({variant,params,segs,pins}:Props){
   disconnected:tr('The board was unplugged. Plug it back in and detect again.','Papan terlepas. Colok lagi lalu deteksi ulang.'),
   upload_failed:tr('Upload failed. Check the cable and press reset, then try again.','Upload gagal. Periksa kabel dan tekan reset, lalu coba lagi.'),
   no_board:tr('No UNO found on that port.','Tidak ada UNO di port itu.'),
+  consent_required:tr('Approve the upload in the AIoT desktop dialog. In a browser this needs the desktop app (or AIOT_LAB_DEV_CONSENT=1 for development).','Setujui upload di dialog aplikasi desktop AIoT. Di browser ini butuh aplikasi desktop (atau AIOT_LAB_DEV_CONSENT=1 untuk development).'),
+  consent_denied:tr('Upload not approved. Click Allow in the dialog to continue.','Upload tidak disetujui. Klik Izinkan di dialog untuk lanjut.'),
   not_trusted:tr('Authorize this port first.','Otorisasi port ini dulu.'),
   bad_firmware:tr('This firmware does not fit the UNO.','Firmware ini tidak muat di UNO.'),
   unknown:tr('Something went wrong with the board.','Ada masalah dengan papan.'),

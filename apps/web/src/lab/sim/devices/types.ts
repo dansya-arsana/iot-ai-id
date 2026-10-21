@@ -127,6 +127,8 @@ export interface DeviceDef<S=DeviceState|PartState>{
  defaults?:PartProps;
  /** true for the original builtin kinds whose state() already is a PartState; plugin devices return a flat DeviceState. */
  legacyState?:boolean;
+ /** 'not-emulated': the part is a visual and reference model only (no signal behaviour). The UI shows an honest badge. Default 'emulated'. */
+ runtime?:'emulated'|'not-emulated';
  create(ctx:DeviceCtx):DeviceModel<S>;
 }
 export const defineDevice=<S>(d:DeviceDef<S>):DeviceDef<S>=>d;

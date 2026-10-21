@@ -6,7 +6,7 @@ export interface HwBoard{port:string;label:string;vid:string|null;pid:string|nul
 export interface HwDetect{toolchain:boolean;boards:HwBoard[];trusted:Record<string,string>}
 export interface HwLine{n:number;t:number;text:string}
 export interface HwSerial{open:boolean;end?:{code:string;message?:string};lines:HwLine[]}
-export type HwErrorCode='toolchain'|'busy'|'disconnected'|'upload_failed'|'no_board'|'not_trusted'|'bad_firmware'|'unknown';
+export type HwErrorCode='toolchain'|'busy'|'disconnected'|'upload_failed'|'no_board'|'not_trusted'|'consent_required'|'consent_denied'|'bad_firmware'|'unknown';
 export class HwError extends Error{constructor(readonly code:HwErrorCode,message:string){super(message);}}
 
 /** The panel only exists on the local API (desktop app or local dev), never on the public host. */
@@ -16,7 +16,7 @@ async function call<T>(path:string,init?:RequestInit):Promise<T>{
  try{return await api<T>('/lab/hardware'+path,init);}
  catch(e){
   const message=e instanceof Error?e.message:'Request failed';
-  const known:Record<string,HwErrorCode>={toolchain:'toolchain',busy:'busy',disconnected:'disconnected',upload_failed:'upload_failed',no_board:'no_board',not_trusted:'not_trusted'};
+  const known:Record<string,HwErrorCode>={toolchain:'toolchain',busy:'busy',disconnected:'disconnected',upload_failed:'upload_failed',no_board:'no_board',not_trusted:'not_trusted',consent_required:'consent_required'};
   throw new HwError(known[(e as {code?:string}).code??'']??guessCode(message),message);
  }
 }
@@ -31,7 +31,13 @@ function guessCode(m:string):HwErrorCode{
 }
 export const hw={
  detect:()=>call<HwDetect>('/detect'),
- trust:(port:string)=>call<{trusted:true;expiresAt:string}>('/trust',{method:'POST',body:JSON.stringify({port,authorize:true})}),
+ /** Inside the desktop app a native dialog yields a one-time token; plain browsers send none (server allows that only in dev mode). */
+ trust:async(port:string)=>{
+  const bridge=(globalThis as {aiotDesktop?:{requestConsent(p:string):Promise<string|null>}}).aiotDesktop;
+  let consent:string|undefined;
+  if(bridge){const t=await bridge.requestConsent(port);if(!t)throw new HwError('consent_denied','Not approved');consent=t;}
+  return call<{trusted:true;expiresAt:string}>('/trust',{method:'POST',body:JSON.stringify({port,authorize:true,...(consent?{consent}:{})})});
+ },
  upload:(port:string,flashBase64:string)=>call<{uploaded:true;bytes:number;sha256:string}>('/upload',{method:'POST',body:JSON.stringify({port,flashBase64})}),
  serialStart:(port:string)=>call<{started:true}>('/serial/start',{method:'POST',body:JSON.stringify({port})}),
  serialStop:()=>call<{stopped:true}>('/serial/stop',{method:'POST',body:'{}'}),

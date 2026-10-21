@@ -31,3 +31,5 @@
  .lab--mobile:has(.lab-pop) .lab-dock,.lab--mobile:has(.lab-pop) .lab-run{display:none}
 }
 @keyframes lab-sheet-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.lab-pop-head .lab-x{position:static;flex:none}
