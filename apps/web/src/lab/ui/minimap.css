@@ -1,0 +1,47 @@
+/* Lab parity pack: minimap, focus pills, components panel, rail extras. Bench tokens only. */
+.lab-minimap{position:absolute;left:16px;bottom:16px;z-index:4;width:156px;height:118px;border-radius:var(--lab-r-lg);background:var(--lab-card);border:var(--lab-bw) solid var(--lab-line);box-shadow:var(--lab-shadow-1);overflow:hidden;animation:lab-mini-in var(--lab-d3) var(--lab-ease-out) both}
+.lab-minimap canvas{display:block;cursor:crosshair}
+.lab-minimap-n{position:absolute;top:5px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--lab-mono);font-size:9px;line-height:1;color:var(--lab-ink-2);pointer-events:none}
+.lab-minimap-n i{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid var(--lab-stop)}
+@keyframes lab-mini-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* focused: callout cards shrink to pills with a live dot */
+.lab-callout[data-pill=true]::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--lab-live);box-shadow:0 0 0 3px var(--lab-live-tint)}
+.lab-callout[data-pill=true]{display:flex}
+/* camera hint pill */
+.lab-hint{padding:5px 12px;border-radius:999px;background:var(--lab-card);border:var(--lab-bw) solid var(--lab-line);box-shadow:var(--lab-shadow-1)}
+/* components flyout */
+.lab-comp-head{display:flex;align-items:baseline;gap:8px;margin:0 28px 10px 0}
+.lab-comp-head h2{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.lab-comp-head span{font-family:var(--lab-mono);font-size:12px;color:var(--lab-ink-3)}
+.lab-comp-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.lab-comp-row{display:flex;align-items:center;gap:12px;width:100%;padding:8px;border:0;border-radius:var(--lab-r-md);background:transparent;text-align:left;color:var(--lab-ink);cursor:pointer;transition:background var(--lab-d1) var(--lab-ease)}
+.lab-comp-row:hover,.lab-comp-row[aria-current=true]{background:var(--lab-paper-deep)}
+.lab-comp-row[aria-current=true] .lab-comp-tile{background:var(--lab-ink);color:var(--lab-on-ink);border-color:var(--lab-ink)}
+.lab-comp-tile{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:var(--lab-r-md);border:var(--lab-bw) solid var(--lab-line-strong);background:var(--lab-raised);color:var(--lab-ink-2)}
+.lab-comp-text{display:grid;gap:2px;min-width:0}
+.lab-comp-text strong{font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.lab-comp-text span{font-size:12px;line-height:1.35;color:var(--lab-ink-2)}
+.lab-comp-sep{margin:8px 8px 4px;font-family:var(--lab-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--lab-ink-3)}
+.lab-flyout[data-fly=parts]{width:340px}
+/* rail extras: run button, expand toggle */
+.lab-rail-run[data-running=true]{background:var(--lab-stop);color:var(--lab-on-ink)}
+.lab-rail-run:not([data-running=true]){color:var(--lab-ink)}
+.lab-rail-grow{flex:1}
+.lab-rail[data-expanded=true]{width:168px;align-items:stretch;padding-left:8px;padding-right:8px;box-shadow:var(--lab-shadow-pop)}
+.lab-rail[data-expanded=true] .lab-rail-btn{width:auto;height:44px;flex-direction:row;justify-content:flex-start;gap:12px;padding:0 10px}
+.lab-rail[data-expanded=true] .lab-rail-label{font-size:13px}
+.lab-rail[data-expanded=true] .lab-flyout{left:calc(100% + 10px)}
+.lab-rail-expand svg{transition:transform var(--lab-d2) var(--lab-ease)}
+.lab-rail[data-expanded=true] .lab-rail-expand svg{transform:rotate(180deg)}
+/* settings flyout */
+.lab-set-title{margin:0 28px 10px 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.lab-switch-row small{display:block;color:var(--lab-ink-3);font-size:12px}
+@media (prefers-reduced-motion:reduce){.lab-minimap{animation:none}}
+.lab--reduced .lab-minimap{animation:none}
+/* bottom-left stack: minimap above the controls dock (mobile keeps the dock's own placement) */
+.lab-bl{position:absolute;left:16px;bottom:16px;z-index:4;display:flex;flex-direction:column;align-items:flex-start;gap:10px;pointer-events:none}
+.lab-bl>*{pointer-events:auto}
+.lab-bl .lab-dock,.lab-bl .lab-minimap{position:static}
+.lab--mobile .lab-bl{display:contents}
+.lab--mobile .lab-bl .lab-dock{position:absolute}
+.lab:not(.lab--mobile) .lab-hint{left:auto;right:196px;bottom:18px;transform:none;white-space:nowrap;max-width:none;border-radius:999px}

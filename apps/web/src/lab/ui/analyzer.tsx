@@ -18,8 +18,9 @@ const KEY:Record<LessonId,string[]>={
  distance:['D7','D6'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D6','D12','D10','D11','D5'],
 };
 const LABEL:Partial<Record<string,string>>={D7:'TRIG',D6:'ECHO'};
-export function lanesFor(id:LessonId,livePins:string[],tx:boolean,max:number):{lanes:string[];more:number}{
- const all=[...new Set([...KEY[id],...livePins.filter(p=>p!=='D1'&&p!=='D0')])].filter(p=>id==='parking'||KEY[id].includes(p)||livePins.includes(p));
+export function lanesFor(id:LessonId,livePins:string[],tx:boolean,max:number,ai=false):{lanes:string[];more:number}{
+ const key=ai?[]:KEY[id];
+ const all=[...new Set([...key,...livePins.filter(p=>p!=='D1'&&p!=='D0')])].filter(p=>(!ai&&id==='parking')||key.includes(p)||livePins.includes(p));
  const room=tx?max-1:max;
  const lanes=all.slice(0,room);
  if(tx)lanes.push('TX');
@@ -117,7 +118,7 @@ function Lane({pin,api,reduced,markerRef,txRef}:{pin:string;api:StageApi;reduced
 }
 
 export interface AnalyzerProps{
- api:StageApi;lessonId:LessonId;lanePins:string[];tx:boolean;
+ api:StageApi;lessonId:LessonId;ai?:boolean;lanePins:string[];tx:boolean;
  status:string;simTimeMs:number;speed:number;pins:Record<string,PinSample>|null;
  segs:SerialSeg[];onClear:()=>void;
  record:TestRecordData|null;showRecord:boolean;onShowSignals:()=>void;marker:number|null;
@@ -137,9 +138,10 @@ export function Analyzer(p:AnalyzerProps){
   if(a.length>400)a.splice(0,200);
  }),[p.api]);
  useEffect(()=>{if(!running)return;txRef.current=[];},[running]);
- const max=p.mobile?1:p.compact?2:3;
- const {lanes,more}=lanesFor(p.lessonId,p.lanePins,p.tx&&!p.mobile,max);
  const h=p.api.history();
+ const idleNow=!running&&!(p.record&&p.showRecord);
+ const max=p.mobile?1:p.compact||idleNow?2:3;
+ const {lanes,more}=lanesFor(p.lessonId,p.lanePins,p.tx&&!p.mobile,max,p.ai);
  const hasData=lanes.some(l=>l!=='TX'&&h.trace(l as UnoPin).n>1);
  const txBytes=p.segs.reduce((n,s)=>s.sys?n:n+new TextEncoder().encode(s.text).length,0);
  const lastLine=[...p.segs].reverse().find(s=>!s.sys&&s.text.trim());
@@ -181,7 +183,7 @@ export function Analyzer(p:AnalyzerProps){
         {!p.mobile&&running&&<div className="lab-ruler" aria-hidden="true"><span/><div>{[-2000,-1500,-1000,-500,0].map(t=><i key={t} style={{left:`${(t+WINDOW_MS)/WINDOW_MS*100}%`}}>{t===0?'0 ms':t}</i>)}</div><span/></div>}
        </div>
        {!hasData&&!running&&(
-        <div className="lab-inst-idle"><p>{tr('Press Run. These traces are drawn by the emulated chip, not an animation.','Tekan Jalankan. Jejak ini digambar oleh chip tiruan, bukan animasi.')}</p><small>{p.receipt}</small></div>
+        <div className="lab-inst-idle"><p>{tr('Press Run. These traces come from the emulated chip.','Tekan Jalankan. Jejak ini berasal dari chip tiruan.')}</p><small>{p.receipt}</small></div>
        )}
       </>}
     </div>

@@ -40,9 +40,17 @@ const generic=(id:LessonId)=>(h:PinHistory,s:SimSnapshot):RecordRow[]=>{
  rows.push({k:'at',v:`t=${fmtTime(s.simTimeMs)} · ${fmtCycles(s.simTimeMs)} cyc`});
  return rows.slice(0,5);
 };
-export const RECORDS:Record<LessonId,(h:PinHistory,s:SimSnapshot)=>RecordRow[]>={
+type Rec=(h:PinHistory,s:SimSnapshot,m:Record<string,number>)=>RecordRow[];
+const at=(s:SimSnapshot):RecordRow=>({k:'at',v:`t=${fmtTime(s.simTimeMs)} · ${fmtCycles(s.simTimeMs)} cyc`});
+const distanceRec:Rec=(_h,s,m)=>{
+ const e=part(s,'hcsr04');
+ return [{k:'echo',v:m.first!==undefined&&m.lastEcho!==undefined?`${Math.round(m.first)} cm → ${Math.round(m.lastEcho)} cm`:`${Math.round(e?.echoCm??0)} cm`},at(s)];
+};
+const parkingRec:Rec=(_h,s,m)=>[
+ {k:'lights',v:m.rAt!==undefined&&m.gAt!==undefined?`red at ${Math.round(m.rAt)} cm · green at ${Math.round(m.gAt)} cm`:'red + green seen'},at(s)];
+export const RECORDS:Record<LessonId,Rec>={
  board:generic('board'),blink:generic('blink'),button:generic('button'),knob:generic('knob'),rgb:generic('rgb'),light:generic('light'),
- distance:generic('distance'),sound:generic('sound'),motor:generic('motor'),servo:generic('servo'),parking:generic('parking'),
+ distance:distanceRec,sound:generic('sound'),motor:generic('motor'),servo:generic('servo'),parking:parkingRec,
 };
 /** The sentence the Goal row quotes on a pass. */
 export const quoteOf=(rows:RecordRow[])=>rows.filter(r=>r.k!=='at').slice(0,2).map(r=>`${r.k} ${r.v}`).join(' · ');

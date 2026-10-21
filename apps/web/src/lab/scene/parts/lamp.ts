@@ -19,6 +19,7 @@ function buildLamp(_p:PartProps,g:Group):Inner{
  const cone=new Mesh(new ConeGeometry(18,38,32,1,true),new MeshBasicMaterial({color:C.LAMP_LIGHT,transparent:true,opacity:0.2,depthWrite:false}));
  cone.material.userData.own=true;cone.position.set(0,-25,0);cone.userData.noPick=true;cone.userData.noInk=true;
  head.add(cone);
+ const hs=new Group();hs.name='hotspot';hs.userData.noPick=true;head.add(hs);
  const glow=sprite(glowTexture(),C.LAMP_LIGHT,34,-4,0,false);head.add(glow);
  addShadow(inner,24,24,0.35,6,0,0.03,0);
  const dim=new Color(C.SILVER_DARK),on=new Color(C.LAMP_LIGHT);

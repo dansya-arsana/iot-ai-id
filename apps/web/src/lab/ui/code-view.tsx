@@ -12,7 +12,7 @@ const nf=(n:number)=>n.toLocaleString('en-US');
 
 interface Flash{n:number;lines:number[];params:string[]}
 
-export function CodeView({variant,params,currentLine,running,onRun,onStop,onParam,note,log,hideRun,badge}:{badge?:ReactNode;
+export function CodeView({variant,params,currentLine,running,onRun,onStop,onParam,note,log,hideRun,badge,runLocked}:{runLocked?:boolean;badge?:ReactNode;
  variant:FirmwareVariant;params:ParamValues;currentLine:number|null;running:boolean;
  onRun:()=>void;onStop:()=>void;onParam:(name:string)=>void;note:string|null;log:string|null;hideRun?:boolean;
 }){
@@ -60,7 +60,7 @@ export function CodeView({variant,params,currentLine,running,onRun,onStop,onPara
     <button type="button" className="lab-iconbtn" aria-label={copied?tr('Copied','Tersalin'):tr('Copy','Salin')} title={tr('Copy','Salin')} onClick={copy}><Icon name={copied?'check':'copy'} size={18}/></button>
     <button type="button" className="lab-iconbtn" aria-label={tr('Download .ino','Unduh .ino')} title={tr('Download .ino','Unduh .ino')} onClick={download}><Icon name="download" size={18}/></button>
     <button type="button" className="lab-iconbtn" aria-label={tr('Expand','Perbesar')} title={tr('Expand','Perbesar')} aria-pressed={expanded} onClick={()=>setExpanded(v=>!v)}><Icon name="expand" size={18}/></button>
-    <button type="button" className="lab-run" data-running={running} data-hide={hideRun} data-testid="lab-run" aria-label={running?tr('Stop','Hentikan'):tr('Run','Jalankan')} title={running?tr('Stop','Hentikan'):tr('Run','Jalankan')} onClick={running?onStop:onRun}>
+    <button type="button" className="lab-run" data-running={running} data-hide={hideRun} data-testid="lab-run" aria-label={running?tr('Stop','Hentikan'):tr('Run','Jalankan')} title={runLocked&&!running?tr('Assembling…','Merakit…'):running?tr('Stop','Hentikan'):tr('Run','Jalankan')} disabled={runLocked&&!running} onClick={running?onStop:onRun}>
      {running
       ?<svg key="s" className="lab-run-glyph" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect width="12" height="12" rx="2" fill="currentColor"/></svg>
       :<svg key="p" className="lab-run-glyph" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 1.2v11.6a.6.6 0 0 0 .9.5l9.2-5.8a.6.6 0 0 0 0-1L3.4.7a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>}
@@ -84,8 +84,7 @@ export function CodeView({variant,params,currentLine,running,onRun,onStop,onPara
      })}
     </pre>
    </div>
-   {note&&<p className="lab-note" role="status">{note}</p>}
-   <p className="lab-code-foot" data-log={!!log}>{log?<>{log}</>:tr('Click a highlighted value to change it.','Klik nilai yang disorot untuk mengubahnya.')}</p>
+   <p className="lab-code-foot" data-log={!!log} data-note={!!note} role={note?'status':undefined}>{note?<><Icon name="chip" size={14}/>{note}</>:log?<>{log}</>:tr('Click a highlighted value to change it.','Klik nilai yang disorot untuk mengubahnya.')}</p>
   </section>
  );
 }

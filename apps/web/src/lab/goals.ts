@@ -48,7 +48,7 @@ export const GOALS:Record<LessonId,(s:SimSnapshot,m:GoalMemory)=>boolean>={
   if(!h)return false;
   const was=m.ping??0;
   if(was&&!h.pinging&&h.echoCm!==null){
-   m.seen=(m.seen??0)+1;
+   m.seen=(m.seen??0)+1;m.lastEcho=h.echoCm;
    if(m.first===undefined)m.first=h.echoCm;else if(Math.abs(h.echoCm-m.first)>=1)m.distinct=1;
   }
   m.ping=h.pinging?1:0;
@@ -62,9 +62,9 @@ export const GOALS:Record<LessonId,(s:SimSnapshot,m:GoalMemory)=>boolean>={
  motor:(s)=>{const mo=byKind(s,'motor');return !!mo&&mo.rpm>=0.5*MOTOR_MAX_RPM;},
  servo:(s,m)=>{const v=byKind(s,'servo');return !!v&&range(m,'ang',v.angleDeg)>=90;},
  parking:(s,m)=>{
-  const r=ledById(s,'ledR'),g=ledById(s,'ledG');
-  if(r?.on)m.r=1;
-  if(g?.on)m.g=1;
+  const r=ledById(s,'ledR'),g=ledById(s,'ledG'),h=byKind(s,'hcsr04');
+  if(r?.on){m.r=1;if(h?.echoCm!=null&&m.rAt===undefined)m.rAt=h.echoCm;}
+  if(g?.on){m.g=1;if(h?.echoCm!=null&&m.gAt===undefined)m.gAt=h.echoCm;}
   return !!m.r&&!!m.g;
  },
 };

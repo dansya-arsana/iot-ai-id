@@ -6,7 +6,8 @@ import {buildUno} from './board-uno';
 import {buildBreadboard} from './breadboard';
 import {buildPart,type PartView} from './parts/index';
 import {buildWires,disposeWireTextures,type WireBuild} from './wires';
-import {CameraRig,type ContentRect,type SafeInsets} from './camera';
+import {CameraRig,bindCameraKeys,type CameraPose,type ContentRect,type SafeInsets} from './camera';
+import {createSelectionRing,footprint,type MapRect,type MinimapData} from './selection';
 import {createPicking,type PickEntry} from './picking';
 import {addOutline,disposeMaterialCache,disposeObject,makeHullMaterial,setLineResolution,setMaxAnisotropy} from './materials';
 import {boxCorners,contentBox,contentCorners} from './bounds';
@@ -17,7 +18,7 @@ import {specToCircuit,type CircuitSpec,type SpecStep} from '../circuit-spec';
 import {createAssemblyController,installAssemblyDemo,type AssemblyControl} from './assembly';
 import {EXAMPLE_CLOSE_ALARM} from '../circuit-examples';
 
-export type {ContentRect,SafeInsets};
+export type {ContentRect,SafeInsets,CameraPose,MinimapData,MapRect};
 export interface LabSceneV2 extends LabScene{
  /** Refit the lesson framing to the canvas minus these CSS-px insets (tween 500ms, 0 if reduced motion). */
  setSafeArea(insets:SafeInsets):void;
@@ -64,6 +65,15 @@ export interface LabSceneV3 extends LabSceneV2{
  setInteractive(handlers:InteractiveHandlers|null):void;
  /** "Zoom to it": tween the camera onto a part. Resolves when the camera arrived. Unknown ids resolve immediately. */
  focusPart(id:string):Promise<void>;
+ /** Parity pack: the teal double ring on the desk around a part or board feature (null clears). */
+ selectPart(id:string|null):void;
+ /** Id of the part wearing the selection ring (null: none). */
+ selectedPart():string|null;
+ /** Top-down footprints of the board, breadboard and parts plus the live camera pose, for the minimap. */
+ minimap():MinimapData;
+ /** Slide the camera to a floor point (minimap click) keeping zoom and angle. */
+ recentre(x:number,z:number):void;
+ cameraPose():CameraPose;
 }
 
 const POWER_PINS=new Set(['5V','3V3','GND','VIN']);
@@ -134,6 +144,9 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
  ring.rotation.x=-Math.PI/2;ring.position.y=0.08;ring.visible=false;ring.userData.noPick=true;ring.userData.noInk=true;scene.add(ring);
  let ringT=-1,ringR=100;
 
+ const selRing=createSelectionRing(scene);
+ let selId:string|null=null;
+ const unbindKeys=bindCameraKeys(rig);
  const uno=buildUno();scene.add(uno.group);
  const bb=buildBreadboard();scene.add(bb.group);
  const partsRoot=new Group(),wiresRoot=new Group();scene.add(partsRoot,wiresRoot);
@@ -158,7 +171,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
   const f=(uno.features as Record<string,Object3D|undefined>)[id];
   return f??null;
  };
- const box=new Box3(),vec=new Vector3();
+ const box=new Box3(),ubox=new Box3(),vec=new Vector3();
  const toScreen=(v:Vector3,out:ScreenPoint):ScreenPoint=>{
   rig.camera.updateMatrixWorld();
   v.project(rig.camera);
@@ -169,6 +182,8 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
  /** Hotspot on the visible top surface: top-centre of the real geometry (D13 socket for the digital header). */
  const hotspot=(id:string,obj:Object3D,into:Vector3):Vector3=>{
   if(id==='uno.digital-header')return into.copy(uno.pinAnchor('D13'));
+  const hs=obj.getObjectByName('hotspot');
+  if(hs){hs.updateWorldMatrix(true,false);return into.setFromMatrixPosition(hs.matrixWorld);}
   contentBox([obj],box);
   return box.isEmpty()?into.setFromMatrixPosition(obj.matrixWorld):into.set((box.min.x+box.max.x)/2,box.max.y,(box.min.z+box.max.z)/2);
  };
@@ -215,7 +230,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
  };
 
  const disposeLesson=():void=>{
-  clearRims();
+  clearRims();selRing.set(null);selId=null;
   for(const c of [...partsRoot.children]){partsRoot.remove(c);disposeObject(c);}
   for(const c of [...wiresRoot.children]){wiresRoot.remove(c);disposeObject(c);}
   views=[];byId.clear();entries=[];wires=null;
@@ -323,6 +338,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
    assembly.tick(dtMs);
    wires?.update(snap,dtMs);
    rig.update(dtMs);
+   selRing.update(dtMs,settings.reducedMotion);
    if(hlTarget||hoverHl){hlT+=dtMs;rimMat.uniforms.uOp!.value=0.65+0.25*Math.sin(hlT*0.006);}
    if(ringT>=0){
     ringT+=dtMs;
@@ -362,6 +378,21 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
    scene_.focus(id);
    return new Promise<void>(r=>setTimeout(r,settings.reducedMotion?0:500));
   },
+  selectPart(id:string|null):void{const o=id?resolve(id):null;selId=o?id:null;selRing.set(o);},
+  selectedPart():string|null{return selId;},
+  minimap():MinimapData{
+   const rects:MapRect[]=[];
+   const add=(r:MapRect|null):void=>{if(r)rects.push(r);};
+   add(footprint('uno','uno',uno.group));
+   if(bb.group.visible)add(footprint('breadboard','breadboard',bb.group));
+   for(const {id,view} of views)add(footprint(id,'part',view.group));
+   let x0=1e9,z0=1e9,x1=-1e9,z1=-1e9;
+   for(const r of rects){x0=Math.min(x0,r.x0);z0=Math.min(z0,r.z0);x1=Math.max(x1,r.x1);z1=Math.max(z1,r.z1);}
+   if(!rects.length){x0=-40;x1=40;z0=-40;z1=40;}
+   return {rects,pose:rig.pose(),bounds:{x0,z0,x1,z1}};
+  },
+  recentre(x:number,z:number):void{rig.recentre(new Vector3(x,0,z));},
+  cameraPose():CameraPose{return rig.pose();},
   setSafeArea(i:SafeInsets):void{rig.setSafe(i);},
   contentRect():ContentRect|null{return rig.contentRect();},
   thumbnails(t){
@@ -394,18 +425,38 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
   focus(target:string|null):void{
    if(!target){rig.focus(null);return;}
    const obj=resolve(target);
-   if(obj){contentBox([obj],box);rig.focus(box.getCenter(vec).clone());return;}
-   if(POWER_PINS.has(target)||/^(D\d+|A\d)$/.test(target))rig.focus(uno.pinAnchor(target as BoardPin),2);
+   if(obj){
+    contentBox([obj],box);
+    // big targets (the whole Uno, the breadboard) zoom only as far as keeps them fully in view; small ones get the full 1.8x
+    const diag=box.getSize(new Vector3()).length();
+    const z=Math.max(1,Math.min(1.8,radius*2/(Math.max(diag,24)*1.7)));
+    if(target.startsWith('uno.')){ // a part of the Uno: lean towards the board centre so the USB port, jack and pin labels stay in frame
+     contentBox([uno.group],ubox);
+     const bc=ubox.getCenter(new Vector3()),pc=box.getCenter(new Vector3()),bs=ubox.getSize(new Vector3()).length()*0.35;
+     const g=bc.clone().sub(pc);if(g.length()>1e-6)g.setLength(bs);
+     const gb=box.clone().expandByVector(new Vector3(bs*0.3,0,bs*0.3)).union(box.clone().translate(g));
+     const cs:Vector3[]=[];
+     for(const x of [gb.min.x,gb.max.x])for(const y of [gb.min.y,gb.max.y])for(const zz of [gb.min.z,gb.max.z])cs.push(new Vector3(x,y,zz));
+     const fp2=gb.getCenter(new Vector3());
+     rig.focus(fp2,Math.max(1.25,Math.min(1.8,rig.zoomThatFits(cs,fp2))));return;
+    }
+    rig.focus(box.getCenter(vec).clone(),z);return;
+   }
+   if(POWER_PINS.has(target)||/^(D\d+|A\d)$/.test(target)){
+    contentBox([uno.group],ubox);
+    rig.focus(uno.pinAnchor(target as BoardPin).clone().lerp(ubox.getCenter(new Vector3()),0.5),1.25);
+   }
   },
   highlight(target:string|null):void{hlTarget=target;applyHighlight();},
   setSettings(s:Partial<SceneSettings>):void{
    Object.assign(settings,s);
    dots.visible=settings.grid;rig.autoRotate=settings.autoRotate;rig.reducedMotion=settings.reducedMotion;
+   canvas.dataset.grid=String(settings.grid);canvas.dataset.turntable=String(settings.autoRotate);
   },
   zoomLevel():number{return rig.zoomLevel();},
   dispose():void{
    interactive.handlers=null;assembly.cancel();
-   picking.dispose();
+   picking.dispose();unbindKeys();selRing.dispose();
    disposeLesson();
    uno.dispose();bb.dispose();
    disposeObject(ground);disposeObject(dots);ring.geometry.dispose();disposeObject(ring);

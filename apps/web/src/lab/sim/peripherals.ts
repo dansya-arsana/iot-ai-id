@@ -137,7 +137,7 @@ function build(spec:PartSpec,props:PartProps,env:Env,all:()=>PartModel[]):PartMo
      busy=true;lastTrig=cycle;
      env.schedule(4000,()=>{
       const d=dist();
-      const width=d!==null&&d<=400?Math.round(d*58*16):Math.round(SIM_CLOCK_HZ*0.038);
+      const width=d!==null&&d<=400?(Math.round(d*58)+29)*16:Math.round(SIM_CLOCK_HZ*0.038);
       env.setPin(echo,true);
       env.schedule(width,()=>{env.setPin(echo,false);busy=false;});
      });

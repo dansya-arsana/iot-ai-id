@@ -3,8 +3,11 @@ import {setMmPerPx} from './materials';
 
 export interface SafeInsets{top:number;right:number;bottom:number;left:number}
 export interface ContentRect{x:number;y:number;w:number;h:number}
+/** Camera pose for the minimap: look-at point on the floor (mm), azimuth (rad, 0 = looking toward -z), visible half extents (mm). */
+export interface CameraPose{x:number;z:number;az:number;halfW:number;halfH:number;zoom:number}
 
 const DUR=500;
+const IDLE_MS=2500; // turntable waits this long after the last user camera input
 const FILL=0.93;
 const ease=(t:number):number=>t<0.5?4*t*t*t:1-(-2*t+2)**3/2;
 const rad=(d:number):number=>(d*Math.PI)/180;
@@ -21,7 +24,15 @@ export class CameraRig{
  private insets:SafeInsets={top:0,right:0,bottom:0,left:0};
  private tw:{t:number;ft:Vector3;fz:number;faz:number;tt:Vector3;tz:number;taz:number}|null=null;
  private tmp=new Vector3();private r=new Vector3();private u=new Vector3();
+ private idleMs=IDLE_MS;private mx=0;private my=0;
  constructor(){this.apply();}
+ /** Any user camera input restarts the turntable idle timer. */
+ touch():void{this.idleMs=0;}
+ /** Held-key pan: x = right(+)/left(-), y = forward(+)/back(-), each -1..1. Applied per frame in update(). */
+ setMove(x:number,y:number):void{this.mx=x;this.my=y;if(x||y){this.touch();this.tw=null;}}
+ pose():CameraPose{return {x:this.target.x,z:this.target.z,az:this.az,halfW:this.halfH()*this.aspect,halfH:this.halfH(),zoom:this.zoom};}
+ /** Slide the view to a floor point, keeping zoom and angle. */
+ recentre(p:Vector3):void{this.touch();this.glideTo(new Vector3(p.x,this.target.y,p.z),this.tw?this.tw.tz:this.zoom,this.tw?this.tw.taz:this.az,false);}
 
  /** Set the lesson framing: 8 world-space bbox corners and the view angles in degrees. */
  setContent(corners:Vector3[],azDeg:number,elevDeg:number,instant:boolean):void{
@@ -31,7 +42,9 @@ export class CameraRig{
   this.glideTo(this.fitTarget,1,this.az,instant);
  }
  setSafe(i:SafeInsets):void{
-  this.insets={...i};this.computeFit();this.glideTo(this.fitTarget,1,this.az,false);
+  this.insets={...i};this.computeFit();
+  // a visibility toggle must not undo a focused or user-moved view: only re-glide when the camera is sitting on the fit
+  if(this.tw?this.tw.tz===1:Math.abs(this.zoom-1)<0.001)this.glideTo(this.fitTarget,1,this.az,false);
  }
  /** Keep an in-flight or settled fit pinned to the freshly computed fit (resize before/while tweening). */
  private followFit():void{
@@ -67,7 +80,7 @@ export class CameraRig{
   this.tw={t:0,ft:this.target.clone(),fz:this.zoom,faz:this.az,tt:t.clone(),tz:cz,taz:az};
  }
  pan(dxPx:number,dyPx:number,viewHeightPx:number):void{
-  this.tw=null;
+  this.tw=null;this.touch();
   const mpp=(2*this.halfH())/Math.max(1,viewHeightPx);
   const rx=Math.cos(this.az),rz=-Math.sin(this.az),fx=-Math.sin(this.az),fz=-Math.cos(this.az);
   const k=mpp/Math.sin(this.elev);
@@ -75,22 +88,41 @@ export class CameraRig{
   this.apply();
  }
  zoomBy(f:number):void{
+  this.touch();
   const z=MathUtils.clamp((this.tw?this.tw.tz:this.zoom)*f,0.6,4);
   if(this.reducedMotion){this.zoom=z;this.tw=null;this.apply();return;}
   this.tw={t:0,ft:this.target.clone(),fz:this.zoom,faz:this.az,tt:(this.tw?this.tw.tt:this.target).clone(),tz:z,taz:this.tw?this.tw.taz:this.az};
  }
  rotate(dir:1|-1):void{
+  this.touch();
   const taz=(this.tw?this.tw.taz:this.az)+dir*Math.PI/2;
   if(this.reducedMotion){this.az=taz;this.tw=null;this.apply();return;}
   this.tw={t:0,ft:this.target.clone(),fz:this.zoom,faz:this.az,tt:(this.tw?this.tw.tt:this.target).clone(),tz:this.tw?this.tw.tz:this.zoom,taz};
  }
  reset():void{
+  this.touch();
   const az=Math.round(this.az/(Math.PI*2))*Math.PI*2+this.baseAz;
   this.glideTo(this.fitTarget,1,az,false);
  }
- focus(p:Vector3|null,zoomIn=1.6):void{
+ focus(p:Vector3|null,zoomIn=1.8):void{
+  this.touch();
   if(!p){this.reset();return;}
   this.glideTo(p,zoomIn,this.az,false);
+ }
+ /** Largest zoom at which the box corners, seen around centre c, still sit inside the safe rect. */
+ zoomThatFits(corners:Vector3[],c:Vector3):number{
+  const az=this.tw?this.tw.taz:this.az;
+  const r=new Vector3(Math.cos(az),0,-Math.sin(az));
+  const u=new Vector3(-Math.sin(az)*Math.sin(this.elev),Math.cos(this.elev),-Math.cos(az)*Math.sin(this.elev));
+  const {top,right,bottom,left}=this.insets;
+  const ppm=this.h/(2*this.fitHalf);
+  let z=4;
+  for(const k of corners){
+   const d=k.clone().sub(c),dx=d.dot(r),dy=d.dot(u);
+   if(Math.abs(dx)>1e-6)z=Math.min(z,(dx>0?this.w/2-right:this.w/2-left)/(Math.abs(dx)*ppm));
+   if(Math.abs(dy)>1e-6)z=Math.min(z,(dy>0?this.h/2-top:this.h/2-bottom)/(Math.abs(dy)*ppm));
+  }
+  return Math.max(0.6,z);
  }
  zoomLevel():number{return this.zoom;}
  private halfH():number{return this.fitHalf/this.zoom;}
@@ -108,7 +140,13 @@ export class CameraRig{
  }
  update(dtMs:number):void{
   let dirty=false;
-  if(this.tw){
+  this.idleMs+=dtMs;
+  if((this.mx||this.my)&&dtMs>0){
+   const k=this.halfH()*1.4*dtMs/1000;
+   const rx=Math.cos(this.az),rz=-Math.sin(this.az),fx=-Math.sin(this.az),fz=-Math.cos(this.az);
+   this.target.x+=(rx*this.mx+fx*this.my)*k;this.target.z+=(rz*this.mx+fz*this.my)*k;
+   this.idleMs=0;dirty=true;
+  }else if(this.tw){
    const w=this.tw;w.t=Math.min(1,w.t+dtMs/DUR);
    const e=ease(w.t);
    this.target.lerpVectors(w.ft,w.tt,e);
@@ -116,7 +154,7 @@ export class CameraRig{
    this.az=MathUtils.lerp(w.faz,w.taz,e);
    if(w.t>=1)this.tw=null;
    dirty=true;
-  }else if(this.autoRotate&&!this.reducedMotion){this.az+=dtMs*0.00012;dirty=true;}
+  }else if(this.autoRotate&&!this.reducedMotion&&this.idleMs>=IDLE_MS){this.az+=dtMs*0.00012;dirty=true;}
   if(dirty)this.apply();
  }
  /** Re-apply camera + hull scale (after offscreen renders changed the shared scale). */
@@ -129,4 +167,27 @@ export class CameraRig{
   c.position.copy(this.tmp);c.lookAt(this.target);c.updateMatrixWorld();
   setMmPerPx(2*h/this.h);
  }
+}
+
+/**
+ * Keyboard pan for the stage: W/A/S/D move the view over the floor while held. Ignored while typing in a field.
+ * Q/E/+/-/R stay in the page-level handler. Returns the unbind function.
+ */
+export function bindCameraKeys(rig:CameraRig,target:Window=window):()=>void{
+ const held=new Set<string>();
+ const typing=(t:EventTarget|null):boolean=>{
+  const el=t as HTMLElement|null;const tag=el?.tagName;
+  return tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||!!el?.isContentEditable;
+ };
+ const push=():void=>rig.setMove((held.has('d')?1:0)-(held.has('a')?1:0),(held.has('w')?1:0)-(held.has('s')?1:0));
+ const down=(e:KeyboardEvent):void=>{
+  if(e.metaKey||e.ctrlKey||e.altKey||typing(e.target))return;
+  const k=e.key.toLowerCase();
+  if(k!=='w'&&k!=='a'&&k!=='s'&&k!=='d')return;
+  held.add(k);push();
+ };
+ const up=(e:KeyboardEvent):void=>{held.delete(e.key.toLowerCase());push();};
+ const clear=():void=>{held.clear();push();};
+ target.addEventListener('keydown',down);target.addEventListener('keyup',up);target.addEventListener('blur',clear);
+ return ()=>{target.removeEventListener('keydown',down);target.removeEventListener('keyup',up);target.removeEventListener('blur',clear);clear();};
 }

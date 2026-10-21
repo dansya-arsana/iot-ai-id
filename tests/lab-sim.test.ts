@@ -226,11 +226,11 @@ test('hcsr04 echo width for 40 cm',()=>{
  f.setNow(1000);us.onEdge!('D7',1,1000);
  f.setNow(1000+200);us.onEdge!('D7',0,1200);
  f.advanceTo(1200+4000);
- f.advanceTo(1200+4000+37120);
+ f.advanceTo(1200+4000+37584);
  const up=f.events.find(e=>e.pin==='D6'&&e.level);
  const down=f.events.find(e=>e.pin==='D6'&&!e.level);
  assert.ok(up&&down);
- assert.ok(Math.abs(down.at-up.at-37120)<=16);
+ assert.ok(Math.abs(down.at-up.at-37584)<=16);
  assert.equal(up.at,5200);
  const st=us.state();
  if(st.kind==='hcsr04')assert.equal(st.echoCm,40);

@@ -3,13 +3,16 @@
 .lab-pop[data-side=left]{transform-origin:right center}
 .lab-pop[data-side=right]{transform-origin:left center}
 @keyframes lab-pop-in{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
-.lab-pop-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:12px 8px 8px 14px;border-bottom:var(--lab-bw) solid var(--lab-line)}
-.lab-pop-head h2{margin:2px 0 0;font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.lab-pop-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:12px 8px 8px 14px;border-bottom:var(--lab-bw) dashed var(--lab-line-strong)}
+.lab-pop-head h2{margin:2px 0 0;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;line-height:1.2}
+.lab-pop-desc{margin:5px 0 0;font-size:12px;line-height:1.4;color:var(--lab-ink-2)}
+.lab-pop-hint{margin:-4px 0 0;text-align:center;font-family:var(--lab-mono);font-size:11px;color:var(--lab-ink-3)}
+.lab-pop{overflow:auto}
 .lab-pop-body{display:flex;flex-direction:column;gap:14px;padding:12px 14px 14px}
 .lab-pop-field{display:flex;flex-direction:column;gap:8px}
-.lab-pop-field>label{display:flex;justify-content:space-between;align-items:baseline;color:var(--lab-ink-2)}
+.lab-pop-field>label{text-transform:uppercase;letter-spacing:.06em;font-size:11px;display:flex;justify-content:space-between;align-items:baseline;color:var(--lab-ink-2)}
 .lab-pop-field output{font-family:var(--lab-mono);font-size:12px;color:var(--lab-ink)}
-.lab-pop-label{color:var(--lab-ink-2)}
+.lab-pop-label{color:var(--lab-ink-2);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
 .lab-pop-field input[type=range]{width:100%}
 .lab-pop-chips{display:flex;flex-wrap:wrap;gap:6px}
 .lab-pop-chip{height:30px;padding:0 12px;border:var(--lab-bw) solid var(--lab-line-strong);border-radius:999px;background:var(--lab-raised);color:var(--lab-ink-2);font-weight:600;font-size:12px;cursor:pointer;transition:background var(--lab-d1) var(--lab-ease),color var(--lab-d1) var(--lab-ease)}
@@ -20,3 +23,11 @@
 .lab-pop :focus-visible,.lab-canvas:focus-visible{outline:2px solid var(--lab-ink);outline-offset:2px}
 .lab-canvas:focus-visible{outline-offset:-3px}
 @media (prefers-reduced-motion:reduce){.lab-pop{animation:none}.lab-pop-chip{transition:none}}
+/* phones: the popover is a bottom sheet over the page (the stage stays visible above it); the dock steps aside while it is open */
+@media (max-width:767px){
+ .lab-pop{position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:calc(64px + env(safe-area-inset-bottom,0px))!important;width:auto;max-width:none;max-height:42svh!important;border-radius:var(--lab-r-lg) var(--lab-r-lg) 0 0;box-shadow:var(--lab-shadow-pop);z-index:40;animation:lab-sheet-in var(--lab-d2) var(--lab-ease-out) both}
+ .lab-pop-head{padding:10px 8px 6px 14px}
+ .lab-pop-body{gap:10px;padding:10px 14px 12px}
+ .lab--mobile:has(.lab-pop) .lab-dock{display:none}
+}
+@keyframes lab-sheet-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}

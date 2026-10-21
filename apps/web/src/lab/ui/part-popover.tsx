@@ -1,13 +1,18 @@
-import {useEffect,useId,useLayoutEffect,useRef,useState} from 'react';
+import {useEffect,useId,useRef} from 'react';
 import type {CSSProperties} from 'react';
 import {useLang} from '../../i18n';
 import type {ControlSpec,PartModule} from '../scene/parts/types';
+import {PARTS_COPY} from '../parts-copy';
 import './part-popover.css';
 
 export type PopoverValue=string|number|boolean;
 export interface PartPopoverProps{
  partId:string;
  module:PartModule;
+ /** Replace the module's controls (threshold popovers: sliders mapped to firmware params). */
+ controls?:readonly ControlSpec[];
+ title?:string;
+ desc?:string;
  /** Current values by control key (props merged with live sim inputs). */
  values:Readonly<Record<string,PopoverValue|undefined>>;
  /** Anchor in CSS px, relative to `bounds` (the canvas). */
@@ -19,7 +24,7 @@ export interface PartPopoverProps{
  onClose():void;
 }
 
-const GAP=14,MARGIN=10;
+const MARGIN=12;
 
 function Range({c,value,onChange,label}:{c:Extract<ControlSpec,{type:'range'}>;value:number;onChange:(v:number)=>void;label:string}){
  const id=useId();
@@ -34,28 +39,20 @@ function Range({c,value,onChange,label}:{c:Extract<ControlSpec,{type:'range'}>;v
 }
 
 /** Generic part popover: renders a PartModule's interact.controls (choice chips, range sliders, toggles, actions). */
-export function PartPopover({partId,module,values,at,bounds,onChange,onFocusPart,onClose}:PartPopoverProps){
+export function PartPopover({partId,module,controls:override,title,desc,values,bounds,onChange,onFocusPart,onClose}:PartPopoverProps){
  const {tr,lang}=useLang();
  const ref=useRef<HTMLDivElement>(null);
- const [pos,setPos]=useState<{left:number;top:number;side:'right'|'left'}>({left:at.x+GAP,top:at.y,side:'right'});
- const controls=module.interact?.controls??[];
+ const controls=override??module.interact?.controls??[];
  const titleId=useId();
-
- useLayoutEffect(()=>{
-  const el=ref.current;if(!el)return;
-  const w=el.offsetWidth,h=el.offsetHeight;
-  let side:'right'|'left'='right',left=at.x+GAP;
-  if(left+w>bounds.width-MARGIN){side='left';left=at.x-GAP-w;}
-  left=Math.max(MARGIN,Math.min(bounds.width-w-MARGIN,left));
-  const top=Math.max(MARGIN,Math.min(bounds.height-h-MARGIN,at.y-h/2));
-  setPos({left,top,side});
- },[at.x,at.y,bounds.width,bounds.height,controls.length]);
+ const line=desc??(()=>{const d=PARTS_COPY[module.kind]?.desc[lang]??'';const m=/^.*?[.!?](\s|$)/.exec(d);return (m?m[0]:d).trim();})();
+ const draggable=!!module.interact?.drag&&module.interact.drag.handle!=='press';
 
  useEffect(()=>{
   const el=ref.current;
   const prev=document.activeElement as HTMLElement|null;
   el?.querySelector<HTMLElement>('input,button')?.focus({preventScroll:true});
-  const onDoc=(e:PointerEvent):void=>{if(el&&!el.contains(e.target as Node))onClose();};
+  // pointer-down outside closes it, except on the 3D stage: dragging the part must keep the popover open and live
+  const onDoc=(e:PointerEvent):void=>{const t=e.target as HTMLElement|null;if(el&&!el.contains(t)&&!t?.closest('canvas.lab-canvas,[data-testid=lab-run],.lab-rail-run,.lab-code-card,.lab-dock,.lab-viewbar,.lab-minimap'))onClose();};
   document.addEventListener('pointerdown',onDoc,true);
   return ()=>{document.removeEventListener('pointerdown',onDoc,true);if(prev&&prev.isConnected)prev.focus({preventScroll:true});};
  },[partId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -71,10 +68,10 @@ export function PartPopover({partId,module,values,at,bounds,onChange,onFocusPart
  };
 
  return (
-  <div ref={ref} className="lab-pop" role="dialog" aria-labelledby={titleId} data-testid={`lab-popover-${partId}`} data-side={pos.side}
-   style={{left:pos.left,top:pos.top}} onKeyDown={onKey}>
+  <div ref={ref} className="lab-pop" role="dialog" aria-labelledby={titleId} data-testid={`lab-popover-${partId}`} 
+   data-dock="top-left" style={{left:MARGIN,top:MARGIN,maxHeight:Math.max(160,bounds.height-MARGIN*2)}} onKeyDown={onKey}>
    <header className="lab-pop-head">
-    <div><span className="lab-eyebrow">{tr('PART','KOMPONEN')}</span><h2 id={titleId}>{module.name[lang]}</h2></div>
+    <div><h2 id={titleId}>{title??module.name[lang]}</h2>{line&&<p className="lab-pop-desc">{line}</p>}</div>
     <button type="button" className="lab-x" aria-label={tr('Close','Tutup')} onClick={onClose}>
      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none"/></svg>
     </button>
@@ -104,6 +101,7 @@ export function PartPopover({partId,module,values,at,bounds,onChange,onFocusPart
      }
      return <button key={i} type="button" className="lab-btn-ghost lab-pop-action" data-testid="lab-pop-focus" onClick={onFocusPart}>{label}</button>;
     })}
+    {draggable&&<p className="lab-pop-hint">{tr('or drag it in the scene','atau seret di adegan')}</p>}
    </div>
   </div>
  );

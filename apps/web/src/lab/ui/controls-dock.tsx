@@ -6,12 +6,14 @@ import {Icon} from './icons';
 
 export type Inputs=Record<string,PartInput>;
 
-export function ControlsDock({circuit,inputs,onInput}:{circuit:Circuit;inputs:Inputs;onInput:(id:string,i:PartInput)=>void}){
+export function ControlsDock({circuit,inputs,onInput,hideId,visibleIds,fold}:{circuit:Circuit;inputs:Inputs;onInput:(id:string,i:PartInput)=>void;hideId?:string|null;visibleIds?:ReadonlySet<string>|null;fold?:boolean}){
  const {tr}=useLang();
  const items=circuit.parts.filter(p=>p.kind==='button'||p.kind==='potentiometer'||p.kind==='lamp'||p.kind==='obstacle');
+ // one source of truth: while the part popover is open, its slider replaces the dock's (kept in the DOM, visually collapsed)
+ const folded=(p:{id:string;kind:string})=>!!fold||p.id===hideId||(!!visibleIds&&!visibleIds.has(p.id));
  if(!items.length)return null;
  return (
-  <div className="lab-dock">
+  <div className="lab-dock" data-folded={items.every(folded)}>
    {items.map(p=>{
     const cur=inputs[p.id];
     if(p.kind==='button'){
@@ -42,7 +44,7 @@ export function ControlsDock({circuit,inputs,onInput}:{circuit:Circuit;inputs:In
      );
     }
     const r=INPUT_RANGES.obstacle,v=cur?.kind==='obstacle'?cur.distanceCm:Number(p.props.distanceCm??40);
-    return <label key={p.id} className="lab-slider" data-testid={`lab-control-${p.id}`}><span>{tr('Obstacle distance','Jarak halangan')}</span><output>{Math.round(v)} cm</output>
+    return <label key={p.id} className="lab-slider" data-folded={folded(p)} data-testid={`lab-control-${p.id}`}><span>{tr('Obstacle distance','Jarak halangan')}</span><output>{Math.round(v)} cm</output>
      <input className="lab-range" data-analog type="range" min={r.min} max={r.max} step={1} value={v} aria-label={tr('Obstacle distance','Jarak halangan')} style={{'--fill':`${(v-r.min)/(r.max-r.min)*100}%`} as CSSProperties} onChange={e=>onInput(p.id,{kind:'obstacle',distanceCm:Number(e.target.value)})}/></label>;
    })}
   </div>

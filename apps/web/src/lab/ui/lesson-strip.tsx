@@ -1,4 +1,4 @@
-import {useEffect,useRef} from 'react';
+import {useEffect,useLayoutEffect,useRef} from 'react';
 import type {ReactNode} from 'react';
 import {useLang} from '../../i18n';
 import {LESSONS} from '../lessons';
@@ -9,20 +9,40 @@ const CONCEPT:Record<LessonId,string>={
  board:'BOARD',blink:'OUTPUT',button:'INPUT',knob:'ADC',rgb:'PWM',light:'LDR',distance:'PULSEIN',sound:'TONE',motor:'TRANSISTOR',servo:'SERVO',parking:'PROJECT',
 };
 
-export function LessonStrip({active,done,celebrate,thumbs,reduced,onPick,extra}:{extra?:ReactNode;active:LessonId;done:LessonId[];celebrate:LessonId|null;thumbs:Partial<Record<LessonId,string>>;reduced:boolean;onPick:(id:LessonId)=>void}){
+export function LessonStrip({active,done,celebrate,thumbs,reduced,onPick,extra}:{extra?:ReactNode;active:LessonId|null;done:LessonId[];celebrate:LessonId|null;thumbs:Partial<Record<LessonId,string>>;reduced:boolean;onPick:(id:LessonId)=>void}){
  const {tr,lang}=useLang();
  const scroller=useRef<HTMLDivElement>(null);
- const by=(d:number)=>scroller.current?.scrollBy({left:d*456,behavior:reduced?'auto':'smooth'});
+ const GAP=12;
+ const cardStep=():number=>{const c=scroller.current?.querySelector<HTMLElement>('.lab-card-lesson');return c?c.offsetWidth+GAP:0;};
+ const perView=():number=>{const sc=scroller.current;const st=cardStep();return sc&&st?Math.max(1,Math.round((sc.clientWidth+GAP-8)/st)):1;};
+ const by=(d:number)=>{const sc=scroller.current,st=cardStep();if(!sc||!st)return;sc.scrollTo({left:Math.round(sc.scrollLeft/st+d*Math.max(1,perView()-1))*st,behavior:reduced?'auto':'smooth'});};
+ // size the viewport to a whole number of cards so no card is ever cut off at either end (desktop; on mobile the strip swipes)
+ useLayoutEffect(()=>{
+  const sc=scroller.current,strip=sc?.parentElement;
+  if(!sc||!strip)return;
+  const fit=()=>{
+   const st=cardStep();
+   if(!st||getComputedStyle(strip.querySelector('.lab-strip-arrow')!).display==='none'){sc.style.width='';sc.style.flex='';return;}
+   let other=0,n=0;
+   for(const ch of Array.from(strip.children)){if(ch!==sc){other+=(ch as HTMLElement).offsetWidth;n++;}}
+   const room=strip.clientWidth-other-n*8-8;
+   const k=Math.max(1,Math.min(LESSONS.length,Math.floor((room+GAP)/st)));
+   sc.style.flex='0 1 auto';sc.style.width=`${k*st-GAP+8}px`;
+  };
+  fit();
+  const ro=new ResizeObserver(fit);ro.observe(strip);
+  return()=>ro.disconnect();
+ },[]);
  useEffect(()=>{
-  const el=scroller.current?.querySelector<HTMLElement>(`[data-testid="lab-lesson-${active}"]`);
-  const sc=scroller.current;
-  if(!el||!sc)return;
-  // scroll only the strip (never the page) so the active card sits in the middle
-  const left=el.offsetLeft-(sc.clientWidth-el.offsetWidth)/2;
-  sc.scrollTo({left:Math.max(0,left),behavior:reduced?'auto':'smooth'});
- },[active,reduced]);
+  const sc=scroller.current,st=cardStep();
+  if(!sc||!st)return;
+  const idx=active?LESSONS.findIndex(l=>l.id===active):0;
+  const n=perView();
+  const first=Math.max(0,Math.min(LESSONS.length-n,idx-Math.floor((n-1)/2)));
+  sc.scrollTo({left:first*st,behavior:reduced?'auto':'smooth'});
+ },[active,reduced]);// eslint-disable-line react-hooks/exhaustive-deps
  return (
-  <div className="lab-strip" id="lab-sec-lessons">
+  <div className="lab-strip" id="lab-sec-lessons" data-ai={active===null}>
    {extra}
    <button type="button" className="lab-strip-arrow" aria-label={tr('Previous lessons','Pelajaran sebelumnya')} onClick={()=>by(-1)}><Icon name="chevron" size={18} className="lab-flip"/></button>
    <div className="lab-strip-scroll" ref={scroller} role="list">

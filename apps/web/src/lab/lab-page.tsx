@@ -40,6 +40,11 @@ import type {TestRecordData} from './ui/test-record';
 import {Viewbar} from './ui/viewbar';
 import {AiBuilder,AiBuildButton,AiGeneratedChip} from './ui/ai-builder';
 import {PartPopover} from './ui/part-popover';
+import {partCopy,popoverControls} from './parts-copy';
+import {Minimap} from './ui/minimap';
+import {thresholdControls} from './ui/thresholds';
+import type {ThresholdSpec} from './ui/thresholds';
+import type {ControlSpec} from './scene/parts/types';
 import type {PopoverValue} from './ui/part-popover';
 import type {PartModule} from './scene/parts/types';
 import type {LabSceneV3} from './scene';
@@ -51,15 +56,20 @@ interface Runtime{id:LessonId;variantId:string;params:ParamValues;props:Record<s
 interface UiSnap{status:SimSnapshot['status'];simTimeMs:number;currentLine:number|null;pins:Record<string,PinSample>|null;parts:SimSnapshot['parts'];speed:number}
 /** The AI builder's circuit on the stage: runs its own firmware and circuit instead of the open lesson's. */
 interface AiMode{lessonId:LessonId;build:AiBuild;variant:FirmwareVariant;circuit:Circuit;inputs:Inputs}
-type PopState={id:string;at:{x:number;y:number};bounds:{width:number;height:number};module:PartModule};
-function PopHost({pop,circuit,inputs,sweep,onChange,onFocus,onClose}:{pop:PopState;circuit:Circuit;inputs:Inputs;sweep:Record<string,boolean>;onChange:(pid:string,key:string,value:PopoverValue)=>void;onFocus:(pid:string)=>void;onClose:()=>void}){
+type PopState={id:string;at:{x:number;y:number};bounds:{width:number;height:number};module:PartModule;controls?:readonly ControlSpec[];thr?:{spec:ThresholdSpec;controls:ControlSpec[]}};
+function PopHost({pop,circuit,inputs,sweep,params,lang,onChange,onParam,onFocus,onClose}:{pop:PopState;circuit:Circuit;inputs:Inputs;sweep:Record<string,boolean>;params:ParamValues;lang:'en'|'id';onChange:(pid:string,key:string,value:PopoverValue)=>void;onParam:(name:string,value:number)=>void;onFocus:(pid:string)=>void;onClose:()=>void}){
  const part=circuit.parts.find(p=>p.id===pop.id);
+ if(!part&&!pop.thr)return <PartPopover partId={pop.id} module={pop.module} controls={pop.controls} values={{}} at={pop.at} bounds={pop.bounds} onChange={()=>undefined} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
  if(!part)return null;
+ if(pop.thr)return <PartPopover partId={pop.id} module={pop.module} controls={popoverControls('threshold',pop.thr.controls)} title={pop.thr.spec.title[lang]} desc={pop.thr.spec.desc[lang]} values={params} at={pop.at} bounds={pop.bounds} onChange={(k,v)=>onParam(k,Number(v))} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
  const inp=inputs[pop.id];
  const values:Record<string,PopoverValue|undefined>={...part.props as Record<string,PopoverValue|undefined>,sweep:sweep[pop.id]===true};
+ if(inp?.kind==='potentiometer')values.value=inp.value;
+ if(part.kind==='potentiometer'&&values.value===undefined)values.value=Number(part.props.value??512);
+ if(part.kind==='resistor'&&values.ohms!==undefined)values.ohms=String(values.ohms);
  if(inp?.kind==='obstacle')values.distanceCm=inp.distanceCm;
  if(inp?.kind==='lamp'){if(inp.distanceCm!==undefined)values.distanceCm=inp.distanceCm;if(inp.on!==undefined)values.on=inp.on;}
- return <PartPopover partId={pop.id} module={pop.module} values={values} at={pop.at} bounds={pop.bounds} onChange={(k,v)=>onChange(pop.id,k,v)} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
+ return <PartPopover partId={pop.id} module={pop.module} controls={pop.controls} values={values} at={pop.at} bounds={pop.bounds} onChange={(k,v)=>onChange(pop.id,k,v)} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
 }
 function aiVariant(b:AiBuild):FirmwareVariant{
  const src=b.spec.sketch.source;
@@ -133,11 +143,14 @@ function LabInner({id}:{id:LessonId}){
  const [ready,setReady]=useState(false);
  const [error,setError]=useState<string|null>(null);
  const [aiOpen,setAiOpen]=useState(false);
+ const [revealed,setRevealed]=useState<ReadonlySet<string>|null>(null);
+ const [flyOpen,setFlyOpen]=useState(false);
  const [ai,setAi]=useState<AiMode|null>(null);
  if(ai&&ai.lessonId!==id){setAi(null);setAiOpen(false);}
  const [sceneObj,setSceneObj]=useState<LabSceneV3|null>(null);
  const [sweep,setSweep]=useState<Record<string,boolean>>({});
  const [pop,setPop]=useState<PopState|null>(null);
+ const [focusId,setFocusId]=useState<string|null>(null);
 
  const runnerRef=useRef<LabRunner|null>(null);
  const sceneRef=useRef<SceneV2|null>(null);
@@ -159,8 +172,10 @@ function LabInner({id}:{id:LessonId}){
  const timers=useRef<number[]>([]);
  const aiRef=useRef<AiMode|null>(null);
  const sweepRef=useRef<Record<string,boolean>>({});
+ const focusRef=useRef<string|null>(null);
  const handlers=useRef({select:(_t:string|null)=>{},input:(_i:string,_p:PartInput)=>{},open:(_i:string,_a:{x:number;y:number})=>{}});
 
+ useEffect(()=>{focusRef.current=focusId;});
  useEffect(()=>{rtRef.current=rt;settingsRef.current=settings;doneRef.current=done;aiRef.current=ai;});
 
  const pushSeg=useCallback((sys:boolean,text:string)=>{
@@ -169,7 +184,6 @@ function LabInner({id}:{id:LessonId}){
   if(a.length>500)a.splice(0,a.length-500);
   dirtyRef.current=true;
  },[]);
- const later=useCallback((fn:()=>void,ms:number)=>{timers.current.push(window.setTimeout(fn,ms));},[]);
 
  // ---- stage api for overlays ----
  const api=useMemo<StageApi>(()=>({
@@ -253,9 +267,7 @@ function LabInner({id}:{id:LessonId}){
   const next:Runtime={...cur,props:{...cur.props,[pid]:props},circuit:{...cur.circuit,parts:cur.circuit.parts.map(p=>p.id===pid?{...p,props}:p)}};
   rtRef.current=next;setRt(next);persist(next);
   runnerRef.current?.setPartProps(pid,props);sceneRef.current?.setPartProps(pid,props);
-  setNote(lang==='id'?'Ini perangkat keras, bukan kode':'This is hardware, not code');
-  later(()=>setNote(null),3000);
- },[persist,later,lang]);
+ },[persist]);
  const changeInput=useCallback((pid:string,input:PartInput)=>{
   const cur=rtRef.current;
   runnerRef.current?.setInput(pid,input);
@@ -264,22 +276,25 @@ function LabInner({id}:{id:LessonId}){
   const next:Runtime={...cur,inputs:{...cur.inputs,[pid]:input}};
   rtRef.current=next;setRt(next);persist(next);
  },[persist]);
- const view=useCallback((c:ViewCommand)=>{sceneRef.current?.view(c);setViewUsed(true);},[]);
+ const clearFocus=useCallback(()=>{setFocusId(null);sceneObj?.selectPart(null);},[sceneObj]);
+ const view=useCallback((c:ViewCommand)=>{sceneRef.current?.view(c);setViewUsed(true);if(c==='reset')clearFocus();},[clearFocus]);
  const changeSettings=useCallback((s:Partial<LabSettings>)=>{
   setSettings(prev=>{const n={...prev,...s};store.saveSettings(n);return n;});
  },[]);
  const resetProgress=useCallback(()=>{store.resetProgress();setDone([]);},[]);
- const goLesson=useCallback((l:LessonId)=>{setPop(null);setSweep({});navigate('/lab/'+l);},[navigate]);
+ const goLesson=useCallback((l:LessonId)=>{setPop(null);setFocusId(null);setSweep({});navigate('/lab/'+l);},[navigate]);
 
  // ---- direct manipulation: the scene reports a click on a part that has controls; the popover edits it ----
- const openPop=useCallback((pid:string,at:{x:number;y:number})=>{
-  const kind=(aiRef.current?.circuit??rtRef.current.circuit).parts.find(p=>p.id===pid)?.kind;
-  if(!kind)return;
+ const openPop=useCallback((pid:string,_at?:{x:number;y:number})=>{
+  const box=stageRef.current;
+  const bounds={width:box?.clientWidth??600,height:box?.clientHeight??400};
+  const part=(aiRef.current?.circuit??rtRef.current.circuit).parts.find(p=>p.id===pid);
   setSelected(null);
   void import('./scene/parts/index').then(m=>{
-   const module=m.partModule(kind);
-   const box=stageRef.current;
-   if(module?.interact?.controls?.length)setPop({id:pid,at,module,bounds:{width:box?.clientWidth??600,height:box?.clientHeight??400}});
+   const module=part?m.partModule(part.kind):undefined;
+   const key=part?part.kind:pid;
+   const mod:PartModule=module??({kind:key,name:partCopy(key).name,interact:undefined} as unknown as PartModule);
+   setPop({id:pid,at:{x:0,y:0},module:mod,controls:popoverControls(key,module?.interact?.controls),bounds});
   });
  },[]);
  const popChange=useCallback((pid:string,key:string,value:PopoverValue)=>{
@@ -290,6 +305,7 @@ function LabInner({id}:{id:LessonId}){
   if(!route.props)return;
   if(key==='sweep'){sweepRef.current={...sweepRef.current,[pid]:value===true};setSweep(sweepRef.current);}
   const props={...part.props,...route.props};
+  if(key==='ohms')props.ohms=Number(value);
   const a=aiRef.current;
   if(a){
    const n={...a,circuit:{...a.circuit,parts:a.circuit.parts.map(p=>p.id===pid?{...p,props}:p)}};
@@ -298,7 +314,26 @@ function LabInner({id}:{id:LessonId}){
   }else changeProps(pid,props);
  },[changeInput,changeProps]);
 
- const focusPart=useCallback((pid:string)=>{void sceneObj?.focusPart(pid);},[sceneObj]);
+ /** Click on a part (or a row in Components): the camera zooms onto it, callouts collapse to pills, the minimap appears, the floor ring marks it. */
+ const focusOn=useCallback((pid:string)=>{
+  setFocusId(pid);sceneObj?.selectPart(pid);sceneRef.current?.focus(pid);
+ },[sceneObj]);
+ const focusPart=useCallback((pid:string)=>{focusOn(pid);},[focusOn]);
+ /** Threshold parts (traffic light, night light): the popover sliders are the firmware params, patched into the flash. */
+ const openThreshold=useCallback((pid:string)=>{
+  if(aiRef.current)return false;
+  const r=rtRef.current;
+  const part=r.circuit.parts.find(p=>p.id===pid);if(!part)return false;
+  const thr=thresholdControls(r.id,pid,variantOf(r.id,r.variantId).params);
+  if(!thr)return false;
+  const box=stageRef.current;
+  void import('./scene/parts/index').then(m=>{
+   const module=m.partModule(part.kind);if(!module)return;
+   setSelected(null);
+   setPop({id:pid,at:{x:0,y:0},module,thr,bounds:{width:box?.clientWidth??600,height:box?.clientHeight??400}});
+  });
+  return true;
+ },[]);
 
  // ---- AI builder: the generated circuit and firmware replace the lesson on the stage until it is closed ----
  const onAiBuilt=useCallback((b:AiBuild)=>{
@@ -309,7 +344,7 @@ function LabInner({id}:{id:LessonId}){
   loadCurrent(rtRef.current);syncUi();
  },[loadCurrent,syncUi]);
  const closeAi=useCallback(()=>{
-  setAiOpen(false);
+  setAiOpen(false);setRevealed(null);
   if(!aiRef.current)return;
   aiRef.current=null;setAi(null);sweepRef.current={};setSweep({});setPop(null);
   const r=rtRef.current;
@@ -321,14 +356,16 @@ function LabInner({id}:{id:LessonId}){
  useEffect(()=>{
   handlers.current={
    select:t=>{
-    if(!t||aiRef.current){setSelected(null);return;}
-    const isPart=rtRef.current.circuit.parts.some(p=>p.id===t);
-    setSelected(isPart?{type:'part',id:t}:{type:'board',id:t});
+    if(!t){setSelected(null);setPop(null);clearFocus();sceneRef.current?.view('reset');return;}
+    focusOn(t);
+    setSelected(null);
+    if(openThreshold(t))return;
+    openPop(t);
    },
    input:changeInput,
    open:openPop,
   };
- },[changeInput,openPop]);
+ },[changeInput,openPop,focusOn,clearFocus,openThreshold]);
 
  // ---- runner + loop (page lifetime) ----
  useEffect(()=>{
@@ -358,7 +395,7 @@ function LabInner({id}:{id:LessonId}){
      timers.current.push(window.setTimeout(()=>setCelebrate(null),1600));
      const v=variantOf(rts.id,rts.variantId);
      const n=LESSONS.find(l=>l.id===rts.id)?.n??0;
-     setRecord({lesson:rts.id,n,tMs:snap.simTimeMs,rows:RECORDS[rts.id](historyRef.current,snap),firmware:`${v.sketch} · ${nf(v.bytes)} B · ${gcc}`});
+     setRecord({lesson:rts.id,n,tMs:snap.simTimeMs,rows:RECORDS[rts.id](historyRef.current,snap,memRef.current),firmware:`${v.sketch} · ${nf(v.bytes)} B · ${gcc}`});
      if(settingsRef.current.reducedMotion)setShowRecord(true);
      else timers.current.push(window.setTimeout(()=>setShowRecord(true),700));
      sceneRef.current?.celebrate?.();
@@ -424,10 +461,11 @@ function LabInner({id}:{id:LessonId}){
 
  // ---- safe area for the auto-fit camera (feature-detected) ----
  const showCallouts=settings.labels&&sceneState==='ready';
+ const hasDock=(ai?ai.circuit:rt.circuit).parts.some(p=>p.kind==='button'||p.kind==='potentiometer'||p.kind==='lamp'||p.kind==='obstacle');
  useEffect(()=>{
   safeRef.current={mobile:vp.mobile,callouts:showCallouts};
-  sceneRef.current?.setSafeArea?.(vp.mobile?{top:12,right:12,bottom:12,left:12}:{top:showCallouts?80:20,right:20,bottom:44,left:20});
- },[vp.mobile,vp.artH,vp.scale,showCallouts,sceneState,id]);
+  sceneRef.current?.setSafeArea?.(vp.mobile?{top:12,right:12,bottom:hasDock?88:12,left:12}:{top:showCallouts?80:20,right:20,bottom:72,left:20});
+ },[vp.mobile,vp.artH,vp.scale,showCallouts,sceneState,id,hasDock]);
 
  // ---- 3D lesson thumbnails: once after ready, in idle time, cached in sessionStorage ----
  useEffect(()=>{
@@ -459,9 +497,16 @@ function LabInner({id}:{id:LessonId}){
   loadCurrent(r);
   sceneRef.current?.setLesson(r.id,r.circuit);
   store.setLastLesson(r.id);
-  const stop0=window.setTimeout(()=>{setSelected(null);setNote(null);setRecord(null);setShowRecord(false);setLastWrote(null);syncUi();},0);
+  const stop0=window.setTimeout(()=>{setSelected(null);setFocusId(null);setPop(null);setNote(null);setRecord(null);setShowRecord(false);setLastWrote(null);syncUi();},0);
   return()=>clearTimeout(stop0);
  },[id,ready,loadCurrent,syncUi]);
+
+ // phones: bring the builder into view when it opens
+ useEffect(()=>{
+  if(!aiOpen||!vp.mobile)return;
+  const t=window.setTimeout(()=>document.querySelector('[data-testid="lab-ai"]')?.scrollIntoView({behavior:'auto',block:'start'}),60);
+  return()=>clearTimeout(t);
+ },[aiOpen,vp.mobile]);
 
  // ---- keyboard ----
  useEffect(()=>{
@@ -469,7 +514,7 @@ function LabInner({id}:{id:LessonId}){
    if(e.metaKey||e.ctrlKey||e.altKey)return;
    const t=e.target as HTMLElement|null;
    const tag=t?.tagName;
-   if(e.key==='Escape'){setSelected(null);return;}
+   if(e.key==='Escape'){setSelected(null);setPop(null);if(focusRef.current){clearFocus();sceneRef.current?.view('reset');}return;}
    if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||tag==='BUTTON'||t?.isContentEditable)return;
    const k=e.key.toLowerCase();
    if(e.key===' '){e.preventDefault();if(runnerRef.current?.snapshot().status==='running')stop();else run();}
@@ -481,7 +526,7 @@ function LabInner({id}:{id:LessonId}){
   };
   window.addEventListener('keydown',on);
   return()=>window.removeEventListener('keydown',on);
- },[run,stop,view]);
+ },[run,stop,view,clearFocus]);
 
  // ---- derived ----
  const variant=ai?ai.variant:variantOf(rt.id,rt.variantId);
@@ -489,11 +534,11 @@ function LabInner({id}:{id:LessonId}){
  const inputs=ai?ai.inputs:rt.inputs;
  const running=ui.status==='running';
  const livePins=useMemo(()=>{
-  if(rt.id==='board')return ['D13'];
+  if(!ai&&rt.id==='board')return ['D13'];
   const set=new Set<string>();
   for(const p of circuit.parts)for(const b of Object.values(p.net))if(b&&(UNO_PINS as readonly string[]).includes(b))set.add(b);
   return [...set];
- },[circuit,rt.id]);
+ },[circuit,rt.id,ai]);
  const overCurrent=Object.values(ui.parts).some(p=>p.kind==='led'&&p.overCurrent);
 const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollIntoView({behavior:settings.reducedMotion?'auto':'smooth',block:'start'});
  const clearSerial=()=>{segsRef.current=[];setSegs([]);};
@@ -505,13 +550,14 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
  return (
   <div className={`lab${vp.mobile?' lab--mobile':''}${settings.reducedMotion?' lab--reduced':''}`} data-lesson={id} data-sim-status={ui.status} data-sim-ms={Math.round(ui.simTimeMs)} data-scene={sceneState}>
    <Artboard vp={vp}>
-    {!vp.mobile&&<Rail lesson={id} done={done} settings={settings} onSettings={changeSettings} onLesson={goLesson} onResetProgress={resetProgress}/>}
+    {!vp.mobile&&<Rail lesson={id} done={done} settings={settings} circuit={circuit} focusId={focusId} running={running} onSettings={changeSettings} onLesson={goLesson} onResetProgress={resetProgress} onFocusPart={focusOn} onRun={()=>(running?stop():run())} onFlyChange={setFlyOpen}/>}
     <header className="lab-header">
      <Link to="/" className="lab-wordmark" aria-label={tr('iot.ai.id home','Beranda iot.ai.id')}><LabGlyph/><span>Lab</span></Link>
      <i className="lab-divider" aria-hidden="true"/>
      <span className="lab-sub">UNO · {tr('EMULATED ATMEGA328P','ATMEGA328P TIRUAN')}</span>
      <span className="lab-grow"/>
      <ChipPill running={running} speed={ui.speed} simTimeMs={ui.simTimeMs} compact={vp.mobile}/>
+     <AiBuildButton active={aiOpen} onClick={()=>(aiOpen?closeAi():setAiOpen(true))}/>
      <Progress done={done} active={id} popped={celebrate}/>
      <LangToggle/>
     </header>
@@ -527,24 +573,27 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
       <div className="lab-atmos" aria-hidden="true"><i className="lab-corner lab-corner--tl"/><i className="lab-corner lab-corner--tr"/><i className="lab-corner lab-corner--bl"/><i className="lab-corner lab-corner--br"/></div>
       {sceneState==='loading'&&<div className="lab-loader"><DotMark animated/><div className="lab-loader-bar"><i/></div><span>{tr('Soldering the board…','Menyolder papan…')}</span></div>}
       {sceneState==='unavailable'&&<p className="lab-3d-note" role="status">{tr('3D view unavailable on this device. The simulation still runs.','Tampilan 3D tidak tersedia di perangkat ini. Simulasi tetap berjalan.')}</p>}
-      <Callouts lesson={lesson} api={api} pills={vp.mobile} show={showCallouts&&!ai} running={running} compact={vp.compact}/>
+      <Callouts lesson={lesson} api={api} pills={vp.mobile||focusId!==null} show={showCallouts&&!ai} running={running} compact={vp.compact}/>
       {!ai&&<Readouts lessonId={id} api={api}/>}
       {selected&&<Inspector target={selected} lesson={lesson} lessonId={id} circuit={circuit} variantId={rt.variantId} params={rt.params} overCurrent={overCurrent} api={api}
        onClose={()=>setSelected(null)} onParam={changeParam} onVariant={changeVariant} onProps={changeProps} onInput={changeInput} onFocus={t=>sceneRef.current?.focus(t)}/>}
-      {pop&&<PopHost pop={pop} circuit={circuit} inputs={inputs} sweep={sweep} onChange={popChange} onFocus={focusPart} onClose={()=>setPop(null)}/>}
-      <ControlsDock circuit={circuit} inputs={inputs} onInput={changeInput}/>
+      {pop&&<PopHost pop={pop} circuit={circuit} inputs={inputs} sweep={sweep} params={rt.params} lang={lang} onChange={popChange} onParam={changeParam} onFocus={focusPart} onClose={()=>setPop(null)}/>}
+      <div className="lab-bl">
+       {focusId&&!vp.mobile&&<Minimap scene={sceneState==='ready'?sceneObj:null} api={api} selected={focusId}/>}
+       <ControlsDock circuit={circuit} inputs={inputs} onInput={changeInput} hideId={pop?.id??null} visibleIds={revealed} fold={flyOpen}/>
+      </div>
       <Viewbar onView={view} used={viewUsed}/>
       {error&&<p className="lab-error" role="alert">{error}</p>}
      </div>
-     <Analyzer api={api} lessonId={id} lanePins={lanePins} tx={usesSerial} status={ui.status} simTimeMs={ui.simTimeMs} speed={ui.speed} pins={ui.pins}
+     <Analyzer api={api} lessonId={id} ai={!!ai} lanePins={lanePins} tx={usesSerial} status={ui.status} simTimeMs={ui.simTimeMs} speed={ui.speed} pins={ui.pins}
       segs={segs} onClear={clearSerial} record={record&&record.lesson===id?record:null} showRecord={showRecord} onShowSignals={()=>setShowRecord(false)} marker={record&&record.lesson===id?record.tMs:null}
       receipt={receipt} compact={vp.compact} mobile={vp.mobile} reduced={settings.reducedMotion}/>
     </section>
-    <LessonStrip extra={<AiBuildButton active={aiOpen} onClick={()=>(aiOpen?closeAi():setAiOpen(true))}/>} active={id} done={done} celebrate={celebrate} thumbs={thumbs} reduced={settings.reducedMotion} onPick={goLesson}/>
+    <LessonStrip active={ai?null:id} done={done} celebrate={celebrate} thumbs={thumbs} reduced={settings.reducedMotion} onPick={goLesson}/>
     <aside className="lab-side">
-     {aiOpen&&<AiBuilder scene={sceneState==='ready'?sceneObj:null} onBuilt={onAiBuilt} onRun={()=>run()} onClose={closeAi}/>}
+     {aiOpen&&<AiBuilder scene={sceneState==='ready'?sceneObj:null} onBuilt={onAiBuilt} onClose={closeAi} onReveal={setRevealed}/>}
      {!ai&&!aiOpen&&<InfoCard lesson={lesson} pins={ui.pins} done={done.includes(id)} quote={quote} variant={variant} report={report} toolchain={labFirmware.toolchain}/>}
-     <CodeView badge={ai?<AiGeneratedChip build={ai.build} short/>:undefined} variant={variant} params={ai?{}:rt.params} currentLine={ui.currentLine} running={running} onRun={run} onStop={stop} onParam={name=>{if(!ai)setSelected({type:'param',name});}} note={note} log={lastWrote}/>
+     <CodeView badge={ai?<AiGeneratedChip build={ai.build} short/>:undefined} variant={variant} params={ai?{}:rt.params} currentLine={ui.currentLine} running={running} runLocked={revealed!==null} onRun={run} onStop={stop} onParam={name=>{if(!ai)setSelected({type:'param',name});}} note={note} log={lastWrote}/>
     </aside>
     {vp.mobile&&(
      <section className="lab-card lab-serial-card" id="lab-sec-serial">

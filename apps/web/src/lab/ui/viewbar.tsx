@@ -12,7 +12,7 @@ export function Viewbar({onView,used}:{onView:(c:ViewCommand)=>void;used:boolean
  );
  return (
   <>
-   <div className={`lab-hint${timeout||used?' is-gone':''}`}>{tr('Drag to orbit · scroll to zoom · Q/E rotate','Seret untuk memutar · scroll untuk zoom · Q/E putar')}</div>
+   <div className={`lab-hint${timeout||used?' is-gone':''}`}>{tr('Drag or WASD to pan · Q / E to rotate · Scroll to zoom','Seret atau WASD untuk geser · Q / E putar · Scroll untuk zoom')}</div>
    <div className="lab-viewbar">
     {btn('rotate-left','rotl',tr('Rotate left','Putar kiri'))}
     {btn('rotate-right','rotr',tr('Rotate right','Putar kanan'))}

@@ -29,13 +29,13 @@ export function holeZ(row:number):number{return (row-4.5)*PITCH+(row>=5?PITCH:-P
 export const RAIL_Z={'5v-rail':-22.86,'gnd-rail':-20.32} as const;
 export function railX(col:number):number{return holeX(col);}
 
-/** Lamp: 5..150 cm maps to 25..160 mm. Obstacle: 3..250 cm maps to 20..200 mm. */
+/** Lamp: 5..150 cm maps to 25..160 mm. Obstacle: 3..250 cm maps to 38..200 mm (38 keeps the box clear of the sensor and breadboard). */
 const lerp=(a:number,b:number,t:number):number=>a+(b-a)*t;
 const clamp=(v:number,lo:number,hi:number):number=>Math.min(hi,Math.max(lo,v));
 export function lampMm(cm:number):number{return lerp(25,160,(clamp(cm,5,150)-5)/145);}
 export function lampCm(mm:number):number{return lerp(5,150,(clamp(mm,25,160)-25)/135);}
-export function obstacleMm(cm:number):number{return lerp(20,200,(clamp(cm,3,250)-3)/247);}
-export function obstacleCm(mm:number):number{return lerp(3,250,(clamp(mm,20,200)-20)/180);}
+export function obstacleMm(cm:number):number{return lerp(38,200,(clamp(cm,3,250)-3)/247);}
+export function obstacleCm(mm:number):number{return lerp(3,250,(clamp(mm,38,200)-38)/162);}
 
 /** Four-band colour indices: digit, digit, multiplier exponent colour, gold tolerance (10). */
 export function resistorBands(ohms:number):[number,number,number,number]{
@@ -66,6 +66,8 @@ function offBoard(p:PartSpec,all:Record<string,Placement>):Placement{
 
 /** First free column per lane: parts sit mid-board (cols 8+), the sonar at the far end, never near the Uno. */
 export const LANE_START:Record<number,number>={2:8,7:8,9:21};
+/** With a sonar on the board: it takes the front-right end, everything else stays at lower columns so its tall body never hides an LED or the buzzer. */
+const SONAR_START:Record<number,number>={2:5,7:5,9:26};
 /** X extent (mm, relative to the first pin) of the physical part body, for the clearance check. */
 export const BODY_X:Partial<Record<PartKind,[number,number]>>={hcsr04:[-19,27]};
 export const UNO_CLEARANCE=10;
@@ -82,13 +84,17 @@ export function unoOverlaps(place:Record<string,Placement>,circuit:Circuit):stri
 export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
  const out:Record<string,Placement>={};
  const cursor:Record<number,number>={};
+ const sonar=circuit.parts.some(p=>p.kind==='hcsr04');
+ const start=sonar?SONAR_START:LANE_START;
+ // LEDs and the buzzer sit in the front lane (lane 7) so the camera sees them; resistors and the rest go behind
+ const order=(k:PartKind):number[]=>sonar&&(k==='led'||k==='buzzer'||k==='rgb-led')?[LANES[1],LANES[0]]:[...LANES];
  for(const p of circuit.parts){
   if(!isOnBoardKind(p.kind))continue;
   const w=WIDTH(p.kind);
-  const lanes:number[]=p.kind==='hcsr04'?[SENSOR_ROW]:[...LANES];
+  const lanes:number[]=p.kind==='hcsr04'?[SENSOR_ROW]:order(p.kind);
   let lane=lanes[lanes.length-1]!;
-  let col=cursor[lane]??LANE_START[lane]??0;
-  for(const l of lanes){const c=cursor[l]??LANE_START[l]??0;if(c+w<=BB_COLS){lane=l;col=c;break;}}
+  let col=cursor[lane]??start[lane]??0;
+  for(const l of lanes){const c=cursor[l]??start[l]??0;if(c+w<=BB_COLS&&(!sonar||p.kind==='hcsr04'||c+w<=18||l===lanes[lanes.length-1])){lane=l;col=c;break;}}
   if(col+w>BB_COLS)col=Math.max(0,BB_COLS-w);
   cursor[lane]=col+w+1;
   out[p.id]={x:holeX(col),z:holeZ(lane),rotY:0,onBoard:true,holes:pinHoleOffsets(p.kind).map(d=>[col+d,lane] as [number,number])};

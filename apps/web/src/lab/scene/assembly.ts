@@ -190,7 +190,7 @@ export function createThreeStage(h:AssemblyHost,spec:CircuitSpec):Stage{
 
  // per-step camera target, measured while everything is still in its final place
  const frames=new Map<SpecStep,{c:Vector3;zoom:number}>();
- const bx=new Box3(),sz=new Vector3();
+ const bx=new Box3(),wb=new Box3(),sz=new Vector3();
  const fit=h.fitSize();
  for(const step of stepsOf(spec)){
   const objs:Object3D[]=[];
@@ -202,8 +202,12 @@ export function createThreeStage(h:AssemblyHost,spec:CircuitSpec):Stage{
   if(!objs.length)continue;
   contentBox(objs,bx);if(bx.isEmpty())continue;
   bx.getSize(sz);
-  const zoom=Math.max(1,Math.min(1.8,fit/(Math.max(sz.length(),24)*2.4)));
-  frames.set(step,{c:bx.getCenter(new Vector3()),zoom});
+  // keep the whole working set (the new pieces plus the board and breadboard they attach to) in view:
+  // lean the camera toward the new pieces, but only nudge the zoom
+  const mid=bx.getCenter(new Vector3());
+  contentBox([h.uno,h.breadboard],wb);
+  const zoom=Math.max(1,Math.min(1.12,fit/(Math.max(sz.length(),24)*2.4)));
+  frames.set(step,{c:wb.isEmpty()?mid:wb.getCenter(new Vector3()).lerp(mid,0.35),zoom});
  }
 
  // seat-pulse rings (flat, fading), one per part, removed in finish()

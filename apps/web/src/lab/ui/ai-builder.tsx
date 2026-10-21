@@ -2,6 +2,7 @@ import './ai-builder.css';
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {Link} from 'react-router-dom';
 import {useLang} from '../../i18n';
+import {Icon} from './icons';
 import {memberAuth} from '../../ops-client';
 import {LAB_AI_DAILY_MEMBER_QUOTA,LAB_AI_PROMPT_MAX} from '../../../../../packages/ops-contract';
 import type {CircuitSpec,SpecStep} from '../circuit-spec';
@@ -15,7 +16,7 @@ type Access='unknown'|'anon'|'member';
 
 export function AiBuildButton({onClick,active}:{onClick:()=>void;active?:boolean}){
  const {tr}=useLang();
- return <button type="button" className="aib-entry" data-testid="lab-ai-open" aria-pressed={active} onClick={onClick}><span aria-hidden="true">+</span> {tr('Build with AI','Bangun dengan AI')}</button>;
+ return <button type="button" className="aib-entry" data-testid="lab-ai-open" title={tr('Build with AI','Bangun dengan AI')} aria-label={tr('Build with AI','Bangun dengan AI')} aria-pressed={active} onClick={onClick}><Icon name="spark" size={16}/><span>{tr('Build with AI','Bangun dengan AI')}</span></button>;
 }
 
 /** Chip for the code view: shown while the sketch on screen is the AI-generated one. */
@@ -26,13 +27,13 @@ export function AiGeneratedChip({build,short}:{build:AiBuild;short?:boolean}){
 
 const fmtIssue=(i:AiIssue,lang:'en'|'id')=>lang==='id'?i.id:i.en;
 
-export function AiBuilder({scene,onBuilt,onRun,onClose}:{
+export function AiBuilder({scene,onBuilt,onClose,onReveal}:{
  scene:AssemblyScene|null;
  /** Called once the firmware is ready: load the hex into the runner and show spec.sketch.source read-only (with AiGeneratedChip). */
  onBuilt:(b:AiBuild)=>void;
- /** Assembly finished (or skipped) and the user pressed Run. */
- onRun:(b:AiBuild)=>void;
  onClose?:()=>void;
+ /** Parts placed so far while assembling; null when not assembling (everything is placed). */
+ onReveal?:(ids:ReadonlySet<string>|null)=>void;
 }){
  const {tr,lang}=useLang();
  const [prompt,setPrompt]=useState('');
@@ -50,7 +51,6 @@ export function AiBuilder({scene,onBuilt,onRun,onClose}:{
 
  useEffect(()=>{
   let live=true;
-  memberAuth.me().then(m=>{if(live)setAccess(m.grants.includes('lab-ai')?'member':'anon');}).catch(()=>{if(live)setAccess('anon');});
   aiClient.examples().then(e=>{if(live)setExamples(e);}).catch(()=>{if(live)setExampleErr(true);});
   return()=>{live=false;ctl.current?.abort();};
  },[]);
@@ -60,11 +60,13 @@ export function AiBuilder({scene,onBuilt,onRun,onClose}:{
   ctl.current?.abort();
   const c=new AbortController();ctl.current=c;
   setStage('assembling');setPhase('assembling');setStep(null);
+  const seen=new Set<string>();onReveal?.(new Set(seen));
+  if(window.innerWidth<=760)document.getElementById('lab-sec-board')?.scrollIntoView({block:'start',behavior:reduced?'auto':'smooth'});
   try{
-   await scene.playAssembly(b.spec,{speed:reduced?0:speed,signal:c.signal,onStep:e=>{if(e.phase==='start')setStep({index:e.index,total:e.total,step:e.step});}});
-   setStage('ready');
-  }catch(e){if((e as Error).name!=='AbortError')setStage('ready');}
- },[scene,reduced]);
+   await scene.playAssembly(b.spec,{speed:reduced?0:speed,signal:c.signal,onStep:e=>{if(e.phase==='start'){setStep({index:e.index,total:e.total,step:e.step});for(const id of e.step.add.parts??[])seen.add(id);onReveal?.(new Set(seen));}}});
+   setStage('ready');onReveal?.(null);
+  }catch(e){if((e as Error).name!=='AbortError'){setStage('ready');onReveal?.(null);}}
+ },[scene,reduced,onReveal]);
 
  const finish=useCallback((b:AiBuild)=>{setBuild(b);onBuilt(b);return assemble(b);},[onBuilt,assemble]);
  const sleep=(ms:number)=>reduced?Promise.resolve():new Promise<void>(r=>setTimeout(r,ms));
@@ -80,7 +82,13 @@ export function AiBuilder({scene,onBuilt,onRun,onClose}:{
  const submit=async()=>{
   const text=prompt.trim();
   if(text.length<8)return;
-  if(access!=='member'){setNeedSignin(true);return;}
+  let acc=access;
+  if(acc==='unknown'){
+   // asked only now, so an anonymous visitor never triggers a 401 just by opening the lab
+   try{const m=await memberAuth.me();acc=m.grants.includes('lab-ai')?'member':'anon';}catch{acc='anon';}
+   setAccess(acc);
+  }
+  if(acc!=='member'){setNeedSignin(true);return;}
   setNeedSignin(false);setErr(null);setStep(null);
   ctl.current?.abort();const c=new AbortController();ctl.current=c;
   setStage('building');setPhase('designing');
@@ -97,7 +105,7 @@ export function AiBuilder({scene,onBuilt,onRun,onClose}:{
   }
  };
 
- const skip=()=>{ctl.current?.abort();if(build)scene?.loadCircuit(build.spec);setStage('ready');setStep(null);};
+ const skip=()=>{ctl.current?.abort();if(build)scene?.loadCircuit(build.spec);setStage('ready');setStep(null);onReveal?.(null);};
  const replay=()=>{if(build)void assemble(build,1);};
  const busy=stage==='building'||stage==='assembling';
  const errText=(e:AiBuildError)=>{
@@ -124,12 +132,13 @@ export function AiBuilder({scene,onBuilt,onRun,onClose}:{
     placeholder={tr('I want an Arduino that beeps and lights red when something is closer than 20 cm','Saya mau Arduino yang berbunyi dan menyalakan lampu merah saat ada benda lebih dekat dari 20 cm')}
     value={prompt} onChange={e=>{setPrompt(e.target.value);setNeedSignin(false);}}
     onKeyDown={e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();void submit();}}}/>
-   <div className="aib-row">
-    <div className="aib-chips" role="list" aria-label={tr('Examples','Contoh')}>
-     {examples.map(ex=><button key={ex.exampleId} type="button" role="listitem" className="aib-ex" data-testid={`lab-ai-ex-${ex.exampleId}`} disabled={busy||!scene} onClick={()=>void runExample(ex)}>{ex.prompt[lang]}</button>)}
+   <div className="aib-chips" role="list" aria-label={tr('Examples','Contoh')}>
+     {examples.map(ex=><button key={ex.exampleId} type="button" role="listitem" className="aib-ex" data-testid={`lab-ai-ex-${ex.exampleId}`} disabled={busy||!scene} onClick={()=>void runExample(ex)} title={ex.prompt[lang]}><Icon name="spark" size={13}/><span>{ex.prompt[lang]}</span></button>)}
      {exampleErr&&<span className="lab-muted">{tr('Examples are unavailable right now.','Contoh sedang tidak tersedia.')}</span>}
-    </div>
-    <button type="button" className="aib-go" data-testid="lab-ai-submit" disabled={busy||prompt.trim().length<8||!scene} onClick={()=>void submit()}>{tr('Build','Bangun')}</button>
+   </div>
+   <div className="aib-foot">
+    <span className="aib-hint">{prompt.trim().length<8?tr('Write at least a short sentence, or tap an example.','Tulis satu kalimat singkat, atau pilih contoh.'):tr('Ctrl + Enter also builds.','Ctrl + Enter juga membangun.')}</span>
+    <button type="button" className="aib-go" data-testid="lab-ai-submit" disabled={busy||prompt.trim().length<8||!scene} onClick={()=>void submit()}><Icon name="spark" size={14}/>{tr('Build','Bangun')}</button>
    </div>
    {needSignin&&<p className="aib-note" role="status" data-testid="lab-ai-signin">
     <Link to="/masuk">{tr('Sign in to build your own','Masuk untuk membuat sendiri')}</Link>. {tr(`Members get ${LAB_AI_DAILY_MEMBER_QUOTA} builds a day. The three examples above are free for everyone and run instantly.`,`Anggota mendapat ${LAB_AI_DAILY_MEMBER_QUOTA} build per hari. Tiga contoh di atas gratis untuk semua dan langsung jalan.`)}
@@ -159,8 +168,6 @@ export function AiBuilder({scene,onBuilt,onRun,onClose}:{
      <div className="aib-actions">
       <button type="button" className="aib-btn" onClick={replay}>{tr('Replay','Ulangi')}</button>
       {stage==='assembling'&&<button type="button" className="aib-btn" data-testid="lab-ai-skip" onClick={skip}>{tr('Skip','Lewati')}</button>}
-      <span className="lab-grow"/>
-      <button type="button" className="aib-go" data-testid="lab-ai-run" disabled={stage!=='ready'} onClick={()=>onRun(build)}>{tr('Run','Jalankan')}</button>
      </div>
     </div>
    )}

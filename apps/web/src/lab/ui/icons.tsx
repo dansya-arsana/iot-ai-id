@@ -51,6 +51,7 @@ const P:Record<string,ReactNode>={
  sonar:<><rect x="4" y="12" width="4" height="8" rx="1"/><path d="M13 12a6 6 0 0 1 0 8M18 9a10 10 0 0 1 0 14M23 6a14 14 0 0 1 0 20"/></>,
  horn:<><circle cx="12" cy="20" r="4"/><path d="M12 20L24 9"/><circle cx="25" cy="8" r="2"/></>,
  port:<><rect x="5" y="11" width="22" height="10" rx="2"/><path d="M9 15v2M13 15v2M17 15v2M21 15v2"/></>,
+ spark:<><path d="M14 5l2.2 6.8L23 14l-6.8 2.2L14 23l-2.2-6.8L5 14l6.8-2.2z"/><path d="M24 21l.9 2.6 2.6.9-2.6.9L24 28l-.9-2.6-2.6-.9 2.6-.9z"/></>,
  reset:<><circle cx="16" cy="16" r="10"/><path d="M16 8v8l5 3"/></>,
 };
 

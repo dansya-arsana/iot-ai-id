@@ -79,23 +79,30 @@ export function Callouts({lesson,api,pills,show,running,compact}:{lesson:Lesson;
     const lv=lives.current[i];
     if(lv&&doLive){const t=liveText(lesson.callouts[i].target,snap,lesson.callouts[i].pin);lv.textContent=t?t.text:'';lv.dataset.tone=t?t.tone:'';lv.parentElement!.dataset.on=t?'true':'false';}
     el.dataset.pill=collapsed?'true':'false';
-    if(collapsed){
+    const pillAt=():boolean=>{
+     el.dataset.pill='true';
      const w=el.offsetWidth||120,ph=el.offsetHeight||28;
-     const px=Math.min(W-w-8,Math.max(8,p.x+12));
+     const right=p.x+12;
+     const px=Math.max(8,right+w>W-8?Math.min(W-w-8,p.x-12-w):right);
      let py=Math.max(8,p.y-34),tries=0;
      const hit=(yy:number)=>placed.some(r=>px<r.x+r.w+4&&px+w+4>r.x&&yy<r.y+r.h+4&&yy+ph+4>r.y);
      while(hit(py)&&tries<6){py+=8;tries++;}
-     if(hit(py)||py+ph>H-8){hide(i);return;}
+     if(hit(py)||py+ph>H-8){hide(i);return true;}
      placed.push({x:px,y:py,w,h:ph});
      el.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
-     pa.style.opacity='0';dot.style.opacity='1';return;
-    }
+     pa.style.opacity='0';dot.style.opacity='1';return true;
+    };
+    if(collapsed){pillAt();return;}
     const ti=topIdx.indexOf(i),bi=botIdx.indexOf(i);
     let x:number,y:number,top=true;
     const h=el.offsetHeight;
     if(ti>=0){x=Math.round(cxs[slots[ti]]-CW/2);y=GAP;}
     else if(bi>=0){const right=botIdx.length===1?p.x>W/2:bi===1;x=right?W-GAP-CW:GAP;y=H-h-GAP-52;top=false;}
     else{hide(i);return;}
+    // a full card that would sit on top of the hardware it labels drops to a pill beside its anchor
+    const crc=scene.contentRect?.();
+    if(crc&&x<crc.x+crc.w-8&&x+CW>crc.x+8&&y<crc.y+crc.h-8&&y+h>crc.y+8){pillAt();return;}
+    el.dataset.pill='false';
     el.style.transform=`translate(${x}px,${y}px)`;
     const cx=Math.round(x+CW/2);
     const y0=top?y+h:y;

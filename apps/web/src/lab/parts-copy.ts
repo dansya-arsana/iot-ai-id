@@ -1,4 +1,5 @@
 import type {Copy} from './lessons';
+import type {ControlSpec} from './scene/parts/types';
 
 const c=(en:string,id:string):Copy=>({en,id});
 export interface PartCopy{name:Copy;desc:Copy;note?:Copy}
@@ -38,4 +39,19 @@ export const PARTS_COPY:Record<string,PartCopy>={
 
 export function partCopy(key:string):PartCopy{
  return PARTS_COPY[key]??{name:c(key,key),desc:c('Part of the board.','Bagian dari papan.'),note:none};
+}
+
+const focusAction:ControlSpec={type:'action',action:'focus',label:c('Zoom to it','Perbesar ke sini')};
+const OHM_OPTS=[47,100,220,330,1000,10000].map(o=>({value:String(o),label:c(o>=1000?`${o/1000}k`:String(o),o>=1000?`${o/1000}k`:String(o))}));
+const LED_COLORS=['red','yellow','green','blue','white'] as const;
+const COLOR_NAME:Record<string,Copy>={red:c('Red','Merah'),yellow:c('Yellow','Kuning'),green:c('Green','Hijau'),blue:c('Blue','Biru'),white:c('White','Putih')};
+/** Controls for parts whose module declares none (the popover is the one place a part is edited). */
+const EXTRA_CONTROLS:Record<string,readonly ControlSpec[]>={
+ potentiometer:[{type:'range',key:'value',label:c('Value (A0)','Nilai (A0)'),min:0,max:1023,step:1}],
+ led:[{type:'choice',key:'color',label:c('Colour','Warna'),options:LED_COLORS.map(k=>({value:k,label:COLOR_NAME[k]!}))}],
+ resistor:[{type:'choice',key:'ohms',label:c('Resistance (ohms)','Hambatan (ohm)'),options:OHM_OPTS}],
+};
+export function popoverControls(kind:string,own?:readonly ControlSpec[]):readonly ControlSpec[]{
+ const base=own&&own.length?own:EXTRA_CONTROLS[kind]??[];
+ return base.some(x=>x.type==='action')?base:[...base,focusAction];
 }
