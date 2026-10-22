@@ -22,9 +22,10 @@ export const device=defineDevice<SoilMoistureState>({
   desc:{en:'A corrosion-free probe that senses soil water through capacitance. The wetter the soil, the lower the voltage on the signal pin.',id:'Probe tanpa korosi yang membaca air di tanah lewat kapasitansi. Makin basah tanahnya, makin rendah tegangan di pin sinyal.'},
   note:{en:'Set the wetness. Dry reads high (about 2.8 V), wet reads low (about 1.2 V).',id:'Atur kebasahan. Kering terbaca tinggi (sekitar 2,8 V), basah terbaca rendah (sekitar 1,2 V).'},
  },
+ power:{rail:['VCC','GND'],min:3.3,max:5.5,ma:5},
  inputs:[{type:'range',key:'wetness',label:{en:'Soil wetness (%)',id:'Kebasahan tanah (%)'},min:0,max:100,step:1,default:40}],
  create(ctx){
-  const sig=ctx.pin('SIG');
+  const sig=ctx.analogPin('SIG');
   const wet=()=>clamp(Math.round(num(ctx.props.wetness,40)),0,100);
   return {
    state:()=>({wetness:wet(),volts:round1(soilVolts(wet())*10)/10}),

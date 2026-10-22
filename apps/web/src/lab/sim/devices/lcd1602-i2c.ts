@@ -1,5 +1,5 @@
 /**
- * LCD1602-I2C: HD44780 16x2 character LCD behind a PCF8574 I2C backpack (address 0x27), driven in 4-bit mode.
+ * LCD1602-I2C: HD44780 16x2 character LCD behind a PCF8574 I2C backpack (address 0x27, or 0x3F with the A0-A2 solder jumpers closed: the `address` popover input), driven in 4-bit mode.
  * PCF8574 port byte (the common backpack wiring): P0=RS, P1=RW, P2=E, P3=backlight, P4..P7=D4..D7.
  * The HD44780 latches on the FALLING edge of E, so we remember the previous port byte and decode it when E drops.
  * Reset state of the controller (datasheet): 8-bit interface, display off, cleared, entry mode I/D=1 S=0.
@@ -16,6 +16,7 @@ export type Lcd1602I2cState={
  backlight:boolean;display:boolean;cursor:boolean;blink:boolean;
  col:number;row:number;          // cursor cell on screen, -1 when scrolled out of the window
  contrast:number;color:string;
+ address:number;               // 7-bit I2C address of the backpack: 0x27 (PCF8574) or 0x3F (PCF8574A)
  writes:number;reads:number;chars:number;
 };
 
@@ -29,11 +30,15 @@ export const device=defineDevice<Lcd1602I2cState>({
   desc:{en:'A 16-column, 2-row character display. A small I2C backpack at address 0x27 turns four wires into the HD44780 4-bit bus, so a Wire sketch can print text.',id:'Layar karakter 16 kolom 2 baris. Modul I2C kecil di alamat 0x27 mengubah empat kabel menjadi bus 4-bit HD44780, jadi sketsa Wire bisa menampilkan teks.'},
   note:{en:'Nothing shows until the sketch runs the init sequence and turns the display on.',id:'Layar kosong sampai sketsa menjalankan urutan inisialisasi dan menyalakan tampilan.'},
  },
+ power:{rail:['VCC','GND'],min:4.5,max:5.5,ma:25},
  inputs:[
   {type:'choice',key:'color',label:{en:'Backlight colour',id:'Warna lampu latar'},options:[{value:'green',label:{en:'Green',id:'Hijau'}},{value:'blue',label:{en:'Blue',id:'Biru'}}],default:'green'},
-  {type:'range',key:'contrast',label:{en:'Contrast (trim pot)',id:'Kontras (trimpot)'},min:0,max:100,step:1,default:60,unit:'%'},
+  {type:'choice',key:'address',label:{en:'I2C address (backpack)',id:'Alamat I2C (modul)'},options:[{value:'0x27',label:{en:'0x27 (PCF8574)',id:'0x27 (PCF8574)'}},{value:'0x3F',label:{en:'0x3F (PCF8574A)',id:'0x3F (PCF8574A)'}}],default:'0x27'},
+ {type:'range',key:'contrast',label:{en:'Contrast (trim pot)',id:'Kontras (trimpot)'},min:0,max:100,step:1,default:60,unit:'%'},
  ],
+ defaults:{address:'0x27'},
  create(ctx){
+  const addr7=():number=>ctx.props.address==='0x3F'?0x3f:0x27;
   const ddram=new Uint8Array(80).fill(0x20),cgram=new Uint8Array(64);
   let bit4=false,hiNib=-1;                       // 8-bit mode until the 0x2 nibble
   let addr=0,inCg=false,shift=0;
@@ -108,11 +113,12 @@ export const device=defineDevice<Lcd1602I2cState>({
      line1:vis(0),line2:big2?vis(1):PAD.repeat(16),cg:hex(),
      backlight:(port&8)!==0,display:disp,cursor:cur,blink,col,row,
      contrast:clamp(Math.round(num(ctx.props.contrast,60)),0,100),
-     color:ctx.props.color==='blue'?'blue':'green',writes,reads,chars,
+     color:ctx.props.color==='blue'?'blue':'green',address:addr7(),writes,reads,chars,
     };
    },
    i2c:{
-    address:0x27,
+    // PCF8574 backpacks answer at 0x20-0x27, PCF8574A ones at 0x38-0x3F; 0x27 and 0x3F (all jumpers open) are the two sold in practice
+    get address(){return addr7();},
     onStart(){},
     onWrite(byte){writes++;onByte(byte&0xff);return true;},
     // PCF8574 quasi-bidirectional port: reading returns the pin levels. With RW=1 and E=1 the HD44780 drives D7..D4:

@@ -96,6 +96,7 @@ export const device=defineDevice<Bme280State>({
   desc:{en:'Reads temperature, humidity and air pressure over I2C; its registers answer real Wire reads and writes.',id:'Membaca suhu, kelembapan, dan tekanan udara lewat I2C; registernya menjawab baca/tulis Wire yang sebenarnya.'},
   note:{en:'Click it to set the temperature, humidity and pressure it senses. SDO to 5V moves it to address 0x77.',id:'Klik untuk mengatur suhu, kelembapan, dan tekanan yang ia rasakan. SDO ke 5V memindahkannya ke alamat 0x77.'},
  },
+ power:{rail:['VCC','GND'],min:1.71,max:3.6,ma:0.4},
  inputs:[
   {type:'range',key:'temperature',label:{en:'Temperature',id:'Suhu'},min:-40,max:85,step:0.5,unit:'°C',default:25},
   {type:'range',key:'humidity',label:{en:'Humidity',id:'Kelembapan'},min:0,max:100,step:1,unit:'%',default:50},

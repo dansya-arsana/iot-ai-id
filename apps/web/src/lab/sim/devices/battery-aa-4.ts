@@ -1,6 +1,6 @@
 /**
  * BATTERY-AA-4 device (protocol 'gpio'): 4 x AA holder with a slide switch and two leads.
- * Source only: no power-net solver exists in the lab, so it reports the pack voltage. One alkaline AA runs
+ * A real supply for the power-net solver (sim/power.ts) and it also reports the pack voltage. One alkaline AA runs
  * 1.60 V fresh, about 1.25 V on the plateau and 0.9 V empty; four in series give 6.4 V down to 3.6 V.
  * Switch off: the leads read 0 V. Own work from public discharge behaviour.
  */
@@ -22,8 +22,10 @@ export const device=defineDevice<BatteryAa4State>({
  copy:{
   name:{en:'4 x AA battery holder',id:'Holder baterai 4 x AA'},
   desc:{en:'Four AA cells in series in one holder with a slide switch: about 6 V when fresh, red lead plus, black lead minus.',id:'Empat baterai AA seri dalam satu holder dengan saklar geser: sekitar 6 V saat baru, kabel merah plus, hitam minus.'},
-  note:{en:'Slide the switch off and the leads read 0 V. The lab shows the voltage but does not power the board from it.',id:'Geser saklar ke mati dan kabel terbaca 0 V. Lab hanya menampilkan tegangan, papan tidak ditenagai olehnya.'},
+  note:{en:'Slide the switch off and the leads read 0 V. It is a real supply: wire PLUS to VIN or a motor driver and MINUS to GND.',id:'Geser saklar ke mati dan kabel terbaca 0 V. Ini catu sungguhan: kabelkan PLUS ke VIN atau driver motor dan MINUS ke GND.'},
  },
+ // a real supply for the net solver: 0 V across the leads while the switch is off
+ supplies:p=>[{pos:'PLUS',neg:'MINUS',volts:p.on===false?0:Math.round(4*aaVolts(clamp(Math.round(num(p.charge,100)),0,100))*100)/100,maxMa:1000}],
  inputs:[
   {type:'range',key:'charge',label:{en:'Charge left',id:'Sisa muatan'},min:0,max:100,step:1,unit:'%',default:100},
   {type:'toggle',key:'on',label:{en:'Switch on',id:'Saklar nyala'},default:true},

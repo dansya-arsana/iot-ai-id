@@ -8,6 +8,7 @@ import {LangToggle} from '../ui';
 import {CIRCUITS,UNO_PINS,isLessonId} from './contract';
 import type {Circuit,FirmwareVariant,LabRunner,LessonId,LoadReport,ParamValues,PartInput,PartProps,PinSample,SimSnapshot,ViewCommand} from './contract';
 import {labFirmware} from './firmware';
+import {boardOf} from './boards';
 import {GOALS} from './goals';
 import type {GoalMemory} from './goals';
 import {LESSONS} from './lessons';
@@ -30,13 +31,14 @@ import {Inspector} from './ui/inspector';
 import type {InspectTarget} from './ui/inspector';
 import {LessonStrip} from './ui/lesson-strip';
 import {createPinHistory} from './ui/pin-history';
+import {PowerNotice} from './ui/power-notice';
 import {Progress} from './ui/progress';
 import {Rail,SettingsPanel} from './ui/rail';
 import {Readouts} from './ui/readouts';
 import {SerialHeader,SerialLog} from './ui/serial-monitor';
 import type {SerialSeg} from './ui/serial-monitor';
 import {HardwarePanel} from './ui/hardware-panel';
-import {RECORDS,quoteOf} from './ui/test-record';
+import {recordFor,quoteOf} from './ui/test-record';
 import type {TestRecordData} from './ui/test-record';
 import {Viewbar} from './ui/viewbar';
 import {AiBuilder,AiBuildButton,AiGeneratedChip} from './ui/ai-builder';
@@ -54,7 +56,7 @@ import {specToCircuit} from './circuit-spec';
 import {routeControl} from './scene/drag';
 
 interface Runtime{id:LessonId;variantId:string;params:ParamValues;props:Record<string,PartProps>;inputs:Inputs;circuit:Circuit}
-interface UiSnap{status:SimSnapshot['status'];simTimeMs:number;currentLine:number|null;pins:Record<string,PinSample>|null;parts:SimSnapshot['parts'];speed:number}
+interface UiSnap{status:SimSnapshot['status'];simTimeMs:number;currentLine:number|null;pins:Record<string,PinSample>|null;parts:SimSnapshot['parts'];speed:number;power:NonNullable<SimSnapshot['power']>}
 /** The AI builder's circuit on the stage: runs its own firmware and circuit instead of the open lesson's. */
 interface AiMode{lessonId:LessonId;build:AiBuild;variant:FirmwareVariant;circuit:Circuit;inputs:Inputs}
 type PopState={id:string;at:{x:number;y:number};bounds:{width:number;height:number};module:PartModule;controls?:readonly ControlSpec[];thr?:{spec:ThresholdSpec;controls:ControlSpec[]}};
@@ -70,7 +72,11 @@ function PopHost({pop,circuit,inputs,sweep,params,lang,onChange,onParam,onFocus,
  if(part.kind==='resistor'&&values.ohms!==undefined)values.ohms=String(values.ohms);
  if(inp?.kind==='obstacle')values.distanceCm=inp.distanceCm;
  if(inp?.kind==='lamp'){if(inp.distanceCm!==undefined)values.distanceCm=inp.distanceCm;if(inp.on!==undefined)values.on=inp.on;}
- return <PartPopover partId={pop.id} module={pop.module} controls={pop.controls} values={values} at={pop.at} bounds={pop.bounds} onChange={(k,v)=>onChange(pop.id,k,v)} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
+ // an L298N whose VS terminal is wired takes its supply from that wire: the slider would lie, so hide it
+ const vsWired=part.kind==='l298n'&&(circuit.wires.some(w=>w.componentId===pop.id&&w.pin==='VS')||(circuit.links??[]).some(l=>(l.a.part===pop.id&&l.a.pin==='VS')||(l.b.part===pop.id&&l.b.pin==='VS')));
+ const ctrls=vsWired?(pop.controls??pop.module.interact?.controls??[]).filter(c=>!('key' in c&&c.key==='vs')):pop.controls;
+ const vsDesc=vsWired?(lang==='id'?'Catu motor diambil dari kabel VS.':'Motor supply comes from the wire on VS.'):undefined;
+ return <PartPopover partId={pop.id} module={pop.module} controls={ctrls} {...(vsDesc?{desc:vsDesc}:{})} values={values} at={pop.at} bounds={pop.bounds} onChange={(k,v)=>onChange(pop.id,k,v)} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
 }
 function aiVariant(b:AiBuild):FirmwareVariant{
  const src=b.spec.sketch.source;
@@ -78,8 +84,8 @@ function aiVariant(b:AiBuild):FirmwareVariant{
 }
 type SceneState='loading'|'ready'|'unavailable';
 
-const EMPTY_UI:UiSnap={status:'idle',simTimeMs:0,currentLine:null,pins:null,parts:{},speed:1};
-const toUi=(s:SimSnapshot):UiSnap=>({status:s.status,simTimeMs:s.simTimeMs,currentLine:s.currentLine,pins:s.pins,parts:s.parts,speed:s.speed});
+const EMPTY_UI:UiSnap={status:'idle',simTimeMs:0,currentLine:null,pins:null,parts:{},speed:1,power:[]};
+const toUi=(s:SimSnapshot):UiSnap=>({status:s.status,simTimeMs:s.simTimeMs,currentLine:s.currentLine,pins:s.pins,parts:s.parts,speed:s.speed,power:s.power??[]});
 const variantOf=(id:LessonId,variantId:string):FirmwareVariant=>{
  const vs=labFirmware.lessons[id].variants;
  return vs.find(v=>v.id===variantId)??vs[0];
@@ -374,7 +380,7 @@ function LabInner({id}:{id:LessonId}){
   runnerRef.current=runner;
   const off=runner.onSerial(chunk=>pushSeg(false,chunk));
   const readyT=window.setTimeout(()=>setReady(true),0);
-  let raf=0,last=performance.now(),lastUi=0;
+  let raf=0,last=performance.now(),lastUi=0,relayClicks=-1;
   const loop=(t:number)=>{
    raf=requestAnimationFrame(loop);
    if(document.hidden){last=t;return;}
@@ -396,7 +402,7 @@ function LabInner({id}:{id:LessonId}){
      timers.current.push(window.setTimeout(()=>setCelebrate(null),1600));
      const v=variantOf(rts.id,rts.variantId);
      const n=LESSONS.find(l=>l.id===rts.id)?.n??0;
-     setRecord({lesson:rts.id,n,tMs:snap.simTimeMs,rows:RECORDS[rts.id](historyRef.current,snap,memRef.current),firmware:`${v.sketch} · ${nf(v.bytes)} B · ${gcc}`});
+     setRecord({lesson:rts.id,n,tMs:snap.simTimeMs,rows:recordFor(rts.id)(historyRef.current,snap,memRef.current),firmware:`${v.sketch} · ${nf(v.bytes)} B · ${gcc}`});
      if(settingsRef.current.reducedMotion)setShowRecord(true);
      else timers.current.push(window.setTimeout(()=>setShowRecord(true),700));
      sceneRef.current?.celebrate?.();
@@ -406,6 +412,12 @@ function LabInner({id}:{id:LessonId}){
      speedNote.current=true;pushSeg(true,`› Simulation at ${Math.round(snap.speed*100)}% speed\n`);
     }
    }
+   // relay contacts click: one clack per contact change (the device counts them; a reload resets the count)
+   let relayNow=0;
+   for(const p of Object.values(snap.parts))if(p.kind==='ext'&&p.type==='relay-module')relayNow+=Number(p.v.clicks)||0;
+   if(relayNow<relayClicks)relayClicks=relayNow;
+   if(running&&relayNow>relayClicks&&relayClicks>=0&&settingsRef.current.sound)audioRef.current?.clack(settingsRef.current.volume);
+   relayClicks=relayNow;
    const buzzer=Object.values(snap.parts).find(p=>p.kind==='buzzer');
    audioRef.current?.update(running,settingsRef.current.sound,buzzer?.kind==='buzzer'?buzzer.on:false,buzzer?.kind==='buzzer'?buzzer.freqHz:0,settingsRef.current.volume);
    if(t-lastUi>100){
@@ -555,7 +567,7 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
     <header className="lab-header">
      <Link to="/" className="lab-wordmark" aria-label={tr('iot.ai.id home','Beranda iot.ai.id')}><LabGlyph/><span>Lab</span></Link>
      <i className="lab-divider" aria-hidden="true"/>
-     <span className="lab-sub">UNO · {tr('EMULATED ATMEGA328P','ATMEGA328P TIRUAN')}</span>
+     <span className="lab-sub">{boardOf(circuit).id==='nano'?'NANO':'UNO'} · {tr('EMULATED ATMEGA328P','ATMEGA328P TIRUAN')}</span>
      <span className="lab-grow"/>
      <ChipPill running={running} speed={ui.speed} simTimeMs={ui.simTimeMs} compact={vp.mobile}/>
      <AiBuildButton active={aiOpen} onClick={()=>(aiOpen?closeAi():setAiOpen(true))}/>
@@ -577,6 +589,7 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
       {sceneState==='unavailable'&&<p className="lab-3d-note" role="status">{tr('3D view unavailable on this device. The simulation still runs.','Tampilan 3D tidak tersedia di perangkat ini. Simulasi tetap berjalan.')}</p>}
       <Callouts lesson={lesson} api={api} pills={vp.mobile||focusId!==null} show={showCallouts&&!ai} running={running} compact={vp.compact} maxPills={vp.mobile?2:undefined} selected={focusId}/>
       {!ai&&<Readouts lessonId={id} api={api}/>}
+      <PowerNotice notes={ui.power}/>
       {selected&&<Inspector target={selected} lesson={lesson} lessonId={id} circuit={circuit} variantId={rt.variantId} params={rt.params} overCurrent={overCurrent} api={api}
        onClose={()=>setSelected(null)} onParam={changeParam} onVariant={changeVariant} onProps={changeProps} onInput={changeInput} onFocus={t=>sceneRef.current?.focus(t)}/>}
       {pop&&<PopHost pop={pop} circuit={circuit} inputs={inputs} sweep={sweep} params={rt.params} lang={lang} onChange={popChange} onParam={changeParam} onFocus={focusPart} onClose={()=>setPop(null)}/>}

@@ -3,6 +3,7 @@ import {defineDevice,num} from './types';
 
 export const device=defineDevice({
  kind:'hcsr04',protocol:'pulse',legacyState:true,pins:['VCC','TRIG','ECHO','GND'],inputs:[],
+ power:{rail:['VCC','GND'],min:4.5,max:5.5,ma:15},
  create(ctx){
   const trig=ctx.pin('TRIG'),echo=ctx.pin('ECHO');
   let rise=0,busy=false,lastTrig=-Infinity,nowCycles=0;

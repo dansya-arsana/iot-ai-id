@@ -4,11 +4,15 @@
  * The part registry (scene/parts/index.ts) is the source of truth for looks; tests keep it consistent with PART_PINS and PIN_COLS used here.
  */
 import {z} from 'zod';
-import type {Circuit,PartKind,PartProps,PartSpec,Wire,WireColor,BoardPin} from './contract';
-import {PART_PINS,UNO_PINS} from './contract';
+import type {Circuit,PartKind,PartLink,PartProps,PartSpec,Wire,WireColor,BoardPin} from './contract';
+import {ANALOG_ONLY_PINS,PART_PINS,UNO_PINS} from './contract';
+import {isAnalogOnly} from './boards';
 import {BB_COLS,BB_ROWS,PIN_COLS} from './scene/layout';
 // side effect: registers every sim/devices/<kind>.ts (pins, holes, copy) so plugin kinds validate with no edit here
-import './sim/devices';
+import {deviceRegistry} from './sim/devices';
+import type {PowerSpec,RegulatorDecl,SupplyDecl} from './sim/devices';
+import {PowerNetwork,checkPower} from './sim/power';
+import {partCopy} from './parts-copy';
 
 export interface Bilingual{en:string;id:string}
 const BilingualSchema=z.object({en:z.string().trim().min(1).max(300),id:z.string().trim().min(1).max(300)}).strict();
@@ -42,7 +46,8 @@ export const SpecStepSchema=z.object({
  add:z.object({parts:z.array(z.string()).max(30).optional(),wires:z.array(z.string()).max(30).optional()}).strict(),
 }).strict();
 export const CircuitSpecSchema=z.object({
- board:z.literal('uno'),
+ /** 'uno' or 'nano': both run the same emulated ATmega328P; the Nano adds A6/A7 (analog input only). */
+ board:z.enum(['uno','nano']).default('uno'),
  parts:z.array(SpecPartSchema).max(40),
  wires:z.array(SpecWireSchema).max(120),
  sketch:z.object({source:z.string().min(1).max(20000),params:z.record(z.string().max(32),z.number()).optional()}).strict(),
@@ -63,16 +68,26 @@ export type IssueSeverity='error'|'warning';
 export interface SpecIssue{code:string;severity:IssueSeverity;en:string;id:string;/** part id, wire id or board pin the issue is about */ref?:string}
 export interface ValidationResult{ok:boolean;issues:SpecIssue[]}
 /** Minimal part catalog the validator needs. Defaults to PART_PINS + PIN_COLS (kept equal to the scene registry by a test). */
-export interface PartCatalog{kinds:readonly string[];pins(kind:string):readonly string[];holes(kind:string):readonly number[]}
+export interface PartCatalog{
+ kinds:readonly string[];pins(kind:string):readonly string[];holes(kind:string):readonly number[];
+ /** Supply rating of a kind (optional: catalogs without it skip the power checks). */
+ power?(kind:string):PowerSpec|undefined;
+ /** Sources and regulators a part provides for these props (battery, power module, LM7805). */
+ supplies?(kind:string,props:PartProps):readonly SupplyDecl[];
+ regulators?(kind:string,props:PartProps):readonly RegulatorDecl[];
+}
 export const DEFAULT_CATALOG:PartCatalog={
  /** Live: includes every registered plugin kind. */
  get kinds():readonly string[]{return Object.keys(PART_PINS);},
  pins:k=>(PART_PINS as Record<string,readonly string[]>)[k]??[],
  holes:k=>(PIN_COLS as Record<string,readonly number[]|undefined>)[k]??[],
+ power:k=>deviceRegistry.get(k)?.power,
+ supplies:(k,p)=>deviceRegistry.get(k)?.supplies?.({...deviceRegistry.get(k)?.defaults,...p})??[],
+ regulators:(k,p)=>deviceRegistry.get(k)?.regulators?.({...deviceRegistry.get(k)?.defaults,...p})??[],
 };
 
 const iss=(code:string,severity:IssueSeverity,en:string,id:string,ref?:string):SpecIssue=>({code,severity,en,id,...(ref?{ref}:{})});
-const BOARD_PINS=new Set<string>([...UNO_PINS,...POWER_BOARD_PINS]);
+const BOARD_PINS=new Set<string>([...UNO_PINS,...ANALOG_ONLY_PINS,...POWER_BOARD_PINS]);
 const isBoardPin=(s:string):boolean=>BOARD_PINS.has(s);
 const RAILS:Record<string,string>={'rail.5v':'5V','rail.gnd':'GND'};
 const half=(row:number):'t'|'b'=>row<5?'t':'b';
@@ -118,23 +133,23 @@ export function buildNets(spec:CircuitSpec,cat:PartCatalog=DEFAULT_CATALOG):Nets
 }
 
 // ---------- sketch pin extraction ----------
-export interface SketchPins{used:Set<string>;outputs:Set<string>;unresolved:string[]}
+export interface SketchPins{used:Set<string>;outputs:Set<string>;unresolved:string[];/** pins used by a digital function (pinMode, digitalRead/Write, tone, pulseIn, attach): A6/A7 cannot do these */digital:Set<string>}
 const unoPin=(n:number,analog:boolean):string|null=>{
- if(analog&&n>=0&&n<=5)return 'A'+n;
+ if(analog&&n>=0&&n<=7)return 'A'+n;
  if(n>=0&&n<=13)return 'D'+n;
- if(n>=14&&n<=19)return 'A'+(n-14);
+ if(n>=14&&n<=21)return 'A'+(n-14);   // 20 and 21 are A6 and A7 of the Nano core
  return null;
 };
 /** Pins a sketch touches, by regex over pinMode/digitalWrite/digitalRead/analogWrite/analogRead/tone/pulseIn/.attach and #define / const int constants. */
 export function sketchPins(source:string):SketchPins{
  const src=source.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
  const consts=new Map<string,string>([['LED_BUILTIN','D13']]);
- const val=(v:string,analog:boolean):string|null=>/^A[0-5]$/.test(v)?v:/^\d+$/.test(v)?unoPin(Number(v),analog):null;
- for(const m of src.matchAll(/#define\s+(\w+)\s+(A[0-5]|\d+)\b/g)){const p=val(m[2]!,false);if(p)consts.set(m[1]!,p);}
- for(const m of src.matchAll(/\b(?:const\s+)?(?:int|byte|uint8_t|unsigned\s+char|short|char)\s+(\w+)\s*=\s*(A[0-5]|\d+)\s*;/g)){const p=val(m[2]!,false);if(p)consts.set(m[1]!,p);}
- const used=new Set<string>(),outputs=new Set<string>(),unresolved:string[]=[];
+ const val=(v:string,analog:boolean):string|null=>/^A[0-7]$/.test(v)?v:/^\d+$/.test(v)?unoPin(Number(v),analog):null;
+ for(const m of src.matchAll(/#define\s+(\w+)\s+(A[0-7]|\d+)\b/g)){const p=val(m[2]!,false);if(p)consts.set(m[1]!,p);}
+ for(const m of src.matchAll(/\b(?:const\s+)?(?:int|byte|uint8_t|unsigned\s+char|short|char)\s+(\w+)\s*=\s*(A[0-7]|\d+)\s*;/g)){const p=val(m[2]!,false);if(p)consts.set(m[1]!,p);}
+ const used=new Set<string>(),outputs=new Set<string>(),digital=new Set<string>(),unresolved:string[]=[];
  const resolve=(arg:string,analog:boolean):string|null=>{
-  const p=/^\w+$/.test(arg)&&!/^(A[0-5]|\d+)$/.test(arg)?consts.get(arg)??null:val(arg,analog);
+  const p=/^\w+$/.test(arg)&&!/^(A[0-7]|\d+)$/.test(arg)?consts.get(arg)??null:val(arg,analog);
   if(!p)unresolved.push(arg);
   return p;
  };
@@ -142,11 +157,14 @@ export function sketchPins(source:string):SketchPins{
   const fn=m[1]!,p=resolve(m[2]!,fn==='analogRead');
   if(!p)continue;
   used.add(p);
+  if(fn!=='analogRead'&&fn!=='analogWrite')digital.add(p);
   if(fn==='digitalWrite'||fn==='analogWrite'||fn==='tone'||fn==='noTone')outputs.add(p);
   if(fn==='pinMode'){const rest=src.slice((m.index??0)+m[0].length,(m.index??0)+m[0].length+40);if(/^\s*,\s*OUTPUT\b/.test(rest))outputs.add(p);}
  }
- for(const m of src.matchAll(/\.attach\s*\(\s*([A-Za-z_]\w*|\d+)/g)){const p=resolve(m[1]!,false);if(p){used.add(p);outputs.add(p);}}
- return {used,outputs,unresolved};
+  // the SPI peripheral owns D11 (MOSI), D12 (MISO) and D13 (SCK): using SPI.* uses those pins even though no pin number appears
+ if(/\bSPI\s*\.\s*(begin|transfer|beginTransaction)\b/.test(src))for(const p of ['D11','D12','D13'])used.add(p);
+ for(const m of src.matchAll(/\.attach\s*\(\s*([A-Za-z_]\w*|\d+)/g)){const p=resolve(m[1]!,false);if(p){used.add(p);outputs.add(p);digital.add(p);}}
+ return {used,outputs,unresolved,digital};
 }
 
 // ---------- the validator ----------
@@ -231,6 +249,12 @@ export function validateCircuitSpec(spec:CircuitSpec,cat:PartCatalog=DEFAULT_CAT
  }
  // 5. sketch vs wiring
  const sp=sketchPins(spec.sketch.source);
+ // A6 and A7 exist on the Nano only, and they can only be read as analog values
+ if(spec.board!=='nano'){
+  const onUno=new Set<string>([...sp.used,...spec.wires.flatMap(w=>[w.from,w.to])].filter(isAnalogOnly));
+  for(const pn of onUno)out.push(iss('pin-not-on-board','error',`Pin ${pn} exists on the Nano only. This circuit uses the Uno, which has A0 to A5. Use another analog pin or switch the board to the Nano.`,`Pin ${pn} hanya ada di Nano. Rangkaian ini memakai Uno yang punya A0 sampai A5. Pakai pin analog lain atau ganti papan ke Nano.`,pn));
+ }
+ for(const pn of sp.digital)if(isAnalogOnly(pn))out.push(iss('analog-only-pin','error',`Pin ${pn} is analog input only: use analogRead(${pn}). pinMode, digitalRead, digitalWrite and tone cannot use it.`,`Pin ${pn} hanya input analog: pakai analogRead(${pn}). pinMode, digitalRead, digitalWrite dan tone tidak bisa memakainya.`,pn));
  const wired=new Set<string>();
  for(const g of groups){if(!partPinsOf(g).length)continue;for(const b of boardIn(g))if(!(POWER_BOARD_PINS as readonly string[]).includes(b))wired.add(b);}
  for(const pn of sp.used){
@@ -243,6 +267,17 @@ export function validateCircuitSpec(spec:CircuitSpec,cat:PartCatalog=DEFAULT_CAT
  for(const pn of sp.outputs){
   const g=groups.find(x=>x.includes('B:'+pn));
   if(g&&boardIn(g).some(x=>(POWER_BOARD_PINS as readonly string[]).includes(x)))out.push(iss('output-short','error',`The code drives pin ${pn} as an output, but it is wired straight to ${boardIn(g).find(x=>(POWER_BOARD_PINS as readonly string[]).includes(x))}. That can damage the board.`,`Kode menjadikan pin ${pn} sebagai output, tetapi dikabel langsung ke ${boardIn(g).find(x=>(POWER_BOARD_PINS as readonly string[]).includes(x))}. Ini bisa merusak papan.`,pn));
+ }
+ // 5b. supply voltages: a 3.3 V part on 5 V, a motor on a board pin, two sources shorted
+ if(cat.power){
+  const groupsForPower=groups;
+  const pnet=new PowerNetwork({
+   groups:groupsForPower,
+   parts:spec.parts.map(p=>({id:p.id,kind:p.kind,props:p.props as PartProps,supplies:cat.supplies?.(p.kind,p.props as PartProps)??[],regulators:cat.regulators?.(p.kind,p.props as PartProps)??[],drives:[],switches:[]})),
+   vinIdle:4.7,
+  });
+  const notes=checkPower(pnet,spec.parts.filter(p=>cat.kinds.includes(p.kind)).map(p=>{const c=partCopy(p.kind).name;const pw=cat.power!(p.kind);return {id:p.id,kind:p.kind,label:{en:`${c.en} (${p.id})`,id:`${c.id} (${p.id})`},...(pw?{power:pw}:{})};}));
+  for(const n of notes)out.push(iss('power-'+n.code,'warning',n.en,n.id,n.part||undefined));
  }
  // 6. steps
  if(spec.steps.length){
@@ -327,17 +362,23 @@ export function specToCircuit(spec:CircuitSpec,cat:PartCatalog=DEFAULT_CATALOG):
   return {id:p.id,kind:p.kind as PartKind,net,props};
  });
  const wires:Wire[]=[];
+ const links:PartLink[]=[];
  spec.wires.forEach(w=>{
   const color=w.color as WireColor;
   const ends=[w.from,w.to];
   const bp=ends.find(e=>isBoardPin(e)||e in RAILS);
   const pp=ends.find(e=>e!==bp);
-  if(!bp)return;
+  if(!bp){
+   // part pin to part pin: a link (L298N OUT1 to a motor, a relay contact to a lamp)
+   const a=/^([^.]+)\.(.+)$/.exec(w.from),b=/^([^.]+)\.(.+)$/.exec(w.to);
+   if(a&&b)links.push({a:{part:a[1]!,pin:a[2]!},b:{part:b[1]!,pin:b[2]!},color});
+   return;
+  }
   const board=(bp in RAILS?RAILS[bp]:bp) as BoardPin;
   if(!pp||pp in RAILS||isBoardPin(pp)){if(pp&&pp in RAILS)wires.push({componentId:'bb',pin:pp==='rail.5v'?'5v-rail':'gnd-rail',boardPin:board,color});return;}
   const m=/^([^.]+)\.(.+)$/.exec(pp);
   if(m)wires.push({componentId:m[1]!,pin:m[2]!,boardPin:board,color});
  });
- return {parts,wires};
+ return {parts,wires,...(links.length?{links}:{}),board:spec.board};
  function partPinsOf2(g:string[]):string[]{return g.flatMap(n=>{const m=/^P:([^.]+)\./.exec(n);return m?[m[1]!]:[];});}
 }

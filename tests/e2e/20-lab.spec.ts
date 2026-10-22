@@ -1,4 +1,8 @@
 import {test,expect,type Page} from '@playwright/test';
+import {readdirSync} from 'node:fs';
+
+/** One card per lesson file: new lessons are added by dropping a file in lab/lessons, so count the files. */
+const LESSON_COUNT=readdirSync('apps/web/src/lab/lessons').filter(f=>f.endsWith('.ts')&&!['index.ts','kit.ts'].includes(f)).length;
 
 const PUBLIC='http://iot.admin.localhost:8891';
 /** Set a range input the way a user drag would: native value setter plus input event. */
@@ -22,8 +26,8 @@ test('lab is public: lesson cards and progress',async({page})=>{
  await page.goto(`${PUBLIC}/lab`);
  await expect(page.locator('.lab')).toBeVisible();
  await expect(page.getByText('Invitation-only')).toHaveCount(0);
- await expect(page.locator('[data-testid^="lab-lesson-"]')).toHaveCount(16);
- await expect(page.getByTestId('lab-progress')).toContainText('/16');
+ await expect(page.locator('[data-testid^="lab-lesson-"]')).toHaveCount(LESSON_COUNT);
+ await expect(page.getByTestId('lab-progress')).toContainText('/'+LESSON_COUNT);
 });
 
 test('blink runs on the emulated UNO and a param edit reaches the firmware',async({page})=>{

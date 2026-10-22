@@ -10,7 +10,7 @@ import {httpLlm,type LabLlm} from '../services/ops/lab-ai.js';
 import {fixtureGenerator,handleInternalLabSpec,labSpecPrompt} from '../services/api/lab-spec.js';
 import {INTERNAL_SPEC_PATH,LAB_AI_EXAMPLE_IDS,LabBuildResponseSchema,LabExamplesResponseSchema,MEMBER_GRANTS,type InternalSpecRequest} from '../packages/ops-contract/index.js';
 import {parseCircuitSpec,specToCircuit} from '../apps/web/src/lab/circuit-spec.js';
-import {labFirmware} from '../apps/web/src/lab/firmware/generated.js';
+import {labFirmware} from '../apps/web/src/lab/firmware/index.js';
 import {createLabRunner} from '../apps/web/src/lab/sim/index.js';
 import type {FirmwareVariant} from '../apps/web/src/lab/contract.js';
 

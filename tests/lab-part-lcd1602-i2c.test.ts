@@ -77,3 +77,24 @@ test('lcd1602-i2c: contrast and colour come from props',()=>{
  const f=fakeEnv();const m=createModels(circuit({SDA:'A4',SCL:'A5'},{color:'blue',contrast:30}),f.env).get('lcd1602-i2c1')!;
  const s=m.state();if(s.kind==='ext'){assert.equal(s.v.color,'blue');assert.equal(s.v.contrast,30);}
 });
+
+test('lcd1602-i2c: the backpack address is 0x27 by default and follows the popover to 0x3F, live',()=>{
+ const f=fakeEnv();
+ const m=createModels(circuit({SDA:'A4',SCL:'A5'}),f.env).get('lcd1602-i2c1')!;
+ const bus=f.i2c[0]!;
+ assert.equal(bus.address,0x27);
+ m.props.address='0x3F';
+ assert.equal(bus.address,0x3f,'the bus asks the device for its address at every START');
+ const s=m.state();assert.ok(s.kind==='ext');if(s.kind==='ext')assert.equal(s.v.address,0x3f);
+ m.props.address='0x27';assert.equal(bus.address,0x27);
+});
+test('lcd1602-i2c: the TWI bus matches the CURRENT address, so a sketch at the wrong address gets a NACK',async()=>{
+ const {TwiBus}=await import('../apps/web/src/lab/sim/devices/core/twi.js');
+ const calls:boolean[]=[];
+ const twi={completeStart(){},completeStop(){},completeConnect:(ack:boolean)=>{calls.push(ack);},completeWrite(){},completeRead(){}};
+ const bus=new TwiBus(twi as never);
+ let addr=0x27;
+ bus.attach({get address(){return addr;},onWrite:()=>true,onRead:()=>0});
+ bus.connectToSlave(0x27,true);addr=0x3f;bus.connectToSlave(0x27,true);bus.connectToSlave(0x3f,true);
+ assert.deepEqual(calls,[true,false,true]);
+});

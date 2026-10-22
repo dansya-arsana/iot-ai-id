@@ -3,7 +3,7 @@ import {AdditiveBlending,Box3,BoxGeometry,Group,LatheGeometry,Mesh,MeshBasicMate
 import type {PartKind,PartProps,PartState} from '../../contract';
 import {deviceRegistry,extState} from '../../sim/devices';
 import type {InputSpec} from '../../sim/devices';
-import {PIN_COLS,PITCH,BODY_X,isOnBoardKind} from '../layout';
+import {PIN_COLS,PITCH,BODY_X,DESK_MM,isOnBoardKind} from '../layout';
 import {glowTexture,solid} from '../materials';
 import {contactShadow} from '../decals';
 import {contentBox} from '../bounds';
@@ -68,9 +68,9 @@ export function footprintOf(kind:PartKind,deskMm?:readonly [number,number]):Part
 
 /** Popover controls generated from a device's typed inputs schema (so the part and the device cannot drift apart). */
 export function controlsFromInputs(inputs:readonly InputSpec[]):ControlSpec[]{
- return inputs.map((i):ControlSpec=>i.type==='range'?{type:'range',key:i.key,label:i.label,min:i.min,max:i.max,step:i.step,...(i.unit?{unit:i.unit}:{})}
+ return inputs.filter(i=>!i.advanced).map((i):ControlSpec=>i.type==='range'?{type:'range',key:i.key,label:i.label,min:i.min,max:i.max,step:i.step,default:i.default,...(i.unit?{unit:i.unit}:{})}
   :i.type==='toggle'?{type:'toggle',key:i.key,label:i.label}
-  :{type:'choice',key:i.key,label:i.label,options:i.options});
+  :{type:'choice',key:i.key,label:i.label,options:i.options,default:i.default,...(i.grid?{grid:i.grid}:{}),...(i.momentaryMs?{momentaryMs:i.momentaryMs}:{}),...(i.fold?{fold:i.fold}:{})});
 }
 
 export interface PartDef{
@@ -80,6 +80,7 @@ export interface PartDef{
 }
 /** Wrap a legacy-style builder (`make(props,group)` returning {apply}) into a PartModule. */
 export function definePart(d:PartDef):PartModule{
+ if(d.deskMm)DESK_MM[d.kind]=d.deskMm;
  // a plugin kind without its own controls gets its popover from the device's inputs schema
  const inputs=deviceRegistry.get(d.kind)?.inputs??[];
  const interact:InteractSpec|undefined=d.interact?.controls?.length||!inputs.length?d.interact

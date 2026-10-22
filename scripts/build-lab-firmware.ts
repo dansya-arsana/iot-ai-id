@@ -1,8 +1,12 @@
 /**
  * Builds the lab firmware: compiles every lesson sketch with arduino-cli (AVR core) and writes
- * apps/web/src/lab/firmware/generated.ts (flash image, patch offsets, line tables, sha256).
+ * apps/web/src/lab/firmware/generated/<sketch>.ts, one file per sketch (flash image, patch offsets, line tables, sha256).
  *
- * Usage: npm run lab:firmware   (or: npx tsx scripts/build-lab-firmware.ts)
+ * Usage:
+ *   npm run lab:firmware                      every sketch of every lesson
+ *   npm run lab:firmware -- blink-default     only that sketch (parallel-safe: touches only generated/blink-default.ts)
+ *   npm run lab:firmware -- blink servo       every variant of those lessons
+ *   npm run lab:firmware -- --raw x.ino out.json [--board nano]   compile any .ino (no params) into a FirmwareVariant JSON, for test fixtures
  *
  * Toolchain selection:
  *  1. Native: if env LAB_AVR_BIN is set (dir with avr-gcc, avr-objdump...) it is passed as
@@ -13,15 +17,16 @@
  *     Force with LAB_DOCKER=1. Override the image with LAB_DOCKER_IMAGE.
  * Everything is compiled with -fno-lto so numeric params stay plain data bytes in flash; each
  * param's patch offset is found by differential compilation and verified (patched bytes ==
- * freshly compiled bytes). Never hand-edit generated.ts.
+ * freshly compiled bytes). Never hand-edit the generated files.
  */
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
-import {existsSync, mkdirSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
+import {mkdirSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {FIRMWARE_SPEC, LESSON_IDS} from '../apps/web/src/lab/contract.js';
-import type {FirmwareBundle, FirmwareParam, FirmwareRegistry, FirmwareVariant, LessonId, ParamCType, ParamSpec} from '../apps/web/src/lab/contract.js';
+import {BOARDS} from '../apps/web/src/lab/boards.js';
+import type {BoardId, FirmwareParam, FirmwareSketch, FirmwareVariant, LessonId, ParamCType, ParamSpec} from '../apps/web/src/lab/contract.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FW_DIR = join(ROOT, 'apps/web/src/lab/firmware');
@@ -115,14 +120,25 @@ function parseHex(hex: string): Uint8Array {
 }
 
 interface Built {flash: Uint8Array; objdump: string}
-function compile(name: string, source: string, wantLines: boolean): Built {
+function compile(name: string, source: string, wantLines: boolean, board: BoardId = 'uno'): Built {
+  const fqbn = BOARDS[board].fqbn;
+  if (!fqbn) throw new Error(`board '${board}' has no compile target (not emulated)`);
   const dir = join(WORK, `c${compiles++}`);
   rmSync(dir, {recursive: true, force: true});
   mkdirSync(join(dir, name), {recursive: true});
   writeFileSync(join(dir, name, `${name}.ino`), source);
   const w = workDir(dir);
-  const cmd = `arduino-cli compile -b arduino:avr:uno ${FLAGS.join(' ')} ${compilerPath()} --build-cache-path ${cacheDir()} --build-path ${w}/build ${w}/${name}`;
-  try { sh(cmd, dir); } catch (e) {
+  const cmd = `arduino-cli compile -b ${fqbn} ${FLAGS.join(' ')} ${compilerPath()} --build-cache-path ${cacheDir()} --build-path ${w}/build ${w}/${name}`;
+  try {
+    // the docker bind mount of a freshly created folder is sometimes not visible for a moment (colima): retry the compile a few times
+    for (let attempt = 0; ; attempt++) {
+      try { sh(cmd, dir); break; } catch (e) {
+        const msg = String((e as {stderr?: string}).stderr ?? '');
+        if (attempt < 3 && /error while creating mount source path|no such file or directory/.test(msg)) { mkdirSync(join(dir, name), {recursive: true}); continue; }
+        throw e;
+      }
+    }
+  } catch (e) {
     const err = e as {stderr?: string; stdout?: string};
     throw new Error(`compile failed for ${name}:\n${err.stdout ?? ''}${err.stderr ?? ''}`, {cause: e});
   }
@@ -175,7 +191,7 @@ function findParam(source: string, p: ParamSpec) {
 
 const withValue = (src: string, loc: {start: number; end: number}, v: number): string => src.slice(0, loc.start) + String(v) + src.slice(loc.end);
 
-function buildVariant(lesson: LessonId, id: string, params: ParamSpec[]): FirmwareVariant {
+function buildVariant(lesson: LessonId, id: string, params: ParamSpec[], board: BoardId = 'uno'): FirmwareVariant {
   const sketch = `${lesson}-${id}`;
   const file = join(FW_DIR, 'sketches', sketch, `${sketch}.ino`);
   const source = readFileSync(file, 'utf8');
@@ -183,7 +199,7 @@ function buildVariant(lesson: LessonId, id: string, params: ParamSpec[]): Firmwa
   let template = source;
   for (let i = params.length - 1; i >= 0; i--) template = template.slice(0, locs[i].start) + `{{${params[i].name}}}` + template.slice(locs[i].end);
 
-  const A = compile(sketch, source, true);
+  const A = compile(sketch, source, true, board);
   const lines = parseLines(A.objdump);
   const loopIdx = source.split('\n').findIndex((l) => /^void\s+loop\s*\(\s*\)/.test(l));
   const body = source.split('\n').slice(loopIdx + 1).findIndex((l) => l.trim() !== '' && !l.trim().startsWith('//') && l.trim() !== '{');
@@ -199,7 +215,7 @@ function buildVariant(lesson: LessonId, id: string, params: ParamSpec[]): Firmwa
     b %= mask;
     if (b === 0) b = ((p.defaultValue ^ 0x5a5a5a5a) >>> 0) % mask;
     if (SIGNED(p.ctype) && b >= mask / 2) b -= mask;
-    const B = compile(sketch, withValue(source, locs[i], b), false);
+    const B = compile(sketch, withValue(source, locs[i], b), false, board);
     if (B.flash.length !== A.flash.length) throw new Error(`${sketch}.${p.name}: flash length differs (${A.flash.length} vs ${B.flash.length})`);
     const diff: number[] = [];
     A.flash.forEach((x, k) => { if (x !== B.flash[k]) diff.push(k); });
@@ -211,7 +227,7 @@ function buildVariant(lesson: LessonId, id: string, params: ParamSpec[]): Firmwa
     // A zero initialiser would move the variable to .bss (different layout), so probe a non-zero boundary.
     let c = p.max === p.defaultValue ? p.min : p.max;
     if (c === 0) c = p.step;
-    const C = compile(sketch, withValue(source, locs[i], c), false);
+    const C = compile(sketch, withValue(source, locs[i], c), false, board);
     const patched = A.flash.slice();
     patched.set(leBytes(c, w), offset);
     if (patched.length !== C.flash.length || patched.some((x, k) => x !== C.flash[k])) throw new Error(`${sketch}.${p.name}: patched flash != compiled flash for ${c}; mark the variable volatile and retry`);
@@ -243,18 +259,43 @@ function toolchainString(): string {
 }
 
 const t0 = Date.now();
+const args = process.argv.slice(2);
+mkdirSync(join(FW_DIR, 'generated'), {recursive: true});
+
+if (args[0] === '--raw') {
+  const [, ino, out] = args;
+  const bi = args.indexOf('--board');
+  const board = (bi >= 0 ? args[bi + 1] : 'uno') as BoardId;
+  if (!ino || !out) throw new Error('usage: --raw <file.ino> <out.json>');
+  rmSync(WORK, {recursive: true, force: true});
+  selectMode();
+  const name = (ino.split('/').pop() ?? 'sketch').replace(/\.ino$/, '');
+  const source = readFileSync(ino, 'utf8');
+  const A = compile(name, source, true, board);
+  const v: FirmwareVariant = {
+    id: 'raw', sketch: name, source, template: source, flashBase64: Buffer.from(A.flash).toString('base64'), bytes: A.flash.length,
+    sha256: createHash('sha256').update(source).digest('hex'), lines: parseLines(A.objdump), params: [],
+  };
+  writeFileSync(out, JSON.stringify({toolchain: toolchainString(), variant: v}));
+  rmSync(WORK, {recursive: true, force: true});
+  console.log(`wrote ${out} (${v.bytes} bytes)`);
+  process.exit(0);
+}
+
+const wanted = (lesson: string, variant: string): boolean => args.length === 0 || args.includes(`${lesson}-${variant}`) || args.includes(lesson);
+const jobs: {lesson: LessonId; id: string; params: ParamSpec[]; board?: BoardId}[] = [];
+for (const lesson of LESSON_IDS) for (const v of FIRMWARE_SPEC[lesson].variants) if (wanted(lesson, v.id)) jobs.push({lesson, id: v.id, params: v.params, ...(v.board ? {board: v.board} : {})});
+for (const a of args) if (!jobs.some((j) => a === j.lesson || a === `${j.lesson}-${j.id}`)) throw new Error(`unknown sketch or lesson "${a}"; known: ${LESSON_IDS.flatMap((l) => FIRMWARE_SPEC[l].variants.map((v) => `${l}-${v.id}`)).join(', ')}`);
 rmSync(WORK, {recursive: true, force: true});
 selectMode();
-const lessons = {} as Record<LessonId, FirmwareBundle>;
-for (const lesson of LESSON_IDS) {
-  console.log(lesson);
-  lessons[lesson] = {lessonId: lesson, variants: FIRMWARE_SPEC[lesson].variants.map((v) => buildVariant(lesson, v.id, v.params))};
+const toolchain = toolchainString();
+for (const j of jobs) {
+  console.log(`${j.lesson}-${j.id}`);
+  const sketch: FirmwareSketch = {toolchain, lessonId: j.lesson, variant: buildVariant(j.lesson, j.id, j.params, j.board)};
+  writeFileSync(
+    join(FW_DIR, 'generated', `${j.lesson}-${j.id}.ts`),
+    `// Generated by scripts/build-lab-firmware.ts — do not edit.\nimport type {FirmwareSketch} from '../../contract';\nexport const sketch:FirmwareSketch=${JSON.stringify(sketch)};\n`,
+  );
 }
-const registry: FirmwareRegistry = {toolchain: toolchainString(), lessons};
-writeFileSync(
-  join(FW_DIR, 'generated.ts'),
-  `// Generated by scripts/build-lab-firmware.ts — do not edit.\nimport type {FirmwareRegistry} from '../contract';\nexport const labFirmware:FirmwareRegistry=${JSON.stringify(registry)};\n`,
-);
 rmSync(WORK, {recursive: true, force: true});
-if (!existsSync(join(FW_DIR, 'generated.ts'))) throw new Error('generated.ts missing');
-console.log(`done: ${registry.toolchain}; ${compiles} compiles in ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+console.log(`done: ${toolchain}; ${jobs.length} sketches, ${compiles} compiles in ${((Date.now() - t0) / 1000).toFixed(0)}s`);

@@ -4,7 +4,7 @@ import {defineDevice,clamp,num} from './types';
 export const device=defineDevice({
  kind:'ldr',protocol:'adc',legacyState:true,pins:['A','B'],inputs:[],
  create(ctx){
-  const pin=ctx.pin('B');
+  const pin=ctx.analogPin('B');
   let lux=5,adc=0,volts=0;
   const calc=():void=>{
    const lamp=ctx.siblings().find(m=>m.spec.kind==='lamp'&&m.props.target===ctx.id);

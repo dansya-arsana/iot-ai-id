@@ -40,6 +40,7 @@ export const device=defineDevice<Dht22State>({
   desc:{en:'Answers a start pulse with 40 bits on one wire: humidity, temperature and a checksum.',id:'Menjawab pulsa mulai dengan 40 bit lewat satu kabel: kelembapan, suhu, dan checksum.'},
   note:{en:'Slide the temperature and humidity; the sketch reads them over the wire.',id:'Geser suhu dan kelembapan; sketsa membacanya lewat kabel.'},
  },
+ power:{rail:['VCC','GND'],min:3.3,max:6,ma:1.5},
  inputs:[
   {type:'range',key:'tempC',label:{en:'Temperature',id:'Suhu'},min:DHT22_TEMP.min,max:DHT22_TEMP.max,step:0.5,unit:'°C',default:24},
   {type:'range',key:'humidity',label:{en:'Humidity',id:'Kelembapan'},min:DHT22_HUM.min,max:DHT22_HUM.max,step:1,unit:'%',default:60},

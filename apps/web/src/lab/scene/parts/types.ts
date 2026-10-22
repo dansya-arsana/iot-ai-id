@@ -60,8 +60,8 @@ export interface DragSpec{
 
 /** A control rendered by the generic part popover. `key` is the PartProps key it edits. */
 export type ControlSpec=
- |{type:'choice';key:string;label:Copy;options:readonly {value:string;label:Copy}[]}
- |{type:'range';key:string;label:Copy;min:number;max:number;step:number;unit?:string}
+ |{type:'choice';key:string;label:Copy;options:readonly {value:string;label:Copy}[];default?:string;grid?:number;/** a tap: the value is set, then put back to `default` after this many ms (keypad keys) */momentaryMs?:number;/** controls with the same fold title sit together in one collapsed disclosure */fold?:Copy}
+ |{type:'range';key:string;label:Copy;min:number;max:number;step:number;unit?:string;default?:number}
  |{type:'toggle';key:string;label:Copy}
  /** A button that does not edit props. 'focus' = "Zoom to it" (scene.focusPart). */
  |{type:'action';action:'focus';label:Copy};

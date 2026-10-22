@@ -8,7 +8,7 @@ export function contentBox(roots:Object3D[],out=new Box3()):Box3{
   r.updateWorldMatrix(true,true);
   r.traverseVisible(o=>{
    const m=o as Mesh;
-   if(!m.isMesh||o.userData.noPick||o.userData.hull||(m as unknown as {isInstancedMesh?:boolean}).isInstancedMesh)return;
+   if(!m.isMesh||o.userData.noPick||o.userData.noFit||o.userData.hull||(m as unknown as {isInstancedMesh?:boolean}).isInstancedMesh)return;
    const g=m.geometry;if(!g)return;
    if(!g.boundingBox)g.computeBoundingBox();
    b.copy(g.boundingBox!).applyMatrix4(m.matrixWorld);out.union(b);

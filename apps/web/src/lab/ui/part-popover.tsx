@@ -27,14 +27,33 @@ export interface PartPopoverProps{
 
 const MARGIN=12;
 
+function decimals(step:number):number{const t=String(step);const i=t.indexOf('.');return i<0?0:Math.min(6,t.length-i-1);}
+
 function Range({c,value,onChange,label}:{c:Extract<ControlSpec,{type:'range'}>;value:number;onChange:(v:number)=>void;label:string}){
  const id=useId();
  const fill=((value-c.min)/(c.max-c.min))*100;
  return (
   <div className="lab-pop-field">
-   <label htmlFor={id}><span>{label}</span><output htmlFor={id}>{Math.round(value)}{c.unit?` ${c.unit}`:''}</output></label>
+   <label htmlFor={id}><span>{label}</span><output htmlFor={id}>{value.toFixed(decimals(c.step))}{c.unit?` ${c.unit}`:''}</output></label>
    <input id={id} type="range" min={c.min} max={c.max} step={c.step} value={value} style={{'--fill':`${fill}%`} as CSSProperties}
     onChange={e=>onChange(Number(e.target.value))}/>
+  </div>
+ );
+}
+
+/** One row of choice chips. A momentary control (keypad key) sets its value, then puts the default back after `momentaryMs`. */
+function ChoiceField({c,label,cur,lang,onChange}:{c:Extract<ControlSpec,{type:'choice'}>;label:string;cur:string;lang:'en'|'id';onChange:(v:string)=>void}){
+ const timer=useRef(0);
+ const tap=(v:string):void=>{
+  onChange(v);
+  if(c.momentaryMs&&v!==(c.default??'none')){window.clearTimeout(timer.current);timer.current=window.setTimeout(()=>onChange(c.default??'none'),c.momentaryMs);}
+ };
+ return (
+  <div className="lab-pop-field" role="group" aria-label={label}>
+   <span className="lab-pop-label">{label}</span>
+   <div className="lab-pop-chips" {...(c.grid?{"data-grid":c.grid,style:{gridTemplateColumns:`repeat(${c.grid},1fr)`}}:{})}>
+    {c.options.map(o=><button key={o.value} type="button" className="lab-pop-chip" aria-pressed={cur===o.value} data-testid={`lab-pop-${c.key}-${o.value}`} onClick={()=>tap(o.value)}>{o.label[lang]}</button>)}
+   </div>
   </div>
  );
 }
@@ -80,18 +99,15 @@ export function PartPopover({partId,module,controls:override,title,desc,values,b
    <div className="lab-pop-body">
     {controls.map((c,i)=>{
      const label=c.label[lang];
-     if(c.type==='choice'){
-      const cur=String(values[c.key]??c.options[0]?.value);
-      return (
-       <div key={i} className="lab-pop-field" role="group" aria-label={label}>
-        <span className="lab-pop-label">{label}</span>
-        <div className="lab-pop-chips">
-         {c.options.map(o=><button key={o.value} type="button" className="lab-pop-chip" aria-pressed={cur===o.value} data-testid={`lab-pop-${c.key}-${o.value}`} onClick={()=>onChange(c.key,o.value)}>{o.label[lang]}</button>)}
-        </div>
-       </div>
-      );
+     const choice=(c:Extract<ControlSpec,{type:'choice'}>,k:number)=><ChoiceField key={k} c={c} label={c.label[lang]} cur={String(values[c.key]??c.default??c.options[0]?.value)} lang={lang} onChange={v=>onChange(c.key,v)}/>;
+     if(c.type==='choice'&&c.fold){
+      const prev=controls[i-1];
+      if(prev&&prev.type==='choice'&&prev.fold?.en===c.fold.en)return null;   // drawn by the first control of its disclosure
+      const group=[];for(let j=i;j<controls.length;j++){const q=controls[j]!;if(q.type==='choice'&&q.fold?.en===c.fold.en)group.push(q);else break;}
+      return <details key={i} className="lab-pop-fold" data-testid="lab-pop-fold"><summary>{c.fold[lang]}</summary>{group.map((q,k)=>choice(q,k))}</details>;
      }
-     if(c.type==='range')return <Range key={i} c={c} label={label} value={Number(values[c.key]??c.min)} onChange={v=>onChange(c.key,v)}/>;
+     if(c.type==='choice')return choice(c,i);
+     if(c.type==='range')return <Range key={i} c={c} label={label} value={Number(values[c.key]??c.default??c.min)} onChange={v=>onChange(c.key,v)}/>;
      if(c.type==='toggle'){
       const on=values[c.key]===true;
       return (

@@ -136,11 +136,15 @@ export class AssemblyPlayer{
 const BOARDISH=/^(D\d+|A\d|5V|3V3|GND|VIN|rail\.(5v|gnd))$/;
 export function mapSpecWires(spec:CircuitSpec,circuit:ReturnType<typeof specToCircuit>):Map<string,number>{
  const out=new Map<string,number>();
- let cur=0;
+ let cur=0,linkCur=0;
  spec.wires.forEach((w,i)=>{
   const ends=[w.from,w.to];
   const bp=ends.find(e=>BOARDISH.test(e));
-  if(!bp)return;
+  if(!bp){
+   // part pin to part pin: links come after every board wire, in spec order
+   if(/^[^.]+\..+$/.test(w.from)&&/^[^.]+\..+$/.test(w.to)){out.set(w.id??`w${i}`,circuit.wires.length+linkCur);linkCur++;}
+   return;
+  }
   const pp=ends.find(e=>e!==bp)??'';
   let key:string|null=null;
   if(/^rail\./.test(pp))key=`bb.${pp==='rail.5v'?'5v-rail':'gnd-rail'}`;

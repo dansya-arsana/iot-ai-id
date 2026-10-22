@@ -31,6 +31,7 @@ export const device=defineDevice<PirHcSr501State>({
   desc:{en:'A pyroelectric sensor behind a Fresnel lens. OUT goes HIGH when something warm moves in view and stays HIGH for the hold time set by the trimmer.',id:'Sensor piroelektrik di balik lensa Fresnel. OUT menjadi HIGH saat benda hangat bergerak di depannya dan bertahan selama waktu tahan yang diatur trimmer.'},
   note:{en:'The module needs about a minute to settle after power-up. Toggle Motion to wave a hand in front of it.',id:'Modul butuh sekitar satu menit untuk stabil setelah dinyalakan. Aktifkan Gerakan untuk melambaikan tangan di depannya.'},
  },
+ power:{rail:['VCC','GND'],min:4.5,max:20,ma:0.1},
  inputs:[
   {type:'toggle',key:'motion',label:{en:'Motion in view',id:'Ada gerakan'},default:false},
   {type:'range',key:'distanceM',label:{en:'Mover distance',id:'Jarak benda'},min:0.5,max:7,step:0.5,unit:'m',default:2},

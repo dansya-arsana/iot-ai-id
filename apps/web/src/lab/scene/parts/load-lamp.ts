@@ -1,10 +1,10 @@
 /** LOAD-LAMP: a small 12 V screw-base bulb on a desk. It glows warm while its relay is closed. Pairs with sim/devices/load-lamp.ts. Guide: docs/lab-extending.md */
-import {CylinderGeometry,Color,Group,Mesh,MeshBasicMaterial,SphereGeometry,TorusGeometry} from 'three';
+import {BoxGeometry,CylinderGeometry,Color,Group,Mesh,MeshBasicMaterial,SphereGeometry,TorusGeometry} from 'three';
 import type {PartProps} from '../../contract';
 import type {LoadLampState} from '../../sim/devices/load-lamp';
 import {glowTexture,ownToon,solid} from '../materials';
 import * as C from '../palette';
-import {definePart,extState,sprite,c,callout,type Inner} from './kit';
+import {definePart,extState,sprite,c,callout,pin,type Inner} from './kit';
 
 /** A small 12 V indicator bulb, about 28 mm globe on an E10 screw base (10 mm). Units are mm. */
 function buildLoadLamp(_p:PartProps,g:Group):Inner{
@@ -17,6 +17,8 @@ function buildLoadLamp(_p:PartProps,g:Group):Inner{
   ring.rotation.x=Math.PI/2;ring.position.y=3.4+i*2.6;g.add(ring);
  }
  g.add(solid(new CylinderGeometry(5.3,5.3,2.2,24),C.HEADER_BLACK,{outline:true,pos:[0,11.7,0]}));
+ // two solder lugs on the plate take the wires: + on the left, - on the right
+ for(const sx of [-7,7])g.add(solid(new BoxGeometry(2.6,0.7,4),C.GOLD,{pos:[sx,1.95,0],cast:false,finish:'gold'}));
  // glass globe, translucent; the filament shows through
  const glassMat=ownToon(C.FILL,'epoxy');
  glassMat.transparent=true;glassMat.opacity=0.34;glassMat.depthWrite=false;
@@ -49,7 +51,7 @@ function buildLoadLamp(_p:PartProps,g:Group):Inner{
 
 export const loadLamp=definePart({
  kind:'load-lamp',name:c('Lamp on the relay contact','Lampu di kontak relay'),
- pins:{},
+ pins:{'+':pin([-7,2.6,0],'power','Plus','Plus'),'-':pin([7,2.6,0],'ground','Minus','Minus')},
  callouts:[callout('bulb',[0,42,0],'Lights when the relay closes','Menyala saat relay menutup'),callout('base',[0,8,0],'Own supply, not from the Arduino','Catu sendiri, bukan dari Arduino')],
  deskMm:[22,22],
  make:buildLoadLamp,

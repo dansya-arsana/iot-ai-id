@@ -3,6 +3,7 @@ import type {MutableRefObject} from 'react';
 import {useLang} from '../../i18n';
 import {CIRCUITS,PWM_PINS} from '../contract';
 import type {LessonId,PinSample,UnoPin} from '../contract';
+import {LESSON_BY_ID} from '../lessons/index';
 import {fmtCycles,fmtTime} from './chip-pill';
 import type {StageApi} from './frame';
 import {PortMap} from './port-map';
@@ -12,11 +13,8 @@ import {TestRecord} from './test-record';
 import type {TestRecordData} from './test-record';
 
 export const WINDOW_MS=2000;
-/** Key pin first, so the lane that matters for the lesson is always on top. */
-const KEY:Record<LessonId,string[]>={
- board:['D13'],blink:['D8'],button:['D8','D2'],knob:['D9','A0'],rgb:['D9','D10','D11'],light:['A1','D8'],
- distance:['D7','D6'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D6','D12','D10','D11','D5'],dht:['D2'],oled:['D2','A4','A5'],motion:['D2','D7'],plant:['A0','D8'],remote:['D2','D3','D4'],
-};
+/** Key pin first, so the lane that matters for the lesson is always on top (lessons/<id>.ts: keyPins). */
+const keyOf=(id:LessonId):string[]=>LESSON_BY_ID[id]?.keyPins??[];
 const SONAR_LABEL:Partial<Record<string,string>>={D7:'TRIG',D6:'ECHO'};
 /** Lane caption: the part pin wired to this board pin in the lesson's circuit (sonar lessons keep TRIG/ECHO). */
 export function pinLabel(id:LessonId,pin:string,ai=false):string|undefined{
@@ -26,7 +24,7 @@ export function pinLabel(id:LessonId,pin:string,ai=false):string|undefined{
  return wire?.pin;
 }
 export function lanesFor(id:LessonId,livePins:string[],tx:boolean,max:number,ai=false):{lanes:string[];more:number}{
- const key=ai?[]:KEY[id];
+ const key=ai?[]:keyOf(id);
  const all=[...new Set([...key,...livePins.filter(p=>p!=='D1'&&p!=='D0')])].filter(p=>(!ai&&id==='parking')||key.includes(p)||livePins.includes(p));
  const room=tx?max-1:max;
  const lanes=all.slice(0,room);
@@ -73,7 +71,7 @@ function Lane({pin,api,reduced,markerRef,txRef}:{pin:string;api:StageApi;reduced
    }else{
     const tr=api.history().trace(pin as UnoPin),n=tr.n,cap=tr.t.length;
     const ps:PinSample|undefined=snap?.pins[pin as UnoPin];
-    if(ps&&ps.mode==='output'&&PWM_PINS.includes(pin as UnoPin)&&ps.duty>0.01&&ps.duty<0.99)kind='pwm';
+    if(ps&&ps.mode==='output'&&PWM_PINS.includes(pin as UnoPin)&&ps.freqHz<=2000&&ps.duty>0.01&&ps.duty<0.99)kind='pwm';
     else if(pin.startsWith('A')&&ps&&ps.analog!==null)kind='ana';
     for(let i=0;i<n;i++){
      const j=(tr.head-n+i+cap)%cap,j2=(j+1)%cap;
@@ -124,6 +122,11 @@ function Lane({pin,api,reduced,markerRef,txRef}:{pin:string;api:StageApi;reduced
  return <canvas ref={cv} className="lab-lane-cv" data-lane-canvas={pin}/>;
 }
 
+/** Pulse width: 0.1 µs steps under 10 µs, whole µs under 1 ms, then ms. */
+const widthText=(ms:number):string=>{const us=ms*1000;return us<10?`${us.toFixed(1)} µs`:us<1000?`${Math.round(us)} µs`:`${ms.toFixed(1)} ms`;};
+/** Fast pulses read as a rate and the width of one pulse, never a count since start. */
+const pulseText=(hz:number,hiMs:number|null):string=>`≈${hz>=1000?`${(hz/1000).toFixed(hz>=10000?0:1)} kHz`:`${Math.round(hz)} /s`}${hiMs===null?'':` · ${widthText(hiMs)}`}`;
+
 export interface AnalyzerProps{
  api:StageApi;lessonId:LessonId;ai?:boolean;lanePins:string[];tx:boolean;
  status:string;simTimeMs:number;speed:number;pins:Record<string,PinSample>|null;
@@ -156,9 +159,10 @@ export function Analyzer(p:AnalyzerProps){
   if(pin==='TX')return `${txBytes} B`;
   const ps=p.pins?.[pin],m=h.measure(pin as UnoPin);
   if(!ps)return '—';
-  if(ps.mode==='output'&&PWM_PINS.includes(pin as UnoPin)&&ps.duty>0.01&&ps.duty<0.99)return `${(ps.duty*100).toFixed(1)}% · ${Math.round(ps.freqHz)} Hz`;
+  if(ps.mode==='output'&&PWM_PINS.includes(pin as UnoPin)&&ps.freqHz<=2000&&ps.duty>0.01&&ps.duty<0.99)return `${(ps.duty*100).toFixed(1)}% · ${Math.round(ps.freqHz)} Hz`;
   if(pin.startsWith('A')&&ps.analog!==null)return String(Math.round(ps.analog));
-  if(m.aliased&&m.pulses>0){const hi=m.highMs;return `≈${Math.round(m.pulses)} × ${hi===null?'':hi<1?`${Math.round(hi*1000)} µs`:`${hi.toFixed(1)} ms`}`;}
+  if(m.aliased&&m.pulses>0)return pulseText(m.freqHz,m.highMs);
+  if(ps.mode==='output'&&ps.duty>0.01&&ps.duty<0.99&&ps.freqHz>=50)return `toggling · ${Math.round(ps.freqHz)} Hz`;
   if(m.highMs!==null&&m.toggles>0)return `hi ${m.highMs.toFixed(1)} ms`;
   return ps.level?'HIGH':'LOW';
  };

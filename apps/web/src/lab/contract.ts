@@ -4,18 +4,28 @@
  */
 
 // ---------- lessons ----------
-export const LESSON_IDS=['board','blink','button','knob','rgb','light','distance','sound','motor','servo','parking','dht','oled','motion','plant','remote'] as const;
-export type LessonId=typeof LESSON_IDS[number];
-export function isLessonId(s:string|null|undefined):s is LessonId{return !!s&&(LESSON_IDS as readonly string[]).includes(s);}
+// Lessons are modules (lessons/<id>.ts, auto-discovered). The registry fills these tables; they are re-exported here so every import keeps working.
+// Exception to "no imports": lessons/index loads no runtime code from this file, so there is no cycle.
+import {LESSON_IDS} from './lessons/index';
+import type {PowerNote} from './sim/power';
+export {LESSON_IDS,CIRCUITS,FIRMWARE_SPEC} from './lessons/index';
+/** Any registered lesson id (a kebab-case string). */
+export type LessonId=string;
+export function isLessonId(s:string|null|undefined):s is LessonId{return !!s&&LESSON_IDS.includes(s);}
 
 // ---------- board ----------
 export const SIM_CLOCK_HZ=16_000_000;
 export const FLASH_WORDS=16384; // ATmega328P: 32 KiB program memory
-export const MOTOR_MAX_RPM=6000;
+export {MOTOR_MAX_RPM} from './constants';
 export const UNO_PINS=['D0','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','D12','D13','A0','A1','A2','A3','A4','A5'] as const;
 export type UnoPin=typeof UNO_PINS[number];
 export type PowerPin='5V'|'3V3'|'GND'|'VIN';
-export type BoardPin=UnoPin|PowerPin;
+/** A6 and A7 exist on the Nano family only (ADC6/ADC7 of the ATmega328P in TQFP): they read analog voltages and have no digital function, no port bit, no pull-up. */
+export type AnalogOnlyPin='A6'|'A7';
+export const ANALOG_ONLY_PINS:readonly AnalogOnlyPin[]=['A6','A7'];
+export type BoardPin=UnoPin|PowerPin|AnalogOnlyPin;
+/** The boards a circuit can sit on. 'uno' and 'nano' run (same ATmega328P in avr8js); 'esp32' is a model only (see sim/boards.ts). */
+export type BoardId='uno'|'nano'|'esp32';
 export type AvrPort='B'|'C'|'D';
 /** ATmega328P port and bit behind each UNO pin. */
 export const PIN_PORT:Record<UnoPin,{port:AvrPort;bit:number}>={
@@ -24,7 +34,7 @@ export const PIN_PORT:Record<UnoPin,{port:AvrPort;bit:number}>={
  A0:{port:'C',bit:0},A1:{port:'C',bit:1},A2:{port:'C',bit:2},A3:{port:'C',bit:3},A4:{port:'C',bit:4},A5:{port:'C',bit:5},
 };
 export const PWM_PINS:readonly UnoPin[]=['D3','D5','D6','D9','D10','D11'];
-export const ADC_CHANNEL:Partial<Record<UnoPin,number>>={A0:0,A1:1,A2:2,A3:3,A4:4,A5:5};
+export const ADC_CHANNEL:Partial<Record<UnoPin|AnalogOnlyPin,number>>={A0:0,A1:1,A2:2,A3:3,A4:4,A5:5,A6:6,A7:7};
 /** Clickable features of the UNO board itself. The scene treats them like part ids. */
 export const BOARD_FEATURES=['uno.usb','uno.power-jack','uno.mcu','uno.usb-chip','uno.crystal','uno.reset','uno.led-on','uno.led-l','uno.led-txrx','uno.digital-header','uno.analog-header','uno.power-header','uno.icsp'] as const;
 export type BoardFeatureId=typeof BOARD_FEATURES[number];
@@ -49,60 +59,24 @@ export interface PartSpec{id:string;kind:PartKind;net:Partial<Record<string,Boar
 export type WireColor='red'|'black'|'orange'|'yellow'|'green'|'blue'|'purple'|'white';
 /** Jumper from a board header pin to a part pin, or to a breadboard rail (componentId 'bb', pin '5v-rail'|'gnd-rail'). Same shape as our canvas Wiring. Visual/export only. */
 export interface Wire{componentId:string;pin:string;boardPin:BoardPin;color:WireColor;}
-export interface Circuit{parts:PartSpec[];wires:Wire[];}
+/** One end of a part-to-part wire. */
+export interface PartPinRef{part:string;pin:string;}
+/**
+ * A jumper between two part pins (L298N OUT1 to a motor, a relay COM to a lamp). It carries no board pin, so the pins it joins have no
+ * entry in PartSpec.net unless they also reach a board pin some other way. Devices see the other end through DeviceCtx.peers()/volts().
+ */
+/** `seated`: the two pins plug straight into each other (a motor plug in its socket), so the net exists but no jumper is drawn. */
+export interface PartLink{a:PartPinRef;b:PartPinRef;color:WireColor;seated?:boolean;}
+export interface Circuit{parts:PartSpec[];wires:Wire[];/** part-to-part wires (optional: absent means none) */links?:PartLink[];/** the board the circuit sits on (absent: 'uno') */board?:BoardId;}
 export const INPUT_RANGES={potentiometer:{min:0,max:1023},lamp:{min:5,max:150},obstacle:{min:3,max:250}} as const;
 
-const w=(componentId:string,pin:string,boardPin:BoardPin,color:WireColor):Wire=>({componentId,pin,boardPin,color});
-const GND_RAIL=w('bb','gnd-rail','GND','black');
-const RAILS:Wire[]=[w('bb','5v-rail','5V','red'),GND_RAIL];
-const ledOn=(id:string,pin:UnoPin,color:LedColor,rId:string):PartSpec[]=>[{id,kind:'led',net:{A:pin,C:'GND'},props:{color}},{id:rId,kind:'resistor',net:{'1':pin},props:{ohms:220,seriesWith:id,role:'series'}}];
-const sonar=(distanceCm:number,shape:'box'|'car'|'ball'|'wall'):PartSpec[]=>[{id:'us1',kind:'hcsr04',net:{VCC:'5V',TRIG:'D7',ECHO:'D6',GND:'GND'},props:{}},{id:'obs1',kind:'obstacle',net:{},props:{target:'us1',distanceCm,shape}}];
-const SONAR_WIRES:Wire[]=[w('us1','VCC','5V','red'),w('us1','TRIG','D7','yellow'),w('us1','ECHO','D6','green'),w('us1','GND','GND','black')];
-const SEG_PINS:UnoPin[]=['D3','D4','D5','D6','D7','D8','D9'];
-export const CIRCUITS:Record<LessonId,Circuit>={
- board:{parts:[],wires:[]},
- blink:{parts:[...ledOn('led1','D8','red','r1')],wires:[w('r1','1','D8','orange'),GND_RAIL]},
- button:{parts:[{id:'btn1',kind:'button',net:{'1':'5V','2':'D2'},props:{pull:'down'}},{id:'r2',kind:'resistor',net:{'1':'D2','2':'GND'},props:{ohms:10000,role:'pull-down'}},...ledOn('led1','D8','red','r1')],wires:[w('btn1','2','D2','yellow'),w('r1','1','D8','orange'),...RAILS]},
- knob:{parts:[{id:'pot1',kind:'potentiometer',net:{VCC:'5V',SIG:'A0',GND:'GND'},props:{value:512}},...ledOn('led1','D9','green','r1')],wires:[w('pot1','SIG','A0','yellow'),w('r1','1','D9','orange'),...RAILS]},
- rgb:{parts:[{id:'rgb1',kind:'rgb-led',net:{R:'D9',G:'D10',B:'D11',K:'GND'},props:{}},{id:'rR',kind:'resistor',net:{'1':'D9'},props:{ohms:220,seriesWith:'rgb1',role:'series'}},{id:'rG',kind:'resistor',net:{'1':'D10'},props:{ohms:220,seriesWith:'rgb1',role:'series'}},{id:'rB',kind:'resistor',net:{'1':'D11'},props:{ohms:220,seriesWith:'rgb1',role:'series'}}],wires:[w('rR','1','D9','orange'),w('rG','1','D10','green'),w('rB','1','D11','blue'),GND_RAIL]},
- light:{parts:[{id:'ldr1',kind:'ldr',net:{A:'5V',B:'A1'},props:{fixedOhms:10000}},{id:'r2',kind:'resistor',net:{'1':'A1','2':'GND'},props:{ohms:10000,role:'divider'}},{id:'lamp1',kind:'lamp',net:{},props:{target:'ldr1',distanceCm:40,on:true}},...ledOn('led1','D8','yellow','r1')],wires:[w('ldr1','B','A1','green'),w('r1','1','D8','orange'),...RAILS]},
- distance:{parts:sonar(40,'box'),wires:SONAR_WIRES},
- sound:{parts:[{id:'bz1',kind:'buzzer',net:{'+':'D5','-':'GND'},props:{}}],wires:[w('bz1','+','D5','orange'),w('bz1','-','GND','black')]},
- motor:{parts:[{id:'q1',kind:'transistor',net:{B:'D6',E:'GND'},props:{model:'NPN'}},{id:'rb',kind:'resistor',net:{'1':'D6'},props:{ohms:1000,role:'base'}},{id:'d1',kind:'diode',net:{K:'5V'},props:{}},{id:'m1',kind:'motor',net:{DRIVE:'D6'},props:{}}],wires:[w('rb','1','D6','orange'),...RAILS]},
- servo:{parts:[{id:'sv1',kind:'servo',net:{SIG:'D9',V:'5V',GND:'GND'},props:{}}],wires:[w('sv1','SIG','D9','orange'),w('sv1','V','5V','red'),w('sv1','GND','GND','black')]},
- dht:{parts:[{id:'dht1',kind:'dht22',net:{VCC:'5V',DATA:'D2',GND:'GND'},props:{tempC:24,humidity:60}},{id:'r1',kind:'resistor',net:{'1':'D2','2':'5V'},props:{ohms:10000,role:'pull-up'}}],wires:[w('dht1','DATA','D2','yellow'),...RAILS]},
- oled:{parts:[{id:'dht1',kind:'dht22',net:{VCC:'5V',DATA:'D2',GND:'GND'},props:{tempC:24,humidity:60}},{id:'r1',kind:'resistor',net:{'1':'D2','2':'5V'},props:{ohms:10000,role:'pull-up'}},{id:'oled1',kind:'oled-ssd1306',net:{VCC:'5V',SDA:'A4',SCL:'A5',GND:'GND'},props:{}}],wires:[w('dht1','DATA','D2','yellow'),w('oled1','SDA','A4','blue'),w('oled1','SCL','A5','purple'),...RAILS]},
- motion:{parts:[{id:'rel1',kind:'relay-module',net:{VCC:'5V',GND:'GND',IN:'D7'},props:{trigger:'low'}},{id:'pir1',kind:'pir-hc-sr501',net:{VCC:'5V',OUT:'D2',GND:'GND'},props:{warmupS:2,holdS:1,retrigger:'H'}},{id:'bulb1',kind:'load-lamp',net:{},props:{target:'rel1'}}],wires:[w('pir1','OUT','D2','yellow'),w('rel1','IN','D7','orange'),...RAILS]},
- plant:{parts:[{id:'lcd1',kind:'lcd1602-i2c',net:{GND:'GND',VCC:'5V',SDA:'A4',SCL:'A5'},props:{}},{id:'soil1',kind:'soil-moisture',net:{VCC:'5V',SIG:'A0',GND:'GND'},props:{wetness:55}},...ledOn('led1','D8','red','r1')],wires:[w('soil1','SIG','A0','yellow'),w('lcd1','SDA','A4','blue'),w('lcd1','SCL','A5','purple'),w('r1','1','D8','orange'),...RAILS]},
- remote:{parts:[{id:'ir1',kind:'ir-receiver',net:{OUT:'D2',GND:'GND',VCC:'5V'},props:{}},{id:'seg1',kind:'seven-segment',net:{a:'D3',b:'D4',c:'D5',d:'D6',e:'D7',f:'D8',g:'D9',COM:'GND'},props:{color:'red',seriesOhms:220}}],wires:[w('ir1','OUT','D2','yellow'),...SEG_PINS.map((p,i)=>w('seg1','abcdefg'[i]!,p,(['orange','green','blue','purple','white','yellow','orange'] as WireColor[])[i]!)),...RAILS]},
- parking:{parts:[...sonar(60,'car'),...ledOn('ledG','D10','green','rG'),...ledOn('ledY','D11','yellow','rY'),...ledOn('ledR','D12','red','rR'),{id:'bz1',kind:'buzzer',net:{'+':'D5','-':'GND'},props:{}}],wires:[...SONAR_WIRES,w('rG','1','D10','green'),w('rY','1','D11','yellow'),w('rR','1','D12','orange'),w('bz1','+','D5','purple'),GND_RAIL]},
-};
 
 // ---------- firmware (generated by scripts/build-lab-firmware.ts) ----------
 /** C declaration per ctype: uint8 'byte', uint16 'unsigned int', int16 'int', uint32 'unsigned long', int32 'long'. */
 export type ParamCType='uint8'|'int16'|'uint16'|'int32'|'uint32';
 export interface ParamSpec{name:string;ctype:ParamCType;defaultValue:number;min:number;max:number;step:number;}
 /** Sketch folder = `${lessonId}-${variant.id}`. The first variant is the default. */
-export interface VariantSpec{id:string;params:ParamSpec[];}
-const P=(name:string,ctype:ParamCType,defaultValue:number,min:number,max:number,step:number):ParamSpec=>({name,ctype,defaultValue,min,max,step});
-export const FIRMWARE_SPEC:Record<LessonId,{variants:VariantSpec[]}>={
- board:{variants:[{id:'default',params:[P('waitMs','uint16',1000,100,3000,100)]}]},
- blink:{variants:[{id:'default',params:[P('onTime','uint16',500,50,2000,50),P('offTime','uint16',500,50,2000,50)]}]},
- button:{variants:[{id:'hold',params:[]},{id:'toggle',params:[P('debounceMs','uint16',50,5,300,5)]}]},
- knob:{variants:[{id:'default',params:[P('printEvery','uint16',200,50,1000,50)]}]},
- rgb:{variants:[{id:'default',params:[P('red','uint8',255,0,255,1),P('green','uint8',64,0,255,1),P('blue','uint8',160,0,255,1)]}]},
- light:{variants:[{id:'default',params:[P('threshold','uint16',400,50,1000,10)]}]},
- distance:{variants:[{id:'default',params:[P('interval','uint16',250,60,1000,10)]}]},
- sound:{variants:[{id:'scale',params:[P('noteMs','uint16',300,60,800,20)]},{id:'alarm',params:[P('noteMs','uint16',300,60,800,20)]}]},
- motor:{variants:[{id:'default',params:[P('topSpeed','uint8',200,60,255,5),P('stepMs','uint8',20,5,100,5)]}]},
- servo:{variants:[{id:'default',params:[P('fromDeg','uint8',10,0,90,5),P('toDeg','uint8',170,90,180,5),P('stepMs','uint8',15,2,50,1)]}]},
- dht:{variants:[{id:'default',params:[P('readEvery','uint16',2000,1000,5000,500)]}]},
- oled:{variants:[{id:'default',params:[P('readEvery','uint16',2000,1000,5000,500)]}]},
- motion:{variants:[{id:'default',params:[P('holdMs','uint16',3000,500,10000,500)]}]},
- plant:{variants:[{id:'default',params:[P('dryBelow','uint8',30,5,90,5)]}]},
- remote:{variants:[{id:'default',params:[]}]},
- parking:{variants:[{id:'default',params:[P('nearCm','uint16',15,5,50,1),P('farCm','uint16',40,20,150,5)]}]},
-};
+export interface VariantSpec{id:string;params:ParamSpec[];/** board the sketch is compiled for (default 'uno'); 'nano' uses the Nano core, which defines A6 and A7 */board?:BoardId;}
 export interface FirmwareParam extends ParamSpec{offset:number;} // byte offset of the little-endian initial value in the flash image
 export interface FirmwareVariant{
  id:string; sketch:string;      // e.g. 'blink-default'
@@ -113,6 +87,8 @@ export interface FirmwareVariant{
  params:FirmwareParam[];
 }
 export interface FirmwareBundle{lessonId:LessonId;variants:FirmwareVariant[];}
+/** One generated file `firmware/generated/<sketch>.ts` exports `sketch`: the compiled variant plus the toolchain string that built it. */
+export interface FirmwareSketch{toolchain:string;lessonId:LessonId;variant:FirmwareVariant;}
 export interface FirmwareRegistry{toolchain:string;lessons:Record<LessonId,FirmwareBundle>;}
 export type ParamValues=Record<string,number>;
 
@@ -150,6 +126,8 @@ export interface SimSnapshot{
  parts:Record<string,PartState>; // every PartSpec id of the loaded circuit
  currentLine:number|null;        // 1-based .ino line of the last executed sketch instruction
  txActive:boolean;               // UART sent a byte in the last 30 ms (TX LED)
+ /** Friendly supply warnings (a 3.3 V part on 5 V, a motor on a board pin...), refreshed about every 100 ms of simulated time. Absent in old snapshots. */
+ power?:PowerNote[];
 }
 export interface LoadReport{sketch:string;bytes:number;toolchain:string;patched:{name:string;value:number;offset:number}[];}
 export interface LabRunner{

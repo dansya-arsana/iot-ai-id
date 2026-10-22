@@ -1,6 +1,6 @@
 # Lab firmware
 
-The public `/lab` runs real ATmega328P firmware in avr8js. The firmware is compiled ahead of time from the original sketches in `apps/web/src/lab/firmware/sketches/<lesson>-<variant>/` and committed as data in `apps/web/src/lab/firmware/generated.ts` (flash image as base64, per-param patch offsets, DWARF line table, sha256 of the source). `npm run build` never needs a toolchain.
+The public `/lab` runs real ATmega328P firmware in avr8js. The firmware is compiled ahead of time from the original sketches in `apps/web/src/lab/firmware/sketches/<lesson>-<variant>/` and committed as data in `apps/web/src/lab/firmware/generated/<sketch>.ts`, one file per sketch (flash image as base64, per-param patch offsets, DWARF line table, sha256 of the source). `npm run build` never needs a toolchain.
 
 ## Regenerate
 
@@ -27,13 +27,13 @@ The images contain object code of ArduinoCore-avr, including its `Wire` library 
 
 ## Add a lesson or variant
 
-1. Add the lesson/variant and its params to `FIRMWARE_SPEC` in `apps/web/src/lab/contract.ts`.
+1. Add the variant and its params to the `firmware` field of the lesson module `apps/web/src/lab/lessons/<lesson>.ts` (`FIRMWARE_SPEC` is built from the lesson modules; `board:'nano'` on a variant compiles it with the Nano core).
 2. Write `sketches/<lesson>-<variant>/<lesson>-<variant>.ino`: `Serial.begin(9600)`, a ready line in `setup`, each param declared once as a non-zero, non-const global (`byte` for uint8, `unsigned int` for uint16) equal to its default.
-3. Run `npm run lab:firmware` and `npx tsx --test tests/lab-firmware.test.ts`.
+3. Run `npm run lab:firmware -- <lesson>-<variant>` (only that sketch; `-- <lesson>` builds all its variants; no argument builds everything) and `npx tsx --test tests/lab-firmware.test.ts tests/lab-lesson-modules.test.ts`. Test fixtures that are not lessons: `npm run lab:firmware -- --raw x.ino out.json [--board nano]`.
 
 ## AI-generated firmware (Lab AI builder)
 
-The AI builder compiles sketches at request time, not at build time, so the committed `generated.ts` is not involved. Sketches go through `services/ops/lab-compile.ts`, which runs `arduino-cli` in a one-shot sandbox container (`aiot-avr-sandbox:1.8.8`, built from `scripts/lab-firmware/Dockerfile.sandbox` on top of `aiot-avr:1.8.8`): no network, read-only root, tmpfs work dir, unprivileged user, pids/memory/cpu limits, 20 s timeout, 20 KB source cap. The result has the same shape as a `FirmwareVariant` (base64 flash, sha256, DWARF line map), so the runner and the code view use it unchanged.
+The AI builder compiles sketches at request time, not at build time, so the committed `generated/*.ts` files are not involved. Sketches go through `services/ops/lab-compile.ts`, which runs `arduino-cli` in a one-shot sandbox container (`aiot-avr-sandbox:1.8.8`, built from `scripts/lab-firmware/Dockerfile.sandbox` on top of `aiot-avr:1.8.8`): no network, read-only root, tmpfs work dir, unprivileged user, pids/memory/cpu limits, 20 s timeout, 20 KB source cap. The result has the same shape as a `FirmwareVariant` (base64 flash, sha256, DWARF line map), so the runner and the code view use it unchanged.
 
 The three curated examples under `apps/web/src/lab/ai/examples/*.json` are precompiled with `npx tsx scripts/build-lab-examples.ts` (needs the sandbox image; never hand-edit the JSON). Rebuild them after changing a sketch in that script or in `circuit-examples.ts`.
 

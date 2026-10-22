@@ -24,6 +24,8 @@ function label(g:Group,text:string,w:number,h:number,x:number,y:number,z:number,
  m.material.userData.own=true;m.material.userData.ownMap=true;m.position.set(x,y,z);m.userData.noPick=true;m.userData.noInk=true;g.add(m);
 }
 
+const TX=14-50/2+4.4,CY=6+26/2;
+
 function buildRelay(_p:PartProps,g:Group):Inner{
  const bw=50,bh=26,py=6; // board stands upright on the three legs, like the sonar
  const cx=14,cy=py+bh/2;
@@ -71,7 +73,9 @@ function buildRelay(_p:PartProps,g:Group):Inner{
 
 export const relayModule=definePart({
  kind:'relay-module',name:c('Relay module (1 channel, 5 V)','Modul relay (1 kanal, 5 V)'),
- pins:{VCC:pin([0,0,0],'power','VCC (5V)','VCC (5V)'),GND:pin([PITCH,0,0],'ground','Ground','Ground'),IN:pin([2*PITCH,0,0],'input','IN (active low)','IN (aktif low)')},
+ pins:{VCC:pin([0,0,0],'power','VCC (5V)','VCC (5V)'),GND:pin([PITCH,0,0],'ground','Ground','Ground'),IN:pin([2*PITCH,0,0],'input','IN (active low)','IN (aktif low)'),
+  // screw block of the switched side (same numbers as buildRelay: tx, cy-8/cy/cy+8)
+  COM:pin([TX,CY,10],'passive','COM (common)','COM (bersama)'),NO:pin([TX,CY+8,10],'passive','NO (normally open)','NO (normal terbuka)'),NC:pin([TX,CY-8,10],'passive','NC (normally closed)','NC (normal tertutup)')},
  callouts:[
   callout('relay',[17,24,16],'The relay clicks when IN goes low','Relay berbunyi klik saat IN menjadi low'),
   callout('terminals',[-6,18,10],'NC / COM / NO: the switched side','NC / COM / NO: sisi yang disaklar'),

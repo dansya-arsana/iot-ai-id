@@ -33,3 +33,11 @@
 @keyframes lab-sheet-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
 .lab-pop-head .lab-x{position:static;flex:none}
+
+.lab-pop-chips[data-grid]{display:grid;gap:4px}
+.lab-pop-chips[data-grid] .lab-pop-chip{min-width:0;padding-inline:0;text-align:center}
+.lab-pop-chips[data-grid] .lab-pop-chip{height:26px}.lab-pop-chips[data-grid] .lab-pop-chip:last-child{grid-column:1/-1}
+
+.lab-pop-fold{display:flex;flex-direction:column;gap:8px;border-top:var(--lab-bw) solid var(--lab-line-strong);padding-top:8px}
+.lab-pop-fold>summary{cursor:pointer;color:var(--lab-ink-2);font-weight:600;font-size:12px}
+.lab-pop-fold[open]>summary{margin-bottom:8px}

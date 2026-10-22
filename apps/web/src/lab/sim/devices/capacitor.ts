@@ -31,7 +31,7 @@ export const device=defineDevice<CapacitorState>({
  defaults:{variant:'electrolytic',uF:100,rOhms:10000},
  create(ctx){
   let v=0,last:boolean|null=null;
-  const pos=ctx.pin('POS');
+  const pos=ctx.pin('POS'),apos=ctx.analogPin('POS');   // apos also sees A6/A7 of the Nano
   const variant=()=>{const s=ctx.props.variant;return typeof s==='string'&&VARIANTS.includes(s)?s:'electrolytic';};
   const uF=()=>clamp(num(ctx.props.uF,100),0.1,1000);
   const r=()=>clamp(num(ctx.props.rOhms,10000),100,100000);
@@ -39,22 +39,22 @@ export const device=defineDevice<CapacitorState>({
   return {
    state:()=>({variant:variant(),uF:uF(),rOhms:r(),volts:Math.round(v*100)/100,charge:clamp(v/5,0,1),tauMs:round1(tau()*1000)}),
    tick(cycles){
-    if(!pos)return;
+    if(!apos)return;
     const dt=cycles/16e6;
-    if(ctx.hostDrives(pos)){
+    if(pos&&ctx.hostDrives(pos)){
      const target=ctx.pinLevel(pos)?5:0;
      v+=(target-v)*(1-Math.exp(-dt/tau()));
      last=null;
     }else{
      v*=Math.exp(-dt/LEAK_S[variant()]!);
-     if(!pos.startsWith('A')){
+     if(pos&&!pos.startsWith('A')){
       const hi=last===null?v>2.5:last?v>2.0:v>3.0;
       if(hi!==last){last=hi;ctx.env.setPin(pos,hi);}
      }
     }
     v=clamp(v,0,5);
    },
-   adc:()=>pos&&pos.startsWith('A')?{pin:pos,volts:v}:null,
+   adc:()=>apos&&apos.startsWith('A')?{pin:apos,volts:v}:null,
   };
  },
 });

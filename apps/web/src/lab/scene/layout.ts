@@ -22,6 +22,10 @@ export const PIN_COLS:Partial<Record<PartKind,number[]>>={
  led:[0,1],resistor:[0,3],button:[0,2],potentiometer:[0,1,2],'rgb-led':[0,1,2,3],ldr:[0,2],
  hcsr04:[0,1,2,3],buzzer:[0,3],transistor:[0,1,2],diode:[0,3],
 };
+/** Desk footprint (x width, z depth in mm) per kind, filled by definePart so the layout needs no scene import. */
+export const DESK_MM:Partial<Record<string,readonly [number,number]>>={};
+/** Where a seated 28BYJ-48 sits relative to its ULN2003 (plug face in the white socket: socket x offset, plug length 76 + 2.5 mm seat). */
+export const STEPPER_SEAT={x:24,z:78.5} as const;
 export const isOnBoardKind=(k:PartKind):boolean=>k in PIN_COLS;
 
 export function holeX(col:number):number{return BB_CX-((BB_COLS-1)*PITCH)/2+col*PITCH;}
@@ -64,6 +68,8 @@ function offBoard(p:PartSpec,all:Record<string,Placement>):Placement{
   case 'load-lamp':return {x:target?target.x-32:BB_CX-32,z:(target?target.z:62)+8,rotY:0,onBoard:false};
   case 'obstacle':return {x:target?target.x+1.5*PITCH:BB_CX,z:target?target.z+14:60,rotY:0,onBoard:false};
   case 'motor':return {x:BB_CX-10,z:62,rotY:0,onBoard:false};
+  // a motor plug seated in its driver's socket: the stepper sits in front of the driver, turned to face it
+  case 'stepper-28byj48':return target?{x:target.x+STEPPER_SEAT.x,z:target.z+STEPPER_SEAT.z,rotY:Math.PI,onBoard:false}:{x:BB_CX,z:62,rotY:0,onBoard:false};
   case 'servo':return {x:BB_CX,z:62,rotY:0,onBoard:false};
   default:return {x:BB_CX,z:62,rotY:0,onBoard:false};
  }
@@ -92,7 +98,7 @@ export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
  const sonar=circuit.parts.some(p=>p.kind==='hcsr04');
  const start=sonar?SONAR_START:LANE_START;
  // LEDs and the buzzer sit in the front lane (lane 7) so the camera sees them; resistors and the rest go behind
- const order=(k:PartKind):number[]=>sonar&&(k==='led'||k==='buzzer'||k==='rgb-led')?[LANES[1],LANES[0]]:[...LANES];
+ const order=(k:PartKind,front=false):number[]=>front?[LANES[1],LANES[0]]:sonar&&(k==='led'||k==='buzzer'||k==='rgb-led')?[LANES[1],LANES[0]]:[...LANES];
  for(const p of circuit.parts){
   if(!isOnBoardKind(p.kind))continue;
   const w=WIDTH(p.kind);
@@ -101,7 +107,7 @@ export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
   const bx=p.kind==='hcsr04'?undefined:BODY_X[p.kind];
   const lead=bx&&-bx[0]>5?Math.ceil(-bx[0]/PITCH):0;
   const span=bx&&bx[1]-(w-1)*PITCH>6?Math.ceil(bx[1]/PITCH)+1:w;
-  const lanes:number[]=p.kind==='hcsr04'?[SENSOR_ROW]:order(p.kind);
+  const lanes:number[]=p.kind==='hcsr04'?[SENSOR_ROW]:order(p.kind,p.props.lane==='front');
   let lane=lanes[lanes.length-1]!;
   let col=(cursor[lane]??start[lane]??0)+lead;
   let fit=false;
@@ -112,7 +118,31 @@ export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
   cursor[lane]=col+Math.max(w,span)+1;
   out[p.id]={x:holeX(col),z:holeZ(lane),rotY:0,onBoard:true,holes:pinHoleOffsets(p.kind).map(d=>[col+d,lane] as [number,number])};
  }
- for(const p of circuit.parts){if(!isOnBoardKind(p.kind))out[p.id]=offBoard(p,out);}
+ // Desk props (batteries, regulators, drivers, motors...) get their own slot: a prop that would land on an earlier one steps sideways in 10 mm steps until its footprint is clear.
+ // Props anchored to a partner (lamp, obstacle, load-lamp with a target) keep their anchor, and a lone prop keeps the old fixed slot, so existing lessons lay out as before.
+ const desk:Placement[]=[];const deskRects:[number,number,number,number][][]=[];
+ const rects=(kind:PartKind,id:string,x:number,z:number):[number,number,number,number][]=>{
+  const [w,d]=DESK_MM[kind]??[46,30];
+  const r:[number,number,number,number][]=[[x,z,w,d]];
+  for(const q of circuit.parts)if(q.props.target===id&&q.kind==='load-lamp'){const [lw,ld]=DESK_MM[q.kind]??[22,22];r.push([x-32,z+8,lw,ld]);}
+  for(const q of circuit.parts)if(q.props.target===id&&q.kind==='stepper-28byj48')r.push([x+STEPPER_SEAT.x,z+47.5,42,90]);
+  return r;
+ };
+ const clash=(A:[number,number,number,number][],B:[number,number,number,number][]):boolean=>A.some(a=>B.some(b=>Math.abs(a[0]-b[0])<(a[2]+b[2])/2+4&&Math.abs(a[1]-b[1])<(a[3]+b[3])/2+4));
+ for(const p of circuit.parts){
+  if(isOnBoardKind(p.kind))continue;
+  const pl=offBoard(p,out);
+  // a lesson can ask for a tall prop (battery, relay board) to stand clear of the Uno: deskX is its centre in mm
+  if(typeof p.props.target!=='string'&&typeof p.props.deskX==='number')pl.x=p.props.deskX;
+  if(typeof p.props.target!=='string'){
+   // clearance uses each part's own footprint (deskMm); the Uno's outline and any bulb hung off this part (load-lamp, 32 mm to its left) count too
+   const unoBox:[number,number,number,number][]=[[0,0,UNO_W,UNO_D]];
+   const hits=(x:number):boolean=>{const mine=rects(p.kind,p.id,x,pl.z);return clash(mine,unoBox)||deskRects.some(q=>clash(mine,q));};
+   const x0=pl.x;
+   for(let k=1;k<=40&&hits(pl.x);k++)pl.x=x0+10*(k%2===1?(k+1)>>1:-(k>>1));
+  }
+  desk.push(pl);deskRects.push(rects(p.kind,p.id,pl.x,pl.z));out[p.id]=pl;
+ }
  return out;
 }
 

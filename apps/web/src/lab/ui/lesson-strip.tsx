@@ -2,12 +2,10 @@ import {useEffect,useLayoutEffect,useRef} from 'react';
 import type {ReactNode} from 'react';
 import {useLang} from '../../i18n';
 import {LESSONS} from '../lessons';
+import {LESSON_BY_ID} from '../lessons/index';
 import type {LessonId} from '../contract';
 import {Icon} from './icons';
 
-const CONCEPT:Record<LessonId,string>={
- board:'BOARD',blink:'OUTPUT',button:'INPUT',knob:'ADC',rgb:'PWM',light:'LDR',distance:'PULSEIN',sound:'TONE',motor:'TRANSISTOR',servo:'SERVO',parking:'PROJECT',dht:'ONE-WIRE',oled:'I2C',motion:'RELAY',plant:'I2C + ADC',remote:'NEC IR',
-};
 
 export function LessonStrip({active,done,celebrate,thumbs,reduced,onPick,extra}:{extra?:ReactNode;active:LessonId|null;done:LessonId[];celebrate:LessonId|null;thumbs:Partial<Record<LessonId,string>>;reduced:boolean;onPick:(id:LessonId)=>void}){
  const {tr,lang}=useLang();
@@ -54,7 +52,7 @@ export function LessonStrip({active,done,celebrate,thumbs,reduced,onPick,extra}:
         ?<img src={src} alt="" width={72} height={60} decoding="async"/>
         :<Icon name={l.id} size={28}/>}</span>
        <span className="lab-card-text">
-        <span className="lab-eyebrow">{String(l.n).padStart(2,'0')} · {CONCEPT[l.id]}</span>
+        <span className="lab-eyebrow">{String(l.n).padStart(2,'0')} · {LESSON_BY_ID[l.id]?.concept??''}</span>
         <span className="lab-card-title">{l.title[lang]}</span>
        </span>
        {d&&<span className="lab-card-done" aria-label={tr('Completed','Selesai')}><Icon name="check" size={12}/></span>}

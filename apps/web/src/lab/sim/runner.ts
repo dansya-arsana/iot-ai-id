@@ -1,9 +1,12 @@
 import {INPUT_RANGES,SIM_CLOCK_HZ,UNO_PINS} from '../contract';
 import type {Circuit,CreateLabRunner,FirmwareVariant,LabRunner,LoadReport,ParamValues,PartInput,PartProps,PartState,PinSample,SimSnapshot,SimStatus,UnoPin} from '../contract';
 import {buildLineIndex,decodeFlash,patchFlash,toProgramWords} from './flash';
+import {boardOf} from '../boards';
 import {AvrMachine} from './machine';
-import {createModels} from './peripherals';
+import {createWorldModels} from './peripherals';
 import type {PartModel} from './peripherals';
+import type {PowerNote} from './power';
+import type {World} from './world';
 
 const CYCLES_PER_MS=SIM_CLOCK_HZ/1000;
 const SERIAL_KEEP=65536;
@@ -20,6 +23,9 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
  let error:string|null=null;
  let machine:AvrMachine|null=null;
  let models=new Map<string,PartModel>();
+ let world:World|null=null;
+ let notes:PowerNote[]=[];
+ let notesAt=-1;
  let samples=idleSamples();
  let speed=1;
  let lastTx=-1;
@@ -40,8 +46,10 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
   for(const p of UNO_PINS)next[p]=machine.monitor.sample(p,ws,we);
   const frame={samples:next,dtSec,cycles:we};
   for(const m of models.values())m.update(frame);
-  for(const m of models.values()){const a=m.analog?.();if(a)next[a.pin].analog=a.adc;}
+  for(const m of models.values()){const a=m.analog?.();if(a&&a.pin in next)next[a.pin as UnoPin].analog=a.adc;}
   samples=next;
+  // supply warnings are cheap but not free: refresh about every 100 ms of simulated time
+  if(world&&(notesAt<0||we-notesAt>=CYCLES_PER_MS*100||we<notesAt)){notes=world.notes();notesAt=we;}
  }
  function flushSerial():void{
   if(!pending)return;
@@ -55,14 +63,17 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
   return {
    status,error,simTimeMs:c/CYCLES_PER_MS,speed,pins:samples,parts,
    currentLine:machine&&machine.line>0?machine.line:null,
+   power:notes,
    txActive:lastTx>=0&&c-lastTx<TX_WINDOW,
   };
  }
- function drop():void{machine=null;models=new Map();samples=idleSamples();}
+ function drop():void{machine=null;models=new Map();world=null;notes=[];notesAt=-1;samples=idleSamples();}
 
  return {
   load(variant:FirmwareVariant,params:ParamValues,circuit:Circuit,toolchain:string):LoadReport{
    try{
+    const board=boardOf(circuit);
+    if(board.runtime!=='emulated')throw new Error(`${board.name.en} is a model only: the lab can run the Uno and the Nano (ATmega328P), not ${board.chip}.`);
     const {bytes,patched}=patchFlash(decodeFlash(variant.flashBase64),variant.params,params);
     const m=new AvrMachine(toProgramWords(bytes),buildLineIndex(variant.lines));
     drop();
@@ -70,7 +81,7 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
     const dec=new TextDecoder('utf-8');
     const taps:((b:number,cycle:number)=>void)[]=[];
     m.usart.onByteTransmit=b=>{for(const t of taps)t(b,m.cpu.cycles);const s=dec.decode(new Uint8Array([b]),{stream:true});serial+=s;pending+=s;lastTx=m.cpu.cycles;if(serial.length>SERIAL_KEEP*2)serial=serial.slice(-SERIAL_KEEP);};
-    models=createModels(circuit,{
+    const made=createWorldModels(circuit,{
      setPin:(p,l)=>m.setPin(p,l),
      setAdc:(ch,v)=>m.setAdc(ch,v),
      schedule:(c,cb)=>m.schedule(c,cb),
@@ -79,9 +90,11 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
      pinMode:p=>m.pinMode(p),
      watchLine:p=>m.watchLine(p),
      attachI2c:sl=>m.attachI2c(sl),
+     attachSpi:sl=>m.attachSpi(sl),
      tapUart:cb=>{taps.push(cb);},
      uartSend:b=>{m.usart.writeByte(b);},
     });
+    models=made.models;world=made.world;
     const edgeModels=[...models.values()].filter(x=>x.onEdge);
     m.monitor.onEdge=(pin,level,cycle)=>{for(const x of edgeModels)x.onEdge!(pin,level,cycle);};
     for(const [id,i] of inputs)models.get(id)?.setInput(i);

@@ -30,6 +30,7 @@ export const device=defineDevice<Mq2State>({
   desc:{en:'A heated tin-oxide mesh whose resistance drops in smoke and combustible gas. AO gives a voltage that rises with gas, DO flips LOW past the trimmer threshold.',id:'Mesh timah oksida yang dipanaskan; hambatannya turun saat ada asap dan gas mudah terbakar. AO memberi tegangan yang naik dengan gas, DO menjadi LOW melewati ambang trimmer.'},
   note:{en:'The heater needs time to warm up: readings are high and drift down at first.',id:'Pemanas butuh waktu untuk panas: awalnya bacaan tinggi lalu turun perlahan.'},
  },
+ power:{rail:['VCC','GND'],min:4.5,max:5.5,ma:150},
  inputs:[
   {type:'range',key:'ppm',label:{en:'Gas (LPG equivalent)',id:'Gas (setara LPG)'},min:0,max:10000,step:10,unit:'ppm',default:0},
   {type:'range',key:'threshold',label:{en:'DO threshold (trimmer)',id:'Ambang DO (trimmer)'},min:0,max:1023,step:1,default:400},
@@ -37,7 +38,7 @@ export const device=defineDevice<Mq2State>({
  ],
  defaults:{ppm:0,threshold:400,warmupS:20},
  create(ctx){
-  const ao=ctx.pin('AO'),dout=uno(ctx.net('DO'));
+  const ao=ctx.analogPin('AO'),dout=uno(ctx.net('DO'));
   let t=0,smooth=ratioForPpm(num(ctx.props.ppm,0)),low:boolean|null=null;
   const warm=()=>clamp(num(ctx.props.warmupS,20),1,60);
   // 0 cold .. 1 hot; Rs scales from 30 % to 100 % of its final value (cold mesh reads high)

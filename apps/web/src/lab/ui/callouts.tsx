@@ -1,5 +1,6 @@
 import {useEffect,useRef} from 'react';
 import {useLang} from '../../i18n';
+import {PWM_PINS} from '../contract';
 import type {PartState,SimSnapshot,UnoPin} from '../contract';
 import type {Lesson} from '../lessons';
 import type {StageApi} from './frame';
@@ -16,7 +17,11 @@ export function liveText(target:string,snap:SimSnapshot|null,pin?:string):{text:
  if(pin&&snap.pins[pin as UnoPin]){
   const s=snap.pins[pin as UnoPin];
   if(s.analog!==null&&s.mode!=='output')return {text:`${pin} ${Math.round(s.analog)}`,tone:'pwm'};
-  if(s.duty>0.01&&s.duty<0.99&&s.freqHz>=50)return {text:`PWM ≈${Math.round(s.duty*100)}% · ${Math.round(s.freqHz)} Hz`,tone:'pwm'};
+  if(s.duty>0.01&&s.duty<0.99&&s.freqHz>=50){
+   // PWM only on timer outputs at analogWrite rates; anything else is a chip-select or scan line toggling
+   if(PWM_PINS.includes(pin as UnoPin)&&s.freqHz<=2000)return {text:`PWM ≈${Math.round(s.duty*100)}% · ${Math.round(s.freqHz)} Hz`,tone:'pwm'};
+   return {text:`toggling · ${Math.round(s.freqHz)} Hz`,tone:'live'};
+  }
   return {text:`${pin} ${s.level?'HIGH':'LOW'}`,tone:'live'};
  }
  const part:PartState|undefined=snap.parts[target];

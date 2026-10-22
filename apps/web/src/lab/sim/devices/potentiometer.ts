@@ -6,7 +6,7 @@ export const device=defineDevice({
  inputs:[{type:'range',key:'value',label:{en:'Value',id:'Nilai'},min:INPUT_RANGES.potentiometer.min,max:INPUT_RANGES.potentiometer.max,step:1,default:512}],
  create(ctx){
   let value=clamp(Math.round(num(ctx.props.value,512)),INPUT_RANGES.potentiometer.min,INPUT_RANGES.potentiometer.max);
-  const pin=ctx.pin('SIG');
+  const pin=ctx.analogPin('SIG');
   ctx.props.value=value;
   return {
    state:()=>({kind:'potentiometer',value}),

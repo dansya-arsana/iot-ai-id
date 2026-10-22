@@ -3,6 +3,7 @@ import {uno} from './core/util';
 
 export const device=defineDevice({
  kind:'servo',protocol:'pwm',legacyState:true,pins:['SIG','V','GND'],inputs:[],
+ power:{rail:['V','GND'],min:4,max:6,ma:250},
  create(ctx){
   let pulseUs=0,angle=90;
   return {state:()=>({kind:'servo',pulseUs,angleDeg:angle}),update(f){

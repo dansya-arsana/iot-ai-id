@@ -21,7 +21,7 @@ function buildMotor(p:PartProps,g:Group):Inner{
  return {
   apply(s,dt){
    if(s.kind!=='motor')return;
-   spin.rotation.x+=clamp01(s.rpm/MOTOR_MAX_RPM)*(1-0.75*load)*4*2*Math.PI*dt/1000; // load slows the shaft
+   spin.rotation.x+=Math.sign(s.rpm)*clamp01(Math.abs(s.rpm)/MOTOR_MAX_RPM)*(1-0.75*load)*4*2*Math.PI*dt/1000; // load slows the shaft; negative rpm spins the other way
   },
  };
 }

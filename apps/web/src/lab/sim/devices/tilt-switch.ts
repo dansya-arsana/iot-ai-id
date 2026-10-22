@@ -10,7 +10,7 @@ import {uno} from './core/util';
 export type TiltSwitchState={tilted:boolean;high:boolean};
 
 export const device=defineDevice<TiltSwitchState>({
- kind:'tilt-switch',protocol:'gpio',
+ kind:'tilt-switch',protocol:'switch',
  pins:['VCC','SIG','GND'],holes:[0,1,2],
  copy:{
   name:{en:'Tilt switch (SW-520D)',id:'Saklar miring (SW-520D)'},

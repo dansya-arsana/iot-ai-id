@@ -10,13 +10,18 @@ import {BODY_X,PIN_COLS} from '../../scene/layout';
 import {nodeLoad,pick} from './core/discover';
 import type {Mods} from './core/discover';
 import {instantiate} from './core/host';
+import type {WorldApi} from './core/host';
 import type {DeviceDef,Env} from './types';
 import type {PartModel} from '../peripherals';
 
 export * from './types';
 export {drivePulses,PulseMeter} from './core/pulses';
 export {TwiBus} from './core/twi';
+export {SpiBus} from './core/spi';
+export {TwoWireSlave,Ws2812Decoder,WS2812} from './core/bitbang';
+export type {TwoWireConfig,TwoWireHandlers,Ws2812Options,Ws2812Frame} from './core/bitbang';
 export {instantiate} from './core/host';
+export type {WorldApi} from './core/host';
 
 const SKIP=['index.ts','types.ts'];
 function load():Mods{
@@ -42,8 +47,8 @@ export const deviceRegistry={
 };
 
 /** Build the PartModel of one spec from its registered device; unknown kinds become an inert passive part. */
-export function createDevice(spec:PartSpec,props:PartProps,env:Env,all:()=>readonly PartModel[]):PartModel{
+export function createDevice(spec:PartSpec,props:PartProps,env:Env,all:()=>readonly PartModel[],world?:WorldApi):PartModel{
  const def=DEVICES.get(spec.kind);
  if(!def)return {spec,props,state:()=>({kind:'passive'}),update(){},setInput(){}};
- return instantiate(def,spec,props,env,all);
+ return instantiate(def,spec,props,env,all,world);
 }

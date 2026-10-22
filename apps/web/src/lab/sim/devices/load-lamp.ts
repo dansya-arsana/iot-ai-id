@@ -3,6 +3,8 @@
  * It has no pins of its own. The relay it hangs on is named by `props.target`; the bulb shines when that relay is energised:
  * VCC of the module wired to 5 V, IN driven as an output, and its level matching the module's trigger (active low by default).
  * It reads the same signals the relay reads (the IN pin's duty) and applies the same operate/release delay, so the lamp and the relay click stay in step.
+ * Electrical mode: when its + and - pins are wired (part to part, e.g. relay COM/NO and a battery) it follows the voltage across them instead: it lights above 40 % of
+ * its 12 V rating and its power falls with the square of the voltage. The `target` link above stays the default when the pins are unwired.
  * Pair: scene/parts/load-lamp.ts. Guide: docs/lab-extending.md
  */
 import {defineDevice} from './types';
@@ -12,10 +14,11 @@ import {RELAY_OPERATE_MS,RELAY_RELEASE_MS} from './relay-module';
 export type LoadLampState={on:boolean;/** a relay was found and its contact feeds this bulb */linked:boolean;/** watts drawn through the contact */watts:number};
 
 export const LAMP_WATTS=5;
+export const LAMP_RATED_V=12;
 
 export const device=defineDevice<LoadLampState>({
  kind:'load-lamp',protocol:'gpio',
- pins:[],
+ pins:['+','-'],
  copy:{
   name:{en:'Lamp on the relay contact (12 V, 5 W)',id:'Lampu di kontak relay (12 V, 5 W)'},
   desc:{en:'A small bulb that is switched by the relay module it points at. It has no pins: its power comes through the relay contact (COM to NO), so it only lights while the relay is closed.',id:'Bohlam kecil yang disakelar modul relay yang ditunjuknya. Ia tidak punya pin: dayanya lewat kontak relay (COM ke NO), jadi hanya menyala saat relay menutup.'},
@@ -24,9 +27,17 @@ export const device=defineDevice<LoadLampState>({
  inputs:[],
  create(ctx){
   let on=false,linked=false,pendingMs=0;
+  let watts=0;
   return {
-   state:()=>({on,linked,watts:on?LAMP_WATTS:0}),
+   state:()=>({on,linked,watts:on?watts:0}),
    update(f){
+    if(ctx.peers('+').length||ctx.peers('-').length){
+     const v=Math.max(0,(ctx.volts('+')??0)-(ctx.volts('-')??0));
+     on=v>=0.4*LAMP_RATED_V;linked=true;
+     watts=Math.round(LAMP_WATTS*Math.min(1.2,v/LAMP_RATED_V)**2*100)/100;
+     return;
+    }
+    watts=LAMP_WATTS;
     const relay=ctx.siblings().find(s=>s.spec.id===ctx.props.target&&s.spec.kind==='relay-module');
     linked=!!relay;
     if(!relay){on=false;return;}

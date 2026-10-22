@@ -64,7 +64,7 @@ function buildLcd(_p:PartProps,g:Group):Inner{
   }
   ctx.globalAlpha=1;tex.needsUpdate=true;
  };
- draw({line1:'\u00ff'.repeat(16),line2:' '.repeat(16),cg:'0'.repeat(128),backlight:true,display:true,cursor:false,blink:false,col:0,row:0,contrast:60,color:'green',writes:0,reads:0,chars:0},false);
+ draw({line1:'\u00ff'.repeat(16),line2:' '.repeat(16),cg:'0'.repeat(128),backlight:true,display:true,cursor:false,blink:false,col:0,row:0,contrast:60,color:'green',address:0x27,writes:0,reads:0,chars:0},false);
  return {
   apply(s,dt){
    const st=extState<Lcd1602I2cState>(s,'lcd1602-i2c');

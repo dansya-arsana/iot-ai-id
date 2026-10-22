@@ -33,6 +33,7 @@ export const device=defineDevice<OledSsd1306State>({
   desc:{en:'A 128x64 pixel monochrome screen on I2C (address 0x3C). The sketch sends real SSD1306 commands and pixel bytes; every pixel you see was written by the code.',id:'Layar monokrom 128x64 piksel lewat I2C (alamat 0x3C). Sketch mengirim perintah dan byte piksel SSD1306 yang asli; setiap piksel yang tampak ditulis oleh kode.'},
   note:{en:'Needs Wire on A4/A5. Nothing shows until the sketch sends display-on and pixel data.',id:'Butuh Wire di A4/A5. Tidak ada tampilan sebelum sketch mengirim perintah display-on dan data piksel.'},
  },
+ power:{rail:['VCC','GND'],min:3.0,max:5.5,ma:20},
  inputs:[{type:'choice',key:'color',label:{en:'Panel colour',id:'Warna panel'},options:[{value:'white',label:{en:'White',id:'Putih'}},{value:'blue',label:{en:'Blue',id:'Biru'}}],default:'white'}],
  create(ctx){
   const ram=new Uint8Array(W*PAGES);

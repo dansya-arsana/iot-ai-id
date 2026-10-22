@@ -22,10 +22,15 @@ function fakeEnv(){
 }
 const circuit=(net:Partial<Record<string,BoardPin>>,props:Record<string,string|number|boolean>={}):Circuit=>({wires:[],parts:[{id:'p1',kind:'arduino-nano',net,props}]});
 
-test('arduino-nano: visual-only prop, no pins, reports its chip and USB power',()=>{
+test('arduino-nano: the model reports its chip and USB power and names the board id a circuit selects',()=>{
  const f=fakeEnv();
  const m=createModels(circuit({},{usbPower:true}),f.env).get('p1')!;
- const v=(m.state() as unknown as {v:{chip:string;usbPower:boolean}}).v;
- assert.equal(v.chip,'ATmega328P');assert.equal(v.usbPower,true);
+ const v=(m.state() as unknown as {v:{chip:string;usbPower:boolean;board:string;analogOnly:string}}).v;
+ assert.equal(v.chip,'ATmega328P');assert.equal(v.usbPower,true);assert.equal(v.board,'nano');assert.equal(v.analogOnly,'A6,A7');
  m.props.usbPower=false;assert.equal((m.state() as unknown as {v:{usbPower:boolean}}).v.usbPower,false);
+});
+test('arduino-nano: it is no longer flagged model-only (the Nano board runs); the ESP32 still is',async()=>{
+ const {deviceRegistry}=await import('../apps/web/src/lab/sim/devices/index.js');
+ assert.equal(deviceRegistry.get('arduino-nano')!.runtime,undefined);
+ assert.equal(deviceRegistry.get('esp32-devkit')!.runtime,'not-emulated');
 });

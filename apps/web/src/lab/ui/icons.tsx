@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react';
+import {LESSON_BY_ID} from '../lessons/index';
 
 const P:Record<string,ReactNode>={
  board:<><rect x="5" y="9" width="22" height="14" rx="2"/><rect x="11" y="13" width="7" height="6"/><path d="M8 9V6M12 9V6M16 9V6M20 9V6"/></>,
@@ -60,6 +61,9 @@ const P:Record<string,ReactNode>={
  reset:<><circle cx="16" cy="16" r="10"/><path d="M16 8v8l5 3"/></>,
 };
 
+/** Icon of a lesson that brings its own path data (lessons/<id>.ts: icon). */
+function lessonIcon(name:string):ReactNode{const d=LESSON_BY_ID[name]?.icon;return d?<>{d.map((p,i)=><path key={i} d={p}/>)}</>:undefined;}
+
 export function Icon({name,size=20,className}:{name:string;size?:number;className?:string}){
- return <svg className={className} width={size} height={size} viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth={Math.max(1.5,1.5*32/size)} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{P[name]??P.chip}</svg>;
+ return <svg className={className} width={size} height={size} viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth={Math.max(1.5,1.5*32/size)} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{P[name]??lessonIcon(name)??P.chip}</svg>;
 }

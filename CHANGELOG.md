@@ -7,7 +7,7 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 ## [Unreleased]
 
 ### Added
-- Public Arduino lab (`/lab`, `/lab/:lesson`): 16 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
+- Public Arduino lab (`/lab`, `/lab/:lesson`): 26 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
   - "Bench Record" design in the AIoT system (Archivo, IBM Plex Mono, warm-grey bench, one live-green accent). It shows what really runs: a logic analyzer drawn from the emulated chip's pin history (HIGH/LOW, PWM duty and frequency, analog input, TX), a port map, a live cycle counter and speed, callouts with measured values (LED current, ADC reading, PWM), goals checked from chip data ("D8 toggled 4× · high 500.1 ms"), firmware size, and 3D lesson thumbnails.
   - Inspector values are patched into the real firmware bytes (verified against a recompile), line highlighting comes from DWARF line tables, and each lesson has a real success check.
   - The code view is read-only. Only the declared parameters and the pre-compiled variants can change; there is no in-browser compiler.
@@ -24,6 +24,19 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 - Parts gallery at `/lab/parts` and `/lab/parts/<kind>` (every registered kind rendered with its default props).
 - `DeviceDef.runtime: 'not-emulated'` with an honest "Model only" badge in the gallery and the part popover (ESP32, Nano).
 - Desktop app native consent: authorizing a board for upload opens an OS dialog; the backend only accepts a one-time HMAC token (60 s, one port). Local dev needs `AIOT_LAB_DEV_CONSENT=1`. See docs/lab-hardware.md.
+- Lab catalog wave 2 (80 registered parts, 26 lessons). Every part simulates its real protocol at signal level, has EN and ID copy, a docs page in `docs/lab-parts/` and tests; real-firmware tests use our own minimal drivers (no GPL code).
+  - Temperature and pressure: DS18B20 (1-Wire ROM, search, scratchpad, CRC8), LM35, NTC thermistor, BMP280 (Bosch compensation).
+  - Motion and magnetic: MPU6050 (I2C, 0x68/0x69, interrupt), Hall A3144, reed switch.
+  - Input: KY-023 joystick, KY-040 rotary encoder (Gray code), 4x4 keypad (ghost keys), TTP223 touch.
+  - Environment: KY-038 sound, flame sensor, rain sensor, FC-51 IR obstacle.
+  - Power and measurement: ACS712 current, voltage sensor module, HX711 load cell (24-bit, gain select), MB102 breadboard power, LM7805, AMS1117-3.3.
+  - Switches, lights and diodes: slide switch, toggle switch, 10-segment LED bar, IR LED, photodiode, WS2812 strip, ring and matrix (800 kHz decode), KY-008 laser, KY-016 RGB module, coin vibration motor.
+  - Clocks and comms: DS3231 RTC with AT24C32 EEPROM, HC-05 Bluetooth (data and AT mode), NEO-6M GPS (NMEA with checksums), ESP-01 (AT shell, no Wi-Fi), NodeMCU v3 (model only).
+  - SPI: RC522 RFID (ISO 14443-A, 4 and 7 byte UIDs), MAX7219 chained matrix, microSD (SPI-mode card, raw blocks).
+  - Displays: TM1637 4-digit, LCD2004 I2C, Nokia 5110 PCD8544.
+  - Motion drivers: 28BYJ-48 stepper, ULN2003 board, MG996R servo, IRF520 MOSFET module, mini water pump.
+- Lessons 17 to 26: Weather station (BMP280, DHT22, LCD2004), Tilt alarm (MPU6050), RFID door (RC522, servo, relay), Keypad lock, Rainbow pixels (WS2812 and encoder), Stepper control, Kitchen scale (HX711), Real-time clock (DS3231 and MAX7219), Motor driver (L298N), GPS logger (NEO-6M and Nokia 5110). Each is one module under `lab/lessons/<id>.ts` with its own sketch.
+- Lab platform: SPI and bit-bang bus cores, part-to-part nets with a power solver and power warnings (over, under, external, conflict, dropout), Arduino Nano board with A6/A7, scaffolder flags `--protocol spi|twowire|ws2812`, `--desk`, `--power`, and one firmware file per sketch (`firmware/generated/<sketch>.ts`).
 
 ### Fixed
 - Lab callout pills are measured in layout pixels, so they no longer cover the power jack below 1440 px; the test record wraps instead of clipping on narrow or short screens; framing of lessons 7 and 11 improved.

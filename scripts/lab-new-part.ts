@@ -1,10 +1,11 @@
 /**
  * Scaffold a new lab component (kind): visual part + simulation device + unit test + docs stub, all auto-discovered.
  *
- * Usage: npm run lab:new-part -- <kind> --protocol gpio|adc|pwm|pulse|i2c|onewire|uart|switch [--desk] [--force]
+ * Usage: npm run lab:new-part -- <kind> --protocol gpio|adc|pwm|pulse|i2c|onewire|uart|switch|spi|twowire|ws2812 [--desk] [--power 3.3-5.5] [--force]
  *   <kind>      kebab-case id, e.g. ds18b20 or tilt-switch
  *   --protocol  picks the device template (which hooks it uses); default gpio
  *   --desk      off-board prop (no breadboard legs), like the lamp or the obstacle
+ *   --power a-b supply rating in volts (e.g. 3.3-5.5): the device gets a PowerSpec, so the lab warns when its VCC/GND rail is outside it
  *   --force     overwrite existing files
  *
  * Creates (no core file is edited, see docs/lab-extending.md):
@@ -13,12 +14,12 @@
  *   tests/lab-part-<kind>.test.ts            unit test of the device
  *   docs/lab-parts/<kind>.md                 docs stub, and docs/lab-parts/README.md is regenerated (the gallery index)
  */
-import {existsSync, mkdirSync, readdirSync, writeFileSync} from 'node:fs';
+import {existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const PROTOCOLS = ['gpio', 'adc', 'pwm', 'pulse', 'i2c', 'onewire', 'uart', 'switch'] as const;
+const PROTOCOLS = ['gpio', 'adc', 'pwm', 'pulse', 'i2c', 'onewire', 'uart', 'switch', 'spi', 'twowire', 'ws2812'] as const;
 type Protocol = (typeof PROTOCOLS)[number];
 
 interface Tpl {proto?: string; pins: string[]; state: string; stateInit: string; inputs: string; body: string; test: string; blurb: string}
@@ -73,7 +74,7 @@ const TEMPLATES: Record<Protocol, Tpl> = {
     state: '{value:number;volts:number}',
     stateInit: '{value:512,volts:2.5}',
     inputs: `[{type:'range',key:'value',label:{en:'Reading',id:'Bacaan'},min:0,max:1023,step:1,default:512}]`,
-    body: `  const sig=ctx.pin('SIG');
+    body: `  const sig=ctx.analogPin('SIG');   // analogPin also resolves A6/A7 of the Nano (analog input only)
   const value=()=>clamp(Math.round(num(ctx.props.value,512)),0,1023);
   return {
    state:()=>({value:value(),volts:round1(value()/1023*5)}),
@@ -206,6 +207,102 @@ const TEMPLATES: Record<Protocol, Tpl> = {
   assert.deepEqual(f.sent,[65]);
   const s=m.state();assert.ok(s.kind==='ext');if(s.kind==='ext'){assert.equal(s.v.rx,1);assert.equal(s.v.last,0x3f);}`,
   },
+  spi: {
+    blurb: 'an SPI slave: the sketch uses SPI.transfer with a chip-select pin; first byte = register (bit 7 set reads), then data with auto-increment',
+    pins: ['VCC', 'GND', 'SCK', 'MOSI', 'MISO', 'CS'],
+    state: '{selected:boolean;reads:number;writes:number;lastReg:number;mode:number}',
+    stateInit: '{selected:false,reads:0,writes:0,lastReg:0,mode:0}',
+    inputs: `[{type:'range',key:'value',label:{en:'Reading',id:'Bacaan'},min:0,max:255,step:1,default:42}]`,
+    body: `  const regs=new Uint8Array(16);
+  let selected=false,reads=0,writes=0,lastReg=0,mode=0,reg=0,read=false;
+  regs[0x0f]=0x58;                       // an ID register the sketch can check
+  const sync=():void=>{regs[0]=clamp(Math.round(num(ctx.props.value,42)),0,255);};
+  sync();
+  return {
+   state:()=>({selected,reads,writes,lastReg,mode}),
+   spi:{
+    cs:'CS',activeLow:true,                // any board pin can carry CS; the bus ignores the byte unless that pin is driven low
+    onSelect(sel){selected=sel;},          // a new frame: forget the command
+    // one byte per call; info.index is 0 for the first byte after CS fell, info.mode is the master's SPI mode (0-3)
+    onTransfer(mosi,info){
+     mode=info.mode;sync();
+     if(info.index===0){read=(mosi&0x80)!==0;reg=mosi&0x0f;lastReg=reg;return 0xff;}   // command byte
+     const at=(reg+info.index-1)&0x0f;
+     if(read){reads++;return regs[at]!;}
+     regs[at]=mosi;writes++;return 0xff;
+    },
+   },
+  };`,
+    test: `  const f=fakeEnv();
+  const m=createModels(circuit({CS:'D10'},{value:7}),f.env).get('__KIND__1')!;
+  const bus=f.spi[0]!;
+  assert.equal(bus.csPin,'D10');assert.equal(bus.activeLow,true);
+  const info={mode:0 as const,lsbFirst:false,clockHz:4_000_000,cycle:0};
+  m.onEdge!('D10',0,10);                                   // sketch pulls CS low
+  assert.equal(bus.transfer(0x80,info),0xff);              // command: read register 0
+  assert.equal(bus.transfer(0x00,info),7);                 // value comes back on the second byte
+  m.onEdge!('D10',1,500);
+  m.onEdge!('D10',0,600);                                  // a new frame restarts the byte index
+  assert.equal(bus.transfer(0x8f,info),0xff);assert.equal(bus.transfer(0,info),0x58);
+  const s=m.state();assert.ok(s.kind==='ext');if(s.kind==='ext'){assert.equal(s.v.reads,2);assert.equal(s.v.lastReg,15);}`,
+  },
+  twowire: {
+    blurb: 'a custom clocked two-wire bus (TM1637 style): START/STOP on DIO while CLK is high, bytes LSB first, ACK low pulse on the 9th clock',
+    pins: ['VCC', 'GND', 'CLK', 'DIO'],
+    state: '{frames:number;bytes:number;last:number;acks:number}',
+    stateInit: '{frames:0,bytes:0,last:0,acks:0}',
+    inputs: '[]',
+    body: `  let frames=0,bytes=0,last=0,acks=0;
+  // TwoWireSlave decodes START/STOP/bytes from the edges of CLK and DIO; DIO is an open-drain shared line
+  const bus=new TwoWireSlave(ctx,{clk:'CLK',data:'DIO',lsbFirst:true,ack:true},{
+   onStart(){frames++;},
+   onByte(byte){bytes++;last=byte;acks++;return true;},   // return false to NACK; to answer a read call bus.shiftOut(bits,{on:'falling'})
+  });
+  return {
+   state:()=>({frames,bytes,last,acks}),
+   onPinChange:(pin,level,cycle)=>bus.edge(pin,level,cycle),
+  };`,
+    test: `  const f=fakeEnv();
+  const m=createModels(circuit({CLK:'D2',DIO:'D3'}),f.env).get('__KIND__1')!;
+  let t=0;
+  const clk=(l:0|1)=>m.onEdge!('D2',l,t+=40),dio=(l:0|1)=>m.onEdge!('D3',l,t+=40);
+  clk(1);dio(1);dio(0);                                     // START: DIO falls while CLK is high
+  for(let i=0;i<8;i++){clk(0);dio(((0x40>>i)&1) as 0|1);clk(1);}   // 0x40 = 0b01000000, LSB first
+  f.log.length=0;clk(0);                                    // falling edge of the 8th clock: the slave pulls DIO low (ACK)
+  assert.equal(f.log.at(-1)?.pin,'D3');assert.equal(f.log.at(-1)?.level,false);
+  clk(1);clk(0);assert.equal(f.log.at(-1)?.level,true);     // 9th clock: ACK released
+  dio(0);clk(1);dio(1);                                     // STOP
+  const s=m.state();assert.ok(s.kind==='ext');if(s.kind==='ext'){assert.equal(s.v.frames,1);assert.equal(s.v.last,0x40);assert.equal(s.v.acks,1);}`,
+  },
+  ws2812: {
+    blurb: 'a WS2812 style LED strip on one data wire at 800 kHz, decoded from the cycle-stamped edges (GRB, 24 bits per LED, >50 us low latches)',
+    pins: ['VCC', 'DIN', 'GND'],
+    state: '{count:number;leds:string;frames:number;timingErrors:number}',
+    stateInit: '{count:8,leds:\'\',frames:0,timingErrors:0}',
+    inputs: `[{type:'range',key:'count',label:{en:'LEDs in the strip',id:'LED dalam strip'},min:1,max:60,step:1,default:8}]`,
+    body: `  let leds:string='',frames=0,timingErrors=0;
+  const count=()=>clamp(Math.round(num(ctx.props.count,8)),1,60);
+  // the decoder measures every high pulse (0.4 us = 0, 0.8 us = 1) and latches on a low of 50 us or more
+  const dec=new Ws2812Decoder({
+   schedule:(c,cb)=>ctx.schedule(c,cb),
+   count:count(),
+   onFrame(fr){leds=fr.pixels.map(p=>p.map(v=>v.toString(16).padStart(2,'0')).join('')).join('');frames++;timingErrors+=fr.timingErrors;},
+  });
+  return {
+   state:()=>({count:count(),leds,frames,timingErrors}),
+   onPinChange:(pin,level,cycle)=>{if(pin===ctx.pin('DIN'))dec.edge(level,cycle);},
+  };`,
+    test: `  const f=fakeEnv();
+  const m=createModels(circuit({DIN:'D6'},{count:2}),f.env).get('__KIND__1')!;
+  let t=0;
+  // at 16 MHz: a 0 is 0.4 us high (6 cycles) + 0.85 us low (14); a 1 is 0.8 us high (13 cycles) + 0.45 us low (7)
+  const bit=(b:number)=>{m.onEdge!('D6',1,t);t+=b?13:6;m.onEdge!('D6',0,t);t+=b?7:14;};
+  const byte=(v:number)=>{for(let i=7;i>=0;i--)bit((v>>i)&1);};
+  for(const px of [[0x11,0x22,0x33],[0xff,0,0x80]]){byte(px[1]!);byte(px[0]!);byte(px[2]!);}   // GRB order
+  f.run(t+us(60));                                                                              // 60 us of low latches the frame
+  const s=m.state();assert.ok(s.kind==='ext');
+  if(s.kind==='ext'){assert.equal(s.v.leds,'112233ff0080');assert.equal(s.v.frames,1);assert.equal(s.v.timingErrors,0);}`,
+  },
 };
 
 const camel = (k: string): string => k.replace(/-([a-z0-9])/g, (_m, c: string) => c.toUpperCase());
@@ -218,20 +315,24 @@ function fill(src: string, v: Record<string, string>): string {
 /** Helpers from devices/types a template body actually calls, as an import suffix. */
 const helpers = (body: string): string => ['clamp', 'num', 'round1', 'us'].filter((n) => new RegExp(`\\b${n}\\(`).test(body)).map((n) => ',' + n).join('');
 
-function deviceFile(kind: string, p: Protocol, t: Tpl, desk: boolean): string {
+function deviceFile(kind: string, p: Protocol, t: Tpl, desk: boolean, power: [number, number] | null): string {
   const pins = desk ? [] : t.pins;
   return fill(`/**
  * __TITLE__ device (protocol '${p}'): ${t.blurb}.
  * Pair: scene/parts/__KIND__.ts (3D). Both are auto-discovered; nothing else to edit. Guide: docs/lab-extending.md
  */
-import {defineDevice__HELPERS__} from './types';__UNO__
+import {defineDevice__HELPERS__} from './types';__UNO____BB__
 
 export type __PASCAL__State=${t.state};
 
 export const device=defineDevice<__PASCAL__State>({
  kind:'__KIND__',protocol:'${t.proto??p}',
- // pins in physical order; this list becomes PART_PINS['__KIND__'] and must equal the part's pins
- pins:${JSON.stringify(pins).replace(/"/g, "'")},${desk ? '' : `holes:${JSON.stringify(pins.map((_x, i) => i))},`}
+ // pins in physical order; this list becomes PART_PINS['__KIND__'] and must equal the part's pins.
+ // A pin without a hole entry is a terminal (screw block, pad) that only takes wires; holes may be shorter than pins.
+ pins:${JSON.stringify(pins).replace(/"/g, "'")},${desk ? '' : `holes:${JSON.stringify(pins.map((_x, i) => i))},`}${power ? `
+ // supply rating (datasheet): the lab warns above max or below min. ma = typical current; add external:true for a motor-like load
+ power:{rail:['${pins.includes('V') ? 'V' : 'VCC'}','GND'],min:${power[0]},max:${power[1]},ma:10},` : ''}
+ // a power source or regulator would add: supplies:p=>[{pos:'PLUS',neg:'MINUS',volts:9}] or regulators:()=>[{in:'IN',out:'OUT',gnd:'GND',volts:5,dropout:2}] (see lm7805.ts, battery-9v.ts)
  copy:{
   name:{en:'__TITLE__',id:'__TITLE__'},
   desc:{en:'TODO one sentence about what __TITLE__ does.',id:'TODO satu kalimat tentang fungsi __TITLE__.'},
@@ -243,7 +344,7 @@ export const device=defineDevice<__PASCAL__State>({
 ${t.body}
  },
 });
-`, {KIND: kind, TITLE: title(kind), HELPERS: helpers(t.body), UNO: /\buno\(/.test(t.body) ? "\nimport {uno} from './core/util';" : '', PASCAL: camel(kind).replace(/^./, (c) => c.toUpperCase())});
+`, {KIND: kind, TITLE: title(kind), HELPERS: helpers(t.body), UNO: /\buno\(/.test(t.body) ? "\nimport {uno} from './core/util';" : '', BB: ['TwoWireSlave', 'Ws2812Decoder'].filter((n) => t.body.includes(n)).map((n) => `\nimport {${n}} from './core/bitbang';`).join(''), PASCAL: camel(kind).replace(/^./, (c) => c.toUpperCase())});
 }
 
 function partFile(kind: string, p: Protocol, t: Tpl, desk: boolean): string {
@@ -295,18 +396,18 @@ import assert from 'node:assert/strict';
 import type {BoardPin,Circuit,UnoPin} from '../apps/web/src/lab/contract.js';
 import {__EMPTY__createModels} from '../apps/web/src/lab/sim/peripherals.js';
 __USIMP__
-import type {I2cSlave} from '../apps/web/src/lab/sim/devices/types.js';
+import type {I2cSlave,SpiBinding} from '../apps/web/src/lab/sim/devices/types.js';
 
 /** Minimal board: a clock with scheduled callbacks, pin logs and the shared-line / I2C / UART hooks. */
 function fakeEnv(){
  const events:{at:number;cb:()=>void}[]=[];
  let now=0;
- const adc:number[]=[],log:{pin:UnoPin;level:boolean;at:number}[]=[],i2c:I2cSlave[]=[],uart:((b:number,c:number)=>void)[]=[],sent:number[]=[];
- return {adc,log,i2c,uart,sent,
+ const adc:number[]=[],log:{pin:UnoPin;level:boolean;at:number}[]=[],i2c:I2cSlave[]=[],spi:SpiBinding[]=[],uart:((b:number,c:number)=>void)[]=[],sent:number[]=[];
+ return {adc,log,i2c,spi,uart,sent,
   env:{
    setPin:(p:UnoPin,l:boolean)=>{log.push({pin:p,level:l,at:now});},setAdc:(_c:number,v:number)=>{adc.push(v);},
    schedule:(c:number,cb:()=>void)=>{events.push({at:now+c,cb});events.sort((a,b)=>a.at-b.at);},now:()=>now,
-   watchLine:()=>undefined,attachI2c:(s:I2cSlave)=>{i2c.push(s);},tapUart:(cb:(b:number,c:number)=>void)=>{uart.push(cb);},uartSend:(b:number)=>{sent.push(b);},
+   watchLine:()=>undefined,attachI2c:(s:I2cSlave)=>{i2c.push(s);},attachSpi:(s:SpiBinding)=>{spi.push(s);},tapUart:(cb:(b:number,c:number)=>void)=>{uart.push(cb);},uartSend:(b:number)=>{sent.push(b);},
   },
   at:(n:number)=>{now=n;},
   run(to:number){while(events.length&&events[0]!.at<=to){const e=events.shift()!;now=e.at;e.cb();}now=to;},
@@ -350,8 +451,12 @@ Write down here: where the model comes from (own work or a permissive source; ne
 
 function regenIndex(): void {
   const dir = join(ROOT, 'docs/lab-parts');
-  const rows = readdirSync(dir).filter((f) => f.endsWith('.md') && f !== 'README.md').sort().map((f) => `- [${f.replace(/\.md$/, '')}](./${f})`);
-  writeFileSync(join(dir, 'README.md'), `# Lab parts\n\nOne page per scaffolded kind (generated by \`npm run lab:new-part\`). The live list is the registry: \`registry.kinds()\` in \`scene/parts/index.ts\`.\n\n${rows.join('\n')}\n`);
+  const flag = (kind: string): string => {
+    const f = join(ROOT, `apps/web/src/lab/sim/devices/${kind}.ts`);
+    return existsSync(f) && /runtime:\s*'not-emulated'/.test(readFileSync(f, 'utf8')) ? ' (model only, not emulated)' : '';
+  };
+  const rows = readdirSync(dir).filter((f) => f.endsWith('.md') && f !== 'README.md').sort().map((f) => `- [${f.replace(/\.md$/, '')}](./${f})${flag(f.replace(/\.md$/, ''))}`);
+  writeFileSync(join(dir, 'README.md'), `# Lab parts\n\nOne page per scaffolded kind (generated by \`npm run lab:new-part\`). The live list is the registry: \`registry.kinds()\` in \`scene/parts/index.ts\`. Gallery: \`/lab/parts\` (all kinds) and \`/lab/parts/<kind>\` (one, large).\n\n${rows.join('\n')}\n`);
 }
 
 function main(): void {
@@ -360,12 +465,17 @@ function main(): void {
   const pi = args.indexOf('--protocol');
   const protocol = (pi >= 0 ? args[pi + 1] : 'gpio') as Protocol;
   const desk = args.includes('--desk');
+  const pw = args.indexOf('--power');
+  const pm = pw >= 0 ? /^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/.exec(args[pw + 1] ?? '') : null;
+  if (pw >= 0 && !pm) throw new Error('--power takes a range in volts, e.g. --power 3.3-5.5');
+  const power: [number, number] | null = pm ? [Number(pm[1]), Number(pm[2])] : null;
+  if (power && (power[0] >= power[1] || desk || !(TEMPLATES[protocol]?.pins.includes('GND') && (TEMPLATES[protocol]!.pins.includes('VCC') || TEMPLATES[protocol]!.pins.includes('V'))))) throw new Error('--power needs min < max and a protocol with VCC and GND pins, not --desk');
   const force = args.includes('--force');
   if (!kind || !/^[a-z][a-z0-9-]{1,23}$/.test(kind)) throw new Error('usage: npm run lab:new-part -- <kind> --protocol ' + PROTOCOLS.join('|') + ' [--desk] [--force]   (kind: kebab-case, 2-24 chars)');
   if (!PROTOCOLS.includes(protocol)) throw new Error(`unknown protocol '${protocol}', use ${PROTOCOLS.join('|')}`);
   const t = TEMPLATES[protocol];
   const files: [string, string][] = [
-    [`apps/web/src/lab/sim/devices/${kind}.ts`, deviceFile(kind, protocol, t, desk)],
+    [`apps/web/src/lab/sim/devices/${kind}.ts`, deviceFile(kind, protocol, t, desk, power)],
     [`apps/web/src/lab/scene/parts/${kind}.ts`, partFile(kind, protocol, t, desk)],
     [`tests/lab-part-${kind}.test.ts`, testFile(kind, t, desk)],
     [`docs/lab-parts/${kind}.md`, docFile(kind, protocol, t, desk)],

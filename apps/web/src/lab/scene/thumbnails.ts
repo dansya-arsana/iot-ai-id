@@ -1,6 +1,8 @@
 import {Box3,DirectionalLight,Group,HemisphereLight,OrthographicCamera,Scene,SRGBColorSpace,Vector3,WebGLRenderTarget,type Texture,type WebGLRenderer} from 'three';
 import type {LessonId,PartKind,PartSpec,PartState} from '../contract';
 import {LESSON_IDS} from '../contract';
+import {LESSON_MODULES} from '../lessons/index';
+import type {LessonModule} from '../lessons/index';
 import {buildUno} from './board-uno';
 import {buildPart} from './parts/index';
 import {contentBox} from './bounds';
@@ -10,32 +12,23 @@ import * as C from './palette';
 const rad=(d:number):number=>(d*Math.PI)/180;
 const spec=(kind:PartKind,props:Record<string,string|number|boolean>={}):PartSpec=>({id:kind,kind,net:{},props});
 type Item={s:PartSpec;x:number;z?:number;state?:PartState};
-const litLed:PartState={kind:'led',brightness:1,on:true,currentMa:12,overCurrent:false};
-/** The hero subject of each lesson, laid out as a small tableau. */
-const SUBJECT:Record<LessonId,Item[]|'uno'>={
- board:'uno',
- blink:[{s:spec('led',{color:'red'}),x:0,state:litLed},{s:spec('resistor',{ohms:220}),x:14}],
- button:[{s:spec('button'),x:0}],
- knob:[{s:spec('potentiometer',{value:640}),x:0,state:{kind:'potentiometer',value:640}}],
- rgb:[{s:spec('rgb-led'),x:0,state:{kind:'rgb-led',r:1,g:0.08,b:0.6}}],
- light:[{s:spec('ldr'),x:0},{s:spec('lamp',{distanceCm:40,on:true}),x:34,z:-6,state:{kind:'lamp',distanceCm:40,on:true}}],
- distance:[{s:spec('hcsr04'),x:0}],
- sound:[{s:spec('buzzer'),x:0}],
- motor:[{s:spec('motor'),x:0}],
- servo:[{s:spec('servo'),x:0}],
- dht:[{s:spec('dht22',{tempC:24,humidity:60}),x:0}],
- oled:[{s:spec('oled-ssd1306'),x:0}],
- motion:[{s:spec('pir-hc-sr501'),x:0},{s:spec('relay-module'),x:46}],
- plant:[{s:spec('soil-moisture',{wetness:55}),x:0}],
- remote:[{s:spec('ir-receiver'),x:0},{s:spec('seven-segment'),x:30}],
- parking:[{s:spec('hcsr04'),x:0,z:0},{s:spec('obstacle',{shape:'car',distanceCm:30}),x:0,z:34,state:{kind:'obstacle',distanceCm:30}}],
-};
+const LIT_LED:PartState={kind:'led',brightness:1,on:true,currentMa:12,overCurrent:false};
+const PASSIVE=new Set(['resistor','diode','transistor','capacitor']);
+/** The hero subject of a lesson, laid out as a small tableau: its `thumbnail` data, else the first two non-passive parts of its circuit. */
+function subjectOf(m:LessonModule):Item[]|'uno'{
+ if(m.thumbnail==='uno')return 'uno';
+ if(m.thumbnail)return m.thumbnail.map(t=>({s:spec(t.kind,t.props),x:t.x,...(t.z!==undefined?{z:t.z}:{}),...(t.state?{state:t.state}:{})}));
+ const kinds=[...new Set(m.circuit.parts.map(p=>p.kind))].filter(k=>!PASSIVE.has(k)).slice(0,2);
+ return (kinds.length?kinds:['led']).map((k,i)=>({s:spec(k,k==='led'?{color:'red'}:{}),x:i*34,...(k==='led'?{state:LIT_LED}:{})}));
+}
 
 const next=():Promise<void>=>new Promise(r=>requestAnimationFrame(()=>r()));
 
 /** Renders each lesson's hero subject into a render target, one per frame, and returns webp data URLs. */
 export async function renderThumbnails(renderer:WebGLRenderer,env:Texture|null,o:{width:number;height:number;dpr:number;order?:LessonId[];onEach?:(id:LessonId,url:string)=>void}):Promise<Partial<Record<LessonId,string>>>{
  const order=[...(o.order??[]),...LESSON_IDS].filter((id,i,a)=>a.indexOf(id)===i);
+ const SUBJECT:Record<string,Item[]|'uno'>={};
+ for(const m of LESSON_MODULES)SUBJECT[m.id]=subjectOf(m);
  return renderSubjects<LessonId>(renderer,env,SUBJECT,order,o);
 }
 

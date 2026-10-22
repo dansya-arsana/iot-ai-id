@@ -1,9 +1,10 @@
-import {AVRADC,AVRIOPort,AVRTWI,AVRTimer,AVRUSART,CPU,PinState,adcConfig,avrInstruction,portBConfig,portCConfig,portDConfig,timer0Config,timer1Config,timer2Config,twiConfig,usart0Config} from 'avr8js';
+import {AVRADC,AVRIOPort,AVRSPI,AVRTWI,AVRTimer,AVRUSART,CPU,PinState,adcConfig,avrInstruction,portBConfig,portCConfig,portDConfig,spiConfig,timer0Config,timer1Config,timer2Config,twiConfig,usart0Config} from 'avr8js';
 import {PIN_PORT,SIM_CLOCK_HZ,UNO_PINS} from '../contract';
 import type {AvrPort,PinMode,UnoPin} from '../contract';
 import {PinMonitor} from './pins';
 import {TwiBus} from './devices/core/twi';
-import type {I2cSlave} from './devices/types';
+import {SpiBus} from './devices/core/spi';
+import type {I2cSlave,SpiBinding} from './devices/types';
 
 /** ATmega328P with timers, GPIO, USART and ADC. Pure: no DOM. */
 export class AvrMachine{
@@ -14,6 +15,8 @@ export class AvrMachine{
  readonly monitor:PinMonitor;
  /** I2C bus; created on first attachI2c so sketches without Wire run exactly as before. */
  bus:TwiBus|null=null;
+ /** SPI master; created on first attachSpi, same idea as the I2C bus. */
+ spiBus:SpiBus|null=null;
  private lines=new Set<UnoPin>();
  private ext:Partial<Record<UnoPin,boolean>>={};
  /** 1-based .ino line of the last executed sketch instruction, 0 = none yet. */
@@ -64,6 +67,22 @@ export class AvrMachine{
  attachI2c(slave:I2cSlave):void{
   if(!this.bus){const twi=new AVRTWI(this.cpu,twiConfig,SIM_CLOCK_HZ);this.bus=new TwiBus(twi);twi.eventHandler=this.bus;this.bus.onActivity=()=>{this.pulseLine('A4');this.pulseLine('A5');};}
   this.bus.attach(slave);
+ }
+ attachSpi(slave:SpiBinding):void{
+  if(!this.spiBus){
+   const spi=new AVRSPI(this.cpu,spiConfig,SIM_CLOCK_HZ);
+   this.spiBus=new SpiBus(spi,p=>this.spiCsLevel(p),()=>this.cpu.cycles,(c,cb)=>this.schedule(c,cb));
+   this.spiBus.onActivity=cycles=>this.pulseHigh('D13',Math.max(2,cycles>>1));
+  }
+  this.spiBus.attach(slave);
+ }
+ /** Level the slave sees on a chip-select pin: what the sketch drives; an input pin floats high (module pull-up). */
+ spiCsLevel(pin:UnoPin):0|1{return this.pinMode(pin)==='output'?this.lineLevel(pin):1;}
+ /** A short high pulse on an idle-low line (SCK shown on D13 during an SPI byte). */
+ pulseHigh(pin:UnoPin,cycles:number):void{
+  if(this.monitor.level(pin)!==0)return;
+  this.monitor.record(pin,1,this.cpu.cycles);
+  this.cpu.addClockEvent(()=>this.monitor.record(pin,0,this.cpu.cycles),cycles);
  }
  /** A short low pulse (10 us) on an idle-high line, so SDA/SCL show the transaction-level I2C traffic. */
  pulseLine(pin:UnoPin):void{

@@ -22,9 +22,10 @@ export const device=defineDevice<WaterLevelState>({
   desc:{en:'A strip of exposed copper traces. Water bridges the traces, so the analog voltage grows with how deep the strip is submerged.',id:'Strip jalur tembaga terbuka. Air menghubungkan jalur-jalurnya, jadi tegangan analog naik seiring dalamnya strip terendam.'},
   note:{en:'Set the immersion depth in mm. Dry reads 0 V, fully covered about 2.4 V.',id:'Atur kedalaman rendaman dalam mm. Kering terbaca 0 V, terendam penuh sekitar 2,4 V.'},
  },
+ power:{rail:['VCC','GND'],min:3.3,max:5.5,ma:20},
  inputs:[{type:'range',key:'depth',label:{en:'Immersion depth (mm)',id:'Kedalaman rendam (mm)'},min:0,max:WATER_TRACE_MM,step:1,default:10}],
  create(ctx){
-  const sig=ctx.pin('SIG');
+  const sig=ctx.analogPin('SIG');
   const depth=()=>clamp(Math.round(num(ctx.props.depth,10)),0,WATER_TRACE_MM);
   return {
    state:()=>({depth:depth(),volts:Math.round(waterVolts(depth())*100)/100}),

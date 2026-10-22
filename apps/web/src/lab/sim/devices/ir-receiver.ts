@@ -49,6 +49,7 @@ export const device=defineDevice<IrReceiverState>({
   desc:{en:'A 38 kHz infrared receiver. It removes the carrier, so OUT idles HIGH and pulses LOW with the remote NEC bursts that a decoder sketch can time.',id:'Penerima inframerah 38 kHz. Pembawa dibuang, sehingga OUT diam di HIGH dan berdenyut LOW mengikuti burst NEC remote yang bisa diukur sketch dekoder.'},
   note:{en:'Pick a remote key in the panel to send a real NEC frame.',id:'Pilih tombol remote di panel untuk mengirim frame NEC asli.'},
  },
+ power:{rail:['VCC','GND'],min:2.7,max:5.5,ma:1},
  inputs:[
   {type:'choice',key:'button',label:{en:'Remote key',id:'Tombol remote'},options:[{value:'none',label:{en:'(release)',id:'(lepas)'}},...KEYS.map(k=>({value:k.key,label:{en:k.key.toUpperCase(),id:k.key.toUpperCase()}}))],default:'none'},
   {type:'toggle',key:'hold',label:{en:'Hold key (repeat codes)',id:'Tahan tombol (kode ulang)'},default:false},

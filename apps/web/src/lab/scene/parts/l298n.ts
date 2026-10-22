@@ -18,6 +18,9 @@ function label(g:Group,text:string,w:number,h:number,x:number,y:number,z:number)
  m.material.userData.own=true;m.material.userData.ownMap=true;m.position.set(x,y,z);m.userData.noPick=true;m.userData.noInk=true;g.add(m);
 }
 
+/** Terminal anchors in mm (buildL298 places the screw blocks with the same numbers): left/right x, y of the board centre, z of the screw heads. */
+const TL=3*PITCH-43/2+4.2,TR=3*PITCH+43/2-4.2,TY=5+43/2,TZ=11;
+
 function buildL298(_p:PartProps,g:Group):Inner{
  const bw=43,bh=43,py=5,cx=3*PITCH,cy=py+bh/2;
  for(let i=0;i<7;i++)g.add(leg(i*PITCH,py+0.4));
@@ -72,6 +75,10 @@ export const l298n=definePart({
   ENA:pin([0,0,0],'input','ENA (enable A / PWM)','ENA (aktif A / PWM)'),IN1:pin([PITCH,0,0],'input','IN1','IN1'),IN2:pin([2*PITCH,0,0],'input','IN2','IN2'),
   IN3:pin([3*PITCH,0,0],'input','IN3','IN3'),IN4:pin([4*PITCH,0,0],'input','IN4','IN4'),ENB:pin([5*PITCH,0,0],'input','ENB (enable B / PWM)','ENB (aktif B / PWM)'),
   GND:pin([6*PITCH,0,0],'ground','Ground','Ground'),
+  // screw terminals (the same positions buildL298 draws: left OUT1/OUT2, right OUT3/OUT4, bottom right VS and 5V)
+  OUT1:pin([TL,TY+4.45,TZ],'output','OUT1 (motor A)','OUT1 (motor A)'),OUT2:pin([TL,TY+9.55,TZ],'output','OUT2 (motor A)','OUT2 (motor A)'),
+  OUT3:pin([TR,TY+4.45,TZ],'output','OUT3 (motor B)','OUT3 (motor B)'),OUT4:pin([TR,TY+9.55,TZ],'output','OUT4 (motor B)','OUT4 (motor B)'),
+  VS:pin([TR,TY-18.1,TZ],'power','VS (motor supply)','VS (catu motor)'),V5:pin([TR,TY-7.9,TZ],'power','5V (logic)','5V (logik)'),
  },
  callouts:[
   callout('sink',[3*PITCH,32,20],'Heat sink: the bridge wastes about 2 V','Heat sink: jembatan membuang sekitar 2 V'),

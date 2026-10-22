@@ -1,7 +1,8 @@
 import {Link} from 'react-router-dom';
 import {useLang} from '../../i18n';
 import type {LessonId,PartState,SimSnapshot,UnoPin} from '../contract';
-import {PWM_PINS} from '../contract';
+import {PWM_PINS,UNO_PINS} from '../contract';
+import {LESSON_BY_ID} from '../lessons/index';
 import {oledLitPixels} from '../goals';
 import {fmtCycles,fmtTime} from './chip-pill';
 import type {PinHistory} from './pin-history';
@@ -22,9 +23,8 @@ function pinRows(h:PinHistory,pin:UnoPin,s:SimSnapshot):RecordRow[]{
 }
 const part=<K extends PartState['kind']>(s:SimSnapshot,kind:K)=>Object.values(s.parts).find(p=>p.kind===kind) as Extract<PartState,{kind:K}>|undefined;
 
-const KEY:Record<LessonId,UnoPin[]>={
- board:['D13'],blink:['D8'],button:['D8'],knob:['D9'],rgb:['D9','D10','D11'],light:['A1'],distance:['D7'],sound:['D5'],motor:['D6'],servo:['D9'],parking:['D7','D12'],dht:['D2'],oled:['D2'],motion:['D2','D7'],plant:['A0','D8'],remote:['D2'],
-};
+/** Pins the record quotes: lessons/<id>.ts recordPins, else the board pins among keyPins. */
+const recordPinsOf=(id:LessonId):UnoPin[]=>{const m=LESSON_BY_ID[id];return m?.recordPins??((m?.keyPins??[]).filter(p=>(UNO_PINS as readonly string[]).includes(p)) as UnoPin[]);};
 const pwmRows=(s:SimSnapshot):RecordRow[]=>{
  const ch=(['D9','D10','D11'] as UnoPin[]).map(p=>`${p} ${Math.round(s.pins[p].duty*100)}%`);
  const hz=Math.max(...(['D9','D10','D11'] as UnoPin[]).map(p=>s.pins[p].freqHz));
@@ -33,7 +33,7 @@ const pwmRows=(s:SimSnapshot):RecordRow[]=>{
  return rows;
 };
 const generic=(id:LessonId)=>(h:PinHistory,s:SimSnapshot):RecordRow[]=>{
- const rows=id==='rgb'?pwmRows(s):KEY[id].flatMap(p=>pinRows(h,p,s));
+ const rows=id==='rgb'?pwmRows(s):recordPinsOf(id).flatMap(p=>pinRows(h,p,s));
  const h1=part(s,'hcsr04');if(h1&&h1.echoCm!==null)rows.push({k:'echo',v:`${Math.round(h1.echoCm)} cm`});
  const b=part(s,'buzzer');if(b&&b.on)rows.push({k:'tone',v:`${Math.round(b.freqHz)} Hz`});
  const m=part(s,'motor');if(m)rows.push({k:'motor',v:`${Math.round(m.rpm)} rpm`});
@@ -68,10 +68,9 @@ const remoteRec:Rec=(_h,s)=>{
 };
 const parkingRec:Rec=(_h,s,m)=>[
  {k:'lights',v:m.rAt!==undefined&&m.gAt!==undefined?`red at ${Math.round(m.rAt)} cm · green at ${Math.round(m.gAt)} cm`:'red + green seen'},at(s)];
-export const RECORDS:Record<LessonId,Rec>={
- board:generic('board'),blink:generic('blink'),button:generic('button'),knob:generic('knob'),rgb:generic('rgb'),light:generic('light'),
- distance:distanceRec,sound:generic('sound'),motor:generic('motor'),servo:generic('servo'),parking:parkingRec,dht:generic('dht'),oled:oledRec,motion:motionRec,plant:plantRec,remote:remoteRec,
-};
+/** Lessons with a hand-written record; every other lesson uses the generic pin-and-part record. */
+const CUSTOM_RECORDS:Record<string,Rec>={distance:distanceRec,parking:parkingRec,oled:oledRec,motion:motionRec,plant:plantRec,remote:remoteRec};
+export const recordFor=(id:LessonId):Rec=>CUSTOM_RECORDS[id]??generic(id);
 /** The sentence the Goal row quotes on a pass. */
 export const quoteOf=(rows:RecordRow[])=>rows.filter(r=>r.k!=='at').slice(0,2).map(r=>`${r.k} ${r.v}`).join(' · ');
 

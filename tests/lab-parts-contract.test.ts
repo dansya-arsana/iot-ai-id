@@ -21,7 +21,7 @@ const {EMPTY}=await import('../apps/web/src/lab/sim/peripherals.js');
 import type {BoardPin,PartSpec,PartState,UnoPin} from '../apps/web/src/lab/contract.js';
 import type {DeviceDef,Env} from '../apps/web/src/lab/sim/devices/index.js';
 
-const PROTOCOLS=['gpio','adc','pwm','pulse','i2c','onewire','uart'];
+const PROTOCOLS=['gpio','adc','pwm','pulse','i2c','onewire','uart','switch','spi','twowire','ws2812'];
 const text=(c:{en:string;id:string}|undefined):boolean=>!!c&&typeof c.en==='string'&&typeof c.id==='string'&&c.en.trim().length>0&&c.id.trim().length>0;
 const finite3=(a:readonly number[]):boolean=>a.length===3&&a.every(Number.isFinite);
 const kinds=[...new Set([...registry.kinds(),...deviceRegistry.kinds()])].sort();
@@ -29,7 +29,7 @@ const kinds=[...new Set([...registry.kinds(),...deviceRegistry.kinds()])].sort()
 function fakeEnv():Env{
  const events:{at:number;cb:()=>void}[]=[];
  return {setPin(){},setAdc(){},now:()=>0,schedule:(c,cb)=>{events.push({at:c,cb});},
-  pinLevel:()=>0,pinMode:()=>'input',watchLine(){},attachI2c(){},tapUart(){},uartSend(){}};
+  pinLevel:()=>0,pinMode:()=>'input',watchLine(){},attachI2c(){},attachSpi(){},tapUart(){},uartSend(){}};
 }
 /** Wire each pin of a part to a plausible board pin by its electrical role. */
 function wire(kind:string,def:DeviceDef):PartSpec{
@@ -62,7 +62,8 @@ for(const kind of kinds){
   for(const [n,p] of Object.entries(mod.pins)){assert.ok(finite3(p.at),`pin ${n} anchor`);assert.ok(typeof p.type==='string');}
   for(const c of mod.callouts)assert.ok(finite3(c.at),`callout ${c.id} anchor`);
   if(def.holes){
-   assert.equal(def.holes.length,def.pins.length,'one hole column per pin');
+   // pins beyond the holes are terminals (screw blocks, pads) that never sit in the breadboard: they can only take wires
+   assert.ok(def.holes.length<=def.pins.length&&def.holes.length>0,'at most one hole column per pin');
    assert.deepEqual([...mod.footprint.holes],[...def.holes]);assert.equal(mod.footprint.onBoard,true);
    assert.deepEqual(PIN_COLS[kind],[...def.holes]);
   }else assert.equal(mod.footprint.onBoard,kind in PIN_COLS);
@@ -111,5 +112,22 @@ for(const kind of kinds){
   }
   if(!def.legacyState)for(const c of mod.interact?.controls??[])if(c.type!=='action')assert.ok(keys.has(c.key),`popover control ${c.key} is declared in device.inputs`);
   if(!def.legacyState&&def.inputs.length)assert.ok((mod.interact?.controls??[]).some(c=>c.type!=='action'),'inputs reach the popover');
+ });
+ test(`kind ${kind}: part-to-part pins, supply declarations and bus pins refer to real pins`,()=>{
+  const def=deviceRegistry.get(kind)!;
+  const has=(p:string,what:string):void=>{assert.ok(def.pins.includes(p),`${what} names pin '${p}', but ${kind} has ${def.pins.join(', ')||'no pins'}`);};
+  if(def.power){
+   for(const p of def.power.rail)has(p,'power.rail');
+   assert.ok(def.power.min<def.power.max&&def.power.min>=0,'power.min < power.max');
+  }
+  for(const s of def.supplies?.({...def.defaults})??[]){has(s.pos,'supply.pos');has(s.neg,'supply.neg');assert.ok(Number.isFinite(s.volts)&&s.volts>=0,'supply volts');}
+  for(const r of def.regulators?.({...def.defaults})??[]){has(r.in,'regulator.in');has(r.out,'regulator.out');has(r.gnd,'regulator.gnd');assert.ok(r.volts>0&&r.dropout>=0);}
+  const spec=wire(kind,def);
+  const spis:{csPin:UnoPin|null}[]=[];
+  const env={...fakeEnv(),attachSpi:(b:{csPin:UnoPin|null})=>{spis.push(b);}};
+  const m=createDevice(spec,{...spec.props},env,()=>[]);
+  for(const sw of m.switches?.()??[]){has(sw.a,'switches()');has(sw.b,'switches()');}
+  for(const p of def.pins){const d=m.output?.(p);if(d)assert.ok(Number.isFinite(d.volts),`output(${p}) volts`);}
+  if(def.protocol==='spi')assert.ok(spis.length>0,'an spi device must expose model.spi (attached to the SPI bus)');
  });
 }

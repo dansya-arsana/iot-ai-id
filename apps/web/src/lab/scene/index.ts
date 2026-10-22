@@ -1,8 +1,11 @@
 import {Box3,Color,DirectionalLight,Group,HemisphereLight,Mesh,MeshBasicMaterial,type Object3D,NeutralToneMapping,PCFShadowMap,PlaneGeometry,PMREMGenerator,Raycaster,REVISION,RingGeometry,Scene,ShaderMaterial,ShadowMaterial,SRGBColorSpace,Sprite,Vector2,Vector3,WebGLRenderer,type InstancedMesh,type Texture} from 'three';
 import {RoomEnvironment} from 'three/examples/jsm/environments/RoomEnvironment.js';
-import type {BoardPin,Circuit,CreateLabScene,LabScene,LessonId,PartKind,PartProps,PartSpec,PartState,SceneSettings,ScreenPoint,SimSnapshot,ViewCommand} from '../contract';
-import {BB_COLS,BB_CX,BB_D,BB_TOP,BB_W,LESSON_VIEW,holeX,freeHoleNear,layoutCircuit,obstacleMm} from './layout';
+import {PART_PINS} from '../contract';
+import type {BoardId,BoardPin,Circuit,CreateLabScene,LabScene,LessonId,PartKind,PartProps,PartSpec,PartState,SceneSettings,ScreenPoint,SimSnapshot,ViewCommand} from '../contract';
+import {BB_COLS,BB_CX,BB_D,BB_TOP,BB_W,LESSON_VIEW,PIN_COLS,holeX,freeHoleNear,isOnBoardKind,layoutCircuit,obstacleMm} from './layout';
 import {buildUno} from './board-uno';
+import type {UnoBuild} from './board-uno';
+import {buildNano} from './board-nano';
 import {buildBreadboard} from './breadboard';
 import {buildPart,type PartView} from './parts/index';
 import {buildWires,disposeWireTextures,type WireBuild} from './wires';
@@ -79,7 +82,6 @@ export interface LabSceneV3 extends LabSceneV2{
 }
 
 const POWER_PINS=new Set(['5V','3V3','GND','VIN']);
-const OFF_BOARD=new Set<PartKind>(['lamp','obstacle','motor','servo']);
 
 function initialState(s:PartSpec):PartState|null{
  const p=s.props;
@@ -149,7 +151,9 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
  const selRing=createSelectionRing(scene);
  let selId:string|null=null;
  const unbindKeys=bindCameraKeys(rig);
- const uno=buildUno();scene.add(uno.group);
+ // the board is swapped per circuit (Circuit.board): the Uno or the Nano-style board, same interface
+ let uno:UnoBuild=buildUno();scene.add(uno.group);
+ let boardId:BoardId='uno';
  const bb=buildBreadboard();scene.add(bb.group);
  const partsRoot=new Group(),wiresRoot=new Group();scene.add(partsRoot,wiresRoot);
 
@@ -291,6 +295,8 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
   setLesson(lesson:LessonId,circuit:Circuit):void{
    assembly.cancel();
    disposeLesson();occ.clear();
+   const wantBoard:BoardId=circuit.board==='nano'?'nano':'uno';
+   if(wantBoard!==boardId){scene.remove(uno.group);uno.dispose();uno=wantBoard==='nano'?buildNano():buildUno();scene.add(uno.group);boardId=wantBoard;}
    const place=layoutCircuit(circuit);
    fitMaxX=Math.max(holeX(12),...Object.values(place).flatMap(p=>p.onBoard?[p.x,...(p.holes??[]).map(h=>holeX(h[0]))]:[]));
    const usedPins=new Set<string>();
@@ -311,9 +317,25 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
      const v=byId.get(w.componentId);if(!v)return null;
      const p=v.group.localToWorld(v.pinAnchor(w.pin));
      const spec=circuit.parts.find(s=>s.id===w.componentId);
-     if(spec&&!OFF_BOARD.has(spec.kind)){const h=freeHoleNear(p.x,p.z);return new Vector3(h.x,BB_TOP,h.z);}
+     if(spec&&isOnBoardKind(spec.kind)&&PIN_COLS[spec.kind]?.[(PART_PINS[spec.kind]??[]).indexOf(w.pin)]!==undefined){const h=freeHoleNear(p.x,p.z);return new Vector3(h.x,BB_TOP,h.z);}
      return p;
-    });
+    },
+    // part-to-part jumpers: a pin that plugs into the breadboard ends at its hole, a terminal or desk part at its own anchor
+    (circuit.links??[]).filter(l=>!l.seated).map(l=>{
+     const endOf=(r:{part:string;pin:string}):Vector3|null=>{
+      const v=byId.get(r.part),spec=circuit.parts.find(x=>x.id===r.part);
+      if(!v||!spec)return null;
+      const p=v.group.localToWorld(v.pinAnchor(r.pin));
+      const hasHole=isOnBoardKind(spec.kind)&&PIN_COLS[spec.kind]?.[(PART_PINS[spec.kind]??[]).indexOf(r.pin)]!==undefined;
+      if(hasHole){const h=freeHoleNear(p.x,p.z);return new Vector3(h.x,BB_TOP,h.z);}
+      return p;
+     };
+     return {id:`${l.a.part}.${l.a.pin}`,color:l.color,a:endOf(l.a),b:endOf(l.b)};
+    }),
+    // wires into a standing LCD backpack arrive from behind the screen
+    w=>circuit.parts.find(s=>s.id===w.componentId)?.kind==='lcd2004-i2c',
+    // a front-lane part ahead of that display gets its jumper from the front, below the glass
+    w=>{const sp=circuit.parts.find(s=>s.id===w.componentId);return !!sp&&sp.kind!=='lcd2004-i2c'&&circuit.parts.some(q=>q.kind==='lcd2004-i2c')&&(place[sp.id]?.onBoard??false)&&(place[sp.id]?.z??0)>0;});
    wires=wb;wiresRoot.add(wb.group);
    for(const w of circuit.wires)if(/^(D\d+|A\d)$/.test(w.boardPin))usedPins.add(w.boardPin);
    uno.setUsedPins(usedPins);
