@@ -1,5 +1,5 @@
 /** LED-BAR-10: 10-segment bar graph, about 25.4 x 10 x 5 mm housing with ten 2 x 4.5 mm windows at 2.54 mm pitch. Pairs with sim/devices/led-bar-10.ts. */
-import {BoxGeometry,Color,Group,MeshStandardMaterial} from 'three';
+import {BoxGeometry,Color,Group,Object3D,MeshStandardMaterial} from 'three';
 import type {PartProps} from '../../contract';
 import type {LedBar10State} from '../../sim/devices/led-bar-10';
 import {PITCH} from '../layout';
@@ -28,6 +28,7 @@ function buildBar(p:PartProps,g:Group):Inner{
   const w=solid(new BoxGeometry(2,0.5,4.5),0,{cast:false,pos:[i*PITCH,y0+H+0.12,0]});
   w.material=m;w.userData.noInk=true;g.add(w);
  }
+ const hs=new Object3D();hs.name='hotspot';hs.userData.noPick=true;hs.position.set(9*PITCH,y0+H,-2);g.add(hs);
  return {
   apply(s){
    const st=extState<LedBar10State>(s,'led-bar-10');

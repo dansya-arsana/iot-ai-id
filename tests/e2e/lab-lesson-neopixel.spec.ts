@@ -1,4 +1,5 @@
 import {test,expect,type Page} from '@playwright/test';
+import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim} from './lab-sim';
 
 /**
  * Lesson "Rainbow pixels" (WS2812 ring + rotary encoder): the real sketch runs in the browser. Assertions read the REAL simulated
@@ -15,8 +16,9 @@ type LabHook={project(t:string):{x:number;y:number;visible:boolean}|null;update(
 declare global{interface Window{__labScene?:LabHook;__snap?:Snap}}
 
 const stateOf=(page:Page,id:string):Promise<V|null>=>page.evaluate(i=>{const p=window.__snap?.parts[i];return p&&p.kind==='ext'?(p as Ext).v:null;},id);
-async function until(page:Page,id:string,pred:(v:V)=>boolean,timeout=30000){
- await expect.poll(async()=>{const v=await stateOf(page,id);return !!v&&pred(v);},{timeout,intervals:[250]}).toBe(true);
+/** Wait for a part state, measured in simulated ms (see lab-sim.ts), never in wall-clock seconds. */
+async function until(page:Page,id:string,pred:(v:V)=>boolean,budgetSimMs=30000){
+ await untilSim(page,`${id} state`,()=>stateOf(page,id),v=>!!v&&pred(v),budgetSimMs);
 }
 const pixels=(v:V)=>(String(v.leds).match(/.{6}/g)??[]);
 const peak=(v:V)=>Math.max(...pixels(v).flatMap(p=>[0,2,4].map(i=>parseInt(p.slice(i,i+2),16))));
@@ -48,16 +50,16 @@ const setRange=(loc:ReturnType<Page['locator']>,v:number)=>loc.evaluate((el:HTML
 },v);
 
 test('rainbow pixels: the ring shows a rainbow, the knob changes its brightness and the goal completes',async({page})=>{
+ test.setTimeout(SLOW_TEST_MS);
  await page.setViewportSize({width:1440,height:900});
  await page.goto(`${PUBLIC}/lab/neopixel?e2e=1`);
  await expect(page.locator('.lab')).toHaveAttribute('data-scene','ready',{timeout:30000});
  await page.waitForTimeout(1200);
  await expect(page.getByText(/Rainbow pixels/i).first()).toBeVisible();
- await page.evaluate(()=>{const sc=window.__labScene!;const orig=sc.update.bind(sc);sc.update=(s,d)=>{window.__snap=s;orig(s,d);};});
+ await hookSnapshot(page);
  await expect(page.getByTestId('lab-goal')).toHaveAttribute('data-done','false');
  await page.getByTestId('lab-run').first().click();
- const serial=page.getByTestId('lab-serial');
- await expect(serial).toContainText('ready',{timeout:15000});
+ await serialHas(page,'ready');
 
  // the ring decodes 16 different colours from the 800 kHz stream, with no timing error
  await until(page,'ring1',v=>Number(v.frames)>5&&pixels(v).length===16);
@@ -74,29 +76,30 @@ test('rainbow pixels: the ring shows a rainbow, the knob changes its brightness 
  await page.screenshot({path:`${SHOTS}/rainbow-popover.png`,animations:'disabled'});
  await setRange(pop.locator('input[type=range]').first(),4);
  await until(page,'enc1',v=>Number(v.steps)===4);
- await expect(serial).toContainText('level=128',{timeout:15000});
+ await serialHas(page,'level=128');
  await until(page,'ring1',v=>peak(v)>before+40);
  expect(await stateOf(page,'ring1')).toMatchObject({timingErrors:0});
- await expect(page.getByTestId('lab-goal')).toHaveAttribute('data-done','true',{timeout:10000});
+ await goalDone(page);
 
  // back down two detents lowers it again
  await setRange(pop.locator('input[type=range]').first(),2);
- await expect(serial).toContainText('level=96',{timeout:15000});
+ await serialHas(page,'level=96');
  await page.screenshot({path:`${SHOTS}/rainbow-dimmed.png`,animations:'disabled'});
 });
 
 test('rainbow pixels: pushing the knob switches the animation',async({page})=>{
+ test.setTimeout(SLOW_TEST_MS);
  await page.setViewportSize({width:1440,height:900});
  await page.goto(`${PUBLIC}/lab/neopixel?e2e=1`);
  await expect(page.locator('.lab')).toHaveAttribute('data-scene','ready',{timeout:30000});
  await page.waitForTimeout(1200);
- await page.evaluate(()=>{const sc=window.__labScene!;const orig=sc.update.bind(sc);sc.update=(s,d)=>{window.__snap=s;orig(s,d);};});
+ await hookSnapshot(page);
  await page.getByTestId('lab-run').first().click();
  await until(page,'ring1',v=>Number(v.frames)>5);
  const pop=await openPopover(page,'enc1');
  await pop.locator('label.lab-pop-toggle').first().click();   // Knob pushed (SW low: one falling edge)
  await until(page,'enc1',v=>v.pressed===true);
- await expect(page.getByTestId('lab-serial')).toContainText('mode=1',{timeout:15000});
+ await serialHas(page,'mode=1');
  // the comet leaves dark pixels behind its head
  await until(page,'ring1',v=>pixels(v).some(p=>p==='000000'),15000);
  await page.screenshot({path:`${SHOTS}/comet.png`,animations:'disabled'});

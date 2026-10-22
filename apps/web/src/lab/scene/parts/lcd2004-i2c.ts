@@ -41,7 +41,7 @@ function buildLcd(_p:PartProps,g:Group):Inner{
  const ctx=cv.getContext('2d')!;
  const tex=canvasTexture(cv);
  const mat=new MeshBasicMaterial({map:tex,toneMapped:false});mat.userData.own=true;mat.userData.ownMap=true;
- const win=new Mesh(new PlaneGeometry(76,76*TH/TW),mat);win.position.set(cx,y0+H/2,zf+5.75);win.userData.noPick=true;win.userData.noInk=true;g.add(win);
+ const win=new Mesh(new PlaneGeometry(76,76*TH/TW),mat);win.position.set(cx,y0+H/2,zf+5.75);win.userData.noPick=true;win.userData.glass=true;win.userData.noInk=true;g.add(win);
  let last='',t=0;
  const draw=(st:Lcd2004I2cState,blinkOn:boolean):void=>{
   const key=[st.line1,st.line2,st.line3,st.line4,st.cg,st.backlight,st.display,st.cursor,st.blink&&blinkOn,st.col,st.row,st.contrast,st.color].join('|');

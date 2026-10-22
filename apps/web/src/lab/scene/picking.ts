@@ -3,7 +3,7 @@ import type {PartInput,PartState,ScreenPoint,TargetId} from '../contract';
 import {INPUT_RANGES} from '../contract';
 import {lampCm,lampMm,obstacleCm,obstacleMm} from './layout';
 import type {Interactive} from './parts/index';
-import type {PartModule} from './parts/types';
+import type {Grab,PartModule} from './parts/types';
 import type {InteractiveHandlers} from './index';
 import {cursorsFor,keyNudge,pointerAngle,relativeKnob,snapCm} from './drag';
 import type {CameraRig} from './camera';
@@ -22,6 +22,8 @@ export interface PickingOptions{
  module?(id:string):PartModule|undefined;
  /** Hover/drag/keyboard-focus rim on a part (null clears). */
  hoverHighlight?(id:string|null):void;
+ /** World position of a part's hotspot ring (null for non-parts): a click on the ring selects the part even where the ray misses it. */
+ hotspotWorld?(id:string):Vector3|null;
 }
 export interface Picking{dispose():void}
 
@@ -35,23 +37,41 @@ export function createPicking(o:PickingOptions):Picking{
  const hitPt=new Vector3();const tmpV=new Vector3();
  const sp:ScreenPoint={x:0,y:0,visible:true};
  type Drag={id:string|null;mode:Interactive|null;sx:number;sy:number;lx:number;ly:number;moved:boolean;pointerId:number;
-  startMm:number;startHit:number;entry:PickEntry|null;pressed:boolean;startVal:number;startAng:number;last:number|null;touch:boolean;at:ScreenPoint};
+  startMm:number;startHit:number;entry:PickEntry|null;pressed:boolean;startVal:number;startAng:number;last:number|null;touch:boolean;at:ScreenPoint;
+  /** direct manipulation of a piece of the part (keypad key, stick, encoder knob) */
+  grab:Grab|null;cx:number;cy:number;lastAng:number;acc:number;base:number;gv:Record<string,string|number|boolean>;timer:number};
  let drag:Drag|null=null;
 
  const setNdc=(e:PointerEvent|WheelEvent):void=>{
   const r=canvas.getBoundingClientRect();
   ndc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
  };
- const pick=(e:PointerEvent):{entry:PickEntry;point:Vector3}|null=>{
+ type Pick={entry:PickEntry;point:Vector3;grab:Grab|null;grabObj:Object3D|null};
+ const pick=(e:PointerEvent):Pick|null=>{
+  const hit=rayPick(e);
+  if(hit||!o.hotspotWorld)return hit;
+  const r=canvas.getBoundingClientRect();
+  let best:Pick|null=null,bd=22;
+  for(const entry of o.entries()){
+   const w=o.hotspotWorld(entry.id);if(!w)continue;
+   tmpV.copy(w).project(rig.camera);
+   const d=Math.hypot(((tmpV.x+1)/2)*r.width+r.left-e.clientX,((1-tmpV.y)/2)*r.height+r.top-e.clientY);
+   if(d<bd){bd=d;best={entry,point:w.clone(),grab:null,grabObj:null};}
+  }
+  return best;
+ };
+ const rayPick=(e:PointerEvent):Pick|null=>{
   setNdc(e);ray.setFromCamera(ndc,rig.camera as OrthographicCamera|PerspectiveCamera);
   const entries=o.entries();
   const hits=ray.intersectObjects(entries.map(x=>x.object),true);
   for(const h of hits){
    if(h.object.userData.noPick||h.object.visible===false)continue;
    let n:Object3D|null=h.object;
+   let grab:Grab|null=null,grabObj:Object3D|null=null;
    while(n){
+    if(!grab&&n.userData.grab){grab=n.userData.grab as Grab;grabObj=n;}
     const id=n.userData.targetId as string|undefined;
-    if(id){const entry=entries.find(x=>x.id===id);if(entry)return {entry,point:h.point};}
+    if(id){const entry=entries.find(x=>x.id===id);if(entry)return {entry,point:h.point,grab,grabObj};}
     n=n.parent;
    }
   }
@@ -78,8 +98,9 @@ export function createPicking(o:PickingOptions):Picking{
  const hovered:{id:string|null}={id:null};
  const setHl=(id:string|null):void=>{if(hovered.id===id)return;hovered.id=id;o.hoverHighlight?.(id);};
  let sel:string|null=null;
- const cursorFor=(e:PickEntry|null,active:boolean):string=>{
+ const cursorFor=(e:PickEntry|null,active:boolean,grab:Grab|null=null):string=>{
   if(!e)return '';
+  if(grab&&o.handlers?.()?.onControl)return grab.type==='tap'?'pointer':active?'grabbing':'grab';
   const c=cursorsFor(o.module?.(e.id)?.interact?.drag);
   if(c)return active?c.active:c.hover;
   return e.interactive?(active?'grabbing':'grab'):'pointer';
@@ -93,7 +114,29 @@ export function createPicking(o:PickingOptions):Picking{
  const onMove=(e:PointerEvent):void=>{
   if(drag&&e.pointerId===drag.pointerId){
    const d=drag;
-   if(!d.moved&&Math.hypot(e.clientX-d.sx,e.clientY-d.sy)>=DRAG_PX)d.moved=true;
+   if(!d.moved&&Math.hypot(e.clientX-d.sx,e.clientY-d.sy)>=DRAG_PX){
+    d.moved=true;
+    if(d.grab&&d.grab.type!=='tap'){
+     // a drag is not a push: cancel the pending press, release one already down
+     if(d.timer){window.clearTimeout(d.timer);d.timer=0;}
+     if(d.pressed){d.pressed=false;o.onInput(d.id!,{kind:'button',pressed:false});o.handlers?.()?.onPress?.(d.id!,false);}
+    }
+   }
+   if(d.grab&&d.grab.type!=='tap'&&d.moved){
+    const g=d.grab,ctl=o.handlers?.()?.onControl;
+    const set=(key:string,v:string|number|boolean):void=>{if(d.gv[key]===v)return;d.gv[key]=v;ctl?.(d.id!,key,v);};
+    if(g.type==='knob'){
+     const r=canvas.getBoundingClientRect();
+     const ang=pointerAngle(e.clientX-r.left-d.cx,e.clientY-r.top-d.cy,Math.PI/2);
+     let da=ang-d.lastAng;if(da>180)da-=360;else if(da<-180)da+=360;
+     d.acc+=da;d.lastAng=ang;
+     set(g.key,Math.max(g.min,Math.min(g.max,Math.round(d.base+(d.acc/360)*g.perTurn))));
+    }else{
+     const k=(v:number):number=>Math.round(g.max/2+Math.max(-1,Math.min(1,v/g.travelPx))*(g.max/2));
+     set(g.x,k(e.clientX-d.sx));set(g.y,k(e.clientY-d.sy));
+    }
+    return;
+   }
    if(d.mode==='rotate'&&d.entry){
     const r=canvas.getBoundingClientRect();
     o.project(d.entry.object,sp);
@@ -124,7 +167,7 @@ export function createPicking(o:PickingOptions):Picking{
   }else{o.onHover(null,null);o.handlers?.()?.onHoverPart?.(null,null);}
   const live=!!o.handlers?.();
   setHl(live&&p&&(p.entry.interactive||hasControls(p.entry.id))?p.entry.id:null);
-  canvas.style.cursor=cursorFor(p?p.entry:null,false);
+  canvas.style.cursor=cursorFor(p?p.entry:null,false,p?p.grab:null);
  };
  const projectHit=(pt:Vector3):ScreenPoint=>{
   const r=canvas.getBoundingClientRect();tmpV.copy(pt).project(rig.camera);
@@ -133,11 +176,29 @@ export function createPicking(o:PickingOptions):Picking{
  const onDown=(e:PointerEvent):void=>{
   if(e.button!==0||drag)return;
   const p=pick(e);
-  const d:Drag={id:p?p.entry.id:null,mode:p?p.entry.interactive??null:null,sx:e.clientX,sy:e.clientY,lx:e.clientX,ly:e.clientY,moved:false,pointerId:e.pointerId,startMm:0,startHit:0,entry:p?p.entry:null,pressed:false,startVal:0,startAng:0,last:null,touch:e.pointerType==='touch',at:p?projectHit(p.point):{x:0,y:0,visible:false}};
+  const d:Drag={id:p?p.entry.id:null,mode:p?p.entry.interactive??null:null,sx:e.clientX,sy:e.clientY,lx:e.clientX,ly:e.clientY,moved:false,pointerId:e.pointerId,startMm:0,startHit:0,entry:p?p.entry:null,pressed:false,startVal:0,startAng:0,last:null,touch:e.pointerType==='touch',at:p?projectHit(p.point):{x:0,y:0,visible:false},grab:null,cx:0,cy:0,lastAng:0,acc:0,base:0,gv:{},timer:0};
   drag=d;
   canvas.setPointerCapture(e.pointerId);
   if(d.id){sel=d.id;if(o.handlers?.())setHl(d.id);}
-  if(d.mode==='press'){d.pressed=true;o.onInput(d.id!,{kind:'button',pressed:true});o.handlers?.()?.onPress?.(d.id!,true);}
+  const ctl=o.handlers?.()?.onControl;
+  if(p?.grab&&ctl){
+   const g=p.grab;d.grab=g;d.mode=null;
+   if(g.type==='tap'){
+    ctl(d.id!,g.key,g.value);
+    const id=d.id!;window.setTimeout(()=>ctl(id,g.key,g.rest),g.ms);
+   }else{
+    // the piece also acts as the push switch: a click or a hold presses it, a drag turns/tilts it instead
+    if(p.grabObj){o.project(p.grabObj,sp);d.cx=sp.x;d.cy=sp.y;}
+    if(g.type==='knob'){
+     const r=canvas.getBoundingClientRect();
+     d.lastAng=pointerAngle(e.clientX-r.left-d.cx,e.clientY-r.top-d.cy,Math.PI/2);
+     const st=o.partState(d.id!);
+     const v=st&&st.kind==='ext'?(st.v as Record<string,unknown>)[g.key]:undefined;
+     d.base=typeof v==='number'?v:0;
+    }
+    d.timer=window.setTimeout(()=>{d.timer=0;if(drag===d&&!d.moved){d.pressed=true;o.onInput(d.id!,{kind:'button',pressed:true});o.handlers?.()?.onPress?.(d.id!,true);}},140);
+   }
+  }else if(d.mode==='press'){d.pressed=true;o.onInput(d.id!,{kind:'button',pressed:true});o.handlers?.()?.onPress?.(d.id!,true);}
   else if(d.mode==='slide-x'||d.mode==='slide-z'||d.mode==='toggle-slide'){
    const st=o.partState(d.id!);
    const cm=st&&(st.kind==='lamp'||st.kind==='obstacle')?st.distanceCm:50;
@@ -153,15 +214,21 @@ export function createPicking(o:PickingOptions):Picking{
    d.last=d.startVal;
    o.handlers?.()?.onDrag?.(d.id!,'value',d.startVal,'start');
   }
-  if(d.id&&d.mode)canvas.style.cursor=cursorFor(d.entry,true);
+  if(d.id&&(d.mode||d.grab))canvas.style.cursor=cursorFor(d.entry,true,d.grab);
  };
  const finish=(e:PointerEvent,cancel:boolean):void=>{
   const d=drag;if(!d||e.pointerId!==d.pointerId)return;
   drag=null;
   if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+  if(d.timer){
+   // a quick click on a push piece: press it for a moment
+   window.clearTimeout(d.timer);d.timer=0;
+   if(!d.moved&&!cancel&&d.id){const id=d.id;o.onInput(id,{kind:'button',pressed:true});o.handlers?.()?.onPress?.(id,true);window.setTimeout(()=>{o.onInput(id,{kind:'button',pressed:false});o.handlers?.()?.onPress?.(id,false);},120);}
+  }
+  if(d.grab?.type==='stick'&&d.moved&&d.id){const g=d.grab,ctl=o.handlers?.()?.onControl;ctl?.(d.id,g.x,Math.round(g.max/2));ctl?.(d.id,g.y,Math.round(g.max/2));}   // a thumb stick springs back to centre
   if(d.pressed){o.onInput(d.id!,{kind:'button',pressed:false});o.handlers?.()?.onPress?.(d.id!,false);}
   if(d.moved&&d.last!==null&&d.id)o.handlers?.()?.onDrag?.(d.id,d.mode==='rotate'?'value':'distanceCm',d.last,'end');
-  if(d.id)canvas.style.cursor=d.touch?'':cursorFor(d.entry,false);
+  if(d.id)canvas.style.cursor=d.touch?'':cursorFor(d.entry,false,d.grab);
   if(cancel)return;
   const click=!d.moved&&Math.hypot(e.clientX-d.sx,e.clientY-d.sy)<DRAG_PX;
   if(click){
@@ -172,8 +239,8 @@ export function createPicking(o:PickingOptions):Picking{
     const on=!(st&&st.kind==='lamp'&&st.on);
     o.onInput(d.id!,{kind:'lamp',on});h?.onPress?.(d.id!,on);
    }
-   o.onSelect(d.id);
-   if(popover)h!.onOpenControls!(d.id!,d.at);
+   if(d.grab?.type!=='tap')o.onSelect(d.id);   // a key tap must not zoom the keypad out from under the finger
+   if(popover&&d.grab?.type!=='tap')h!.onOpenControls!(d.id!,d.at);
   }
   if(d.touch)setHl(null);
  };

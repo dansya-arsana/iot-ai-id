@@ -40,7 +40,7 @@ function buildLcd(_p:PartProps,g:Group):Inner{
  const ctx=cv.getContext('2d')!;
  const tex=canvasTexture(cv);
  const mat=new MeshBasicMaterial({map:tex,toneMapped:false});mat.userData.own=true;mat.userData.ownMap=true;
- const win=new Mesh(new PlaneGeometry(64.5,13.8),mat);win.position.set(cx,y0+H/2+0.2,zf+5.45);win.userData.noPick=true;win.userData.noInk=true;g.add(win);
+ const win=new Mesh(new PlaneGeometry(64.5,13.8),mat);win.position.set(cx,y0+H/2+0.2,zf+5.45);win.userData.noPick=true;win.userData.glass=true;win.userData.noInk=true;g.add(win);
  const tint=new Color();void tint;void MONO;
  let last='',t=0;
  const draw=(st:Lcd1602I2cState,blinkOn:boolean)=>{

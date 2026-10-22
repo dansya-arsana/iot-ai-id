@@ -18,10 +18,13 @@
  * Everything is compiled with -fno-lto so numeric params stay plain data bytes in flash; each
  * param's patch offset is found by differential compilation and verified (patched bytes ==
  * freshly compiled bytes). Never hand-edit the generated files.
+ *
+ * Concurrency: every run works in its own folder .runtime/lab-fw/run-<pid>-<time> (removed on exit), so two builds at once do not collide.
+ * Docker/colima bind-mount hiccups ("error while creating mount source path", daemon blips) are retried with exponential backoff.
  */
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
-import {mkdirSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
+import {existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {FIRMWARE_SPEC, LESSON_IDS} from '../apps/web/src/lab/contract.js';
@@ -30,7 +33,9 @@ import type {BoardId, FirmwareParam, FirmwareSketch, FirmwareVariant, LessonId, 
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FW_DIR = join(ROOT, 'apps/web/src/lab/firmware');
-const WORK = join(ROOT, '.runtime/lab-fw');
+// One work dir per run (pid + start time), so two builds at once never wipe or overwrite each other's compile folders.
+const RUNS = join(ROOT, '.runtime/lab-fw');
+const WORK = join(RUNS, `run-${process.pid}-${Date.now().toString(36)}`);
 const CACHE = join(WORK, 'cache');
 const IMAGE = process.env.LAB_DOCKER_IMAGE || 'aiot-avr:1.8.8';
 const AVR_BIN = process.env.LAB_AVR_BIN?.replace(/\/+$/, '');
@@ -41,15 +46,47 @@ type Mode = 'native' | 'docker';
 let mode: Mode = 'native';
 let compiles = 0;
 
+const sleep = (ms: number): void => { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); };
+/** Docker (colima) sometimes cannot see a bind-mount source created a moment ago, or the VM socket blips: those are worth retrying. */
+const TRANSIENT_DOCKER = /error while creating mount source path|mounts? denied|invalid mount config|bind source path does not exist|no such file or directory.*mount|Cannot connect to the Docker daemon|connection reset|Error response from daemon: (?:error|failed to create)/i;
+
 function sh(script: string, work?: string): string {
   if (mode === 'docker') {
     const args = ['run', '--rm', '-v', `${CACHE}:/cache`];
     if (work) args.push('-v', `${work}:/work`);
     args.push(IMAGE, 'sh', '-c', script);
-    return execFileSync('docker', args, {encoding: 'utf8', maxBuffer: 256 << 20, stdio: ['ignore', 'pipe', 'pipe']});
+    // up to 6 attempts, 0.5 s, 1 s, 2 s, 4 s, 8 s apart; the mount sources are created again before each retry
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return execFileSync('docker', args, {encoding: 'utf8', maxBuffer: 256 << 20, stdio: ['ignore', 'pipe', 'pipe']});
+      } catch (e) {
+        const err = e as {stderr?: string; message?: string};
+        const msg = `${err.stderr ?? ''}${err.message ?? ''}`;
+        if (attempt >= 5 || !TRANSIENT_DOCKER.test(msg)) throw e;
+        const wait = 500 * 2 ** attempt;
+        console.log(`docker mount/daemon hiccup (attempt ${attempt + 1}), retrying in ${wait} ms`);
+        mkdirSync(CACHE, {recursive: true});
+        if (work) mkdirSync(work, {recursive: true});
+        sleep(wait);
+      }
+    }
   }
   return execFileSync('sh', ['-c', script], {encoding: 'utf8', maxBuffer: 256 << 20, stdio: ['ignore', 'pipe', 'pipe'], cwd: work});
 }
+
+/** Drop run folders a crashed build left behind (older than a day); never touch a younger one, it may belong to a build running right now. */
+function pruneStaleRuns(): void {
+  if (!existsSync(RUNS)) return;
+  for (const d of readdirSync(RUNS)) {
+    if (!d.startsWith('run-')) continue;
+    const p = join(RUNS, d);
+    try { if (Date.now() - statSync(p).mtimeMs > 24 * 3600 * 1000) rmSync(p, {recursive: true, force: true}); } catch { /* another build removed it */ }
+  }
+}
+const cleanup = (): void => { rmSync(WORK, {recursive: true, force: true}); };
+process.on('exit', cleanup);
+process.on('SIGINT', () => process.exit(130));
+process.on('SIGTERM', () => process.exit(143));
 
 const compilerPath = (): string => (mode === 'native' && AVR_BIN ? `--build-property compiler.path=${AVR_BIN}/` : '');
 const cacheDir = (): string => (mode === 'docker' ? '/cache' : CACHE);
@@ -130,14 +167,7 @@ function compile(name: string, source: string, wantLines: boolean, board: BoardI
   const w = workDir(dir);
   const cmd = `arduino-cli compile -b ${fqbn} ${FLAGS.join(' ')} ${compilerPath()} --build-cache-path ${cacheDir()} --build-path ${w}/build ${w}/${name}`;
   try {
-    // the docker bind mount of a freshly created folder is sometimes not visible for a moment (colima): retry the compile a few times
-    for (let attempt = 0; ; attempt++) {
-      try { sh(cmd, dir); break; } catch (e) {
-        const msg = String((e as {stderr?: string}).stderr ?? '');
-        if (attempt < 3 && /error while creating mount source path|no such file or directory/.test(msg)) { mkdirSync(join(dir, name), {recursive: true}); continue; }
-        throw e;
-      }
-    }
+    sh(cmd, dir); // retries transient docker mount failures with backoff (see sh)
   } catch (e) {
     const err = e as {stderr?: string; stdout?: string};
     throw new Error(`compile failed for ${name}:\n${err.stdout ?? ''}${err.stderr ?? ''}`, {cause: e});
@@ -267,7 +297,7 @@ if (args[0] === '--raw') {
   const bi = args.indexOf('--board');
   const board = (bi >= 0 ? args[bi + 1] : 'uno') as BoardId;
   if (!ino || !out) throw new Error('usage: --raw <file.ino> <out.json>');
-  rmSync(WORK, {recursive: true, force: true});
+  pruneStaleRuns();
   selectMode();
   const name = (ino.split('/').pop() ?? 'sketch').replace(/\.ino$/, '');
   const source = readFileSync(ino, 'utf8');
@@ -277,7 +307,7 @@ if (args[0] === '--raw') {
     sha256: createHash('sha256').update(source).digest('hex'), lines: parseLines(A.objdump), params: [],
   };
   writeFileSync(out, JSON.stringify({toolchain: toolchainString(), variant: v}));
-  rmSync(WORK, {recursive: true, force: true});
+  cleanup();
   console.log(`wrote ${out} (${v.bytes} bytes)`);
   process.exit(0);
 }
@@ -286,7 +316,7 @@ const wanted = (lesson: string, variant: string): boolean => args.length === 0 |
 const jobs: {lesson: LessonId; id: string; params: ParamSpec[]; board?: BoardId}[] = [];
 for (const lesson of LESSON_IDS) for (const v of FIRMWARE_SPEC[lesson].variants) if (wanted(lesson, v.id)) jobs.push({lesson, id: v.id, params: v.params, ...(v.board ? {board: v.board} : {})});
 for (const a of args) if (!jobs.some((j) => a === j.lesson || a === `${j.lesson}-${j.id}`)) throw new Error(`unknown sketch or lesson "${a}"; known: ${LESSON_IDS.flatMap((l) => FIRMWARE_SPEC[l].variants.map((v) => `${l}-${v.id}`)).join(', ')}`);
-rmSync(WORK, {recursive: true, force: true});
+pruneStaleRuns();
 selectMode();
 const toolchain = toolchainString();
 for (const j of jobs) {
@@ -297,5 +327,5 @@ for (const j of jobs) {
     `// Generated by scripts/build-lab-firmware.ts — do not edit.\nimport type {FirmwareSketch} from '../../contract';\nexport const sketch:FirmwareSketch=${JSON.stringify(sketch)};\n`,
   );
 }
-rmSync(WORK, {recursive: true, force: true});
+cleanup();
 console.log(`done: ${toolchain}; ${jobs.length} sketches, ${compiles} compiles in ${((Date.now() - t0) / 1000).toFixed(0)}s`);

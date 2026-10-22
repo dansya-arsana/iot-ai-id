@@ -1,4 +1,5 @@
 import {test,expect,type Page} from '@playwright/test';
+import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim,waitSim} from './lab-sim';
 
 /**
  * Lesson 23, kitchen scale: the real compiled sketch reads the HX711 model over its two-wire protocol and drives the TM1637 model.
@@ -15,16 +16,13 @@ async function open(page:Page){
  await page.setViewportSize({width:1440,height:900});
  await page.goto(`${PUBLIC}/lab/scale?e2e=1`);
  await expect(page.locator('.lab')).toHaveAttribute('data-scene','ready',{timeout:30000});
- await page.waitForTimeout(1200);
  await expect(page.getByText(/Kitchen scale/i).first()).toBeVisible();
- await page.evaluate(()=>{
-  const sc=window.__labScene!;const orig=sc.update.bind(sc);
-  sc.update=(s,d)=>{window.__snap=s;orig(s,d);};
- });
+ await hookSnapshot(page);
 }
 const stateOf=(page:Page,id:string):Promise<V|null>=>page.evaluate(i=>{const p=window.__snap?.parts[i];return p&&p.kind==='ext'?(p as Ext).v:null;},id);
-async function until(page:Page,id:string,pred:(v:V)=>boolean,timeout=30000){
- await expect.poll(async()=>{const v=await stateOf(page,id);return !!v&&pred(v);},{timeout,intervals:[250]}).toBe(true);
+/** Wait for a part state, measured in simulated ms (see lab-sim.ts), never in wall-clock seconds. */
+async function until(page:Page,id:string,pred:(v:V)=>boolean,budgetSimMs=30000){
+ await untilSim(page,`${id} state`,()=>stateOf(page,id),v=>!!v&&pred(v),budgetSimMs);
 }
 async function partAt(page:Page,id:string,dy=0){
  const p=await page.evaluate(t=>{
@@ -61,7 +59,7 @@ async function tare(page:Page){
   const at=await partAt(page,'btn1',dy);
   await page.mouse.move(at.x,at.y);
   await page.mouse.down();
-  await page.waitForTimeout(250);
+  await waitSim(page,250);
   const hit=await pressed(page);
   await page.mouse.up();
   if(hit)return;
@@ -71,11 +69,12 @@ async function tare(page:Page){
 }
 
 test('lesson 23: the display shows the grams on the bar, tare zeroes it, and the goal is reached',async({page})=>{
+ test.setTimeout(SLOW_TEST_MS);   // every wait below is a budget of SIMULATED ms
  await open(page);
  await page.getByTestId('lab-run').first().click();
- await expect(page.getByTestId('lab-serial')).toContainText('ready',{timeout:15000});
+ await serialHas(page,'ready');
  // power-up tare: an empty bar reads zero, and the sketch really clocked the TM1637 (ACK on every byte)
- await expect(page.getByTestId('lab-serial')).toContainText('tare',{timeout:15000});
+ await serialHas(page,'tare');
  await until(page,'disp1',v=>v.on===true&&v.text==='   0'&&Number(v.acks)>=7);
  await until(page,'hx1',v=>v.powered===true&&Number(v.reads)>=2&&v.channel==='A'&&v.gain===128);
  await page.screenshot({path:`${SHOTS}/scale-empty.png`,animations:'disabled'});
@@ -87,16 +86,16 @@ test('lesson 23: the display shows the grams on the bar, tare zeroes it, and the
  await setRange(sliders.first(),750);
  await until(page,'hx1',v=>v.weight===750&&Number(v.raw)>=322000&&Number(v.raw)<=322300);   // 750 g x 429.5 counts per gram
  await until(page,'disp1',v=>v.text===' 750');
- await expect(page.getByTestId('lab-serial')).toContainText('g=750');
+ await serialHas(page,'g=750');
  await page.screenshot({path:`${SHOTS}/scale-750g.png`,animations:'disabled'});
- await expect(page.getByTestId('lab-goal')).not.toHaveAttribute('data-done','true');
+ await goalDone(page,0,false);
 
  // tare with the weight still on: the display reads zero and the lesson goal is met
  await page.keyboard.press('Escape');
  await tare(page);
  await until(page,'disp1',v=>v.text==='   0');
- await expect(page.getByTestId('lab-serial')).toContainText('g=0');
- await expect(page.getByTestId('lab-goal')).toHaveAttribute('data-done','true',{timeout:10000});
+ await serialHas(page,'g=0');
+ await goalDone(page,10000);
  await page.screenshot({path:`${SHOTS}/scale-tared.png`,animations:'disabled'});
 
  // more weight on top of the bowl, then take it all off: the display shows a negative number with the minus sign

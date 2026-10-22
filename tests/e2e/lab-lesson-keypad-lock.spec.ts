@@ -1,4 +1,5 @@
 import {test,expect,type Page} from '@playwright/test';
+import {waitSim} from './lab-sim';
 
 /**
  * Lesson "Keypad lock": the real compiled sketch scans the 4x4 keypad, drives the TM1637 over its own two-wire bus and moves the
@@ -65,7 +66,7 @@ test('keypad lock: a wrong PIN shows Err, the right PIN shows 0PEn and swings th
  // the main grid is a momentary press (about 150 ms down, then released), so wait for the sketch to see it and the key to come back up
  const tap=async(k:string)=>{
   await pop.getByTestId(`lab-pop-key-${k}`).click();
-  await page.waitForTimeout(450);
+  await waitSim(page,450);   // simulated time: the sketch scans the pad every loop, whatever the machine's speed
   await until(page,'pad1',v=>v.pressed==='');
  };
 

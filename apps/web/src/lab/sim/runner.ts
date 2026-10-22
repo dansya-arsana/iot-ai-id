@@ -29,6 +29,7 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
  let samples=idleSamples();
  let speed=1;
  let lastTx=-1;
+ let uartBytes=0,uartLines=0,uartRx=0;
  let serial='';
  let pending='';
  const listeners=new Set<(c:string)=>void>();
@@ -64,6 +65,11 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
    status,error,simTimeMs:c/CYCLES_PER_MS,speed,pins:samples,parts,
    currentLine:machine&&machine.line>0?machine.line:null,
    power:notes,
+   bus:{
+    uart:{rx:uartRx,bytes:uartBytes,lines:uartLines,baud:machine?Math.round(machine.usart.baudRate)||0:0},
+    spi:{bytes:machine?.spiBus?.bytes??0,transactions:machine?.spiBus?.transactions??0,mode:machine?.spiBus?.mode??0,clockHz:machine?.spiBus?.clockHz??0},
+    i2c:{transactions:machine?.bus?.transactions??0,addresses:[...(machine?.bus?.addresses??[])].sort((a,b)=>a-b),nacks:machine?.bus?.nacks??0},
+   },
    txActive:lastTx>=0&&c-lastTx<TX_WINDOW,
   };
  }
@@ -77,10 +83,10 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
     const {bytes,patched}=patchFlash(decodeFlash(variant.flashBase64),variant.params,params);
     const m=new AvrMachine(toProgramWords(bytes),buildLineIndex(variant.lines));
     drop();
-    machine=m;serial='';pending='';lastTx=-1;speed=1;
+    machine=m;serial='';pending='';lastTx=-1;uartBytes=0;uartLines=0;uartRx=0;speed=1;
     const dec=new TextDecoder('utf-8');
     const taps:((b:number,cycle:number)=>void)[]=[];
-    m.usart.onByteTransmit=b=>{for(const t of taps)t(b,m.cpu.cycles);const s=dec.decode(new Uint8Array([b]),{stream:true});serial+=s;pending+=s;lastTx=m.cpu.cycles;if(serial.length>SERIAL_KEEP*2)serial=serial.slice(-SERIAL_KEEP);};
+    m.usart.onByteTransmit=b=>{uartBytes++;if(b===10)uartLines++;for(const t of taps)t(b,m.cpu.cycles);const s=dec.decode(new Uint8Array([b]),{stream:true});serial+=s;pending+=s;lastTx=m.cpu.cycles;if(serial.length>SERIAL_KEEP*2)serial=serial.slice(-SERIAL_KEEP);};
     const made=createWorldModels(circuit,{
      setPin:(p,l)=>m.setPin(p,l),
      setAdc:(ch,v)=>m.setAdc(ch,v),
@@ -92,7 +98,7 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
      attachI2c:sl=>m.attachI2c(sl),
      attachSpi:sl=>m.attachSpi(sl),
      tapUart:cb=>{taps.push(cb);},
-     uartSend:b=>{m.usart.writeByte(b);},
+     uartSend:b=>{uartRx++;m.usart.writeByte(b);},
     });
     models=made.models;world=made.world;
     const edgeModels=[...models.values()].filter(x=>x.onEdge);
@@ -115,7 +121,7 @@ export const createLabRunner:CreateLabRunner=():LabRunner=>{
    if(want>0){
     machine.run(before+want,performance.now()+12);
     const done=machine.cpu.cycles-before;
-    speed=speed*0.8+0.2*(done/want);
+    speed=speed*0.8+0.2*Math.min(1.5,done/(wallMs*CYCLES_PER_MS));
     sampleAll(before,machine.cpu.cycles,done/SIM_CLOCK_HZ);
    }
    flushSerial();

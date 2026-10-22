@@ -249,7 +249,7 @@
 /* test record */
 .lab-signals[data-swap=record]{padding:0}
 .lab-record{flex:1;min-height:0;display:flex;gap:20px;align-items:center;justify-content:space-between;padding:4px 16px 4px 14px;animation:rec-in var(--lab-d3) var(--lab-ease-out)}
-.lab-record-main{display:grid;gap:3px;min-width:0;min-height:0;overflow:hidden}
+.lab-record-main{display:grid;align-self:stretch;align-content:start;gap:3px;min-width:0;min-height:0;overflow:hidden}
 .lab-record-main header{display:flex;align-items:center;gap:12px}
 .lab-pass{display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:999px;background:var(--lab-live-tint);color:var(--lab-live);font-family:var(--lab-mono);font-weight:500;font-size:11px;letter-spacing:.1em}
 .lab-pass i{width:6px;height:6px;border-radius:50%;background:var(--lab-live)}
@@ -290,7 +290,7 @@
 .lab-thumb{flex:none;display:grid;place-items:center;width:72px;height:60px;border-radius:var(--lab-r-md);background:var(--lab-paper-deep);color:var(--lab-ink-2);overflow:hidden}
 .lab-thumb img{width:72px;height:60px;object-fit:contain;animation:fade-in var(--lab-d2) var(--lab-ease)}
 .lab-card-text{display:grid;gap:3px;min-width:0}
-.lab-card-text .lab-eyebrow{letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lab-card-text .lab-eyebrow{letter-spacing:.04em;overflow:hidden;white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3}
 .lab-card-title{overflow-wrap:anywhere}
 .lab-card-title{font-weight:600;font-size:14px;line-height:1.25;color:var(--lab-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .lab-card-done{position:absolute;top:6px;right:6px;display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--lab-live);color:var(--lab-ink)}
@@ -483,6 +483,9 @@
 .parts-grid[data-one]{grid-template-columns:1fr}
 .parts-card{margin:0;padding:10px}
 .parts-img{width:100%;display:block}
+.parts-imgwrap{position:relative;display:block}
+.parts-live{position:absolute;inset:0;height:100%;background:var(--lab-card)}
+.parts-live[hidden]{display:none}
 .parts-img--empty{aspect-ratio:3/2;display:grid;place-items:center;border-radius:var(--lab-r-lg);background:linear-gradient(100deg,var(--lab-paper-deep) 30%,var(--lab-raised) 50%,var(--lab-paper-deep) 70%);background-size:200% 100%;animation:parts-shimmer 1.4s linear infinite}
 .parts-spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--lab-line-strong);border-top-color:var(--lab-ink);animation:parts-turn .8s linear infinite}
 @keyframes parts-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
@@ -495,3 +498,8 @@
 .parts-desc{margin:4px 0 0;font-size:14px;color:var(--lab-ink-2)}
 @media (max-width:640px){.parts-gallery{padding:16px 12px}.parts-grid{grid-template-columns:repeat(2,minmax(160px,1fr));gap:10px}.parts-grid[data-one]{grid-template-columns:1fr}}
 .lab-tabpanel,.lab-tabpanel *{overflow-wrap:anywhere}
+
+/* parts gallery: the popover on a part's own page sits in the flow, not over a stage */
+.parts-try{margin-top:20px;display:grid;gap:10px}
+.parts-try-box{position:relative;width:min(100%,320px)}
+.parts-try-box .lab-pop{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:100%!important;max-width:none!important;max-height:none!important;border-radius:var(--lab-r-lg)!important;animation:none}

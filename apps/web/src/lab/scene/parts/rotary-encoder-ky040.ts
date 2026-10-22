@@ -1,7 +1,7 @@
 /**
  * ROTARY-ENCODER-KY040: encoder module standing on the breadboard. PCB 30 x 19 mm with a 5-pin header, an EC11-class encoder
  * (12 x 12 x 6.5 mm case, 7 mm threaded bushing, 6 mm D-shaft) and a 17 mm knurled knob (public dimensions, modelled by us).
- * Pairs with sim/devices/rotary-encoder-ky040.ts. Click the knob = push SW; the knob angle follows the simulated shaft.
+ * Pairs with sim/devices/rotary-encoder-ky040.ts. Click the knob = push SW, drag round it = turn; the knob angle follows the simulated shaft.
  */
 import {BoxGeometry,CylinderGeometry,Group} from 'three';
 import type {PartProps} from '../../contract';
@@ -25,6 +25,7 @@ function buildEncoder(_p:PartProps,g:Group):Inner{
  g.add(solid(new CylinderGeometry(3.5,3.5,6,24),C.SILVER_DARK,{outline:true,pos:[cx,cy+1.5,9.5],rot:[Math.PI/2,0,0],finish:'metal'}));
  const turn=new Group();turn.position.set(cx,cy+1.5,0);g.add(turn);
  const push=new Group();turn.add(push);
+ push.userData.grab={type:'knob',key:'position',min:0,max:60,perTurn:20};   // drag around the knob to turn it; a click pushes it
  push.add(solid(new CylinderGeometry(3,3,11,20),C.SILVER,{pos:[0,0,12.5],rot:[Math.PI/2,0,0],finish:'metal'}));
  // knob: 17 mm, knurled, with a pointer notch
  push.add(solid(new CylinderGeometry(8.5,8.5,11,40),C.KNOB,{outline:true,pos:[0,0,19],rot:[Math.PI/2,0,0]}));
@@ -54,9 +55,8 @@ export const rotaryEncoderKy040=definePart({
   GND:pin([4*PITCH,0,0],'ground','Ground','Ground'),
  },
  callouts:[
-  callout('knob',[2*PITCH,15,24],'Click the knob to push it','Klik kenop untuk menekannya'),
+  callout('knob',[2*PITCH,15,24],'Click the knob to push it, drag around it to turn it','Klik kenop untuk menekannya, seret mengelilinginya untuk memutar'),
   callout('pulls',[2*PITCH,12,1],'10 k pull-ups hold CLK and DT HIGH at rest','Pull-up 10 k menahan CLK dan DT di HIGH saat diam'),
  ],
- interact:{drag:{handle:'press',cursor:{hover:'pointer',active:'pointer'}}},
  make:buildEncoder,
 });

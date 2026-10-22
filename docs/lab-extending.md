@@ -33,7 +33,8 @@ apps/web/src/lab/
   scene/parts/
     index.ts             registry + auto-discovery + buildPart
     kit.ts               geometry helpers, definePart, controlsFromInputs, extState
-    types.ts             PartModule
+    types.ts             PartModule, ControlSpec, Grab (3D direct manipulation)
+    demo.ts              hover demos of the parts gallery (see "Gallery demos")
     <kind>.ts            one PartModule per kind
   scene/board-uno.ts board-nano.ts   the two runnable boards (same UnoBuild interface, swapped per Circuit.board)
   lessons/
@@ -79,7 +80,20 @@ Read user edits from `ctx.props` lazily (when you need the value), not at create
 
 Typed state in the scene: `extState<MyState>(state,'<kind>')` (from `parts/kit`) narrows a `PartState` to your device's state or returns `undefined`.
 
-Footprint: `holes` gives the breadboard column offset of each pin, in pin order (omit for a desk prop); `bodyX` is the body's x extent in mm when it is wider than the legs. The layout reserves breadboard columns for a body that reaches more than 5 mm left or 6 mm right of its legs (PIR, relay, LCD...), so neighbours never hide it; a body wider than the free lanes goes to the back lane. A part spec may carry `lane:'front'` (on-board parts: use the lane facing the camera) or, for a desk prop, `deskX` (centre in mm, to keep a tall battery or relay board clear of the Uno). Popover inputs of type `choice` may set `momentaryMs` (a tap that releases itself, like keypad keys) and `fold` (same title = one collapsed disclosure). Two lanes only: a lesson can hold about four wide modules, so fold per-pin resistors into a popover input instead of seven resistor parts (see the seven-segment `seriesOhms`).
+Footprint: `holes` gives the breadboard column offset of each pin, in pin order (omit for a desk prop); `bodyX` is the body's x extent in mm when it is wider than the legs. The layout reserves breadboard columns for a body that reaches more than 5 mm left or 6 mm right of its legs (PIR, relay, LCD...), so neighbours never hide it; a body wider than the free lanes goes to the back lane. A part spec may carry `lane:'front'` (on-board parts: use the lane facing the camera) or, for a desk prop, `deskX` (centre in mm, to keep a tall battery or relay board clear of the Uno). Popover inputs of type `choice` may set `momentaryMs` (a tap that releases itself, like keypad keys) and `fold` (same title = one collapsed disclosure). The layout also keeps the measured right edge of the last body in each lane (from `bodyX`, 0.5 mm clear), so give `bodyX` honestly: it is what keeps a neighbour from overlapping the part. A module that cannot fit in the lane (a driver with a long body) may hang over the end of the breadboard; its legs stay in the strip. Two lanes only: a lesson can hold about four wide modules, so fold per-pin resistors into a popover input instead of seven resistor parts (see the seven-segment `seriesOhms`).
+
+## Direct manipulation in 3D, terminals and the layout guard
+
+* **Grabs.** A mesh or group of a part may carry `userData.grab` (type `Grab` in `scene/parts/types.ts`): `{type:'tap',key,value,rest,ms}` (a click taps one value, like a keypad key: set, then back to `rest` after `ms`), `{type:'stick',x,y,max,travelPx}` (drag tilts a thumb stick; it springs back on release) and `{type:'knob',key,min,max,perTurn}` (drag round it to turn it). The picking layer finds the grab under the pointer and calls `InteractiveHandlers.onControl(partId,key,value)`, which the page routes exactly like a popover edit, so the 3D gesture and the popover always agree and every `key` is a key of the device `inputs`. A plain click on a stick or knob still pushes its switch (a button input) and a click on any part still opens its popover. `scene.grabPoints(partId)` returns screen points of the pieces for tests.
+* **Terminal input.** `{type:'terminal',key,label,placeholder,input,log,ending?}` in a device's `inputs` renders a text terminal in the popover: `log` names the state field with the transcript (one row per line, `< ` from the sketch, `> ` from the user), Send delivers `{kind:'ext',type:input,v:{line,ending}}` to the model's `setInput`. The HC-05 uses it.
+* **Layout guard.** `scene.layoutReport()` (only with `?e2e=1`) returns per-mesh boxes of the board and every part, display glass planes (a mesh with `userData.glass=true`: mark the window of a display part) and the centre line of every jumper. `tests/e2e/29-lab-layout.spec.ts` walks EVERY lesson file and fails on overlapping parts or part-on-Uno, a jumper drawn in front of a display's glass in the lesson camera, or a part whose hotspot is hidden. A part and its `props.target` (stepper in its driver, bulb on its relay) may touch. A lesson that fails: give a part `lane:'front'`, a `deskX`, a `view`, or fix the part's `bodyX`.
+* **Where a jumper ends.** On the pin's hole when the placed part stands on the breadboard (`Placement.onBoard`) and the pin has a hole; otherwise at the pin's own 3D anchor (desk modules, screw terminals, header pins of an off-board module). Decided from the placement, not the kind.
+
+## Gallery demos and the Test Record
+
+* `/lab/parts` cards come alive on hover (`scene/parts/demo.ts`): the real device model runs on a fake clock while the popover `inputs` are swept (ranges glide, toggles flip, momentary choices tap); output-only builtins (LED, buzzer, motor, servo) and displays that a sketch would fill have a state table (`STATIC`, `DISPLAY`). `/lab/parts/<kind>` also has a "Try it" popover bound to the same model, with no sketch running. Add a `DISPLAY` entry when a new display kind should show a pattern.
+* The runner's snapshot carries `bus` (`BusStats`): UART bytes, lines and baud, SPI transactions, bytes, mode and clock, I2C transactions, addresses and NACKs. The generic Test Record (`ui/test-record.tsx`) picks the row from the protocol of the part wired to each record pin (UART, SPI, I2C, WS2812 frames and pixels), so a new lesson needs no `CUSTOM_RECORDS` entry for its buses.
+* e2e specs wait in **simulated** time: `tests/e2e/lab-sim.ts` (`untilSim`, `waitSim`, `serialHas`, `goalDone`, `hookSnapshot`). A budget of N simulated ms is the same on every machine; wall clock only caps a stalled simulation.
 
 ## Buses and protocols
 
@@ -231,10 +245,10 @@ export const lesson=defineLesson({
 ```
 
    `kit.ts` holds the helpers (`c`, `co`, `pinRow`, `sp`, `b`, `w`, `ledOn`, `sonar`, `RAILS`, `P`, and the goal helpers `byKind`, `extOf`, `changes`, `range`, `pill`...). Copy a similar lesson (`lessons/dht.ts`, `oled.ts`, `plant.ts`) and edit it. The tests check 3-5 callouts, 3-5 walkthrough steps, English and Indonesian everywhere and the SEO length.
-3. Compile only your sketch: `npm run lab:firmware -- <id>-default` (or `-- <id>` for all its variants). It writes `firmware/generated/<id>-default.ts` and touches nothing else. Needs Docker image `aiot-avr:1.8.8` with colima running; commit the generated file.
+3. Compile only your sketch: `npm run lab:firmware -- <id>-default` (or `-- <id>` for all its variants). It writes `firmware/generated/<id>-default.ts` and touches nothing else. Needs Docker image `aiot-avr:1.8.8` with colima running; commit the generated file. Every run works in its own folder `.runtime/lab-fw/run-<pid>-<time>` (removed on exit), so two builds at once do not collide, and a transient colima mount failure is retried with exponential backoff.
 4. Tests: an integration test that runs the real firmware (see `tests/lab-dht22.test.ts`, `tests/lab-lessons-13-16.test.ts`), and an e2e spec (`tests/e2e/27-lab-lessons-13-16.spec.ts` shows how to read part states from the live snapshot by wrapping `window.__labScene.update`). `tests/lab-lesson-modules.test.ts` already checks that every lesson has its generated file and that the generated source equals the sketch on disk.
 
-A lesson that needs a record on the Test Record panel beyond the generic pins (a decoded value, an echo) cannot add one without editing `ui/test-record.tsx` (`CUSTOM_RECORDS`): ask the owner of the core instead of editing it in a parallel branch; the generic record is fine for most lessons.
+A lesson that needs a record on the Test Record panel beyond the generic one (a decoded value, an echo) cannot add one without editing `ui/test-record.tsx` (`CUSTOM_RECORDS`): ask the owner of the core instead of editing it in a parallel branch. The generic record already speaks the buses (UART bytes, lines and baud; SPI transactions; I2C addresses; WS2812 frames and pixels), so most lessons need nothing.
 
 Lessons 13-16 (OLED dashboard, motion light, plant monitor, remote control) are worked examples: the sketches carry their own SSD1306, PCF8574 LCD and NEC drivers on top of `Wire` only, and the goals read the OLED frame buffer, the relay contact, the LCD text and the 7-segment glyph.
 

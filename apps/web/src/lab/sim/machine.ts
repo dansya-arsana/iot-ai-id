@@ -36,6 +36,7 @@ export class AvrMachine{
      if(!(diff&(1<<bit)))continue;
      const pin=PIN_TO_UNO[port][bit];
      if(pin&&!this.lines.has(pin))this.monitor.record(pin,value&(1<<bit)?1:0,this.cpu.cycles);
+     if(pin)this.spiBus?.cs(pin,value&(1<<bit)?1:0);
     }
     // shared lines also change when the MCU releases or takes the pin (DDR write), which does not change the PORT value
     for(const pin of this.lines){if(PIN_PORT[pin].port===port)this.monitor.record(pin,this.lineLevel(pin),this.cpu.cycles);}

@@ -21,9 +21,9 @@ function dashTex():CanvasTexture{
 }
 export const disposeWireTextures=():void=>{dash?.dispose();dash=null;};
 
-/** Path that rounds the left edge of a standing display and arrives at `b` from behind it (display about 98 mm wide, centred on its pins). */
-function behindPath(a:Vector3,b:Vector3,top:number,fan:number,lift:number):Vector3[]{
- const xL=b.x-54-fan*2,zBack=b.z-14-fan*2;
+/** Path that rounds the left edge of a standing display and arrives at `b` from behind it (`reach` mm left of the pin: 54 for the 98 mm LCD2004). */
+function behindPath(a:Vector3,b:Vector3,top:number,fan:number,lift:number,reach:number):Vector3[]{
+ const xL=b.x-reach-fan*2,zBack=b.z-14-fan*2;
  const hi=Math.max(a.y,b.y)+top+10+lift;
  const ctl:[number,number,number][]=[
   [a.x,a.y+top,a.z],
@@ -49,7 +49,8 @@ function frontPath(a:Vector3,b:Vector3,top:number,fan:number,lift:number):Vector
  return new CatmullRomCurve3(ctl.map(q=>new Vector3(q[0],q[1],q[2]))).getPoints(96);
 }
 
-export interface WireBuild{group:Group;update(snap:SimSnapshot,dtMs:number):void}
+export interface WirePath{id:string;pts:[number,number,number][]}
+export interface WireBuild{group:Group;/** the centre line of every jumper, world mm (layout checks) */paths:WirePath[];update(snap:SimSnapshot,dtMs:number):void}
 const headerOf=(p:string):string=>/^D\d/.test(p)?'d':/^A\d/.test(p)?'a':'p';
 
 /** A part-to-part jumper (Circuit.links). Both ends are resolved by the scene: a world anchor, or null to skip. */
@@ -61,19 +62,20 @@ export interface LinkEnds{id:string;color:WireColor;a:Vector3|null;b:Vector3|nul
  * carry no pin activity (no PWM dashes), only the colour.
  */
 /**
- * `behindOf(w)`: this wire's part end plugs in behind a standing display (an LCD backpack): the jumper goes around the left of the display and
+ * `behindOf(w)`: nonzero (mm to clear on the left) when this wire's part end plugs in behind a standing display (an LCD backpack): the jumper goes around the left of the display and
  * arrives from the back, so it never drapes across the screen face.
  */
-export function buildWires(wires:Wire[],unoAnchor:(w:Wire)=>Vector3,end:(w:Wire,railIndex:number)=>Vector3|null,links:readonly LinkEnds[]=[],behindOf:(w:Wire)=>boolean=()=>false,frontOf:(w:Wire)=>boolean=()=>false):WireBuild{
+export function buildWires(wires:Wire[],unoAnchor:(w:Wire)=>Vector3,end:(w:Wire,railIndex:number)=>Vector3|null,links:readonly LinkEnds[]=[],behindOf:(w:Wire)=>number=()=>0,frontOf:(w:Wire)=>boolean=()=>false):WireBuild{
  const g=new Group();g.name='wires';
  const rails:Record<string,number>={};
  const seen:Record<string,number>={};
  const total:Record<string,number>={};
  for(const w of wires)total[headerOf(w.boardPin)]=(total[headerOf(w.boardPin)]??0)+1;
  const live=new Color(C.LIVE);
+ const paths:WirePath[]=[];
  const dyn:{mat:MeshStandardMaterial;ov:MeshBasicMaterial|null;pin:string;pwm:boolean}[]=[];
  /** One jumper: housings at both ends, a sleeved tube between them. `pin` is the board pin it follows (null for a link). */
- const draw=(wi:number,a:Vector3,b:Vector3,colorName:Wire['color'],targetId:string,fan:number,lift:number,pin:string|null,behind=false,front=false):void=>{
+ const draw=(wi:number,a:Vector3,b:Vector3,colorName:Wire['color'],targetId:string,fan:number,lift:number,pin:string|null,behind=0,front=false):void=>{
   const first=g.children.length;
   const color=C.WIRE_COLOR[colorName];
   for(const p of [a,b]){
@@ -82,8 +84,9 @@ export function buildWires(wires:Wire[],unoAnchor:(w:Wire)=>Vector3,end:(w:Wire,
    const pinMesh=new Mesh(pinGeo,toon(C.SILVER,'metal'));pinMesh.position.set(p.x,p.y+LIFT-1.1,p.z);pinMesh.userData.noPick=true;g.add(pinMesh);
   }
   const top=LIFT+HOUSING_H;
-  const pts=behind?behindPath(a,b,top,fan,lift):front?frontPath(a,b,top,fan,lift):wireCurve([a.x,a.y+top,a.z],[b.x,b.y+top,b.z],fan,lift).map(q=>new Vector3(q[0],q[1],q[2]));
+  const pts=behind>0?behindPath(a,b,top,fan,lift,behind):front?frontPath(a,b,top,fan,lift):wireCurve([a.x,a.y+top,a.z],[b.x,b.y+top,b.z],fan,lift).map(q=>new Vector3(q[0],q[1],q[2]));
   const curve=new CatmullRomCurve3(pts);
+  paths.push({id:targetId,pts:pts.map(q=>[q.x,q.y,q.z])});
   const mat=new MeshStandardMaterial({color,roughness:0.45,metalness:0});mat.userData.own=true;
   const tube=new Mesh(new TubeGeometry(curve,96,R,12,false),mat);
   tube.castShadow=true;tube.userData.targetId=targetId;
@@ -115,7 +118,7 @@ export function buildWires(wires:Wire[],unoAnchor:(w:Wire)=>Vector3,end:(w:Wire,
  }
  links.forEach((l,i)=>{if(l.a&&l.b)draw(wires.length+i,l.a,l.b,l.color,`wire:${l.id}`,(i%3-1)*1.6,2.5*i,null);});
  return {
-  group:g,
+  group:g,paths,
   update(snap,dt){
    let speed=0;
    for(const d of dyn){

@@ -2,7 +2,7 @@ import {Box3,Color,DirectionalLight,Group,HemisphereLight,Mesh,MeshBasicMaterial
 import {RoomEnvironment} from 'three/examples/jsm/environments/RoomEnvironment.js';
 import {PART_PINS} from '../contract';
 import type {BoardId,BoardPin,Circuit,CreateLabScene,LabScene,LessonId,PartKind,PartProps,PartSpec,PartState,SceneSettings,ScreenPoint,SimSnapshot,ViewCommand} from '../contract';
-import {BB_COLS,BB_CX,BB_D,BB_TOP,BB_W,LESSON_VIEW,PIN_COLS,holeX,freeHoleNear,isOnBoardKind,layoutCircuit,obstacleMm} from './layout';
+import {BB_COLS,BB_CX,BB_D,BB_TOP,BB_W,LESSON_VIEW,PIN_COLS,holeX,freeHoleNear,layoutCircuit,obstacleMm} from './layout';
 import {buildUno} from './board-uno';
 import type {UnoBuild} from './board-uno';
 import {buildNano} from './board-nano';
@@ -56,10 +56,16 @@ export interface InteractiveHandlers{
  onPress?(partId:string,pressed:boolean):void;
  /** Click on a part that has interact.controls: open the generic popover anchored at `at` (CSS px). */
  onOpenControls?(partId:string,at:ScreenPoint):void;
+ /** A 3D gesture on a piece of a part (keypad key, joystick stick, encoder knob) edits one control, exactly as the popover would. */
+ onControl?(partId:string,key:string,value:string|number|boolean):void;
  /** Hover enter/leave for affordance styling in the HUD (cursor is set by the scene). */
  onHoverPart?(partId:string|null,at:ScreenPoint|null):void;
 }
 export interface LabSceneV3 extends LabSceneV2{
+ /** Boxes of every part, the board, display glass and wire paths (world mm), for layout assertions. */
+ layoutReport():LayoutReport;
+ /** Screen points (CSS px, canvas-relative) of every direct-manipulation piece of a part: keypad keys, the stick, the knob. For tests. */
+ grabPoints(id:string):{grab:Record<string,unknown>;x:number;y:number}[];
  /** Pause/resume/skip the running assembly (no-ops when idle). */
  assembly:AssemblyControl;
  /** Replace the scene content with a CircuitSpec (board, breadboard, parts at spec.place, wires). Stub: lays out via layoutCircuit and ignores spec.place until the loader lands. */
@@ -81,6 +87,20 @@ export interface LabSceneV3 extends LabSceneV2{
  cameraPose():CameraPose;
 }
 
+/** Geometry for layout checks (tests): world-mm boxes [x0,y0,z0,x1,y1,z1] of the board and every part, display glass planes, jumper centre lines. */
+export type Box6=[number,number,number,number,number,number];
+export interface LayoutReport{
+ uno:Box6;
+ /** per-mesh boxes of the board */
+ unoBoxes:Box6[];
+ parts:{id:string;kind:string;/** the part this one hangs off or plugs into (props.target), if any */target?:string;box:Box6;/** per-mesh boxes (precise overlap tests) */boxes:Box6[]}[];
+ glass:{id:string;box:[number,number,number,number,number,number]}[];
+ wires:{id:string;pts:[number,number,number][]}[];
+ /** wire ids whose centre line covers a display glass in the current camera view */
+ crossings:{wire:string;glass:string}[];
+}
+/** Character LCDs that stand on their backpack pins: how far left of the pin (mm) a jumper must swing to reach the back without crossing the glass. */
+const STANDING_DISPLAY:Record<string,number>={'lcd2004-i2c':54,'lcd1602-i2c':45};
 const POWER_PINS=new Set(['5V','3V3','GND','VIN']);
 
 function initialState(s:PartSpec):PartState|null{
@@ -158,6 +178,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
  const partsRoot=new Group(),wiresRoot=new Group();scene.add(partsRoot,wiresRoot);
 
  let views:{id:string;view:PartView}[]=[];
+ let curParts:PartSpec[]=[];
  const byId=new Map<string,PartView>();
  let wires:WireBuild|null=null;
  let entries:PickEntry[]=[];
@@ -251,6 +272,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
   onSelect:o.onSelect,onHover:o.onHover,onInput:o.onInput,
   handlers:()=>interactive.handlers,
   module:id=>byId.get(id)?.module,
+  hotspotWorld:id=>{const v=byId.get(id);return v?hotspot(id,v.group,new Vector3()):null;},
   hoverHighlight:id=>{hoverHl=id;applyHighlight();},
  });
 
@@ -263,7 +285,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
   const b=contentBox(roots).clone();
   const pts=contentCorners(roots);
   if(lv.board){
-   const x0=BB_CX-BB_W/2,x1=Math.min(BB_CX+BB_W/2,fitMaxX+8);
+   const x0=BB_CX-BB_W/2,x1=Math.min(BB_CX+BB_W/2,Math.max(fitMaxX+8,...views.filter(v=>v.view.group.userData.kind!=='obstacle'&&!v.id.startsWith('obs')).map(v=>contentBox([v.view.group]).max.x+4)));
    const z=BB_D/2;
    for(const x of [x0,x1])for(const y of [0,BB_TOP])for(const zz of [-z,z]){pts.push(new Vector3(x,y,zz));b.expandByPoint(pts[pts.length-1]!);}
   }
@@ -297,6 +319,7 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
    disposeLesson();occ.clear();
    const wantBoard:BoardId=circuit.board==='nano'?'nano':'uno';
    if(wantBoard!==boardId){scene.remove(uno.group);uno.dispose();uno=wantBoard==='nano'?buildNano():buildUno();scene.add(uno.group);boardId=wantBoard;}
+   curParts=circuit.parts;
    const place=layoutCircuit(circuit);
    fitMaxX=Math.max(holeX(12),...Object.values(place).flatMap(p=>p.onBoard?[p.x,...(p.holes??[]).map(h=>holeX(h[0]))]:[]));
    const usedPins=new Set<string>();
@@ -310,32 +333,30 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
     for(const v of Object.values(spec.net))if(v&&/^(D\d+|A\d)$/.test(v))usedPins.add(v);
    }
    partsRoot.updateMatrixWorld(true);
+   // Where a jumper meets a part pin: a pin that plugs into the breadboard ends at the free hole of its strip; a pin of any part standing
+   // OFF the breadboard (a desk module, a header or screw terminal) ends at the pin's own 3D anchor. Decided from the placement, never from the kind.
+   const endOf=(r:{part:string;pin:string}):Vector3|null=>{
+    const v=byId.get(r.part),spec=circuit.parts.find(x=>x.id===r.part);
+    if(!v||!spec)return null;
+    const p=v.group.localToWorld(v.pinAnchor(r.pin));
+    const seated=place[r.part]?.onBoard===true&&PIN_COLS[spec.kind]?.[(PART_PINS[spec.kind]??[]).indexOf(r.pin)]!==undefined;
+    if(seated){const h=freeHoleNear(p.x,p.z);return new Vector3(h.x,BB_TOP,h.z);}
+    return p;
+   };
    const wb=buildWires(circuit.wires,
     w=>uno.pinAnchor(w.boardPin as BoardPin),
     (w,idx)=>{
      if(w.componentId==='bb'){return bb.railAnchor(w.pin==='5v-rail'?'5v-rail':'gnd-rail',idx*2);}
-     const v=byId.get(w.componentId);if(!v)return null;
-     const p=v.group.localToWorld(v.pinAnchor(w.pin));
-     const spec=circuit.parts.find(s=>s.id===w.componentId);
-     if(spec&&isOnBoardKind(spec.kind)&&PIN_COLS[spec.kind]?.[(PART_PINS[spec.kind]??[]).indexOf(w.pin)]!==undefined){const h=freeHoleNear(p.x,p.z);return new Vector3(h.x,BB_TOP,h.z);}
-     return p;
+     return endOf({part:w.componentId,pin:w.pin});
     },
     // part-to-part jumpers: a pin that plugs into the breadboard ends at its hole, a terminal or desk part at its own anchor
     (circuit.links??[]).filter(l=>!l.seated).map(l=>{
-     const endOf=(r:{part:string;pin:string}):Vector3|null=>{
-      const v=byId.get(r.part),spec=circuit.parts.find(x=>x.id===r.part);
-      if(!v||!spec)return null;
-      const p=v.group.localToWorld(v.pinAnchor(r.pin));
-      const hasHole=isOnBoardKind(spec.kind)&&PIN_COLS[spec.kind]?.[(PART_PINS[spec.kind]??[]).indexOf(r.pin)]!==undefined;
-      if(hasHole){const h=freeHoleNear(p.x,p.z);return new Vector3(h.x,BB_TOP,h.z);}
-      return p;
-     };
      return {id:`${l.a.part}.${l.a.pin}`,color:l.color,a:endOf(l.a),b:endOf(l.b)};
     }),
     // wires into a standing LCD backpack arrive from behind the screen
-    w=>circuit.parts.find(s=>s.id===w.componentId)?.kind==='lcd2004-i2c',
+    w=>STANDING_DISPLAY[circuit.parts.find(s=>s.id===w.componentId)?.kind??'']??0,
     // a front-lane part ahead of that display gets its jumper from the front, below the glass
-    w=>{const sp=circuit.parts.find(s=>s.id===w.componentId);return !!sp&&sp.kind!=='lcd2004-i2c'&&circuit.parts.some(q=>q.kind==='lcd2004-i2c')&&(place[sp.id]?.onBoard??false)&&(place[sp.id]?.z??0)>0;});
+    w=>{const sp=circuit.parts.find(s=>s.id===w.componentId);return !!sp&&!STANDING_DISPLAY[sp.kind]&&circuit.parts.some(q=>!!STANDING_DISPLAY[q.kind])&&(place[sp.id]?.onBoard??false)&&(place[sp.id]?.z??0)>0;});
    wires=wb;wiresRoot.add(wb.group);
    for(const w of circuit.wires)if(/^(D\d+|A\d)$/.test(w.boardPin))usedPins.add(w.boardPin);
    uno.setUsedPins(usedPins);
@@ -435,6 +456,81 @@ export const createLabScene:CreateLabScene=(o):LabSceneV3=>{
   },
   thumbnails(t){
    return renderThumbnails(renderer,scene.environment as Texture|null,t).finally(()=>{rig.refresh();setLineResolution(cssW,cssH);});
+  },
+  grabPoints(id:string){
+   const v=byId.get(id);if(!v)return [];
+   const out:{grab:Record<string,unknown>;x:number;y:number}[]=[];
+   v.group.traverse(o=>{
+    if(!o.userData.grab)return;
+    contentBox([o],box);if(box.isEmpty())return;
+    const mid=box.getCenter(new Vector3()),top=mid.clone().setY(box.max.y),front=mid.clone().setZ(box.max.z),edge=mid.clone().setY(box.max.y).setZ(box.max.z);
+    // the first candidate where a click lands on this very piece (a taller neighbour or the piece's own rim may take the ray)
+    const pts=[front,mid,top,edge];
+    let pick=pts[0]!;
+    for(const c of pts){
+     const q0=c.clone().project(rig.camera);ndc.set(q0.x,q0.y);ray.setFromCamera(ndc,rig.camera);
+     const hit=ray.intersectObjects(partsRoot.children,true).find(h=>!h.object.userData.noPick&&h.object.visible!==false);
+     let n:Object3D|null=hit?hit.object:null,mine=false;
+     while(n){if(n===o){mine=true;break;}n=n.parent;}
+     if(mine){pick=c;break;}
+    }
+    const q=toScreen(pick.clone(),{x:0,y:0,visible:true});
+    out.push({grab:o.userData.grab as Record<string,unknown>,x:q.x,y:q.y});
+   });
+   return out;
+  },
+  layoutReport():LayoutReport{
+   scene.updateMatrixWorld(true);
+   const bx=(o:Object3D):[number,number,number,number,number,number]|null=>{contentBox([o],box);return box.isEmpty()?null:[box.min.x,box.min.y,box.min.z,box.max.x,box.max.y,box.max.z];};
+   /** one box per real mesh larger than 1.5 mm: an L-shaped part (the stepper and its cable) is then not one fat rectangle */
+   const meshBoxes=(o:Object3D):Box6[]=>{
+    const out:Box6[]=[];
+    o.updateWorldMatrix(true,true);
+    o.traverseVisible(m=>{
+     const me=m as Mesh;
+     if(!me.isMesh||m.userData.noPick||m.userData.noFit||m.userData.hull||(me as unknown as {isInstancedMesh?:boolean}).isInstancedMesh||!me.geometry)return;
+     if(!me.geometry.boundingBox)me.geometry.computeBoundingBox();
+     const b=me.geometry.boundingBox!.clone().applyMatrix4(me.matrixWorld);
+     if(Math.max(b.max.x-b.min.x,b.max.y-b.min.y,b.max.z-b.min.z)<1.5)return;
+     out.push([b.min.x,b.min.y,b.min.z,b.max.x,b.max.y,b.max.z]);
+    });
+    return out;
+   };
+   const specOf=new Map(curParts.map(p=>[p.id,p]));
+   const parts:LayoutReport['parts']=[];const glass:LayoutReport['glass']=[];
+   for(const {id,view} of views){
+    const b=bx(view.group);if(b)parts.push({id,kind:view.module.kind,boxes:meshBoxes(view.group),target:typeof specOf.get(id)?.props.target==='string'?String(specOf.get(id)!.props.target):undefined,box:b});
+    view.group.traverse(o=>{
+     if(!o.userData.glass)return;
+     const m=o as Mesh;if(!m.geometry.boundingBox)m.geometry.computeBoundingBox();
+     const g=m.geometry.boundingBox!.clone().applyMatrix4(m.matrixWorld);
+     glass.push({id,box:[g.min.x,g.min.y,g.min.z,g.max.x,g.max.y,g.max.z]});
+    });
+   }
+   // a jumper "crosses" a display when, seen from the current camera, its centre line passes in front of the glass quad
+   const crossings:LayoutReport['crossings']=[];
+   rig.camera.updateMatrixWorld();
+   const cam=rig.camera.position;
+   const toNdc=(x:number,y:number,z:number):[number,number,number]=>{vec.set(x,y,z).project(rig.camera);return [vec.x,vec.y,cam.distanceTo(new Vector3(x,y,z))];};
+   for(const {id,view} of views)view.group.traverse(o=>{
+    if(!o.userData.glass)return;
+    const m=o as Mesh;if(!m.geometry.boundingBox)m.geometry.computeBoundingBox();
+    const bb2=m.geometry.boundingBox!;
+    const quad=[[bb2.min.x,bb2.min.y],[bb2.max.x,bb2.min.y],[bb2.max.x,bb2.max.y],[bb2.min.x,bb2.max.y]].map(([x,y])=>{const wv=new Vector3(x,y,0).applyMatrix4(m.matrixWorld);return toNdc(wv.x,wv.y,wv.z);});
+    const cen=new Vector3((bb2.min.x+bb2.max.x)/2,(bb2.min.y+bb2.max.y)/2,0).applyMatrix4(m.matrixWorld);
+    const dGlass=cam.distanceTo(cen);
+    const inside=(px:number,py:number):boolean=>{let pos=0,neg=0;for(let i=0;i<4;i++){const a=quad[i]!,b=quad[(i+1)%4]!;const cr=(b[0]-a[0])*(py-a[1])-(b[1]-a[1])*(px-a[0]);if(cr>0)pos++;else if(cr<0)neg++;}return pos===0||neg===0;};
+    for(const w of wires?.paths??[]){
+     let hit=false;
+     for(let i=0;i<w.pts.length-1&&!hit;i++)for(let k=0;k<4;k++){
+      const t=k/4,p0=w.pts[i]!,p1=w.pts[i+1]!;
+      const q=toNdc(p0[0]+(p1[0]-p0[0])*t,p0[1]+(p1[1]-p0[1])*t,p0[2]+(p1[2]-p0[2])*t);
+      if(inside(q[0],q[1])&&q[2]<dGlass-1){hit=true;break;}
+     }
+     if(hit)crossings.push({wire:w.id,glass:id});
+    }
+   });
+   return {uno:bx(uno.group)??[0,0,0,0,0,0],unoBoxes:meshBoxes(uno.group),parts,glass,wires:wires?.paths??[],crossings};
   },
   celebrate():void{ringT=0;ringR=Math.max(40,radius*0.9);},
   project(target:string):ScreenPoint|null{

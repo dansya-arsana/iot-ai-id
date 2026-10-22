@@ -8,15 +8,18 @@ export class TwiBus implements TWIEventHandler{
  private repeated=false;
  /** Called once per bus event so the machine can show clock and data activity on A4/A5 (the bus itself is transaction-level). */
  onActivity:(()=>void)|null=null;
+ /** Counters for the Test Record: completed transactions, addresses addressed, address NACKs. */
+ transactions=0;nacks=0;readonly addresses=new Set<number>();
  constructor(private twi:AVRTWI){}
  /** Slaves are matched by their CURRENT address at every START, so a device whose address follows a popover or a wire (BME280 SDO, LCD jumpers) moves live. */
  attach(s:I2cSlave):void{this.slaves.push(s);}
  start(repeated:boolean):void{this.onActivity?.();this.repeated=repeated;if(!repeated)this.cur=null;this.twi.completeStart();}
- stop():void{this.onActivity?.();this.cur?.onStop?.();this.cur=null;this.twi.completeStop();}
+ stop():void{this.onActivity?.();this.transactions++;this.cur?.onStop?.();this.cur=null;this.twi.completeStop();}
  connectToSlave(addr:number,write:boolean):void{
   this.onActivity?.();
   const s=this.slaves.find(x=>(x.address&0x7f)===(addr&0x7f))??null;
   this.cur=s;
+  this.addresses.add(addr&0x7f);if(!s)this.nacks++;
   if(s)s.onStart?.(this.repeated,write);
   this.twi.completeConnect(!!s);
  }

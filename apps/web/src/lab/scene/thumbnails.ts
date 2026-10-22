@@ -62,6 +62,7 @@ async function renderSubjects<K extends string>(renderer:WebGLRenderer,env:Textu
   if(SUBJ[id]==='uno'){const u=buildUno();grp.add(u.group);dispose.push(()=>u.dispose());}
   else for(const it of SUBJ[id] as Item[]){
    const v=buildPart(it.s);v.group.position.set(it.x,0,it.z??0);grp.add(v.group);
+   v.group.traverse(o=>{if(o.userData.noFit)o.visible=false;});   // floating props (the HC-05's phone) stay out of a card's picture
    if(it.state)v.apply(it.state,0);
   }
   contentBox([grp],box);
@@ -69,7 +70,7 @@ async function renderSubjects<K extends string>(renderer:WebGLRenderer,env:Textu
   for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z])pts.push(new Vector3(x,y,z));
   let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
   for(const p of pts){const a=p.dot(right),b=p.dot(up);x0=Math.min(x0,a);x1=Math.max(x1,a);y0=Math.min(y0,b);y1=Math.max(y1,b);}
-  const mpp=Math.max((x1-x0)/(0.85*W),(y1-y0)/(0.85*H));
+ const mpp=Math.max((x1-x0)/(0.85*W),(y1-y0)/(0.85*H));
   const hw=mpp*W/2,hh=mpp*H/2;
   cam.left=-hw;cam.right=hw;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();
   ctr.copy(right).multiplyScalar((x0+x1)/2).addScaledVector(up,(y0+y1)/2);
@@ -90,4 +91,46 @@ async function renderSubjects<K extends string>(renderer:WebGLRenderer,env:Textu
  }
  rt.dispose();
  return out;
+}
+
+/**
+ * A live preview of one part for the gallery: the same tile framing as renderKindSheet, redrawn every frame into `canvas` with the state
+ * `demo(tMs)` gives. Returns a stop function. The renderer is the gallery's own (no extra WebGL context).
+ */
+export function startLivePreview(renderer:WebGLRenderer,env:Texture|null,kind:string,o:{width:number;height:number;dpr:number;canvas:HTMLCanvasElement;demo:(tMs:number)=>PartState}):()=>void{
+ const W=Math.max(8,Math.round(o.width*o.dpr)),H=Math.max(8,Math.round(o.height*o.dpr));
+ const scene=new Scene();scene.environment=env;scene.environmentIntensity=0.55;
+ scene.add(new HemisphereLight(C.FLOOR_SKY,C.FLOOR_GROUND,0.6));
+ const key=new DirectionalLight(C.WHITE,2.0);key.position.set(-140,300,40);scene.add(key);
+ const fill=new DirectionalLight(C.FILL,0.35);fill.position.set(200,120,220);scene.add(fill);
+ const v=buildPart(spec(kind));scene.add(v.group);
+ v.group.traverse(c=>{if(c.userData.noFit)c.visible=false;});   // floating props (the HC-05's phone) stay out of a card's picture
+ v.apply(o.demo(0),0);
+ const box=new Box3();contentBox([v.group],box);
+ const az=rad(45),el=rad(30);
+ const right=new Vector3(Math.cos(az),0,-Math.sin(az)),up=new Vector3(-Math.sin(az)*Math.sin(el),Math.cos(el),-Math.cos(az)*Math.sin(el));
+ const dir=new Vector3(Math.sin(az)*Math.cos(el),Math.sin(el),Math.cos(az)*Math.cos(el));
+ let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+ for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){const p=new Vector3(x,y,z);const a=p.dot(right),b=p.dot(up);x0=Math.min(x0,a);x1=Math.max(x1,a);y0=Math.min(y0,b);y1=Math.max(y1,b);}
+ const fillK=kind==='led'||kind==='rgb-led'?0.6:0.85;   // a glowing part keeps room for its halo
+ const mpp=Math.max((x1-x0)/(fillK*W),(y1-y0)/(fillK*H));
+ const hw=mpp*W/2,hh=mpp*H/2;
+ const cam=new OrthographicCamera(-hw,hw,hh,-hh,-4000,4000);
+ const ctr=new Vector3().addScaledVector(right,(x0+x1)/2).addScaledVector(up,(y0+y1)/2);
+ cam.position.copy(ctr).addScaledVector(dir,1200);cam.lookAt(ctr);cam.updateMatrixWorld();
+ o.canvas.width=W;o.canvas.height=H;
+ const g=o.canvas.getContext('2d')!;
+ let raf=0,dead=false;const t0=performance.now();let prev=t0;
+ const frame=():void=>{
+  if(dead)return;
+  const now=performance.now();
+  v.apply(o.demo(now-t0),now-prev);prev=now;
+  setMmPerPx(mpp*o.dpr);setLineResolution(W/o.dpr,H/o.dpr);
+  renderer.setRenderTarget(null);renderer.setPixelRatio(1);renderer.setSize(W,H,false);
+  renderer.setClearColor(0x000000,0);renderer.clear();renderer.render(scene,cam); // ds-allow-hex
+  g.clearRect(0,0,W,H);g.drawImage(renderer.domElement,0,0,W,H);
+  raf=requestAnimationFrame(frame);
+ };
+ raf=requestAnimationFrame(frame);
+ return ()=>{dead=true;cancelAnimationFrame(raf);scene.remove(v.group);v.group.traverse(c=>{(c as {geometry?:{dispose():void}}).geometry?.dispose?.();});};
 }

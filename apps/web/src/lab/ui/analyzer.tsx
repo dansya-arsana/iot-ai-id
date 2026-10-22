@@ -125,7 +125,7 @@ function Lane({pin,api,reduced,markerRef,txRef}:{pin:string;api:StageApi;reduced
 /** Pulse width: 0.1 µs steps under 10 µs, whole µs under 1 ms, then ms. */
 const widthText=(ms:number):string=>{const us=ms*1000;return us<10?`${us.toFixed(1)} µs`:us<1000?`${Math.round(us)} µs`:`${ms.toFixed(1)} ms`;};
 /** Fast pulses read as a rate and the width of one pulse, never a count since start. */
-const pulseText=(hz:number,hiMs:number|null):string=>`≈${hz>=1000?`${(hz/1000).toFixed(hz>=10000?0:1)} kHz`:`${Math.round(hz)} /s`}${hiMs===null?'':` · ${widthText(hiMs)}`}`;
+const pulseText=(hz:number,hiMs:number|null):string=>`${hz>=1000?`≈${(hz/1000).toFixed(hz>=10000?0:1)} kHz`:hz<1?'<1 /s':`≈${Math.round(hz)} /s`}${hiMs===null?'':` · ${widthText(hiMs)}`}`;
 
 export interface AnalyzerProps{
  api:StageApi;lessonId:LessonId;ai?:boolean;lanePins:string[];tx:boolean;
@@ -161,9 +161,9 @@ export function Analyzer(p:AnalyzerProps){
   if(!ps)return '—';
   if(ps.mode==='output'&&PWM_PINS.includes(pin as UnoPin)&&ps.freqHz<=2000&&ps.duty>0.01&&ps.duty<0.99)return `${(ps.duty*100).toFixed(1)}% · ${Math.round(ps.freqHz)} Hz`;
   if(pin.startsWith('A')&&ps.analog!==null)return String(Math.round(ps.analog));
-  if(m.aliased&&m.pulses>0)return pulseText(m.freqHz,m.highMs);
+  if(m.aliased&&m.pulses>0)return pulseText(Math.max(m.freqHz,m.recentHz),m.highMs);
   if(ps.mode==='output'&&ps.duty>0.01&&ps.duty<0.99&&ps.freqHz>=50)return `toggling · ${Math.round(ps.freqHz)} Hz`;
-  if(m.highMs!==null&&m.toggles>0)return `hi ${m.highMs.toFixed(1)} ms`;
+  if(m.highMs!==null&&m.toggles>0)return `hi ${widthText(m.highMs)}`;
   return ps.level?'HIGH':'LOW';
  };
  const modeGlyph=(pin:string)=>{const m=p.pins?.[pin]?.mode;return pin==='TX'?'TX':m==='output'?'OUT':m==='input-pullup'?'PU':m==='input'?'IN':'';};

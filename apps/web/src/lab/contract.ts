@@ -95,7 +95,7 @@ export type ParamValues=Record<string,number>;
 // ---------- simulator (apps/web/src/lab/sim exports createLabRunner) ----------
 export type SimStatus='idle'|'stopped'|'running'|'error';
 export type PinMode='input'|'input-pullup'|'output';
-export interface PinSample{mode:PinMode;level:0|1;duty:number;freqHz:number;highUs:number;analog:number|null;}
+export interface PinSample{edges?:number;mode:PinMode;level:0|1;duty:number;freqHz:number;highUs:number;analog:number|null;}
 export type PartInput=
  |{kind:'button';pressed:boolean}
  |{kind:'potentiometer';value:number}
@@ -118,6 +118,15 @@ export type PartState=
  |{kind:'passive'}
  /** State of a plugin device: `type` is the kind id, `v` the device's typed state (read it with extState() from scene/parts/kit). */
  |{kind:'ext';type:string;v:Record<string,number|boolean|string|null>};
+/** What the emulated buses did since load, for the Test Record: the lab reports protocols, not just toggling pins. */
+export interface BusStats{
+ /** USART0 transmit: bytes the sketch sent, lines (LF) among them, and the baud the USART is set to now (0 until Serial.begin) */
+ uart:{rx:number;bytes:number;lines:number;baud:number};
+ /** SPI master: bytes shifted, transactions (a run of bytes while a chip select stayed active), last mode and clock */
+ spi:{bytes:number;transactions:number;mode:number;clockHz:number};
+ /** TWI master: transactions (START to STOP), distinct 7-bit addresses addressed, and address NACKs */
+ i2c:{transactions:number;addresses:number[];nacks:number};
+}
 export interface SimSnapshot{
  status:SimStatus; error:string|null;
  simTimeMs:number;      // emulated time since load
@@ -128,6 +137,8 @@ export interface SimSnapshot{
  txActive:boolean;               // UART sent a byte in the last 30 ms (TX LED)
  /** Friendly supply warnings (a 3.3 V part on 5 V, a motor on a board pin...), refreshed about every 100 ms of simulated time. Absent in old snapshots. */
  power?:PowerNote[];
+ /** Bus counters since load (absent in old snapshots). */
+ bus?:BusStats;
 }
 export interface LoadReport{sketch:string;bytes:number;toolchain:string;patched:{name:string;value:number;offset:number}[];}
 export interface LabRunner{

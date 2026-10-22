@@ -3,7 +3,7 @@
  * push switch under the stick (SW). Each axis is a plain voltage divider between +5V and GND, so the wiper voltage is
  * supply x position, centred near half supply; the sketch reads it with analogRead (10-bit, 0..1023 at 5 V). SW is a contact to
  * GND: it reads LOW while the stick is pushed down and the module pulls it up when released (the sketch may also enable INPUT_PULLUP).
- * Written from the public behaviour of this module family. The stick is moved from the popover (X, Y) or by clicking it for SW.
+ * Written from the public behaviour of this module family. The stick is tilted by dragging it in 3D or from the popover (X, Y) and pressed by clicking it for SW.
  * Pair: scene/parts/joystick-ky023.ts (3D). Guide: docs/lab-extending.md
  */
 import {ADC_CHANNEL} from '../../contract';
@@ -22,7 +22,7 @@ export const device=defineDevice<JoystickKy023State>({
  copy:{
   name:{en:'Joystick module (KY-023)',id:'Modul joystick (KY-023)'},
   desc:{en:'A thumb stick with two potentiometers, one per axis, and a push switch. VRx and VRy give a voltage that follows the stick, SW goes LOW when you press the stick down.',id:'Joystick jempol dengan dua potensiometer, satu per sumbu, dan saklar tekan. VRx dan VRy memberi tegangan yang mengikuti stick, SW menjadi LOW saat stick ditekan.'},
-  note:{en:'Click the stick to press it. Set X and Y in the panel to tilt it.',id:'Klik stick untuk menekannya. Atur X dan Y di panel untuk memiringkannya.'},
+  note:{en:'Click the stick to press it, or drag it to tilt (it springs back). The panel sets X and Y too.',id:'Klik stick untuk menekannya, atau seret untuk memiringkannya (kembali ke tengah). Panel juga mengatur X dan Y.'},
  },
  power:{rail:['+5V','GND'],min:3,max:5.5,ma:1},
  inputs:[

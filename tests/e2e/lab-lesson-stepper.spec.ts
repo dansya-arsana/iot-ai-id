@@ -1,5 +1,6 @@
 import {test,expect,type Page} from '@playwright/test';
 import {oledPosition,readOledLine} from '../../apps/web/src/lab/lessons/stepper';
+import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim} from './lab-sim';
 
 /**
  * Lesson 22 (Stepper control): the real compiled sketch runs in the browser. The joystick popover changes the ADC voltage on A0 and the SW level on D2;
@@ -18,16 +19,13 @@ async function open(page:Page){
  await page.setViewportSize({width:1440,height:900});
  await page.goto(`${PUBLIC}/lab/stepper?e2e=1`);
  await expect(page.locator('.lab')).toHaveAttribute('data-scene','ready',{timeout:30000});
- await page.waitForTimeout(1200);
  await expect(page.getByText(/Stepper control/i).first()).toBeVisible();
- await page.evaluate(()=>{
-  const sc=window.__labScene!;const orig=sc.update.bind(sc);
-  sc.update=(s,d)=>{window.__snap=s;orig(s,d);};
- });
+ await hookSnapshot(page);
 }
 const stateOf=(page:Page,id:string):Promise<V|null>=>page.evaluate(i=>{const p=window.__snap?.parts[i];return p&&p.kind==='ext'?(p as Ext).v:null;},id);
-async function until(page:Page,id:string,pred:(v:V)=>boolean,timeout=30000){
- await expect.poll(async()=>{const v=await stateOf(page,id);return !!v&&pred(v);},{timeout,intervals:[250]}).toBe(true);
+/** Wait for a part state, measured in simulated ms (see lab-sim.ts), never in wall-clock seconds. */
+async function until(page:Page,id:string,pred:(v:V)=>boolean,budgetSimMs=30000){
+ await untilSim(page,`${id} state`,()=>stateOf(page,id),v=>!!v&&pred(v),budgetSimMs);
 }
 async function partAt(page:Page,id:string,dy=0){
  const p=await page.evaluate(t=>{
@@ -59,15 +57,15 @@ const setRange=(loc:ReturnType<Page['locator']>,v:number)=>loc.evaluate((el:HTML
 const pos=async(page:Page)=>oledPosition(String((await stateOf(page,'oled1'))?.fb??''));
 
 test('lesson 22: the joystick turns the stepper through the ULN2003 and the OLED shows the position the motor is at',async({page})=>{
- test.setTimeout(170000);   // the simulation runs in real time: a slow machine needs longer for the long moves
+ test.setTimeout(SLOW_TEST_MS);   // wall time stretches on a slow machine; every wait below is a budget of SIMULATED ms
  await open(page);
  await page.getByTestId('lab-run').first().click();
- await expect(page.getByTestId('lab-serial')).toContainText('ready',{timeout:15000});
+ await serialHas(page,'ready');
  // at rest: shaft at 0, screen reads POS 0, goal not met
  await until(page,'oled1',v=>readOledLine(String(v.fb),1).trim()==='POS 0'&&readOledLine(String(v.fb),4).trim()==='DEG 0');
  expect((await stateOf(page,'stp1'))!.halfSteps).toBe(0);
  expect((await stateOf(page,'stp1'))!.powered).toBe(true);
- await expect(page.getByTestId('lab-goal')).toHaveAttribute('data-done','false');
+ await goalDone(page,0,false);
  await page.screenshot({path:`${SHOTS}/stepper-rest.png`,animations:'disabled'});
 
  // push the stick fully right: coils chase, the shaft turns forward without losing a step
@@ -83,15 +81,12 @@ test('lesson 22: the joystick turns the stepper through the ULN2003 and the OLED
  // back to the centre: the shaft stops, the screen settles on the exact count, coils rest, the goal ticks
  await until(page,'stp1',v=>Number(v.halfSteps)>=1000);
  await setRange(sliders.nth(0),512);
- await expect.poll(async()=>{
-  const st=await stateOf(page,'stp1');const p=await pos(page);
-  return !!st&&p!==null&&p===st.halfSteps&&Number(st.halfSteps)>=1000;
- },{timeout:20000,intervals:[300]}).toBe(true);
+ await untilSim(page,'screen shows the exact step count',async()=>({st:await stateOf(page,'stp1'),p:await pos(page)}),({st,p})=>!!st&&p!==null&&p===st.halfSteps&&Number(st.halfSteps)>=1000,20000);
  const stopped=(await stateOf(page,'stp1'))!.halfSteps as number;
  const deg=Math.trunc(stopped*360/4076);
  await until(page,'oled1',v=>readOledLine(String(v.fb),4).trim()===`DEG ${deg}`);
- await expect(page.getByTestId('lab-goal')).toHaveAttribute('data-done','true',{timeout:15000});
- await expect(page.getByTestId('lab-serial')).toContainText(`DEG ${deg}`);
+ await goalDone(page,15000);
+ await serialHas(page,`DEG ${deg}`);
  await page.screenshot({path:`${SHOTS}/stepper-position.png`,animations:'disabled'});
 
  // push left: the count falls (reverse order of the coil patterns)

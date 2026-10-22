@@ -41,7 +41,7 @@ function wire(kind:string,def:DeviceDef):PartSpec{
   net[p]=t==='power'?'5V':t==='ground'?'GND':t==='analog-out'?(`A${a++%6}` as UnoPin):(`D${d++}` as UnoPin);
  }
  const props:Record<string,string|number|boolean>={};
- for(const i of def.inputs)props[i.key]=i.default;
+ for(const i of def.inputs)if(i.type!=='terminal')props[i.key]=i.default;
  return {id:kind+'1',kind,net,props:{...def.defaults,...props}};
 }
 
@@ -107,6 +107,7 @@ for(const kind of kinds){
    assert.ok(!keys.has(i.key),`duplicate key ${i.key}`);keys.add(i.key);
    assert.ok(text(i.label),`${i.key} label`);
    if(i.type==='range'){assert.ok(i.min<i.max&&i.step>0&&i.default>=i.min&&i.default<=i.max,`${i.key} range`);}
+   else if(i.type==='terminal'){assert.ok(i.input&&i.log&&text(i.placeholder),`${i.key} terminal`);}
    else if(i.type==='toggle')assert.equal(typeof i.default,'boolean');
    else{assert.ok(i.options.length>0&&i.options.some(o=>o.value===i.default),`${i.key} choice`);for(const o of i.options)assert.ok(text(o.label));}
   }

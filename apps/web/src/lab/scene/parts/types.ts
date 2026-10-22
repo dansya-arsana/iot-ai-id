@@ -63,8 +63,23 @@ export type ControlSpec=
  |{type:'choice';key:string;label:Copy;options:readonly {value:string;label:Copy}[];default?:string;grid?:number;/** a tap: the value is set, then put back to `default` after this many ms (keypad keys) */momentaryMs?:number;/** controls with the same fold title sit together in one collapsed disclosure */fold?:Copy}
  |{type:'range';key:string;label:Copy;min:number;max:number;step:number;unit?:string;default?:number}
  |{type:'toggle';key:string;label:Copy}
+ /** A text terminal: type a line and send it (delivered as an ext input of kind `input`), received lines listed above. */
+ |{type:'terminal';key:string;label:Copy;placeholder:Copy;/** ext input type the Send button delivers to the model */input:string;/** state field with the transcript, one row per line: "< " from the sketch, "> " from the user */log:string;/** key of the choice control that holds the line ending (lf, crlf, none) */ending?:string}
  /** A button that does not edit props. 'focus' = "Zoom to it" (scene.focusPart). */
  |{type:'action';action:'focus';label:Copy};
+
+/**
+ * Direct manipulation of a piece of a part in 3D. A mesh or group carries it in `userData.grab`; the picking layer looks for it on the
+ * object under the pointer and its parents. Every grab edits popover-style controls (keys of the device `inputs`), so the 3D gesture and the popover
+ * always agree.
+ */
+export type Grab=
+ /** a click taps one key: `key` = `value`, then back to `rest` after `ms` (keypad keys) */
+ |{type:'tap';key:string;value:string;rest:string;ms:number}
+ /** drag a thumb stick: pointer travel moves `x` and `y` (0..max, `max/2` = centre) and the stick springs back on release; a plain click still presses the switch */
+ |{type:'stick';x:string;y:string;max:number;travelPx:number}
+ /** drag around the knob: `key` follows the pointer angle, `perTurn` units per full turn, clamped to min..max */
+ |{type:'knob';key:string;min:number;max:number;perTurn:number};
 
 export interface InteractSpec{
  drag?:DragSpec;

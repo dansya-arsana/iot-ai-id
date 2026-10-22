@@ -1,7 +1,7 @@
 /**
  * JOYSTICK-KY023: thumb joystick module standing on the breadboard. PCB 26 x 34 mm, 5-pin header on the short edge, a 16 x 16 mm
  * mini-joystick housing with a 18 mm dished mushroom cap on a shaft that tilts about +-23 degrees (public dimensions of this module family,
- * modelled by us). Pairs with sim/devices/joystick-ky023.ts. Click the cap = press SW; X and Y come from the panel.
+ * modelled by us). Pairs with sim/devices/joystick-ky023.ts. Click the cap = press SW, drag it = tilt X and Y (springs back); the panel sets X and Y too.
  */
 import {BoxGeometry,CylinderGeometry,Group,TorusGeometry} from 'three';
 import type {PartProps} from '../../contract';
@@ -26,6 +26,7 @@ function buildJoystick(_p:PartProps,g:Group):Inner{
  // tilting stick: pivot sits at the collar
  const piv=new Group();piv.position.set(cx,cy,6.6);g.add(piv);
  const stick=new Group();piv.add(stick);
+ stick.userData.grab={type:'stick',x:'x',y:'y',max:1023,travelPx:44};   // drag to tilt (springs back on release); a click presses the switch
  stick.add(solid(new CylinderGeometry(2.1,2.1,6.5,18),C.SILVER_DARK,{pos:[0,0,3.2],rot:[Math.PI/2,0,0],finish:'metal'}));
  stick.add(solid(new CylinderGeometry(8.8,5.4,3.6,36),C.CHIP,{outline:true,pos:[0,0,7.6],rot:[Math.PI/2,0,0]}));
  const dish=solid(new TorusGeometry(8.1,0.7,10,40),C.HEADER_TOP,{pos:[0,0,9.3],cast:false});
@@ -56,9 +57,8 @@ export const joystickKy023=definePart({
   SW:pin([4*PITCH,0,0],'output','Push switch (LOW when pressed)','Saklar tekan (LOW saat ditekan)'),
  },
  callouts:[
-  callout('stick',[2*PITCH,28,10],'Click the stick to press the switch','Klik stick untuk menekan saklar'),
+  callout('stick',[2*PITCH,28,10],'Click the stick to press the switch, drag it to tilt','Klik stick untuk menekan saklar, seret untuk memiringkan'),
   callout('axes',[2*PITCH,10,1],'Two potentiometers: X and Y read as voltages','Dua potensiometer: X dan Y terbaca sebagai tegangan'),
  ],
- interact:{drag:{handle:'press',cursor:{hover:'pointer',active:'pointer'}}},
  make:buildJoystick,
 });

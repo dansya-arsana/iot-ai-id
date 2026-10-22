@@ -131,14 +131,23 @@ export function Callouts({lesson,api,pills,show,running,compact,maxPills,selecte
      const hit=(xx:number,yy:number)=>avoid.concat(placed).some(r=>xx<r.x+r.w+4&&xx+w+4>r.x&&yy<r.y+r.h+4&&yy+ph+4>r.y);
      // first free spot near the anchor (-66..+38 px); never fall back to sitting on hardware
      let px=sides[0],py=0,found=false;
-     for(const dy of [-34,6,-66,38,-14,22,-50]){
-      for(const sx of sides){
-       const yy=Math.max(8,p.y+dy);
-       if(yy+ph<=H-8&&!hit(sx,yy)){px=sx;py=yy;found=true;break;}
+     const wide=[...sides,fitX(p.x-w/2),fitX(p.x+12+60),fitX(p.x-12-w-60),fitX(p.x+12+120),fitX(p.x-12-w-120),fitX(p.x+12+200),fitX(p.x-12-w-200)];
+     const tryDy=(dys:number[],xs:number[]):void=>{
+      for(const dy of dys){
+       for(const sx of xs){
+        const yy=Math.max(8,p.y+dy);
+        if(yy+ph<=H-8&&!hit(sx,yy)){px=sx;py=yy;found=true;return;}
+       }
       }
-      if(found)break;
-     }
-     if(!found||(maxPills!==undefined&&placed.length>=maxPills)){hide(i);return true;}
+     };
+     tryDy([-34,6,-66,38,-14,22,-50],sides);
+     // widen before giving up: a goal part's label is never dropped (the leader line bridges the gap)
+     if(!found)tryDy([-34,6,-66,38,-14,22,-50,-90,60,-120,90,-150,120,150],wide);
+     const goalPart=!lesson.callouts[i].target.startsWith('uno.')&&!/^(D\d+|A\d|GND|5V|3V3)$/.test(lesson.callouts[i].target);
+     if(!found&&(compact||window.innerWidth<900)){hide(i);return true;}   // narrow stage: no room to bridge, keep the no-overlap rule
+     if(!found&&!goalPart){hide(i);return true;}   // out of room: only non-goal callouts may drop
+     if(!found){px=sides[0];py=Math.max(8,Math.min(H-ph-8,p.y-34));}
+     if((!goalPart||compact||window.innerWidth<900)&&maxPills!==undefined&&placed.length>=maxPills){hide(i);return true;}
      placed.push({x:px,y:py,w,h:ph});el.style.opacity='1';
      el.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
      // straight leader to the dot when the pill sits more than ~20px from its part

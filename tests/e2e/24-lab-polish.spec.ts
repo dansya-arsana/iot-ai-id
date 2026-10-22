@@ -81,3 +81,14 @@ test('L11 record keeps "green at 60 cm" whole at 1280',async({page})=>{
  const clipped=await rec.evaluate(el=>[...el.querySelectorAll<HTMLElement>('dd,dt')].filter(e=>e.scrollWidth>e.clientWidth+1).map(e=>e.textContent));
  expect(clipped).toEqual([]);
 });
+
+test('clock record header and rows sit inside the dock at 1440',async({page})=>{
+ await page.setViewportSize({width:1440,height:900});
+ await openLab(page,'clock');
+ await page.getByTestId('lab-run').first().click();
+ const rec=page.getByTestId('lab-test-record');
+ await expect(rec).toBeVisible({timeout:60000});
+ await page.waitForTimeout(600);
+ const out=await rec.evaluate(el=>{const d=el.closest('.lab-signals')!.getBoundingClientRect();return [...el.querySelectorAll<HTMLElement>('header,dt,dd,.lab-record-fw')].filter(e=>{const r=e.getBoundingClientRect();return r.top<d.top-1||r.bottom>d.bottom+1}).map(e=>e.textContent)});
+ expect(out).toEqual([]);
+});

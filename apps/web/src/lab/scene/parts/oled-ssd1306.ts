@@ -26,7 +26,7 @@ function buildOled(_p:PartProps,g:Group):Inner{
  ctx.fillStyle='#000';ctx.fillRect(0,0,128,64);
  const tex=canvasTexture(cv);
  tex.generateMipmaps=false;
- const screen=new Mesh(new PlaneGeometry(21.74,10.86),new MeshBasicMaterial({map:tex,toneMapped:false}));
+ const screen=new Mesh(new PlaneGeometry(21.74,10.86),new MeshBasicMaterial({map:tex,toneMapped:false}));screen.userData.glass=true;
  screen.material.userData.own=true;screen.material.userData.ownMap=true;
  screen.position.set(cx,gy+1,T/2+0.52+zc);screen.userData.noPick=true;screen.userData.noInk=true;g.add(screen);
  // soft glow halo around the lit pixels

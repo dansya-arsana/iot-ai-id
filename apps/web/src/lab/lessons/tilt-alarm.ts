@@ -10,10 +10,10 @@ const BAR_PINS=['D2','D3','D4','D6','D7','D8','D9','D10','D11','D12'] as const;
 const bar=Object.fromEntries(BAR_PINS.map((p,i)=>['A'+(i+1),p]));
 
 export const lesson=defineLesson({
- id:'tilt-alarm',order:180,concept:'IMU',keyPins:['A4','A5','D5'],recordPins:['D5'],
+ id:'tilt-alarm',order:180,view:{az:0,elev:64,board:true},concept:'IMU',keyPins:['A4','A5','D5'],recordPins:['D5'],
  circuit:{
   parts:[
-   {id:'mpu1',kind:'mpu6050',net:{VCC:'5V',GND:'GND',SDA:'A4',SCL:'A5'},props:{roll:0,pitch:0,spin:0,temperature:25}},
+   {id:'mpu1',kind:'mpu6050',net:{VCC:'5V',GND:'GND',SDA:'A4',SCL:'A5'},props:{roll:0,pitch:0,spin:0,temperature:25,lane:'front'}},
    {id:'bz1',kind:'buzzer',net:{'+':'D5','-':'GND'},props:{lane:'front'}},
    {id:'bar1',kind:'led-bar-10',net:{...bar,K:'GND'},props:{color:'red',seriesOhms:220,lane:'front'}},
   ],

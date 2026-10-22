@@ -50,10 +50,10 @@ export const lesson=defineLesson({
  id:'stepper',order:220,concept:'STEPPER',keyPins:['D8','D9','D10','D11','A0','A4','A5'],recordPins:['D8','D9','D10','D11'],
  circuit:{
   parts:[
-   {id:'drv1',kind:'uln2003-driver',net:{IN1:'D8',IN2:'D9',IN3:'D10',IN4:'D11','+':'5V','-':'GND'},props:{}},
-   {id:'joy1',kind:'joystick-ky023',net:{'+5V':'5V',GND:'GND',VRx:'A0',SW:'D2'},props:{x:512,y:512,pressed:false}},
-   {id:'stp1',kind:'stepper-28byj48',net:{},props:{target:'drv1'}},
    {id:'oled1',kind:'oled-ssd1306',net:{VCC:'5V',SDA:'A4',SCL:'A5',GND:'GND'},props:{lane:'front'}},
+   {id:'joy1',kind:'joystick-ky023',net:{'+5V':'5V',GND:'GND',VRx:'A0',SW:'D2'},props:{x:512,y:512,pressed:false}},
+   {id:'drv1',kind:'uln2003-driver',net:{IN1:'D8',IN2:'D9',IN3:'D10',IN4:'D11','+':'5V','-':'GND'},props:{}},
+   {id:'stp1',kind:'stepper-28byj48',net:{},props:{target:'drv1'}},
   ],
   wires:[
    w('joy1','VRx','A0','green'),w('joy1','SW','D2','yellow'),

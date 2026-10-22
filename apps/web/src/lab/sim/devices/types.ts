@@ -157,7 +157,8 @@ export interface DeviceModel<S=DeviceState|PartState>{
 export type InputSpec=
  |{type:'range';key:string;label:Copy;min:number;max:number;step:number;unit?:string;default:number;advanced?:boolean}
  |{type:'toggle';key:string;label:Copy;default:boolean;advanced?:boolean}
- |{type:'choice';key:string;label:Copy;options:readonly {value:string;label:Copy}[];default:string;/** lay the chips out in this many columns (keypad grid) */grid?:number;/** momentary tap: set the value, then back to `default` after this many ms */momentaryMs?:number;/** same fold title = one collapsed disclosure in the popover */fold?:Copy;advanced?:boolean};
+ |{type:'choice';key:string;label:Copy;options:readonly {value:string;label:Copy}[];default:string;/** lay the chips out in this many columns (keypad grid) */grid?:number;/** momentary tap: set the value, then back to `default` after this many ms */momentaryMs?:number;/** same fold title = one collapsed disclosure in the popover */fold?:Copy;advanced?:boolean}
+ |{type:'terminal';key:string;label:Copy;placeholder:Copy;/** ext input type that receives the typed line (`{line,ending}`) */input:string;/** state field with the transcript, one row per line: "< " from the sketch, "> " from the user */log:string;/** key of the choice input that holds the line ending */ending?:string;advanced?:boolean};
 /** Inputs flagged `advanced` stay in the schema (tests, experiments) but get no popover control. */
 export type InputFlags={advanced?:boolean};
 

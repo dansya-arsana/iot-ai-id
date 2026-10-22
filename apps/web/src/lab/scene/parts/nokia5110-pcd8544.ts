@@ -29,7 +29,7 @@ function buildNokia(_p:PartProps,g:Group):Inner{
  const mat=new MeshBasicMaterial({map:tex,toneMapped:false});mat.userData.own=true;mat.userData.ownMap=true;
  // lift the window clear of the glass box (top face at +2.70) and bias its depth so the rows never z-fight
  mat.polygonOffset=true;mat.polygonOffsetFactor=-2;mat.polygonOffsetUnits=-2;
- const win=new Mesh(new PlaneGeometry(30.2,20.2),mat);win.position.set(cx,gy+2,TH/2+3.2+zc);win.userData.noPick=true;win.userData.noInk=true;g.add(win);
+ const win=new Mesh(new PlaneGeometry(30.2,20.2),mat);win.position.set(cx,gy+2,TH/2+3.2+zc);win.userData.noPick=true;win.userData.glass=true;win.userData.noInk=true;g.add(win);
  const lcv=document.createElement('canvas');lcv.width=512;lcv.height=48;
  const lg=lcv.getContext('2d')!;lg.fillStyle=C.SILKSCREEN;lg.font=`600 24px ${MONO}`;lg.textAlign='center';lg.textBaseline='middle';
  lg.fillText('RST CE DC DIN CLK VCC LT GND',256,24);

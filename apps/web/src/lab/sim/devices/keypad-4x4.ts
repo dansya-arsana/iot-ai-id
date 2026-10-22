@@ -14,6 +14,8 @@ import {uno} from './core/util';
 export type Keypad4x4State={pressed:string;count:number;ghost:string;lowMask:number};
 export const KEY_ROWS:readonly (readonly string[])[]=[['1','2','3','A'],['4','5','6','B'],['7','8','9','C'],['*','0','#','D']];
 export const KEYS:readonly string[]=KEY_ROWS.flat();
+/** Shortest tap the model keeps down, in simulated ms (a finger on a membrane key is down for far longer; the sketch scans every few ms). */
+export const MIN_TAP_MS=80;
 export const LINES:readonly string[]=['R1','R2','R3','R4','C1','C2','C3','C4'];
 export const keyPos=(k:string):{r:number;c:number}|null=>{const i=KEYS.indexOf(k);return i<0?null:{r:Math.floor(i/4),c:i%4};};
 
@@ -54,9 +56,17 @@ export const device=defineDevice<Keypad4x4State>({
  create(ctx){
   const pins=LINES.map(n=>uno(ctx.net(n)));
   const last:(boolean|null)[]=LINES.map(()=>null);
+  /** A tap (the momentary `key` control, a click on a 3D key) is down for at least MIN_TAP_MS of SIMULATED time, however long the page took to put it back:
+   *  a browser frame can stall for a while and the simulation advances only a slice per frame, so a wall-clock tap could end before the sketch ever scanned it. */
+  const tapUntil=new Map<string,number>();
   const pressedKeys=():string[]=>{
    const out:string[]=[];
+   const now=ctx.env.now();
+   const tap=ctx.props.key;
+   if(typeof tap==='string'&&keyPos(tap)&&!tapUntil.has(tap))tapUntil.set(tap,now+MIN_TAP_MS*16000);
+   for(const [k,until] of tapUntil)if(now>=until&&ctx.props.key!==k)tapUntil.delete(k);
    for(const k of ['key','key2','key3']){const v=ctx.props[k];if(typeof v==='string'&&keyPos(v)&&!out.includes(v))out.push(v);}
+   for(const k of tapUntil.keys())if(!out.includes(k))out.push(k);
    return out;
   };
   let lowMask=0;

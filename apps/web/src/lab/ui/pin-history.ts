@@ -3,7 +3,7 @@ import type {SimSnapshot,UnoPin} from '../contract';
 
 /** Ring buffer of per-frame pin samples, in EMULATED milliseconds. */
 export interface PinTrace{t:Float32Array;level:Uint8Array;duty:Float32Array;analog:Float32Array;n:number;head:number}
-export interface PinMeasure{toggles:number;highMs:number|null;periodMs:number|null;duty:number;freqHz:number;resolutionMs:number;pulses:number;aliased:boolean}
+export interface PinMeasure{toggles:number;highMs:number|null;periodMs:number|null;duty:number;freqHz:number;resolutionMs:number;pulses:number;aliased:boolean;recentHz:number}
 export interface PinHistory{
  push(s:SimSnapshot):void;reset():void;
  trace(pin:UnoPin):PinTrace;measure(pin:UnoPin):PinMeasure;lastEdgeMs(pin:UnoPin):number|null;
@@ -12,9 +12,9 @@ export interface PinHistory{
 }
 
 const CAP=1024;
-interface Lane{tr:PinTrace;toggles:number;edges:number[];highMs:number|null;duty:number;freqHz:number;maxSpan:number;acc:number;pulses:number;aliased:boolean;ticks:number[]}
+interface Lane{base:number;tr:PinTrace;toggles:number;edges:number[];highMs:number|null;duty:number;freqHz:number;maxSpan:number;acc:number;pulses:number;aliased:boolean;ticks:number[]}
 const mkTrace=():PinTrace=>({t:new Float32Array(CAP),level:new Uint8Array(CAP),duty:new Float32Array(CAP),analog:new Float32Array(CAP),n:0,head:0});
-const mkLane=():Lane=>({tr:mkTrace(),toggles:0,edges:[],highMs:null,duty:0,freqHz:0,maxSpan:0,acc:0,pulses:0,aliased:false,ticks:[]});
+const mkLane=():Lane=>({base:-1,tr:mkTrace(),toggles:0,edges:[],highMs:null,duty:0,freqHz:0,maxSpan:0,acc:0,pulses:0,aliased:false,ticks:[]});
 
 export function createPinHistory(windowMs=4000):PinHistory{
  const lanes=new Map<UnoPin,Lane>(UNO_PINS.map(p=>[p,mkLane()]));
@@ -30,7 +30,8 @@ export function createPinHistory(windowMs=4000):PinHistory{
    for(const p of UNO_PINS){
     const ps=s.pins[p],l=lanes.get(p)!,tr=l.tr;
     const prev=tr.n?tr.level[(tr.head-1+CAP)%CAP]:ps.level;
-    if(ps.level!==prev){l.toggles++;l.edges.push(s.simTimeMs);if(l.edges.length>64)l.edges.shift();}
+    if(ps.edges!==undefined){if(l.base<0)l.base=ps.edges;l.toggles=ps.edges-l.base;}
+    if(ps.level!==prev){if(ps.edges===undefined)l.toggles++;l.edges.push(s.simTimeMs);if(l.edges.length>64)l.edges.shift();}
     l.duty=ps.duty;l.freqHz=ps.freqHz;l.maxSpan=Math.max(l.maxSpan*0.98,span);
     // pulses shorter than a frame alias away in level sampling: the emulator still measures their rate (freqHz), so mark them at that rate
     const pwmLike=ps.mode==='output'&&ps.duty>0.01&&ps.duty<0.99&&ps.freqHz>200;
@@ -57,7 +58,7 @@ export function createPinHistory(windowMs=4000):PinHistory{
    // average over as many whole periods as the edge log holds (2 edges per period) to shrink the per-frame quantisation
    const k=Math.min(e.length-1,16)&~1;
    const periodMs=k>=2?(e[e.length-1]-e[e.length-1-k])/(k/2):null;
-   return {toggles:l.toggles,highMs:l.highMs,periodMs,duty:l.duty,freqHz:l.freqHz,resolutionMs:l.maxSpan,pulses:l.pulses,aliased:l.ticks.length>0&&lastT-l.ticks[l.ticks.length-1]<700};
+   return {toggles:l.toggles,highMs:l.highMs,periodMs,duty:l.duty,freqHz:l.freqHz,resolutionMs:l.maxSpan,pulses:l.pulses,aliased:l.ticks.length>0&&lastT-l.ticks[l.ticks.length-1]<700,recentHz:l.ticks.filter(t=>lastT-t<=2000).length/2};
   },
   pulseTicks:p=>lanes.get(p)!.ticks,
   lastEdgeMs:p=>{const e=lanes.get(p)!.edges;return e.length?e[e.length-1]:null;},

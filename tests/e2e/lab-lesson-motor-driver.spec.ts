@@ -1,4 +1,5 @@
 import {test,expect,type Page} from '@playwright/test';
+import {SLOW_TEST_MS,hookSnapshot,serialHas,untilSim} from './lab-sim';
 
 /**
  * Lesson 25 (motor driver): the real sketch reads the knob, the L298N drives two motors from the 9 V battery through the power solver.
@@ -17,12 +18,12 @@ async function open(page:Page){
  await page.setViewportSize({width:1440,height:900});
  await page.goto(`${PUBLIC}/lab/motor-driver?e2e=1`);
  await expect(page.locator('.lab')).toHaveAttribute('data-scene','ready',{timeout:30000});
- await page.waitForTimeout(1200);
- await page.evaluate(()=>{const sc=(window as unknown as W).__labScene!;const o=sc.update.bind(sc);sc.update=(s,d)=>{(window as unknown as W).__snap=s;o(s,d);};});
+ await hookSnapshot(page);
 }
 const part=(page:Page,id:string):Promise<Part|null>=>page.evaluate(i=>(window as unknown as W).__snap?.parts[i]??null,id);
-async function until(page:Page,id:string,pred:(p:Part)=>boolean,timeout=30000){
- await expect.poll(async()=>{const p=await part(page,id);return !!p&&pred(p);},{timeout,intervals:[250]}).toBe(true);
+/** Wait for a part state, measured in simulated ms (see lab-sim.ts), never in wall-clock seconds. */
+async function until(page:Page,id:string,pred:(p:Part)=>boolean,budgetSimMs=30000){
+ await untilSim(page,`${id} state`,()=>part(page,id),p=>!!p&&pred(p),budgetSimMs);
 }
 async function openPopover(page:Page,id:string){
  const pop=page.getByTestId(`lab-popover-${id}`);
@@ -44,9 +45,10 @@ const setRange=(loc:ReturnType<Page['locator']>,v:number)=>loc.evaluate((el:HTML
 },v);
 
 test('lesson 25: the knob sets both motor speeds through the L298N, opposite ways',async({page})=>{
+ test.setTimeout(SLOW_TEST_MS);   // every wait below is a budget of SIMULATED ms
  await open(page);
  await page.getByTestId('lab-run').first().click();
- await expect(page.getByTestId('lab-serial')).toContainText('ready',{timeout:15000});
+ await serialHas(page,'ready');
 
  // default knob 600/1023: bridge on, motor A forward, motor B mirrored, the battery is the supply (9.6 V fresh)
  await until(page,'m1',p=>(p.rpm??0)>2000&&(p.rpm??0)<5800);
@@ -54,7 +56,7 @@ test('lesson 25: the knob sets both motor speeds through the L298N, opposite way
  const drv=((await part(page,'drv1')) as Part).v!;
  expect(drv.modeA).toBe('forward');expect(drv.modeB).toBe('reverse');
  expect(Number(drv.vs)).toBeGreaterThan(9);
- await expect(page.getByTestId('lab-serial')).toContainText(/pot 600 -> pwm 150/);
+ await serialHas(page,/pot 600 -> pwm 150/);
  await page.screenshot({path:`${SHOTS}/motor-driver-mid.png`,animations:'disabled'});
 
  // the popover input: full knob -> full speed
@@ -63,13 +65,13 @@ test('lesson 25: the knob sets both motor speeds through the L298N, opposite way
  await setRange(slider.first(),1023);
  await until(page,'m1',p=>(p.rpm??0)>5400);
  await until(page,'m2',p=>(p.rpm??0)<-5400);
- await expect(page.getByTestId('lab-serial')).toContainText(/pwm 255/);
+ await serialHas(page,/pwm 255/);
  await page.screenshot({path:`${SHOTS}/motor-driver-full.png`,animations:'disabled'});
 
  // below the dead band both motors stop
  await setRange(slider.first(),10);
  await until(page,'m1',p=>Math.abs(p.rpm??9999)<200);
  await until(page,'m2',p=>Math.abs(p.rpm??9999)<200);
- await expect(page.getByTestId('lab-serial')).toContainText(/pwm 0/);
+ await serialHas(page,/pwm 0/);
  await page.screenshot({path:`${SHOTS}/motor-driver-stopped.png`,animations:'disabled'});
 });

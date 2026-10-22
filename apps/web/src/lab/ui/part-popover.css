@@ -41,3 +41,13 @@
 .lab-pop-fold{display:flex;flex-direction:column;gap:8px;border-top:var(--lab-bw) solid var(--lab-line-strong);padding-top:8px}
 .lab-pop-fold>summary{cursor:pointer;color:var(--lab-ink-2);font-weight:600;font-size:12px}
 .lab-pop-fold[open]>summary{margin-bottom:8px}
+
+/* terminal control (HC-05 phone): a log and a one-line editor */
+.lab-pop-term-log{list-style:none;margin:0;padding:8px 10px;height:112px;overflow:auto;background:var(--lab-paper-deep);border:var(--lab-bw) solid var(--lab-line-strong);border-radius:var(--lab-r-md,8px);font-family:var(--lab-mono);font-size:12px;line-height:1.5;color:var(--lab-ink);display:flex;flex-direction:column;gap:2px}
+.lab-pop-term-log li{overflow-wrap:anywhere}
+.lab-pop-term-log li b{font-weight:600;color:var(--lab-ink-3);text-transform:uppercase;letter-spacing:.06em;font-size:10px;margin-right:4px}
+.lab-pop-term-log li[data-from=you]{color:var(--lab-ink-2)}
+.lab-pop-term-empty{color:var(--lab-ink-3)}
+.lab-pop-term-form{display:flex;gap:6px}
+.lab-pop-term-form input{flex:1;min-width:0;height:32px;padding:0 10px;border:var(--lab-bw) solid var(--lab-line-strong);border-radius:var(--lab-r-md,8px);background:var(--lab-card);color:var(--lab-ink);font-family:var(--lab-mono);font-size:12px}
+.lab-pop-term-form button{height:32px;padding:0 12px}

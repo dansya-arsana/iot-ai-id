@@ -36,7 +36,7 @@ function buildTm(_p:PartProps,g:Group):Inner{
  const ctx=cv.getContext('2d')!;
  const tex=canvasTexture(cv);
  const mat=new MeshBasicMaterial({map:tex,toneMapped:false});mat.userData.own=true;mat.userData.ownMap=true;
- const win=new Mesh(new PlaneGeometry(30,14),mat);win.position.set(cx,hy,TH/2+7.42+zc);win.userData.noPick=true;win.userData.noInk=true;g.add(win);
+ const win=new Mesh(new PlaneGeometry(30,14),mat);win.position.set(cx,hy,TH/2+7.42+zc);win.userData.noPick=true;win.userData.glass=true;win.userData.noInk=true;g.add(win);
  const lcv=document.createElement('canvas');lcv.width=256;lcv.height=48;
  const lg=lcv.getContext('2d')!;lg.fillStyle=C.SILKSCREEN;lg.font=`600 26px ${MONO}`;lg.textAlign='center';lg.textBaseline='middle';
  lg.fillText('CLK DIO 5V GND',128,24);

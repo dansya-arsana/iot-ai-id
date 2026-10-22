@@ -47,7 +47,7 @@ function buildMatrix(p:PartProps,g:Group):Inner{
  const S=24,cv=document.createElement('canvas');cv.width=8*n*S;cv.height=8*S;
  const ctx=cv.getContext('2d')!;
  const tex=canvasTexture(cv);tex.generateMipmaps=false;
- const face=new Mesh(new PlaneGeometry(W-0.5,M-0.8),new MeshBasicMaterial({map:tex,toneMapped:false}));
+ const face=new Mesh(new PlaneGeometry(W-0.5,M-0.8),new MeshBasicMaterial({map:tex,toneMapped:false}));face.userData.glass=true;
  face.material.userData.own=true;face.material.userData.ownMap=true;
  face.rotation.x=-HALF_PI;face.position.set(W/2,TOP+HOUSE+0.04,0);face.userData.noPick=true;face.userData.noInk=true;g.add(face);
  let last='';

@@ -1,6 +1,7 @@
-import {useEffect,useId,useRef} from 'react';
+import {useEffect,useId,useRef,useState} from 'react';
 import type {CSSProperties} from 'react';
 import {useLang} from '../../i18n';
+import type {PartInput} from '../contract';
 import type {ControlSpec,PartModule} from '../scene/parts/types';
 import {PARTS_COPY} from '../parts-copy';
 import {deviceRegistry} from '../sim/devices';
@@ -20,9 +21,15 @@ export interface PartPopoverProps{
  at:{x:number;y:number};
  bounds:{width:number;height:number};
  onChange(key:string,value:PopoverValue):void;
+ /** Live state of the part (the sim's flat state record), for controls that show what the part reports (terminal transcript). */
+ live?:Readonly<Record<string,unknown>>;
+ /** A typed input for the sim (terminal Send). */
+ onInput?(input:PartInput):void;
  /** "Zoom to it": the host calls scene.focusPart(partId). */
  onFocusPart():void;
  onClose():void;
+ /** embedded in a page (the parts gallery): no close button and no zoom-to-part action, since neither has a target */
+ embedded?:boolean;
 }
 
 const MARGIN=12;
@@ -58,8 +65,30 @@ function ChoiceField({c,label,cur,lang,onChange}:{c:Extract<ControlSpec,{type:'c
  );
 }
 
+/** Text terminal: lines the part reported above, a line editor below. "< " rows come from the sketch, "> " rows were typed here. */
+function Terminal({c,live,ending,onSend,lang}:{c:Extract<ControlSpec,{type:'terminal'}>;live:Readonly<Record<string,unknown>>|undefined;ending:string;onSend:(line:string,ending:string)=>void;lang:'en'|'id'}){
+ const [text,setText]=useState('');
+ const logRef=useRef<HTMLOListElement>(null);
+ const rows=String(live?.[c.log]??'').split('\n').filter(Boolean);
+ useEffect(()=>{const el=logRef.current;if(el)el.scrollTop=el.scrollHeight;},[rows.length]);
+ const send=():void=>{const t=text.trim();if(!t)return;onSend(t,ending);setText('');};
+ return (
+  <div className="lab-pop-field lab-pop-term" data-testid="lab-pop-terminal">
+   <span className="lab-pop-label">{c.label[lang]}</span>
+   <ol className="lab-pop-term-log" ref={logRef} data-testid="lab-pop-terminal-log" aria-live="polite">
+    {rows.length===0&&<li className="lab-pop-term-empty">{lang==='id'?'Belum ada baris':'No lines yet'}</li>}
+    {rows.map((r,i)=>{const mine=r.startsWith('>');return <li key={i} data-from={mine?'you':'board'}><b>{mine?(lang==='id'?'kamu':'you'):(lang==='id'?'papan':'board')}</b> {r.replace(/^[<>]\s?/,'')}</li>;})}
+   </ol>
+   <form className="lab-pop-term-form" onSubmit={e=>{e.preventDefault();send();}}>
+    <input type="text" value={text} placeholder={c.placeholder[lang]} aria-label={c.label[lang]} data-testid="lab-pop-terminal-input" autoComplete="off" spellCheck={false} maxLength={120} onChange={e=>setText(e.target.value)}/>
+    <button type="submit" className="lab-btn-ghost" data-testid="lab-pop-terminal-send" disabled={!text.trim()}>{lang==='id'?'Kirim':'Send'}</button>
+   </form>
+  </div>
+ );
+}
+
 /** Generic part popover: renders a PartModule's interact.controls (choice chips, range sliders, toggles, actions). */
-export function PartPopover({partId,module,controls:override,title,desc,values,bounds,onChange,onFocusPart,onClose}:PartPopoverProps){
+export function PartPopover({partId,module,controls:override,title,desc,values,live,bounds,onChange,onInput,onFocusPart,onClose,embedded}:PartPopoverProps){
  const {tr,lang}=useLang();
  const ref=useRef<HTMLDivElement>(null);
  const controls=override??module.interact?.controls??[];
@@ -92,9 +121,9 @@ export function PartPopover({partId,module,controls:override,title,desc,values,b
    data-dock="top-left" style={{left:MARGIN,top:MARGIN,maxHeight:Math.max(160,bounds.height-MARGIN*2)}} onKeyDown={onKey}>
    <header className="lab-pop-head">
     <div><h2 id={titleId}>{title??module.name[lang]}</h2>{line&&<p className="lab-pop-desc">{line}</p>}{deviceRegistry.get(module.kind)?.runtime==='not-emulated'&&<p className="lab-pop-desc" data-badge="not-emulated"><b>{tr('Model only · not emulated','Model saja · tidak diemulasi')}</b></p>}</div>
-    <button type="button" className="lab-x" aria-label={tr('Close','Tutup')} onClick={onClose}>
+    {!embedded&&<button type="button" className="lab-x" aria-label={tr('Close','Tutup')} onClick={onClose}>
      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none"/></svg>
-    </button>
+    </button>}
    </header>
    <div className="lab-pop-body">
     {controls.map((c,i)=>{
@@ -108,6 +137,7 @@ export function PartPopover({partId,module,controls:override,title,desc,values,b
      }
      if(c.type==='choice')return choice(c,i);
      if(c.type==='range')return <Range key={i} c={c} label={label} value={Number(values[c.key]??c.default??c.min)} onChange={v=>onChange(c.key,v)}/>;
+     if(c.type==='terminal')return <Terminal key={i} c={c} live={live} lang={lang} ending={String(c.ending?values[c.ending]??'lf':'lf')} onSend={(line,ending)=>onInput?.({kind:'ext',type:c.input,v:{line,ending}})}/>;
      if(c.type==='toggle'){
       const on=values[c.key]===true;
       return (
@@ -116,6 +146,7 @@ export function PartPopover({partId,module,controls:override,title,desc,values,b
        </label>
       );
      }
+     if(embedded)return null;
      return <button key={i} type="button" className="lab-btn-ghost lab-pop-action" data-testid="lab-pop-focus" onClick={onFocusPart}>{label}</button>;
     })}
     {draggable&&<p className="lab-pop-hint">{tr('or drag it in the scene','atau seret di adegan')}</p>}

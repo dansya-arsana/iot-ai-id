@@ -70,6 +70,7 @@ export function footprintOf(kind:PartKind,deskMm?:readonly [number,number]):Part
 export function controlsFromInputs(inputs:readonly InputSpec[]):ControlSpec[]{
  return inputs.filter(i=>!i.advanced).map((i):ControlSpec=>i.type==='range'?{type:'range',key:i.key,label:i.label,min:i.min,max:i.max,step:i.step,default:i.default,...(i.unit?{unit:i.unit}:{})}
   :i.type==='toggle'?{type:'toggle',key:i.key,label:i.label}
+  :i.type==='terminal'?{type:'terminal',key:i.key,label:i.label,placeholder:i.placeholder,input:i.input,log:i.log,...(i.ending?{ending:i.ending}:{})}
   :{type:'choice',key:i.key,label:i.label,options:i.options,default:i.default,...(i.grid?{grid:i.grid}:{}),...(i.momentaryMs?{momentaryMs:i.momentaryMs}:{}),...(i.fold?{fold:i.fold}:{})});
 }
 

@@ -1,4 +1,5 @@
 // The first twelve lessons must lay out exactly as they did before the module platform (golden taken from the committed layout.ts).
+// One deliberate change: in the knob lesson the LED moved one column right, because the potentiometer's 14 mm base used to overlap it (tests/e2e/29-lab-layout.spec.ts guards every lesson against that).
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';

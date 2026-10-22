@@ -44,7 +44,7 @@ export type Uln2003State={
 export const device=defineDevice<Uln2003State>({
  kind:'uln2003-driver',protocol:'gpio',
  // the six-pin header plugs into the breadboard; OUT1-OUT4 and COM are the five contacts of the motor socket (wires only)
- pins:['IN1','IN2','IN3','IN4','-','+','OUT1','OUT2','OUT3','OUT4','COM'],holes:[0,1,2,3,4,5],bodyX:[-6,38],
+ pins:['IN1','IN2','IN3','IN4','-','+','OUT1','OUT2','OUT3','OUT4','COM'],holes:[0,1,2,3,4,5],bodyX:[-3,35],
  power:{rail:['+','-'],min:4.5,max:12,ma:240},
  copy:{
   name:{en:'ULN2003 stepper driver board',id:'Papan driver stepper ULN2003'},

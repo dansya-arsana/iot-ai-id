@@ -1,10 +1,10 @@
 /**
  * KEYPAD-4X4: 16-key membrane keypad lying on the desk. Membrane 69 x 77 mm and about 1.5 mm thick, 16 raised keys on a
  * 15.5 mm pitch, an 8-wire ribbon with a 2.54 mm header (public dimensions of this common keypad, modelled by us).
- * Pairs with sim/devices/keypad-4x4.ts. Keys are chosen in the panel; a pressed key sinks and turns green, a ghost key turns amber.
+ * Pairs with sim/devices/keypad-4x4.ts. Click a key in 3D (a tap) or pick it in the panel; a pressed key sinks and turns green, a ghost key turns amber.
  * Local frame: origin at the membrane centre, x right, z toward the viewer; the ribbon leaves the front edge.
  */
-import {BoxGeometry,Color,Group,Mesh,MeshBasicMaterial,MeshStandardMaterial,PlaneGeometry} from 'three';
+import {BoxGeometry,Color,Group,Mesh,MeshBasicMaterial,MeshStandardMaterial,Object3D,PlaneGeometry} from 'three';
 import {RoundedBoxGeometry} from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import type {PartProps} from '../../contract';
 import {KEY_ROWS,LINES,type Keypad4x4State} from '../../sim/devices/keypad-4x4';
@@ -38,8 +38,11 @@ function buildKeypad(_p:PartProps,g:Group):Inner{
   const mesh=new Mesh(new RoundedBoxGeometry(KS,1.1,KS,2,0.5),mat);
   mesh.position.set((cI-1.5)*KP,TH+0.55,(r-1.5)*KP);mesh.castShadow=true;mesh.receiveShadow=true;
   const lab=new Mesh(new PlaneGeometry(7,7),keyLabel(k));lab.rotation.x=-Math.PI/2;lab.position.y=0.58;lab.userData.noPick=true;lab.userData.noInk=true;
+  mesh.userData.grab={type:'tap',key:'key',value:k,rest:'none',ms:150};   // a click on the key taps it (momentary), exactly like the popover grid
   mesh.add(lab);g.add(mesh);keys.push({mesh,mat,k,y0:mesh.position.y});
  }));
+ // the part's click target (project(), callouts, tests) is the bare membrane strip behind the top row, so opening the popover never taps a key
+ const hs=new Object3D();hs.name='hotspot';hs.userData.noPick=true;hs.position.set(0,TH,-MD/2+4.5);g.add(hs);
  // 8-pin header at the ribbon end
  g.add(solid(new BoxGeometry(8*2.54,2.5,2.5),C.HEADER_BLACK,{outline:true,pos:[0,1.25,HEADER_Z]}));
  for(let i=0;i<8;i++)g.add(leg(HX(i),4,HEADER_Z));

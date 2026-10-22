@@ -60,7 +60,7 @@ interface UiSnap{status:SimSnapshot['status'];simTimeMs:number;currentLine:numbe
 /** The AI builder's circuit on the stage: runs its own firmware and circuit instead of the open lesson's. */
 interface AiMode{lessonId:LessonId;build:AiBuild;variant:FirmwareVariant;circuit:Circuit;inputs:Inputs}
 type PopState={id:string;at:{x:number;y:number};bounds:{width:number;height:number};module:PartModule;controls?:readonly ControlSpec[];thr?:{spec:ThresholdSpec;controls:ControlSpec[]}};
-function PopHost({pop,circuit,inputs,sweep,params,lang,onChange,onParam,onFocus,onClose}:{pop:PopState;circuit:Circuit;inputs:Inputs;sweep:Record<string,boolean>;params:ParamValues;lang:'en'|'id';onChange:(pid:string,key:string,value:PopoverValue)=>void;onParam:(name:string,value:number)=>void;onFocus:(pid:string)=>void;onClose:()=>void}){
+function PopHost({pop,circuit,inputs,sweep,params,lang,live,onChange,onInput,onParam,onFocus,onClose}:{pop:PopState;circuit:Circuit;inputs:Inputs;sweep:Record<string,boolean>;params:ParamValues;lang:'en'|'id';live?:Readonly<Record<string,unknown>>;onChange:(pid:string,key:string,value:PopoverValue)=>void;onInput:(pid:string,i:PartInput)=>void;onParam:(name:string,value:number)=>void;onFocus:(pid:string)=>void;onClose:()=>void}){
  const part=circuit.parts.find(p=>p.id===pop.id);
  if(!part&&!pop.thr)return <PartPopover partId={pop.id} module={pop.module} controls={pop.controls} values={{}} at={pop.at} bounds={pop.bounds} onChange={()=>undefined} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
  if(!part)return null;
@@ -76,7 +76,7 @@ function PopHost({pop,circuit,inputs,sweep,params,lang,onChange,onParam,onFocus,
  const vsWired=part.kind==='l298n'&&(circuit.wires.some(w=>w.componentId===pop.id&&w.pin==='VS')||(circuit.links??[]).some(l=>(l.a.part===pop.id&&l.a.pin==='VS')||(l.b.part===pop.id&&l.b.pin==='VS')));
  const ctrls=vsWired?(pop.controls??pop.module.interact?.controls??[]).filter(c=>!('key' in c&&c.key==='vs')):pop.controls;
  const vsDesc=vsWired?(lang==='id'?'Catu motor diambil dari kabel VS.':'Motor supply comes from the wire on VS.'):undefined;
- return <PartPopover partId={pop.id} module={pop.module} controls={ctrls} {...(vsDesc?{desc:vsDesc}:{})} values={values} at={pop.at} bounds={pop.bounds} onChange={(k,v)=>onChange(pop.id,k,v)} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
+ return <PartPopover partId={pop.id} module={pop.module} controls={ctrls} {...(vsDesc?{desc:vsDesc}:{})} values={values} live={live} onInput={i=>onInput(pop.id,i)} at={pop.at} bounds={pop.bounds} onChange={(k,v)=>onChange(pop.id,k,v)} onFocusPart={()=>onFocus(pop.id)} onClose={onClose}/>;
 }
 function aiVariant(b:AiBuild):FirmwareVariant{
  const src=b.spec.sketch.source;
@@ -180,7 +180,7 @@ function LabInner({id}:{id:LessonId}){
  const aiRef=useRef<AiMode|null>(null);
  const sweepRef=useRef<Record<string,boolean>>({});
  const focusRef=useRef<string|null>(null);
- const handlers=useRef({select:(_t:string|null)=>{},input:(_i:string,_p:PartInput)=>{},open:(_i:string,_a:{x:number;y:number})=>{}});
+ const handlers=useRef({select:(_t:string|null)=>{},input:(_i:string,_p:PartInput)=>{},open:(_i:string,_a:{x:number;y:number})=>{},control:(_i:string,_k:string,_v:string|number|boolean)=>{}});
 
  useEffect(()=>{focusRef.current=focusId;});
  useEffect(()=>{rtRef.current=rt;settingsRef.current=settings;doneRef.current=done;aiRef.current=ai;});
@@ -371,8 +371,9 @@ function LabInner({id}:{id:LessonId}){
    },
    input:changeInput,
    open:openPop,
+   control:popChange,
   };
- },[changeInput,openPop,focusOn,clearFocus,openThreshold]);
+ },[changeInput,openPop,popChange,focusOn,clearFocus,openThreshold]);
 
  // ---- runner + loop (page lifetime) ----
  useEffect(()=>{
@@ -450,7 +451,7 @@ function LabInner({id}:{id:LessonId}){
    }catch{setSceneState('unavailable');return;}
    sc=made;sceneRef.current=made;
    setSceneObj(made as unknown as LabSceneV3);
-   (made as unknown as LabSceneV3).setInteractive({onOpenControls:(pid,at)=>handlers.current.open(pid,at)});
+   (made as unknown as LabSceneV3).setInteractive({onOpenControls:(pid,at)=>handlers.current.open(pid,at),onControl:(pid,key,value)=>handlers.current.control(pid,key,value)});
    if(new URLSearchParams(window.location.search).has('e2e'))(window as unknown as {__labScene:unknown}).__labScene=made;
    const r=rtRef.current;made.setLesson(r.id,r.circuit);
    const stage=stageRef.current;
@@ -545,6 +546,7 @@ function LabInner({id}:{id:LessonId}){
  const variant=ai?ai.variant:variantOf(rt.id,rt.variantId);
  const circuit=ai?ai.circuit:rt.circuit;
  const inputs=ai?ai.inputs:rt.inputs;
+ const liveOf=(pid:string):Record<string,unknown>|undefined=>{const p=ui.parts[pid] as {kind:string;v?:Record<string,unknown>}|undefined;return p&&p.kind==='ext'?p.v:undefined;};
  const running=ui.status==='running';
  const livePins=useMemo(()=>{
   if(!ai&&rt.id==='board')return ['D13'];
@@ -592,7 +594,7 @@ const scrollTo=(sec:string)=>document.getElementById('lab-sec-'+sec)?.scrollInto
       <PowerNotice notes={ui.power}/>
       {selected&&<Inspector target={selected} lesson={lesson} lessonId={id} circuit={circuit} variantId={rt.variantId} params={rt.params} overCurrent={overCurrent} api={api}
        onClose={()=>setSelected(null)} onParam={changeParam} onVariant={changeVariant} onProps={changeProps} onInput={changeInput} onFocus={t=>sceneRef.current?.focus(t)}/>}
-      {pop&&<PopHost pop={pop} circuit={circuit} inputs={inputs} sweep={sweep} params={rt.params} lang={lang} onChange={popChange} onParam={changeParam} onFocus={focusPart} onClose={()=>setPop(null)}/>}
+      {pop&&<PopHost pop={pop} circuit={circuit} inputs={inputs} sweep={sweep} params={rt.params} lang={lang} live={liveOf(pop.id)} onChange={popChange} onInput={changeInput} onParam={changeParam} onFocus={focusPart} onClose={()=>setPop(null)}/>}
       <div className="lab-bl">
        {focusId&&!vp.mobile&&<Minimap scene={sceneState==='ready'?sceneObj:null} api={api} selected={focusId}/>}
        <ControlsDock circuit={circuit} inputs={inputs} onInput={changeInput} hideId={pop?.id??null} visibleIds={revealed} fold={flyOpen} mobile={vp.mobile} onOpen={openPop}/>

@@ -14,9 +14,9 @@ export type {Callout,ControlSpec,Copy,DragHandle,DragSpec,Footprint,InteractSpec
 export type Interactive=Exclude<DragHandle,'drag-xz'>;
 
 /** Auto-discovery: every parts/<file>.ts that exports a PartModule is registered by its kind. No list to edit. */
-const SKIP=['index.ts','kit.ts','types.ts'];
+const SKIP=['index.ts','kit.ts','types.ts','demo.ts'];
 function load():Mods{
- try{return import.meta.glob(['./*.ts','!./index.ts','!./kit.ts','!./types.ts'],{eager:true}) as Mods;}
+ try{return import.meta.glob(['./*.ts','!./index.ts','!./kit.ts','!./types.ts','!./demo.ts'],{eager:true}) as Mods;}
  catch{return nodeLoad(new URL('./',import.meta.url).href,SKIP);}
 }
 const isPart=(v:unknown):v is PartModule=>{

@@ -1,4 +1,5 @@
 import {test,expect,type Page} from '@playwright/test';
+import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim} from './lab-sim';
 
 /**
  * Lesson "Real-time clock": the real sketch reads a DS3231 over I2C, draws HH:MM:SS on four chained MAX7219 matrices over SPI, and
@@ -31,17 +32,14 @@ async function open(page:Page){
  await page.setViewportSize({width:1440,height:900});
  await page.goto(`${PUBLIC}/lab/clock?e2e=1`);
  await expect(page.locator('.lab')).toHaveAttribute('data-scene','ready',{timeout:30000});
- await page.waitForTimeout(1200);
  await expect(page.getByText(/Real-time clock/i).first()).toBeVisible();
- await page.evaluate(()=>{
-  const sc=(window as W).__labScene!;const orig=sc.update.bind(sc);
-  sc.update=(s,d)=>{(window as W).__snap=s;orig(s,d);};
- });
+ await hookSnapshot(page);
 }
 const ext=(page:Page,id:string):Promise<V|null>=>page.evaluate(i=>{const p=(window as W).__snap?.parts[i];return p&&p.kind==='ext'?p.v!:null;},id);
 const buzzer=(page:Page)=>page.evaluate(()=>{const p=(window as W).__snap?.parts.bz1;return p?{on:!!p.on,hz:p.freqHz??0}:null;});
-async function until(page:Page,id:string,pred:(v:V)=>boolean,timeout=30000){
- await expect.poll(async()=>{const v=await ext(page,id);return !!v&&pred(v);},{timeout,intervals:[200]}).toBe(true);
+/** Wait for a part state, measured in simulated ms (see lab-sim.ts), never in wall-clock seconds. */
+async function until(page:Page,id:string,pred:(v:V)=>boolean,budgetSimMs=30000){
+ await untilSim(page,`${id} state`,()=>ext(page,id),v=>!!v&&pred(v),budgetSimMs);
 }
 async function openPopover(page:Page,id:string,offsets=[25,45,-2,10,70]){
  const pop=page.getByTestId(`lab-popover-${id}`);
@@ -67,7 +65,7 @@ const setRange=(loc:ReturnType<Page['locator']>,v:number)=>loc.evaluate((el:HTML
 },v);
 
 test('clock: the matrix shows the DS3231 time, then the alarm pulls INT low, the buzzer rings and the sketch clears it',async({page})=>{
- test.setTimeout(240000);
+ test.setTimeout(SLOW_TEST_MS);   // every wait below is a budget of SIMULATED ms, so a slow machine only stretches wall time
  await open(page);
  // a popover input changes what the sketch reads over I2C: the chip temperature, reported with the alarm
  const pop=await openPopover(page,'rtc1');
@@ -76,8 +74,8 @@ test('clock: the matrix shows the DS3231 time, then the alarm pulls INT low, the
  await setRange(sliders.first(),31.25);
  await page.keyboard.press('Escape');
  await page.getByTestId('lab-run').first().click();
- await expect(page.getByTestId('lab-serial')).toContainText('clock ready',{timeout:15000});
- await expect(page.getByTestId('lab-serial')).toContainText('clock was stopped: set 07:30:00');
+ await serialHas(page,'clock ready');
+ await serialHas(page,'clock was stopped: set 07:30:00');
 
  // the matrix frame decodes to the time the chip keeps (the chip may be one second ahead of the last redraw)
  await until(page,'mx1',v=>{
@@ -90,21 +88,21 @@ test('clock: the matrix shows the DS3231 time, then the alarm pulls INT low, the
  await page.screenshot({path:`${SHOTS}/clock-time.png`,animations:'disabled'});
  // the face moves on with the chip
  const f0=faceOf(String(a!.fb));
- await until(page,'mx1',v=>{const f=faceOf(String(v.fb));return !!f&&f!==f0;},10000);
+ await until(page,'mx1',v=>{const f=faceOf(String(v.fb));return !!f&&f!==f0;},4000);
 
- // alarm 1 (6 s after start; the browser runs the sim slower than real time, so waits are generous): A1F set, INT low, buzzer at 2 kHz, display at full brightness
- await until(page,'rtc1',v=>v.intLow===true&&v.alarm1===true,90000);
- await expect.poll(async()=>(await buzzer(page))?.on===true,{timeout:5000,intervals:[100]}).toBe(true);
+ // alarm 1 (6 simulated s after start; the budget is simulated time, so a slow machine does not matter): A1F set, INT low, buzzer at 2 kHz, display at full brightness
+ await until(page,'rtc1',v=>v.intLow===true&&v.alarm1===true,30000);
+ await untilSim(page,'buzzer rings',()=>buzzer(page),b=>b?.on===true,2000);
  expect((await buzzer(page))!.hz).toBeGreaterThan(1500);
  expect(String((await ext(page,'mx1'))!.lum).startsWith('f')).toBe(true);
- await expect(page.getByTestId('lab-serial')).toContainText('ALARM 31.25 C');
+ await serialHas(page,'ALARM 31.25 C');
  await page.screenshot({path:`${SHOTS}/clock-alarm.png`,animations:'disabled'});
 
  // after beepMs the sketch writes 0 to the status register: flag cleared, INT released, buzzer quiet, display dimmed again
- await until(page,'rtc1',v=>v.intLow===false&&v.alarm1===false,60000);
- await expect(page.getByTestId('lab-serial')).toContainText('alarm cleared');
- await expect.poll(async()=>(await buzzer(page))?.on===false,{timeout:5000,intervals:[100]}).toBe(true);
+ await until(page,'rtc1',v=>v.intLow===false&&v.alarm1===false,20000);
+ await serialHas(page,'alarm cleared');
+ await untilSim(page,'buzzer quiet',()=>buzzer(page),b=>b?.on===false,2000);
  expect(String((await ext(page,'mx1'))!.lum).startsWith('2')).toBe(true);
  // the lesson goal is checked from this same data
- await expect(page.getByTestId('lab-goal').first()).toHaveAttribute('data-done','true',{timeout:10000});
+ await goalDone(page,10000);
 });

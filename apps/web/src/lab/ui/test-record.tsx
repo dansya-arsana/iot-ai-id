@@ -1,7 +1,8 @@
 import {Link} from 'react-router-dom';
 import {useLang} from '../../i18n';
 import type {LessonId,PartState,SimSnapshot,UnoPin} from '../contract';
-import {PWM_PINS,UNO_PINS} from '../contract';
+import {CIRCUITS,PWM_PINS,UNO_PINS} from '../contract';
+import {deviceRegistry} from '../sim/devices';
 import {LESSON_BY_ID} from '../lessons/index';
 import {oledLitPixels} from '../goals';
 import {fmtCycles,fmtTime} from './chip-pill';
@@ -32,16 +33,89 @@ const pwmRows=(s:SimSnapshot):RecordRow[]=>{
  if(hz>0)rows.push({k:'carrier',v:`${Math.round(hz)} Hz`});
  return rows;
 };
+/** Bus protocols the record reports by their own numbers (a UART pin that "toggled 412x" says nothing). */
+type Bus='uart'|'spi'|'i2c'|'ws2812';
+const BUSES:readonly string[]=['uart','spi','i2c','ws2812'];
+/** Which bus a board pin belongs to in this lesson: the protocol of the part wired to it, else the fixed pins of the chip (D0/D1 USART, A4/A5 TWI, D11-D13 SPI once it ran). */
+function busOf(id:LessonId,pin:string,s:SimSnapshot):Bus|null{
+ const c=CIRCUITS[id];
+ const BUS_PIN:Record<string,Bus>={SDA:'i2c',SCL:'i2c',MOSI:'spi',MISO:'spi',SCK:'spi',CS:'spi',SS:'spi',TX:'uart',RX:'uart',TXD:'uart',RXD:'uart',DIN:'ws2812'};
+ for(const w of (c?.wires??[]).filter(x=>x.boardPin===pin)){
+  const k=c!.parts.find(p=>p.id===w.componentId)?.kind;
+  const pr=k?deviceRegistry.get(k)?.protocol:undefined;
+  const pn=w.pin.toUpperCase();
+  const role=pr==='spi'&&/^(SDA|NSS|CE\d?|SS|CS)$/.test(pn)?'spi':BUS_PIN[pn];
+  if(pr&&BUSES.includes(pr)&&role===pr)return pr as Bus;
+ }
+ if(pin==='D0'||pin==='D1'||pin==='TX')return 'uart';
+ if(pin==='A4'||pin==='A5')return s.bus&&s.bus.i2c.transactions>0?'i2c':null;
+ if(pin==='D11'||pin==='D12'||pin==='D13')return s.bus&&s.bus.spi.bytes>0?'spi':null;
+ return null;
+}
+const STD_BAUD=[300,600,1200,2400,4800,9600,14400,19200,28800,38400,57600,76800,115200,230400,250000,500000,1000000];
+/** UBRR gives 9615 for "9600": name the standard rate within 3 %, else the raw number. */
+const niceBaud=(b:number):number=>{const n=STD_BAUD.reduce((a,c)=>Math.abs(c-b)<Math.abs(a-b)?c:a,STD_BAUD[0]!);return Math.abs(n-b)/n<0.03?n:b;};
+const hex2=(n:number):string=>'0x'+n.toString(16).toUpperCase().padStart(2,'0');
+/** One row for a whole bus, from the emulated peripherals (UART bytes, lines and baud; SPI transactions; I2C addresses; WS2812 frames and pixels). */
+export function busRow(bus:Bus,s:SimSnapshot):RecordRow|null{
+ const b=s.bus;
+ if(bus==='uart'){
+  if(!b)return null;
+  const u=b.uart;
+  return {k:'UART',v:u.bytes+u.rx>0?`TX ${u.bytes} B · RX ${u.rx} B · ${u.lines} line${u.lines===1?'':'s'} · ${u.baud?niceBaud(u.baud):'?'} baud`:'no bytes yet'};
+ }
+ if(bus==='spi'){
+  if(!b)return null;
+  const q=b.spi;
+  return {k:'SPI',v:q.transactions>0?`${q.transactions} tx · ${q.bytes} B · ${q.clockHz>=1e6?`${(q.clockHz/1e6).toFixed(0)} MHz`:`${Math.round(q.clockHz/1000)} kHz`}`:'no transfers yet'};
+ }
+ if(bus==='i2c'){
+  if(!b)return null;
+  const q=b.i2c;
+  return {k:'I2C',v:q.addresses.length?`${q.addresses.map(hex2).join(', ')} · ${q.transactions} transaction${q.transactions===1?'':'s'}${q.nacks?` · ${q.nacks} NACK`:''}`:'no device addressed yet'};
+ }
+ const ws=Object.values(s.parts).filter((p):p is Extract<PartState,{kind:'ext'}>=>p.kind==='ext'&&p.type==='ws2812-strip');
+ if(!ws.length)return null;
+ const frames=ws.reduce((n,p)=>n+Number(p.v.frames||0),0),px=ws.reduce((n,p)=>n+Number(p.v.count||0),0),err=ws.reduce((n,p)=>n+Number(p.v.timingErrors||0),0);
+ return {k:'WS2812',v:`${frames} frame${frames===1?'':'s'} · ${px} pixels${err?` · ${err} timing errors`:' · 0 timing errors'}`};
+}
 const generic=(id:LessonId)=>(h:PinHistory,s:SimSnapshot):RecordRow[]=>{
- const rows=id==='rgb'?pwmRows(s):recordPinsOf(id).flatMap(p=>pinRows(h,p,s));
- const h1=part(s,'hcsr04');if(h1&&h1.echoCm!==null)rows.push({k:'echo',v:`${Math.round(h1.echoCm)} cm`});
+ const seen=new Set<Bus>();
+ const busRows:RecordRow[]=[],pinOut:RecordRow[]=[];
+ if(id==='rgb')pinOut.push(...pwmRows(s));
+ else for(const p of recordPinsOf(id)){
+  const bus=busOf(id,p,s);
+  if(!bus){
+   // one row per plain pin; the one-wire DHT22 line is reported as a part below
+   const dht=(CIRCUITS[id]?.wires??[]).some(w=>w.boardPin===p&&CIRCUITS[id]!.parts.find(q=>q.id===w.componentId)?.kind==='dht22');
+   if(dht)continue;
+   const r=pinRows(h,p,s);
+   const lone=recordPinsOf(id).length===1&&!(CIRCUITS[id]?.parts??[]).some(q=>BUSES.includes(deviceRegistry.get(q.kind)?.protocol??''));
+   if(lone){pinOut.push(...r);continue;}   // a single-pin lesson keeps its full cycle-exact timing
+   pinOut.push(r.length>1&&r[0]!.k.endsWith('toggled')?{k:r[0]!.k,v:`${r[0]!.v}${r[1]&&r[1].k==='period'?` · ${r[1].v}`:''}`}:r[0]!);
+   continue;
+  }
+  if(seen.has(bus))continue;
+  seen.add(bus);
+  const r=busRow(bus,s);
+  if(r)busRows.push(r);else pinOut.push(...pinRows(h,p,s).slice(0,1));
+ }
+ // a bus the lesson's parts speak but no record pin names (the GPS lesson quotes the SPI display pin, yet its data arrives over UART) still gets its row
+ if(id!=='rgb')for(const k of (CIRCUITS[id]?.parts??[]).map(p=>deviceRegistry.get(p.kind)?.protocol)){
+  if(!k||!BUSES.includes(k)||seen.has(k as Bus))continue;
+  seen.add(k as Bus);
+  const r=busRow(k as Bus,s);if(r)busRows.push(r);
+ }
+ const rows:RecordRow[]=[...busRows];
  const b=part(s,'buzzer');if(b&&b.on)rows.push({k:'tone',v:`${Math.round(b.freqHz)} Hz`});
+ const dh=Object.values(s.parts).find(p=>p.kind==='ext'&&p.type==='dht22');
+ if(dh&&dh.kind==='ext'&&dh.v.readT!==null)rows.push({k:'DHT22',v:`${dh.v.reads} reads · ${dh.v.readT} °C ${dh.v.readH} %RH`});
+ rows.push(...pinOut);
+const h1=part(s,'hcsr04');if(h1&&h1.echoCm!==null)rows.push({k:'echo',v:`${Math.round(h1.echoCm)} cm`});
  const m=part(s,'motor');if(m)rows.push({k:'motor',v:`${Math.round(m.rpm)} rpm`});
  const sv=part(s,'servo');if(sv)rows.push({k:'servo',v:`${Math.round(sv.angleDeg)}° · ${Math.round(sv.pulseUs)} µs`});
- const dh=Object.values(s.parts).find(p=>p.kind==='ext'&&p.type==='dht22');
- if(dh&&dh.kind==='ext'&&dh.v.readT!==null)rows.push({k:'dht22',v:`${dh.v.readT} °C · ${dh.v.readH} %RH`});
- rows.push({k:'at',v:`t=${fmtTime(s.simTimeMs)} · ${fmtCycles(s.simTimeMs)} cyc`});
- return rows.slice(0,5);
+ const atRow:RecordRow={k:'at',v:`t=${fmtTime(s.simTimeMs)} · ${fmtCycles(s.simTimeMs)} cyc`};
+ return [...rows.filter(r=>r.k!=="at").slice(0,3),atRow];
 };
 type Rec=(h:PinHistory,s:SimSnapshot,m:Record<string,number>)=>RecordRow[];
 const at=(s:SimSnapshot):RecordRow=>({k:'at',v:`t=${fmtTime(s.simTimeMs)} · ${fmtCycles(s.simTimeMs)} cyc`});

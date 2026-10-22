@@ -37,17 +37,19 @@ export const device=defineDevice<Hc05State>({
  copy:{
   name:{en:'HC-05 Bluetooth module',id:'Modul Bluetooth HC-05'},
   desc:{en:'A serial-over-Bluetooth bridge: what your sketch prints appears on a phone, and what the phone types arrives on Serial.',id:'Jembatan serial lewat Bluetooth: yang dicetak sketch muncul di ponsel, dan yang diketik ponsel masuk ke Serial.'},
-  note:{en:'Click it to play the phone: pick a message and press send, or switch the phone off. EN to 5V enters AT mode at 38400 baud.',id:'Klik untuk memainkan ponselnya: pilih pesan lalu kirim, atau matikan ponselnya. EN ke 5V masuk mode AT pada 38400 baud.'},
+  note:{en:'Click it to use the phone: type a line in the terminal and press Send, or switch the phone off. EN to 5V enters AT mode at 38400 baud.',id:'Klik untuk memakai ponselnya: ketik satu baris di terminal lalu tekan Kirim, atau matikan ponselnya. EN ke 5V masuk mode AT pada 38400 baud.'},
  },
  // the breakout has a 3.3 V regulator behind VCC: 3.6 V to 6 V
  power:{rail:['VCC','GND'],min:3.6,max:6,ma:30},
  inputs:[
   {type:'toggle',key:'connected',label:{en:'Phone connected',id:'Ponsel terhubung'},default:true},
+  // a real terminal: the phone types a line, the sketch's answers come back as lines
+  {type:'terminal',key:'line',label:{en:'Phone terminal',id:'Terminal ponsel'},placeholder:{en:'Type a line and press Send',id:'Ketik satu baris lalu tekan Kirim'},input:'hc05-bluetooth',log:'transcript',ending:'ending'},
   {type:'choice',key:'baud',label:{en:'Module baud (data mode)',id:'Baud modul (mode data)'},options:BAUDS.map(b=>({value:b,label:{en:b,id:b}})),default:'9600'},
-  {type:'choice',key:'phrase',label:{en:'Phone message',id:'Pesan ponsel'},options:PHRASES.map(b=>({value:b,label:{en:b,id:b}})),default:'LED ON'},
+  {type:'choice',key:'phrase',label:{en:'Phone message',id:'Pesan ponsel'},options:PHRASES.map(b=>({value:b,label:{en:b,id:b}})),default:'LED ON',advanced:true},
   {type:'choice',key:'ending',label:{en:'Line ending the phone adds',id:'Akhir baris dari ponsel'},options:[
    {value:'lf',label:{en:'Newline (\\n)',id:'Baris baru (\\n)'}},{value:'crlf',label:{en:'CR + LF',id:'CR + LF'}},{value:'none',label:{en:'Nothing',id:'Tanpa'}}],default:'lf'},
-  {type:'toggle',key:'send',label:{en:'Send the message now',id:'Kirim pesan sekarang'},default:false},
+  {type:'toggle',key:'send',label:{en:'Send the message now',id:'Kirim pesan sekarang'},default:false,advanced:true},
  ],
  defaults:{connected:true,baud:'9600',phrase:'LED ON',ending:'lf',send:false},
  create(ctx:DeviceCtx):DeviceModel<Hc05State>{

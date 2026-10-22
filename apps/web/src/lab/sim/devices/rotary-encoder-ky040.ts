@@ -22,7 +22,7 @@ export const device=defineDevice<RotaryEncoderKy040State>({
  copy:{
   name:{en:'Rotary encoder (KY-040)',id:'Rotary encoder (KY-040)'},
   desc:{en:'A knob that clicks through 20 detents per turn. CLK and DT make two square waves a quarter cycle apart; which one leads tells you the direction. Pushing the knob closes SW.',id:'Kenop yang berklik melewati 20 detent per putaran. CLK dan DT membuat dua gelombang kotak berselisih seperempat siklus; siapa yang mendahului menunjukkan arah. Menekan kenop menutup SW.'},
-  note:{en:'Click the knob to push it. Change the position in the panel to turn it.',id:'Klik kenop untuk menekannya. Ubah posisi di panel untuk memutarnya.'},
+  note:{en:'Click the knob to push it, drag around it to turn it, or set the position in the panel.',id:'Klik kenop untuk menekannya, seret mengelilinginya untuk memutar, atau atur posisi di panel.'},
  },
  power:{rail:['+','GND'],min:3,max:5.5,ma:1},
  inputs:[

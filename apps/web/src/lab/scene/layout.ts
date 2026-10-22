@@ -60,12 +60,14 @@ export function pinHoleOffsets(kind:PartKind):number[]{return PIN_COLS[kind]??[]
 
 const WIDTH=(k:PartKind):number=>{const c=PIN_COLS[k];return c?Math.max(...c)+1:0;};
 
+/** A load lamp hangs this far (mm) left of its relay, clear of the relay board's body. */
+const LOAD_LAMP_DX=40;
 /** Off-board slots near the partner part. Deterministic. */
 function offBoard(p:PartSpec,all:Record<string,Placement>):Placement{
  const target=typeof p.props.target==='string'?all[p.props.target]:undefined;
  switch(p.kind){
   case 'lamp':return {x:target?target.x:BB_CX,z:58,rotY:0,onBoard:false};
-  case 'load-lamp':return {x:target?target.x-32:BB_CX-32,z:(target?target.z:62)+8,rotY:0,onBoard:false};
+  case 'load-lamp':return {x:target?target.x-LOAD_LAMP_DX:BB_CX-LOAD_LAMP_DX,z:(target?target.z:62)+8,rotY:0,onBoard:false};
   case 'obstacle':return {x:target?target.x+1.5*PITCH:BB_CX,z:target?target.z+14:60,rotY:0,onBoard:false};
   case 'motor':return {x:BB_CX-10,z:62,rotY:0,onBoard:false};
   // a motor plug seated in its driver's socket: the stepper sits in front of the driver, turned to face it
@@ -80,7 +82,7 @@ export const LANE_START:Record<number,number>={2:8,7:8,9:21};
 /** With a sonar on the board: it takes the front-right end, everything else stays at lower columns so its tall body never hides an LED or the buzzer. */
 const SONAR_START:Record<number,number>={2:5,7:5,9:26};
 /** X extent (mm, relative to the first pin) of the physical part body, for the clearance check. */
-export const BODY_X:Partial<Record<PartKind,[number,number]>>={hcsr04:[-19,27]};
+export const BODY_X:Partial<Record<PartKind,[number,number]>>={hcsr04:[-19,27],potentiometer:[-4,10]};
 export const UNO_CLEARANCE=10;
 /** Ids of on-board parts whose body comes within UNO_CLEARANCE mm of the Uno bbox (must be empty for every lesson). */
 export function unoOverlaps(place:Record<string,Placement>,circuit:Circuit):string[]{
@@ -95,6 +97,9 @@ export function unoOverlaps(place:Record<string,Placement>,circuit:Circuit):stri
 export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
  const out:Record<string,Placement>={};
  const cursor:Record<number,number>={};
+ /** Right edge (mm) of the last body placed in each lane: the next part starts at least BODY_GAP clear of it, whatever the column maths says. */
+ const edge:Record<number,number>={};
+ const BODY_GAP=0.5;
  const sonar=circuit.parts.some(p=>p.kind==='hcsr04');
  const start=sonar?SONAR_START:LANE_START;
  // LEDs and the buzzer sit in the front lane (lane 7) so the camera sees them; resistors and the rest go behind
@@ -109,13 +114,25 @@ export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
   const span=bx&&bx[1]-(w-1)*PITCH>6?Math.ceil(bx[1]/PITCH)+1:w;
   const lanes:number[]=p.kind==='hcsr04'?[SENSOR_ROW]:order(p.kind,p.props.lane==='front');
   let lane=lanes[lanes.length-1]!;
-  let col=(cursor[lane]??start[lane]??0)+lead;
+  const left=bx?bx[0]:0;
+  // the column the legacy spacing gives, or further right when the previous body in that lane (measured, BODY_GAP clear) would still be in the way
+  const free=(l:number):number=>{
+   const legacy=(cursor[l]??start[l]??0)+lead;
+   return edge[l]===undefined?legacy:Math.max(legacy,Math.ceil((edge[l]!+BODY_GAP-holeX(0)-left)/PITCH));
+  };
+  let col=free(lane);
   let fit=false;
-  for(const l of lanes){const c=(cursor[l]??start[l]??0)+lead;if(c+w<=BB_COLS&&c+span<=BB_COLS+2&&(!sonar||p.kind==='hcsr04'||c+w<=18||l===lanes[lanes.length-1])){lane=l;col=c;fit=true;break;}}
+  for(const l of lanes){const c=free(l);if(c+w<=BB_COLS&&c+span<=BB_COLS+2&&(!sonar||p.kind==='hcsr04'||c+w<=18||l===lanes[lanes.length-1])){lane=l;col=c;fit=true;break;}}
   // a body wider than the free lanes (the 80 mm LCD) goes to the back lane, centred on the board, so the front lane stays free for small parts
-  if(!fit&&span>w){lane=lanes[0]!;col=Math.max(lead,Math.min(col,BB_COLS+2-span));}
+  if(!fit&&span>w){
+   lane=lanes[0]!;
+   // centre it on the board; but when something already stands in that lane, keep clear of it and let this body hang over the end of the board (legs stay in the strip)
+   const f=free(lane);
+   col=edge[lane]!==undefined&&f+w<=BB_COLS?f:Math.max(lead,Math.min(col,BB_COLS+2-span));
+  }
   if(col+w>BB_COLS)col=Math.max(0,BB_COLS-w);
   cursor[lane]=col+Math.max(w,span)+1;
+  edge[lane]=holeX(col)+Math.max((w-1)*PITCH+1,BODY_X[p.kind]?.[1]??0);
   out[p.id]={x:holeX(col),z:holeZ(lane),rotY:0,onBoard:true,holes:pinHoleOffsets(p.kind).map(d=>[col+d,lane] as [number,number])};
  }
  // Desk props (batteries, regulators, drivers, motors...) get their own slot: a prop that would land on an earlier one steps sideways in 10 mm steps until its footprint is clear.
@@ -124,7 +141,7 @@ export function layoutCircuit(circuit:Circuit):Record<string,Placement>{
  const rects=(kind:PartKind,id:string,x:number,z:number):[number,number,number,number][]=>{
   const [w,d]=DESK_MM[kind]??[46,30];
   const r:[number,number,number,number][]=[[x,z,w,d]];
-  for(const q of circuit.parts)if(q.props.target===id&&q.kind==='load-lamp'){const [lw,ld]=DESK_MM[q.kind]??[22,22];r.push([x-32,z+8,lw,ld]);}
+  for(const q of circuit.parts)if(q.props.target===id&&q.kind==='load-lamp'){const [lw,ld]=DESK_MM[q.kind]??[22,22];r.push([x-LOAD_LAMP_DX,z+8,lw,ld]);}
   for(const q of circuit.parts)if(q.props.target===id&&q.kind==='stepper-28byj48')r.push([x+STEPPER_SEAT.x,z+47.5,42,90]);
   return r;
  };

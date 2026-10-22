@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fakeBoard,modelOf,frame,type Board} from './lab-input-fake.js';
-import {ghosts,groups,keyPos} from '../apps/web/src/lab/sim/devices/keypad-4x4.js';
+import {MIN_TAP_MS,ghosts,groups,keyPos} from '../apps/web/src/lab/sim/devices/keypad-4x4.js';
 import type {UnoPin} from '../apps/web/src/lab/contract.js';
 
 const NET={R1:'D2',R2:'D3',R3:'D4',R4:'D5',C1:'D6',C2:'D7',C3:'D8',C4:'D9'} as const;
@@ -34,7 +34,24 @@ test('keypad: pressing 5 pulls column 2 LOW only while row 2 is driven LOW',()=>
  assert.deepEqual(scan(b,m,0),[]);
  assert.deepEqual(scan(b,m,1),[1]);
  assert.deepEqual(scan(b,m,2),[]);
- m.props.key='none';assert.deepEqual(scan(b,m,1),[],'release brings the column back HIGH');
+ m.props.key='none';
+ b.at(400*16000);   // past the shortest tap
+ assert.deepEqual(scan(b,m,1),[],'release brings the column back HIGH');
+});
+
+test('keypad: a tap the page already put back stays down for MIN_TAP_MS of simulated time (a stalled browser frame cannot swallow it)',()=>{
+ const b=fakeBoard();const m=modelOf(b,'keypad-4x4',NET);
+ b.at(1000);
+ m.props.key='5';
+ assert.deepEqual(scan(b,m,1),[1]);
+ m.props.key='none';                       // the 150 ms wall-clock timer fired before the simulation advanced
+ assert.deepEqual(scan(b,m,1),[1],'still down: no simulated time has passed');
+ b.at(1000+(MIN_TAP_MS-5)*16000);
+ assert.deepEqual(scan(b,m,1),[1],'still down just before the minimum');
+ b.at(1000+(MIN_TAP_MS+5)*16000);
+ assert.deepEqual(scan(b,m,1),[],'released after the minimum');
+ // the same key again is a new tap
+ m.props.key='5';assert.deepEqual(scan(b,m,1),[1]);
 });
 
 test('keypad: every one of the 16 keys is found by a full scan at the right row and column',()=>{
@@ -45,6 +62,7 @@ test('keypad: every one of the 16 keys is found by a full scan at the right row 
   const found:[number,number][]=[];
   for(let r=0;r<4;r++)for(const c of scan(b,m,r))found.push([r,c]);
   assert.deepEqual(found,[[Math.floor(i/4),i%4]],`key ${k}`);
+  m.props.key='none';b.at((i+1)*400*16000);   // let the tap end before the next key
  });
 });
 
