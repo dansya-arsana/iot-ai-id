@@ -20,9 +20,7 @@ COPY package.json ./
 COPY packages ./packages
 COPY services ./services
 # ops and api import the pure Lab AI modules (CircuitSpec, layout maths) and read the precomputed examples (ADR 011).
-COPY apps/web/src/lab/contract.ts apps/web/src/lab/circuit-spec.ts apps/web/src/lab/circuit-examples.ts ./apps/web/src/lab/
-COPY apps/web/src/lab/scene/layout.ts ./apps/web/src/lab/scene/
-COPY apps/web/src/lab/ai/examples ./apps/web/src/lab/ai/examples
+COPY apps/web/src/lab ./apps/web/src/lab
 COPY runtime ./runtime
 COPY deploy/jev ./jev
 RUN chmod +x /work/jev/jev-codex
