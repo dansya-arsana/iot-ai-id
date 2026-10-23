@@ -1,12 +1,14 @@
 import {test,expect,type Page} from '@playwright/test';
 import {oledPosition,readOledLine} from '../../apps/web/src/lab/lessons/stepper';
 import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim} from './lab-sim';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson 22 (Stepper control): the real compiled sketch runs in the browser. The joystick popover changes the ADC voltage on A0 and the SW level on D2;
  * the assertions read the REAL simulated outputs from the live snapshot: ULN2003 coil outputs, the stepper's own step count, and the OLED frame buffer.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-lesson-stepper';
 
 type V=Record<string,number|boolean|string|null>;

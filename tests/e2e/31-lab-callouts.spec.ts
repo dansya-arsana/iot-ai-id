@@ -1,8 +1,10 @@
 import {test,expect} from '@playwright/test';
 import {readdirSync} from 'node:fs';
+import {grantLab} from './lab-access';
 
 /** Every callout on a goal part (anything that is not the Uno or a bare board pin) stays visible at 1440, in every lesson. */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const LESSONS=readdirSync(new URL('../../apps/web/src/lab/lessons/',import.meta.url)).filter(f=>f.endsWith('.ts')&&!['index.ts','kit.ts'].includes(f)).map(f=>f.replace(/\.ts$/,'')).sort();
 
 test('lesson folder is not empty',()=>{expect(LESSONS.length).toBeGreaterThanOrEqual(26);});

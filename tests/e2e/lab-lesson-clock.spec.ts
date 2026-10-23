@@ -1,5 +1,6 @@
 import {test,expect,type Page} from '@playwright/test';
 import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim} from './lab-sim';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson "Real-time clock": the real sketch reads a DS3231 over I2C, draws HH:MM:SS on four chained MAX7219 matrices over SPI, and
@@ -7,6 +8,7 @@ import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim} from './lab-sim';
  * state, buzzer state) and the serial text, and a popover input (the chip temperature) changes what the sketch reads.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-lesson-clock';
 
 type V=Record<string,number|boolean|string|null>;

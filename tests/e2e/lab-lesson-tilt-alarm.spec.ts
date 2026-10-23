@@ -1,10 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson 18, Tilt alarm: the real compiled sketch reads the MPU6050 over I2C. Tilting the sensor in its popover fills the LED bar
  * and sounds the buzzer; the assertions read the simulated part states, not only the serial text.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-lesson-tilt-alarm';
 
 type V=Record<string,number|boolean|string|null>;

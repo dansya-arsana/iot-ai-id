@@ -248,7 +248,7 @@ function Team({data,team,run,locale}:{data:Data;team:StaffView[];run:Run;locale:
  </Section>;
 }
 
-const GRANT_LABELS:Record<MemberGrant,[string,string]>={products:['Products','Produk'],bench:['PhysicalBench','PhysicalBench'],arena:['Arena','Arena'],builders:['Builders','Builders'],installer:['Installer download','Unduh installer'],'lab-ai':['Lab AI builder','Pembuat AI Lab']};
+const GRANT_LABELS:Record<MemberGrant,[string,string]>={products:['Products','Produk'],bench:['PhysicalBench','PhysicalBench'],arena:['Arena','Arena'],builders:['Builders','Builders'],installer:['Installer download','Unduh installer'],lab:['Arduino lab','Lab Arduino'],'lab-ai':['Lab AI builder','Pembuat AI Lab']};
 /** Owner and sales: member accounts that unlock areas of iot.ai.id. Codes are shown once; accounts are disabled, never deleted. */
 function Members({data,members,run,locale}:{data:Data;members:MemberView[];run:Run;locale:string}){
  const{tr}=useLang();const [form,setForm]=useState<{username:string;name:string;orgName:string;orgId:string;grants:MemberGrant[]}>({username:'',name:'',orgName:'',orgId:'',grants:[]});

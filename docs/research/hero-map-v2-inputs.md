@@ -2,7 +2,7 @@
 
 # perf
 
-I drove the local build with Playwright at 2000x1150 and 390x844 (iPhone UA, touch). The path was: click Java, open Jakarta, go back, open Bekasi–Karawang, close, turn on the Industrial AMR lens, turn on the Schools lens, open Java again, scroll to the CTA, click it. No repo files were edited. Screenshots and JSON logs are in `/private/tmp/claude-501/-Users-macbook-Documents-GPT-Project-iot-ai-id-public/30b119ae-cf49-43dd-95ad-515a4fa511f3/scratchpad/ux/` (`desk-*.png`, `phone-*.png`, `desk-log.json`, `phone-log.json`, script `drive.cjs`). The server is stopped.
+I drove the local build with Playwright at 2000x1150 and 390x844 (iPhone UA, touch). The path was: click Java, open Jakarta, go back, open Bekasi–Karawang, close, turn on the Industrial AMR lens, turn on the Schools lens, open Java again, scroll to the CTA, click it. No repo files were edited. Screenshots and JSON logs are in `<session-temp>/ux/` (`desk-*.png`, `phone-*.png`, `desk-log.json`, `phone-log.json`, script `drive.cjs`). The server is stopped.
 
 ## First impressions (VP BD, Japanese AMR maker)
 - **27-inch:** the headline is strong and the dot map looks good. But the map is 1436x520 px on a 2000x1150 screen, and about 60% of it is empty sea. The busy part is the lens block: 5 rows and 38 chips sit above the map before I have clicked anything. Next to the map is a 658 px white box with one sentence and a button. It reads like a filter form, not a map I want to explore.
@@ -78,7 +78,7 @@ Selecting a region at 1440x900 makes the hero grow from 900px to 1094px, and the
 
 The `[placeholder]` reply-time and price lines only appear on the local build. `useCompany` hides them on the public host, so that is fine.
 
-Screenshots and scripts are in `/private/tmp/claude-501/-Users-macbook-Documents-GPT-Project-iot-ai-id-public/30b119ae-cf49-43dd-95ad-515a4fa511f3/scratchpad/ux/`: `{1440,2000}-{idle,sumatra,java,pin}.png`, `shot.mjs`, `perf.mjs`, `bbox.ts`.
+Screenshots and scripts are in `<session-temp>/ux/`: `{1440,2000}-{idle,sumatra,java,pin}.png`, `shot.mjs`, `perf.mjs`, `bbox.ts`.
 
 ## What all three concepts share
 
@@ -243,7 +243,7 @@ Go with **B**. It's the only concept that both enlarges the map and keeps the se
 
 # visitor-jp-amr
 
-Persona: Head of Field Operations at a German ag-robot startup, on a 1440x900 laptop. I drove the local build (fixture server) and the live https://iot.ai.id/ with the `iot_region=global` cookie. Screenshots are in `/private/tmp/claude-501/-Users-macbook-Documents-GPT-Project-iot-ai-id-public/30b119ae-cf49-43dd-95ad-515a4fa511f3/scratchpad/ux/`. The scripts there are `drive.mjs` to `drive4.mjs`, with logs in `run*.log`. I edited no repo files. The local API server crashed partway through, so `drive2` to `drive4` ran against live only.
+Persona: Head of Field Operations at a German ag-robot startup, on a 1440x900 laptop. I drove the local build (fixture server) and the live https://iot.ai.id/ with the `iot_region=global` cookie. Screenshots are in `<session-temp>/ux/`. The scripts there are `drive.mjs` to `drive4.mjs`, with logs in `run*.log`. I edited no repo files. The local API server crashed partway through, so `drive2` to `drive4` ran against live only.
 
 ## Root causes found (measured)
 
@@ -374,7 +374,7 @@ On a phone the bottom sheet is 478 of 664 px tall and covers 123 px of the 127 p
 
 For the e2e tests: the `data-s`, `data-region`, `data-testid` and `aria-pressed` hooks can all stay as they are. Fixes 1, 2 and 4 change only how things are rendered.
 
-All files are in `/private/tmp/claude-501/-Users-macbook-Documents-GPT-Project-iot-ai-id-public/30b119ae-cf49-43dd-95ad-515a4fa511f3/scratchpad/ux/perfeng/`:
+All files are in `<session-temp>/ux/perfeng/`:
 - Scripts: `perf.mjs`, `ab.mjs`, `ab2.mjs`, `layout.mjs`, `mobile.mjs`, `idle.mjs`
 - Results: `p-1440-1.json`, `p-1440-4.json`, `p-1280-1.json`, `p-1280-4.json`
 - Screenshots: `click-top-*.png`, `layout-baseline-*.png` vs `layout-fixedAside-*.png`, `mobile-sumatra.png`

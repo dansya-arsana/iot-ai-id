@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
 import {readdirSync} from 'node:fs';
+import {grantLab} from './lab-access';
 
 /**
  * Layout guard over EVERY lesson: parts never overlap each other or the Uno (per mesh, not per fat bounding box), no jumper is drawn in front of a
@@ -7,6 +8,7 @@ import {readdirSync} from 'node:fs';
  * so a lesson added tomorrow is checked tomorrow with no edit here.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const LESSONS=readdirSync(new URL('../../apps/web/src/lab/lessons/',import.meta.url)).filter(f=>f.endsWith('.ts')&&!['index.ts','kit.ts'].includes(f)).map(f=>f.replace(/\.ts$/,'')).sort();
 
 type Box=[number,number,number,number,number,number];

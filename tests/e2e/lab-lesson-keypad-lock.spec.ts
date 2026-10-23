@@ -1,11 +1,13 @@
 import {test,expect,type Page} from '@playwright/test';
 import {waitSim} from './lab-sim';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson "Keypad lock": the real compiled sketch scans the 4x4 keypad, drives the TM1637 over its own two-wire bus and moves the
  * servo. Keys are pressed in the keypad popover; every assertion reads the REAL simulated outputs from the live snapshot.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-lesson-keypad-lock';
 
 type V=Record<string,number|boolean|string|null>;

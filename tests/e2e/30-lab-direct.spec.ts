@@ -1,5 +1,6 @@
 import {test,expect,type Page} from '@playwright/test';
 import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim,waitSim} from './lab-sim';
+import {grantLab} from './lab-access';
 
 /**
  * Direct manipulation in 3D and the part pages: keypad keys are tapped by clicking them, the joystick stick is dragged (and springs back),
@@ -7,6 +8,7 @@ import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim,waitSim} from './l
  * Waits are budgets of SIMULATED time (lab-sim.ts), so a slow machine only stretches wall time.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-direct';
 
 type V=Record<string,number|boolean|string|null>;

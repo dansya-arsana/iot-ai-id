@@ -1,10 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson 26, GPS logger: the real compiled sketch parses NMEA from the NEO-6M and draws the fix on the Nokia 5110.
  * A popover input moves the receiver; the assertions read the REAL frame buffer of the simulated screen, the serial text and the saved goal.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-gps-tracker';
 
 type V=Record<string,number|boolean|string|null>;

@@ -201,9 +201,13 @@ test('history lists own builds only, newest first, with the prompt; anonymous ge
  assert.equal((await h.lab('GET','history',undefined,{member:b})).data.items.length,1);
 });
 
-test('examples: public, no cookie, no model, no compile, no quota; each spec validates and its hash matches its source',async()=>{
+test('examples: member with lab or staff only; no model, no compile, no quota; each spec validates and its hash matches its source',async()=>{
  const h=harness({up:false});
- const r=await h.lab('GET','examples');assert.equal(r.status,200);
+ const sf=await h.staff(),ok=await h.member('lia',['lab']),no=await h.member('nia',['lab-ai']);
+ assert.equal((await h.lab('GET','examples')).status,401);
+ assert.equal((await h.lab('GET','examples',undefined,{member:no,prefix:'/ops/v1/member/lab/'})).status,403);
+ assert.equal((await h.lab('GET','examples',undefined,{staff:sf})).status,200);
+ const r=await h.lab('GET','examples',undefined,{member:ok,prefix:'/ops/v1/member/lab/'});assert.equal(r.status,200);
  const {examples}=LabExamplesResponseSchema.parse(r.data);
  assert.deepEqual(examples.map(e=>e.exampleId),[...LAB_AI_EXAMPLE_IDS]);
  for(const e of examples){
@@ -277,4 +281,11 @@ test('the docker runner reports unavailable when the docker CLI is missing, and 
  const d=new DockerRunner('img','/nonexistent/docker-xyz',1000);
  assert.equal(await d.available(),false);
  const r=await d.run('void setup(){}');assert.ok(!r.ok);
+});
+test('examples: a local install (openExamples) serves them without sign-in, but never to the public-host alias',async()=>{
+ const h=harness();(h.ops.labAi.deps as {openExamples:boolean}).openExamples=true;
+ const call=(host:string)=>h.ops.labAi.handle({method:'GET',path:'/ops/v1/member/lab/examples',ip:'127.0.0.1',headers:{host},plainLoopback:true});
+ assert.equal((await call('127.0.0.1:8787')).status,200);
+ assert.equal((await call('localhost:5173')).status,200);
+ assert.equal((await call('iot.admin.localhost:8891')).status,401);
 });

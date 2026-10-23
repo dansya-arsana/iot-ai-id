@@ -5,7 +5,7 @@ import {api, post} from './api';
 import {BuildProgressionGuide} from './build-progression-guide';
 import {isPublicHost} from './host';
 import {useLang} from './i18n';
-import {InvitationOnly} from './preview';
+import {InvitationOnly, useAccess} from './preview';
 import {Button, Card, LinkButton, CodeBlock, Eyebrow, Input, Notice, SectionHeader, Select, SpecList, Tag, Textarea, TextLink} from './ui';
 import type {assembleEpisode} from '../../../packages/episodes/index';
 import type {SimulatorCapabilities} from '../../../packages/simulator-client/index';
@@ -26,6 +26,7 @@ export function Steps({items, className}: {items: {title?: ReactNode; body: Reac
 
 export function LearnContent() {
   const {tr} = useLang();
+  const {can} = useAccess();
   const navigate = useNavigate();
   const [acknowledged, setAcknowledged] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -43,12 +44,12 @@ export function LearnContent() {
       <Tag>{tr('Local pilot / no school enrollment', 'Pilot lokal / tanpa pendaftaran sekolah')}</Tag>
     </div>
     <div className="xp-lesson">
-      <Card className="xp-lesson-card">
+      {can('/lab') && <Card className="xp-lesson-card">
         <Eyebrow>{tr('In your browser', 'Di browser')}</Eyebrow>
         <h2>{tr('Arduino lab: real code on an emulated UNO', 'Lab Arduino: kode asli di UNO yang diemulasikan')}</h2>
         <p className="xp-lesson-lead">{tr('Eleven guided lessons run precompiled firmware on an emulated ATmega328P. Free, no sign-in.', 'Sebelas pelajaran terpandu menjalankan firmware terkompilasi di ATmega328P yang diemulasikan. Gratis, tanpa masuk.')}</p>
         <div className="xp-lesson-actions"><LinkButton variant="primary" to="/lab">{tr('Open the lab', 'Buka lab')}</LinkButton></div>
-      </Card>
+      </Card>}
       <Card brackets className="xp-lesson-card">
         <Eyebrow>{tr('Lesson 001 / Rev 1', 'Pelajaran 001 / Rev 1')}</Eyebrow>
         <h2>{tr('Build. Break. Recover.', 'Rakit. Rusak. Pulihkan.')}</h2>

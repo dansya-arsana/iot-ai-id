@@ -1,7 +1,9 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab,stubExamples} from './lab-access';
 
 /** Lab review round 2: measurable regressions (zoom floor, pill overflow, traffic-light value, record text, callout mix, mobile overlays, minimap, camera stability, code scroll). */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS='test-results/lab-review2';
 
 interface Pose{x:number;z:number;az:number;zoom:number}
@@ -110,6 +112,7 @@ test('mobile L11: at most two pills, the dock is a 32px chip that opens the shee
 });
 
 test('mobile AI build: the caption sits below the sticky header and the lesson title is replaced',async({page})=>{
+ await stubExamples(page);
  await page.setViewportSize({width:390,height:844});
  await openLab(page,'blink');
  await page.getByTestId('lab-ai-open').click();

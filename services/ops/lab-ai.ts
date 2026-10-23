@@ -1,7 +1,7 @@
 /**
  * Lab AI builder (ADR 011): routes under /ops/v1/lab/ (alias /ops/v1/member/lab/, the only prefix where the member cookie is sent).
  * prompt -> CircuitSpec (LLM via the api container, never here) -> validate (one repair) -> sandboxed compile -> response.
- * Anonymous visitors only get the three precomputed examples. Prompt builds need the `lab-ai` grant or a staff session.
+ * The three precomputed examples need a member with `lab` (or staff). Prompt builds need the `lab-ai` grant or a staff session.
  */
 import {createHash,randomUUID} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -23,7 +23,7 @@ export type LabLlm={
  available():boolean;
  call(req:InternalSpecRequest):Promise<{spec:unknown;provider:string;model:string}>;
 };
-export interface LabDeps{compiler:LabCompiler;llm:LabLlm;examplesDir:string;memberQuota:number;globalCap:number}
+export interface LabDeps{compiler:LabCompiler;llm:LabLlm;examplesDir:string;memberQuota:number;globalCap:number;/** true only for the in-process ops of a local install (desktop app, dev): /lab is open there, so its examples are too. */openExamples:boolean}
 
 const EXAMPLES_DIR=fileURLToPath(new URL('../../apps/web/src/lab/ai/examples/',import.meta.url));
 const TZ_MS=7*3_600_000;// quota days follow Jakarta time (UTC+7)
@@ -58,6 +58,7 @@ export class LabAi{
    examplesDir:deps.examplesDir??EXAMPLES_DIR,
    memberQuota:deps.memberQuota??Number(process.env.OPS_LAB_AI_MEMBER_QUOTA??LAB_AI_DAILY_MEMBER_QUOTA),
    globalCap:deps.globalCap??Number(process.env.OPS_LAB_AI_GLOBAL_CAP??LAB_AI_DAILY_GLOBAL_CAP),
+   openExamples:deps.openExamples??false,
   };
   db.exec(`CREATE TABLE IF NOT EXISTS lab_usage(day TEXT NOT NULL,subject TEXT NOT NULL,n INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(day,subject));
 CREATE TABLE IF NOT EXISTS lab_history(id TEXT PRIMARY KEY,subject TEXT NOT NULL,at TEXT NOT NULL,prompt TEXT NOT NULL,ok INTEGER NOT NULL,repaired INTEGER NOT NULL,sha256 TEXT,ms INTEGER NOT NULL,detail TEXT);
@@ -184,6 +185,12 @@ CREATE TABLE IF NOT EXISTS lab_prompt_cache(key TEXT PRIMARY KEY,payload TEXT NO
   const resource=call.path.replace(/^\/ops\/v1\/(?:member\/)?lab\//,'');
   if(resource.includes('/')||!resource)return{status:404,data:{error:'Not found'}};
   if(resource==='examples'&&method==='GET'){
+   // Gated like /lab in the web app: a member with the `lab` grant, or a staff session (staff cookies reach this route on the admin host only).
+   const viewer=this.who(call);
+   // Local installs keep /lab open (localhost, desktop), so its examples are open too; the public-host e2e alias stays gated.
+   if(this.deps.openExamples&&!String(call.headers?.host??'').startsWith('iot.admin.localhost'))return{status:200,data:this.examples()};
+   if(viewer.kind==='anon')return err(401,'forbidden','Sign in to use the Arduino lab examples.');
+   if(viewer.kind==='member'&&!this.ops.members.session(cookieValue(call.headers?.cookie,MEMBER_COOKIE))?.grants.includes('lab'))return err(403,'forbidden','Your account does not include the Arduino lab yet. Ask AIoT to turn it on.');
    if(!this.anonLimit.take(call.ip))return err(429,'quota','Too many requests. Please wait a few minutes.');
    return{status:200,data:this.examples()};
   }

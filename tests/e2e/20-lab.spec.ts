@@ -1,10 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
 import {readdirSync} from 'node:fs';
+import {grantLab} from './lab-access';
 
 /** One card per lesson file: new lessons are added by dropping a file in lab/lessons, so count the files. */
 const LESSON_COUNT=readdirSync('apps/web/src/lab/lessons').filter(f=>f.endsWith('.ts')&&!['index.ts','kit.ts'].includes(f)).length;
 
 const PUBLIC='http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 /** Set a range input the way a user drag would: native value setter plus input event. */
 async function setRange(page:Page,testid:string,value:number){
  await page.getByTestId(testid).evaluate((el,v)=>{
@@ -22,7 +24,7 @@ async function run(page:Page,lesson:string){
 }
 const level=(page:Page,pin:string)=>page.locator(`[data-pin="${pin}"]`).first().getAttribute('data-level');
 
-test('lab is public: lesson cards and progress',async({page})=>{
+test('lab (member with the lab grant): lesson cards and progress',async({page})=>{
  await page.goto(`${PUBLIC}/lab`);
  await expect(page.locator('.lab')).toBeVisible();
  await expect(page.getByText('Invitation-only')).toHaveCount(0);

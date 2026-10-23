@@ -1,11 +1,13 @@
 import {test,expect,type Page} from '@playwright/test';
 import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim,waitSim} from './lab-sim';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson 23, kitchen scale: the real compiled sketch reads the HX711 model over its two-wire protocol and drives the TM1637 model.
  * The popover slides the weight, the tare button is clicked in 3D, and the assertions read the REAL simulated outputs from the live snapshot.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-lesson-scale';
 
 type V=Record<string,number|boolean|string|null>;

@@ -1,5 +1,6 @@
 import {test,expect,type Page} from '@playwright/test';
 import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim} from './lab-sim';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson "Rainbow pixels" (WS2812 ring + rotary encoder): the real sketch runs in the browser. Assertions read the REAL simulated
@@ -7,6 +8,7 @@ import {SLOW_TEST_MS,goalDone,hookSnapshot,serialHas,untilSim} from './lab-sim';
  * the serial lines the sketch prints, plus the lesson goal flag.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-lesson-neopixel';
 
 type V=Record<string,number|boolean|string|null>;

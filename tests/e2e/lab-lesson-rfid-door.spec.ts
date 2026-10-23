@@ -1,10 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson 19, RFID door: the RC522 popover holds a card over the antenna, the real sketch reads its UID over SPI, and the assertions read the
  * REAL simulated outputs from the live snapshot (servo angle, relay contact, lamp, reader state), not only the serial text.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-rfid-door';
 
 type V=Record<string,number|boolean|string|null>;

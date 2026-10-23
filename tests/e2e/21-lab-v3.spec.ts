@@ -1,4 +1,5 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab,labMember} from './lab-access';
 import {execFileSync} from 'node:child_process';
 
 /** Lab v3: direct manipulation in the 3D scene, the part popover, and the AI builder with its assembly animation. */
@@ -16,7 +17,8 @@ async function partAt(page:Page,id:string){
  expect(p,`part ${id} projected`).not.toBeNull();
  return p!;
 }
-async function openLab(page:Page,lesson:string){
+async function openLab(page:Page,lesson:string,grants:string[]=['lab']){
+ await grantLab(page,PUBLIC,grants);
  await page.goto(`${PUBLIC}/lab/${lesson}?e2e=1`);
  await expect(page.locator('.lab')).toHaveAttribute('data-scene','ready',{timeout:30000});
  await page.waitForTimeout(1200); // let the camera fit settle
@@ -84,7 +86,8 @@ test('clicking the obstacle opens the popover: type chips and distance work, Zoo
  await expect(pop).toHaveCount(0);
 });
 
-test('anonymous: the Parking beeper example assembles step by step, then runs for real',async({page})=>{
+test('member with lab only: the Parking beeper example assembles step by step, then runs for real',async({page,request})=>{
+ await labMember(page,request);
  test.setTimeout(150000);
  await page.setViewportSize({width:1440,height:900});
  await openLab(page,'blink');
@@ -114,7 +117,8 @@ test('anonymous: the Parking beeper example assembles step by step, then runs fo
  await expect(page.getByTestId('lab-code')).toHaveAttribute('data-sketch',/blink/);
 });
 
-test('anonymous: free typing asks to sign in',async({page})=>{
+test('member with lab only: free typing asks to sign in',async({page,request})=>{
+ await labMember(page,request);
  await page.setViewportSize({width:1440,height:900});
  await openLab(page,'blink');
  await page.getByTestId('lab-ai-open').click();
@@ -145,7 +149,7 @@ test('member with lab-ai: prompt -> spec -> compile -> assembly -> run (fixture 
  test.setTimeout(180000);
  await page.setViewportSize({width:1440,height:900});
  const {token}=await (await request.get('/api/session')).json();
- const made=await (await request.fetch('/api/ops/members',{method:'POST',headers:{'X-IOT-Session':token},data:{username:`e2e.labai.${Date.now()}`,name:'Lia Lab',grants:['lab-ai']}})).json();
+ const made=await (await request.fetch('/api/ops/members',{method:'POST',headers:{'X-IOT-Session':token},data:{username:`e2e.labai.${Date.now()}`,name:'Lia Lab',grants:['lab','lab-ai']}})).json();
  await page.goto(PUBLIC+'/masuk');
  await page.getByRole('tab',{name:'Activate invite'}).click();
  await page.fill('#ml-code',made.inviteCode);
@@ -153,7 +157,7 @@ test('member with lab-ai: prompt -> spec -> compile -> assembly -> run (fixture 
  await page.fill('#ml-confirm','a long member password');
  await page.locator('form').getByRole('button',{name:'Activate and sign in'}).click();
  await expect(page).toHaveURL(PUBLIC+'/profile');
- await openLab(page,'blink');
+ await openLab(page,'blink',['lab','lab-ai']);
  await page.getByTestId('lab-ai-open').click();
  await page.getByTestId('lab-ai-prompt').fill('I want an Arduino that beeps and lights red when something is closer than 20 cm');
  await page.getByTestId('lab-ai-submit').click();

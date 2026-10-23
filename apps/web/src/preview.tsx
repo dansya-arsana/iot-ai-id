@@ -27,14 +27,15 @@ async function probeMember(live:()=>boolean):Promise<MemberMe|null>{
  return null;
 }
 /** Gated routes. A grant opens the page for a signed-in member; `null` pages need the staff workspace or the desktop app, so no grant opens them in the cloud. */
-const GATES:Record<string,MemberGrant|null>={'/products':'products','/builders':'builders','/bench':'bench','/arena':'arena','/build':null,'/sites':null,'/site':null,'/design':null};
+const GATES:Record<string,MemberGrant|null>={'/products':'products','/builders':'builders','/bench':'bench','/arena':'arena','/lab':'lab','/build':null,'/sites':null,'/site':null,'/design':null};
 const gateKey=(to:string)=>Object.keys(GATES).find(p=>to===p||to.startsWith(p+'/')||to.startsWith(p+'?'));
 export const isGated=(to:string)=>gateKey(to)!==undefined;
 /** The grants a member can hold, with the page each one opens (profile cards). */
-export const AREAS:{grant:Exclude<MemberGrant,'installer'>;to:string;en:string;id:string;dEn:string;dId:string}[]=[
+export const AREAS:{grant:Exclude<MemberGrant,'installer'|'lab-ai'>;to:string;en:string;id:string;dEn:string;dId:string}[]=[
  {grant:'products',to:'/products',en:'Tested products',id:'Produk teruji',dEn:'Distributor devices with test evidence and localization status.',dId:'Perangkat distributor dengan bukti uji dan status lokalisasi.'},
  {grant:'bench',to:'/bench',en:'PhysicalBench',id:'PhysicalBench',dEn:'Benchmark of agents against real hardware.',dId:'Tolok ukur agen terhadap hardware nyata.'},
  {grant:'arena',to:'/arena',en:'Arena',id:'Arena',dEn:'Hardware challenges for agents and people.',dId:'Tantangan hardware untuk agen dan manusia.'},
+ {grant:'lab',to:'/lab',en:'Arduino lab',id:'Lab Arduino',dEn:'Run real Arduino firmware in your browser, with guided lessons and parts.',dId:'Jalankan firmware Arduino asli di browser, dengan pelajaran dan komponen.'},
  {grant:'builders',to:'/builders',en:'Builders',id:'Builders',dEn:'The community of people building and testing on AIoT.',dId:'Komunitas pembuat dan penguji di AIoT.'},
 ];
 

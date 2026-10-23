@@ -1,7 +1,9 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab} from './lab-access';
 
 /** Lab final polish: pills stay off hardware and controls, leaders when far, record text whole, code box sized to content. */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 type R={x:number;y:number;w:number;h:number};
 type Hook={project(t:string):{x:number;y:number;visible:boolean}|null;targetRect(t:string):R|null};
 const UNO=['uno.mcu','uno.led-l','uno.usb','uno.power-jack','uno.reset','uno.digital-header','uno.analog-header','uno.power-header'];

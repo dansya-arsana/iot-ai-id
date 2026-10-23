@@ -59,7 +59,7 @@ function render(p:Page){
  mkdirSync(dirname(file),{recursive:true});writeFileSync(file,html);
 }
 import {LESSONS} from '../apps/web/src/lab/lessons.js';
-const nav=`<nav><a href="/">Home</a> · <a href="/partner">Partner with us</a> · <a href="/hardware">Hardware library</a> · <a href="/learn">Learn</a> · <a href="/lab">Arduino lab</a> · <a href="/docs">Docs</a> · <a href="/llms.txt">llms.txt</a></nav>`;
+const nav=`<nav><a href="/">Home</a> · <a href="/partner">Partner with us</a> · <a href="/hardware">Hardware library</a> · <a href="/learn">Learn</a> · <a href="/docs">Docs</a> · <a href="/llms.txt">llms.txt</a></nav>`;
 const list=(xs:string[])=>`<ul>${xs.map(x=>`<li>${x}</li>`).join('')}</ul>`;
 
 const homeTitle='Prove your robot where it actually breaks.';
@@ -102,7 +102,9 @@ const hwLine=(h:HardwareReference)=>`<a href="/hardware/${h.id}/">${esc(h.name)}
 render({path:'/partner',title:'Partner with us | AIoT',description:'Device makers, schools and buyers: send an inquiry to AIoT. Field testing in Indonesia, localization, distribution and real-world data. Reply within one working day.',
  body:`<main>${nav}<h1>Partner with AIoT</h1><p>${esc(pitch)}</p><p>Device makers (vendors), Indonesian schools (Lab Mitra) and buyers can send an inquiry through the form on this page. We reply within one working day by email or WhatsApp (+62 812-114-040).</p></main>`});
 /** Invitation-only for the public (see apps/web/src/preview.tsx): no content, noindex, absent from sitemap and llms*.txt. Members and staff reach the real pages after signing in. */
-const invitationOnly=[['/products','Products'],['/builders','Builders'],['/bench','PhysicalBench'],['/arena','Arena'],['/build','Build'],['/sites','Sites'],['/design','Design system']];
+const invitationOnly=[['/products','Products'],['/builders','Builders'],['/bench','PhysicalBench'],['/arena','Arena'],['/build','Build'],['/sites','Sites'],['/design','Design system'],['/lab','Arduino lab']];
+for(const l of LESSONS)invitationOnly.push([`/lab/${l.id}`,'Arduino lab']);
+invitationOnly.push(['/lab/parts','Arduino lab']);
 for(const [path,name] of invitationOnly)render({path,noindex:true,title:`${name} is invitation-only | AIoT`,description:'By invitation.',body:`<main><h1>${esc(name)} is invitation-only.</h1><p>We are opening AIoT to partners and schools in stages. Invited members sign in to see it.</p><p><a href="/partner">Request access</a> · <a href="/masuk">Sign in</a></p></main>`});
 /** Member sign-in and profile: noindex shells, out of the sitemap. */
 for(const [path,name] of [['/masuk','Sign in'],['/login','Sign in'],['/profile','Profile'],['/profil','Profile']])render({path,noindex:true,title:`${name} | AIoT`,description:'AIoT member access.',body:`<main><h1>${name}</h1><p>AIoT is open to invited partners, schools and clients.</p><p><a href="/partner">Request access</a></p></main>`});
@@ -125,12 +127,9 @@ ${h.software.length?`<h2>Software</h2>${list(h.software.map(esc))}`:''}
   jsonld:{'@context':'https://schema.org','@type':'TechArticle',headline:`${h.name} reference specification`,about:{'@type':'Thing',name:h.name,alternateName:h.aliases},description:h.summary,url:`${SITE}/hardware/${h.id}/`,publisher:{'@id':`${SITE}/#org`},citation:h.sources.map(s=>s.url)}});
 }
 render({path:'/learn',title:'Learn | AIoT',description:'Practical guides for sensors, wiring and testing with ESP32 and common modules.',body:`<main>${nav}<h1>Learn</h1><p>Practical learning material for sensors, circuits and testing.</p></main>`});
-render({path:'/lab',title:'Arduino lab: run real Arduino code in your browser | AIoT',description:`Free Arduino UNO lab in your browser: ${LESSONS.length} guided lessons and 80 parts run real firmware on an emulated ATmega328P.`,
- body:`<main>${nav}<h1>Arduino lab</h1><p>Run real Arduino firmware on an emulated ATmega328P in your browser. ${LESSONS.length} guided lessons, free, no sign-in. The code is read-only; you change declared parameters and watch the hardware respond.</p>${list(LESSONS.map(l=>`<a href="/lab/${l.id}">${esc(l.title.en)}</a>: ${esc(l.tagline.en)}`))}</main>`});
-for(const l of LESSONS)render({path:`/lab/${l.id}`,title:`${l.seo.title} | AIoT Arduino lab`,description:l.seo.description,body:`<main>${nav}<h1>${esc(l.title.en)}</h1><p>${esc(l.overview.body.en)}</p><p><a href="/lab">All lessons</a></p></main>`});
 render({path:'/docs',title:'Documentation | AIoT',description:'Documentation for the iot.ai.id hardware workspace, hardware contract, validation and evidence.',body:`<main>${nav}<h1>Documentation</h1><p>Documentation for the hardware contract, deterministic validation, evidence verification and desktop workspace.</p></main>`});
 
-const urls=['/','/id','/partner','/hardware','/learn','/lab',...LESSONS.map(l=>`/lab/${l.id}`),'/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
+const urls=['/','/id','/partner','/hardware','/learn','/docs',...hardwareLibrary.map(h=>`/hardware/${h.id}`)];
 writeFileSync(join(OUT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${SITE}${slash(u)}</loc><lastmod>${today}</lastmod><priority>${u==='/'||u==='/id'?'1.0':u==='/hardware'?'0.8':'0.6'}</priority></url>`).join('\n')}\n</urlset>\n`);
 writeFileSync(join(OUT,'robots.txt'),`# iot.ai.id — crawlers and AI agents are welcome on public pages.
 User-agent: *
@@ -173,7 +172,6 @@ iot.ai.id is based in Indonesia and serves robotics, sensor and AI teams worldwi
 - [Partner with us](${SITE}/partner/): inquiry form for device makers, schools and buyers; reply within one working day
 - [Partnership brief](${SITE}/partnership-brief.txt): services, what partners provide, current limits
 - [Program Lab Mitra (Indonesian)](${SITE}/id/): IoT training and paid hardware-testing tasks for Indonesian vocational schools (SMK)
-- [Arduino lab](${SITE}/lab/): free in-browser Arduino UNO lab, ${LESSONS.length} guided lessons and 80 parts running real firmware on an emulated ATmega328P
 - [Hardware library](${SITE}/hardware/): ${hardwareLibrary.length} board, sensor and module reference specifications
 - [Full LLM context](${SITE}/llms-full.txt): everything on this site in one plain-text file
 

@@ -1,10 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson 17 (weather station): runs the real compiled sketch in the browser, the BMP280 and DHT22 popovers change the world, and
  * the assertions read the REAL simulated LCD rows from the live snapshot, not only the serial text.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-lesson-weather-station';
 
 type V=Record<string,number|boolean|string|null>;

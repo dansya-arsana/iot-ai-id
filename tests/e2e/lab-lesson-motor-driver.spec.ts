@@ -1,11 +1,13 @@
 import {test,expect,type Page} from '@playwright/test';
 import {SLOW_TEST_MS,hookSnapshot,serialHas,untilSim} from './lab-sim';
+import {grantLab} from './lab-access';
 
 /**
  * Lesson 25 (motor driver): the real sketch reads the knob, the L298N drives two motors from the 9 V battery through the power solver.
  * The assertions read the REAL simulated outputs from the live snapshot: motor rpm and direction, the bridge voltage, the battery supply.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-lesson-motor-driver';
 
 type V=Record<string,number|boolean|string|null>;

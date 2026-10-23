@@ -1,7 +1,9 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab} from './lab-access';
 
 /** Lab interaction parity: click-to-focus, minimap, selection ring, Components panel, settings, WASD camera, threshold popovers, live drag. */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS='test-results/lab-parity';
 
 interface Pose{x:number;z:number;az:number;zoom:number}

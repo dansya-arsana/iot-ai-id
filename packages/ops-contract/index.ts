@@ -196,7 +196,7 @@ export const StaffUpdateSchema=z.object({role:z.enum(ROLES).optional(),status:z.
 export type Staff={id:string;username:string;name:string;role:Role;status:typeof STAFF_STATUSES[number];createdBy:string;createdAt:string;updatedAt:string;history:z.infer<typeof HistorySchema>};
 
 // Members (ADR 009 addendum): invited clients, partners and schools whose account unlocks areas of iot.ai.id. Login and activation share the portal schemas.
-export const MEMBER_GRANTS=['products','bench','arena','builders','installer','lab-ai'] as const;
+export const MEMBER_GRANTS=['products','bench','arena','builders','installer','lab','lab-ai'] as const;
 export type MemberGrant=typeof MEMBER_GRANTS[number];
 export const MEMBER_STATUSES=['active','disabled'] as const;
 const grantList=z.array(z.enum(MEMBER_GRANTS)).max(MEMBER_GRANTS.length).transform(g=>MEMBER_GRANTS.filter(x=>g.includes(x)));
@@ -261,7 +261,7 @@ export const LabBuildErrorSchema=z.object({
 }).strict();
 export type LabBuildError=z.infer<typeof LabBuildErrorSchema>;
 
-/** GET /ops/v1/lab/examples (public): the 3 curated prompts with committed specs and hex. No LLM call. */
+/** GET /ops/v1/lab/examples (signed-in member with the `lab` grant, or staff; 401/403 otherwise. Data only, the lab itself is gated in the web app): the 3 curated prompts with committed specs and hex. No LLM call. */
 export const LabExamplesResponseSchema=z.object({examples:z.array(z.object({exampleId:z.enum(LAB_AI_EXAMPLE_IDS),prompt:z.object({en:z.string(),id:z.string()}).strict(),spec:CircuitSpecSchema,build:LabBuildArtifactSchema}).strict()).max(3)}).strict();
 export type LabExamplesResponse=z.infer<typeof LabExamplesResponseSchema>;
 

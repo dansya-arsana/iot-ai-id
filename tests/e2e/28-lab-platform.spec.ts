@@ -1,10 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab} from './lab-access';
 
 /**
  * Lab platform upgrade: the LCD backpack address follows the popover (0x27 / 0x3F), the plant lesson shows the LCD text facing the camera,
  * and no shipped lesson shows a power warning.
  */
 const PUBLIC=process.env.E2E_PUBLIC??'http://iot.admin.localhost:8891';
+test.beforeEach(({page})=>grantLab(page,PUBLIC));
 const SHOTS=process.env.E2E_SHOTS??'test-results/lab-platform';
 
 type V=Record<string,number|boolean|string|null>;

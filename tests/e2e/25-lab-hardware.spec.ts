@@ -1,4 +1,5 @@
 import {test,expect,type Page} from '@playwright/test';
+import {grantLab} from './lab-access';
 
 const PORT='/dev/cu.usbmodem1101';
 const apiPort=(base:string|undefined)=>new URL(base??'http://127.0.0.1:8891').port;
@@ -63,6 +64,7 @@ test('upload failure, missing toolchain and no board show friendly messages',asy
 
 test('the public host shows only the desktop-app note and cannot reach the hardware API',async({page,baseURL})=>{
  const port=apiPort(baseURL);
+ await grantLab(page,`http://iot.admin.localhost:${port}`);
  await page.goto(`http://iot.admin.localhost:${port}/lab/blink`);
  await expect(page.getByTestId('hw-public')).toContainText(/desktop app/i);
  await expect(page.getByTestId('hw-panel')).toHaveCount(0);

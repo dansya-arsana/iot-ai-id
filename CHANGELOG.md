@@ -6,8 +6,11 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 
 ## [Unreleased]
 
+### Changed
+- The Arduino lab is invitation-only for now: new member grant `lab` gates `/lab`, `/lab/:lesson`, `/lab/parts` and `/lab/parts/:kind` on iot.ai.id. Staff presentation mode and localhost/desktop stay open. Nav, footer and the Learn card hide Lab links without access; lab pages are noindex shells, removed from the sitemap, llms.txt and llms-full.txt. `GET /ops/v1/member/lab/examples` now requires a member with `lab` or staff (needs a deploy-ops). Backoffice grant label "Arduino lab".
+
 ### Added
-- Public Arduino lab (`/lab`, `/lab/:lesson`): 26 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
+- Arduino lab (invitation-only, grant `lab`; `/lab`, `/lab/:lesson`): 26 guided lessons on an emulated Arduino UNO. Precompiled ATmega328P firmware runs in avr8js in the browser, in a lazy-loaded chunk with a three.js board scene. Free, no sign-in.
   - "Bench Record" design in the AIoT system (Archivo, IBM Plex Mono, warm-grey bench, one live-green accent). It shows what really runs: a logic analyzer drawn from the emulated chip's pin history (HIGH/LOW, PWM duty and frequency, analog input, TX), a port map, a live cycle counter and speed, callouts with measured values (LED current, ADC reading, PWM), goals checked from chip data ("D8 toggled 4× · high 500.1 ms"), firmware size, and 3D lesson thumbnails.
   - Inspector values are patched into the real firmware bytes (verified against a recompile), line highlighting comes from DWARF line tables, and each lesson has a real success check.
   - The code view is read-only. Only the declared parameters and the pre-compiled variants can change; there is no in-browser compiler.
