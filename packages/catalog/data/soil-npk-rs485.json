@@ -1,0 +1,256 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "soil-npk-rs485",
+  "name": {
+   "v": "RS-485 soil NPK / EC / pH probe (7-in-1)",
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "soil",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 5,
+    "max": 30
+   },
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf ; https://sigmanortec.ro/en/7-in-1-soil-sensor-n-p-k-ph-ec-moisture-temperature-rs485-530v",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 40,
+    "peak": 100
+   },
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "VCC",
+    "func": [
+     "power"
+    ],
+    "note": "Brown on most units; check the label"
+   },
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GND",
+    "func": [
+     "ground"
+    ],
+    "note": "Black on most units"
+   },
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "A",
+    "func": [
+     "nc"
+    ],
+    "note": "RS-485 A+, yellow on most units"
+   },
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "B",
+    "func": [
+     "nc"
+    ],
+    "note": "RS-485 B-, blue on most units"
+   },
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "rs485"
+   ],
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 45,
+    "h": 75,
+    "d": 45
+   },
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf ; https://sigmanortec.ro/en/7-in-1-soil-sensor-n-p-k-ph-ec-moisture-temperature-rs485-530v (cylinder about 45 x 75 mm, needles about 3 x 60 mm, 2-5 m cable)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": true,
+   "p": {
+    "source": "https://sigmanortec.ro/en/7-in-1-soil-sensor-n-p-k-ph-ec-moisture-temperature-rs485-530v",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "ipRating": {
+   "v": "IP67",
+   "p": {
+    "source": "https://sigmanortec.ro/en/7-in-1-soil-sensor-n-p-k-ph-ec-moisture-temperature-rs485-530v",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -10,
+    "max": 60
+   },
+   "p": {
+    "source": "https://sigmanortec.ro/en/7-in-1-soil-sensor-n-p-k-ph-ec-moisture-temperature-rs485-530v",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "max485"
+  ],
+  "p": {
+   "source": "docs/research/pro-parts-briefs.md",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/soil-npk-rs485.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/soil-npk-rs485.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "7-in-1 soil probe (moisture, temperature, EC, pH, N, P, K) with stainless needles and a 4-core cable. Modbus RTU, default address 1, 4800 baud 8N1 (some units 9600), function 0x03. Register map is vendor specific: jxct-style or cwt-style, confirm on your unit.",
+    "id": "Probe tanah 7-in-1 (kelembapan, suhu, EC, pH, N, P, K) dengan jarum stainless dan kabel 4 inti. Modbus RTU, alamat bawaan 1, 4800 baud 8N1 (sebagian unit 9600), fungsi 0x03. Peta register tergantung merek: gaya jxct atau cwt, pastikan pada unit Anda."
+   },
+   "p": {
+    "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf ; https://sigmanortec.ro/en/7-in-1-soil-sensor-n-p-k-ph-ec-moisture-temperature-rs485-530v",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "NPK from EC is an estimate. Calibrate against a lab soil test before acting on it.",
+     "id": "NPK dari EC hanyalah perkiraan. Kalibrasi dengan uji tanah laboratorium sebelum dijadikan dasar tindakan."
+    },
+    "p": {
+     "source": "https://sigmanortec.ro/en/7-in-1-soil-sensor-n-p-k-ph-ec-moisture-temperature-rs485-530v",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "Needles must go fully into the soil with no air gap, and wire colours vary by vendor: check the label.",
+     "id": "Jarum harus masuk penuh ke tanah tanpa celah udara, dan warna kabel berbeda tiap merek: cek label."
+    },
+    "p": {
+     "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "It needs 5-30 V of its own and an RS-485 link (MAX485). It cannot be read from a bare GPIO pin.",
+     "id": "Butuh catu 5-30 V sendiri dan tautan RS-485 (MAX485). Tidak bisa dibaca dari pin GPIO langsung."
+    },
+    "p": {
+     "source": "https://embdev.net/attachment/640888/7_in_Soil_Sensor_Datasheet.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

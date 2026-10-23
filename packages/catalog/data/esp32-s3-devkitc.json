@@ -1,0 +1,947 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "esp32-s3-devkitc",
+  "name": {
+   "v": "ESP32-S3-DevKitC-1",
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "board",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "manufacturer": {
+   "v": "Espressif",
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "ESP32-S3-DevKitC-1-N8R8",
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 4.5,
+    "max": 5.5
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "logicLevelV": {
+   "v": 3.3,
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 80,
+    "peak": 500
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md (typical and peak are estimates)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "3V3_1",
+    "func": [
+     "power"
+    ],
+    "note": "3.3 V supply (on-board LDO output; or feed 3.3 V here with 3V3+G, one input only)"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "3V3_2",
+    "func": [
+     "power"
+    ],
+    "note": "3.3 V supply"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "RST",
+    "func": [
+     "reset"
+    ]
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO4",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO4 ADC1_CH3"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO5",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO5 ADC1_CH4"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO6",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO6 ADC1_CH5"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO7",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO7 ADC1_CH6"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO15",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO15 ADC2_CH4 U0RTS / XTAL_32K_P"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO16",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO16 ADC2_CH5 U0CTS / XTAL_32K_N"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO17",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc",
+     "uart-tx"
+    ],
+    "note": "GPIO17 ADC2_CH6 U1TXD"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO18",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc",
+     "uart-rx"
+    ],
+    "note": "GPIO18 ADC2_CH7 U1RXD"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO8",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO8 ADC1_CH7"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO3",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO3 ADC1_CH2 strapping"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO46",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO46 strapping"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO9",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO9 ADC1_CH8 FSPIHD"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO10",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO10 ADC1_CH9 FSPICS0"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO11",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO11 ADC2_CH0 FSPID"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO12",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO12 ADC2_CH1 FSPICLK"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO13",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO13 ADC2_CH2 FSPIQ"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO14",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO14 ADC2_CH3 FSPIWP"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "5V",
+    "func": [
+     "power"
+    ],
+    "note": "5 V in/out: from USB or feed 5 V here with 5V+G, one input only"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "G_1",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "G_2",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "TX",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "uart-tx"
+    ],
+    "note": "GPIO43 U0TXD"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "RX",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "uart-rx"
+    ],
+    "note": "GPIO44 U0RXD"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO1",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO1 ADC1_CH0"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO2",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "adc"
+    ],
+    "note": "GPIO2 ADC1_CH1"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO42",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO42 MTMS"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO41",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO41 MTDI"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO40",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO40 MTDO"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO39",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO39 MTCK"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO38",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO38"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO37",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO37"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO36",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO36"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO35",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO35"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO0",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO0 BOOT strapping"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO45",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO45 strapping"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO48",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO48"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO47",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO47"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO21",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO21"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO20",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO20 USB_D+"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO19",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "GPIO19 USB_D-"
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "G_3",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "G_4",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "i2c",
+    "spi",
+    "uart",
+    "pwm",
+    "analog",
+    "digital",
+    "wifi",
+    "ble"
+   ],
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 62.74,
+    "h": 25.4,
+    "d": 12
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -40,
+    "max": 85
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "drivers": [
+  {
+   "v": {
+    "boardFamily": "esp32s3",
+    "lib": "Arduino-ESP32",
+    "snippet": "pinMode(4, OUTPUT);\ndigitalWrite(4, HIGH);",
+    "verify": "untested"
+   },
+   "p": {
+    "source": "written by us for the catalog, not compiled or run",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ ],
+ "compatibleWith": {
+  "v": [],
+  "p": {
+   "source": "none declared yet",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "ESP32-S3 board with Wi-Fi, Bluetooth LE, two USB ports and an RGB LED. Model only here.",
+    "id": "Papan ESP32-S3 dengan Wi-Fi, Bluetooth LE, dua port USB, dan LED RGB. Hanya model di sini."
+   },
+   "p": {
+    "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "On N8R8 and N16R8 modules GPIO35 to 37 are used by the PSRAM.",
+     "id": "Pada modul N8R8 dan N16R8 GPIO35 sampai 37 dipakai PSRAM."
+    },
+    "p": {
+     "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "ADC2 cannot be used while Wi-Fi is on.",
+     "id": "ADC2 tidak bisa dipakai saat Wi-Fi aktif."
+    },
+    "p": {
+     "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Use one power input at a time (USB, 5V+G or 3V3+G).",
+     "id": "Pakai satu input daya dalam satu waktu (USB, 5V+G, atau 3V3+G)."
+    },
+    "p": {
+     "source": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

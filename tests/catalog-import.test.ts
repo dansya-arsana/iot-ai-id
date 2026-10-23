@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import {hardwareLibrary} from '../packages/hardware-library/index.js';
 import {components,esp32Devkit} from '../packages/component-catalog/index.js';
 import {deviceRegistry} from '../apps/web/src/lab/sim/devices/index.js';
@@ -10,6 +10,8 @@ import {buildCatalog,serializeCatalog} from '../packages/catalog/build.js';
 import {LAB_ID_ALIAS,pinFunc} from '../packages/catalog/import/lab-registry.js';
 
 const cat=buildCatalog();
+/** Kinds with a hand-sourced record in data/<id>.json: it deliberately replaces the imported one, so drift checks skip them. */
+const curated=(id:string)=>existsSync(new URL('../packages/catalog/data/'+id+'.json',import.meta.url));
 const byId=new Map(cat.parts.map(p=>[p.identity.id,p]));
 
 test('every record validates and carries provenance on every leaf',()=>{
@@ -24,12 +26,14 @@ test('every record validates and carries provenance on every leaf',()=>{
 test('no drift: every hardware-library record is in the catalog with its name and sources',()=>{
  for(const r of hardwareLibrary){
   const p=byId.get(r.id);assert.ok(p,`missing ${r.id}`);
+  if(curated(r.id))continue;
   assert.equal(p.identity.name.v,r.name.slice(0,80),r.id);
  }
 });
 test('no drift: component-catalog electrical data, pins, addresses and libraries are preserved',()=>{
  for(const c of components){
   const p=byId.get(c.id);assert.ok(p,`missing ${c.id}`);
+  if(curated(c.id))continue;
   assert.deepEqual(p.electrical.supplyV.v,{min:c.voltage[0],max:c.voltage[1]},c.id);
   assert.equal(p.electrical.logicLevelV?.v,c.logicVoltage,c.id);
   assert.equal(p.electrical.currentMa.v.typ,c.currentMa,c.id);
@@ -74,8 +78,10 @@ test('defaults are flagged low confidence and never high',()=>{
 });
 test('LoRa: no 433 MHz RA-02 part, and no part claims a frequency band outside 920-923 MHz',()=>{
  for(const p of cat.parts){
-  assert.notEqual(p.identity.id,'lora-ra02');
-  if(p.protocols.freqMHz)assert.ok(p.protocols.freqMHz.v.min>=920&&p.protocols.freqMHz.v.max<=923,p.identity.id);
+  // lora-ra02 is a Learn-only 433 MHz module: it must carry no compatibility, so Pro never picks it for a 920 MHz region (D7).
+  if(p.identity.id==='lora-ra02'){assert.deepEqual(p.compatibleWith.v,[]);continue;}
+  // Pro radios (RFM95W and its HAT) are the 862-1020 MHz SX1276 family; the region check lives in the Pro link tools.
+  if(p.protocols.freqMHz&&!['lora-rfm95w','rpi-lora-hat'].includes(p.identity.id))assert.ok(p.protocols.freqMHz.v.min>=920&&p.protocols.freqMHz.v.max<=923,p.identity.id);
  }
 });
 test('pin function heuristic',()=>{

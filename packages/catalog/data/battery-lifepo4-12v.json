@@ -1,0 +1,219 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "battery-lifepo4-12v",
+  "name": {
+   "v": "12.8 V LiFePO4 battery with BMS (6-50 Ah)",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-lifepo4-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "part",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-lifepo4-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 10,
+    "max": 14.6
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F (4S LFP 10.0-14.6 V, nominal 12.8 V)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 1000,
+    "peak": 12000
+   },
+   "p": {
+    "source": "about 1 C of a 12 Ah block [U], retail class, no sheet cited",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "P+",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-lifepo4-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "P-",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-lifepo4-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [],
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-lifepo4-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 98,
+    "h": 95,
+    "d": 151
+   },
+   "p": {
+    "source": "retail class: 12 Ah about 151 x 98 x 95 mm; 6 Ah 151 x 65 x 94; 20 Ah 181 x 77 x 167; 50 Ah 229 x 138 x 208 [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "massG": {
+   "v": 1500,
+   "p": {
+    "source": "retail class for 12 Ah [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "sealed block but terminals are open: keep it in an enclosure [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "ipRating": {
+   "v": "IP20",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -20,
+    "max": 60
+   },
+   "p": {
+    "source": "typical LFP block: charge only above 0 C [K, general guidance]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "solar-charge-pwm"
+  ],
+  "p": {
+   "source": "apps/web/src/lab/sim/devices/battery-lifepo4-12v.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/battery-lifepo4-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/battery-lifepo4-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Sealed 12.8 V LiFePO4 block with built-in BMS, a drop-in for a small lead-acid battery.",
+    "id": "Blok LiFePO4 12,8 V tertutup dengan BMS bawaan, pengganti aki kecil."
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Set the charge controller to LFP by hand. Do not charge below 0 C.",
+     "id": "Atur pengontrol ke LFP manual. Jangan mengisi di bawah 0 C."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Case sizes and capacities are retail classes, not from one datasheet.",
+     "id": "Ukuran dan kapasitas adalah kelas ritel, bukan dari satu lembar data."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   }
+  ]
+ }
+}

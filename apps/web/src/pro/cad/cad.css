@@ -1,0 +1,53 @@
+/* M5-B 3D viewport. Tokens only: colours come from --ds-* so the viewport sits in the Pro workspace look. */
+.cad{position:relative;width:100%;height:100%;min-height:320px;background:var(--ds-surface);overflow:hidden;outline:none;font-family:var(--ds-font);color:var(--ds-ink);user-select:none}
+.cad-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.cad[data-tool=measure] .cad-canvas{cursor:crosshair}
+.cad-bar{position:absolute;top:var(--cad-top,12px);left:var(--cad-left,12px);right:96px;display:flex;gap:var(--ds-2);flex-wrap:wrap;align-items:center;pointer-events:none}
+.cad-group{display:flex;align-items:center;gap:2px;padding:4px;background:var(--ds-surface-raised);border:1px solid var(--ds-line);border-radius:var(--ds-radius-2);box-shadow:var(--ds-shadow-1);pointer-events:auto}
+.cad-tool{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:var(--ds-radius-1);background:transparent;color:var(--ds-ink);cursor:pointer}
+.cad-tool:hover{background:var(--ds-sunken)}
+.cad-tool[aria-pressed=true]{background:var(--ds-inverse);color:var(--ds-on-inverse)}
+.cad-tool:disabled{opacity:.35;cursor:default}
+.cad-tool:focus-visible,.cad-cube button:focus-visible,.cad-balloon:focus-visible{outline:2px solid var(--ds-ink);outline-offset:2px}
+.cad-sep{width:1px;height:20px;background:var(--ds-line);margin:0 2px}
+.cad-explode{padding:6px 12px;gap:var(--ds-3);font-size:13px;font-weight:600}
+.cad-explode input[type=range]{width:120px;accent-color:var(--ds-ink)}
+.cad-explode output{font-family:var(--ds-mono);font-size:12px;color:var(--ds-ink-2);min-width:34px;text-align:right}
+.cad-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--ds-line);border-radius:var(--ds-radius-pill);background:var(--ds-surface-raised);font-size:12px;color:var(--ds-ink-2);pointer-events:auto}
+.cad-pill b{color:var(--ds-ink);font-weight:600}
+.cad-section{position:absolute;top:calc(var(--cad-top,12px) + 56px);left:var(--cad-left,12px);display:flex;gap:var(--ds-2);align-items:center;padding:6px 10px;background:var(--ds-surface-raised);border:1px solid var(--ds-line);border-radius:var(--ds-radius-2);font-size:12px;box-shadow:var(--ds-shadow-1)}
+.cad-section button{border:1px solid var(--ds-line);background:transparent;border-radius:var(--ds-radius-1);padding:2px 8px;font-family:var(--ds-mono);font-size:12px;cursor:pointer;color:var(--ds-ink)}
+.cad-section button[aria-pressed=true]{background:var(--ds-inverse);color:var(--ds-on-inverse);border-color:var(--ds-inverse)}
+.cad-section input{width:120px;accent-color:var(--ds-ink)}
+.cad-chip{position:absolute;bottom:12px;padding:6px 12px;border:1px solid var(--ds-line);border-radius:var(--ds-radius-pill);background:var(--ds-surface-raised);font-family:var(--ds-mono);font-size:11.5px;color:var(--ds-ink-2);white-space:nowrap}
+.cad-chip-l{left:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;border:0;background:transparent;padding:0}
+.cad-chip-l span{padding:6px 12px;border:1px solid var(--ds-line);border-radius:var(--ds-radius-pill);background:var(--ds-surface-raised)}
+.cad-chip-r{right:12px}
+.cad-chip-r em{font-style:normal;background:var(--ds-sunken);border-radius:3px;padding:1px 5px;margin-right:6px;font-size:10px;letter-spacing:var(--ds-track-label)}
+.cad-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.cad-leader{stroke:var(--ds-ink-3);stroke-width:1;fill:none}
+.cad-leader[data-sel=true]{stroke:var(--ds-ink)}
+.cad-dim{stroke:var(--ds-ink);stroke-width:1.5;fill:none}
+.cad-dim-dot{fill:var(--ds-ink)}
+.cad-balloon{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;border:0;background:transparent;padding:0;cursor:pointer;font-family:var(--ds-font);font-size:12px;color:var(--ds-ink-2)}
+.cad-balloon[data-side=left]{flex-direction:row-reverse;transform:translate(-100%,-50%) translateX(14px)}
+.cad-balloon[data-side=right]{transform:translate(0,-50%) translateX(-14px)}
+.cad-balloon i{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--ds-ink);background:var(--ds-surface-raised);color:var(--ds-ink);font-family:var(--ds-mono);font-size:11px;font-weight:600}
+.cad-balloon[data-sel=true] i{background:var(--ds-inverse);color:var(--ds-on-inverse)}
+.cad-balloon[data-sel=true] span{color:var(--ds-ink);font-weight:600}
+.cad-balloon[data-hover=true] i{border-width:2px}
+.cad-balloon span{text-shadow:0 0 3px var(--ds-surface),0 0 3px var(--ds-surface)}
+.cad-tag{position:absolute;transform:translate(-50%,-130%);background:var(--ds-inverse);color:var(--ds-on-inverse);font-family:var(--ds-mono);font-size:12px;padding:2px 8px;border-radius:var(--ds-radius-1);pointer-events:none}
+.cad-cube{position:absolute;top:var(--cad-top,12px);right:12px;display:flex;flex-direction:column;align-items:center;gap:4px;--cube-s:44px;--cube-h:22px}
+.cad-cube-scene{width:var(--cube-s);height:var(--cube-s);perspective:220px;margin:14px 0 6px}
+.cad-cube-body{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+.cad-cube-face{position:absolute;inset:0;border:1px solid var(--ds-line-strong);background:var(--ds-surface-raised);color:var(--ds-ink-2);font-family:var(--ds-mono);font-size:8px;letter-spacing:var(--ds-track-label);cursor:pointer;padding:0;backface-visibility:hidden}
+.cad-cube-face:hover{background:var(--ds-signal);color:var(--ds-ink)}
+.cad-cube-home{position:absolute;left:-30px;top:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:1px solid var(--ds-line);background:var(--ds-surface-raised);border-radius:var(--ds-radius-1);cursor:pointer;color:var(--ds-ink)}
+.cad-cube-proj{border:0;background:transparent;font-size:11px;color:var(--ds-ink-3);cursor:pointer;font-family:var(--ds-font)}
+.cad-error{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ds-ink-2);font-size:14px;padding:24px;text-align:center}
+.cad-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:640px){.cad-bar{right:12px;top:calc(var(--cad-top,12px) + 0px)}.cad-cube{top:auto;bottom:56px}.cad-explode input[type=range]{width:80px}.cad-chip-r{display:none}}
+@media (prefers-reduced-motion:reduce){.cad *{transition:none!important}}
+
+.cad[data-compact=true] .cad-balloon span{display:none}

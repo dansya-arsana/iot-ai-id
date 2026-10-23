@@ -1,0 +1,231 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "battery-18650-pack",
+  "name": {
+   "v": "18650 battery pack with BMS (4S LiFePO4 or 3S Li-ion)",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-18650-pack.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "part",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-18650-pack.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 7.5,
+    "max": 14.6
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F (LFP 4S 10.0-14.6 V; Li-ion 3S 8.4-12.6 V)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 1000,
+    "peak": 10000
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F (BMS limit default 10 A [U]); Samsung INR18650-35E cell 8 A continuous [U: sheet not fetched]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "P+",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-18650-pack.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "P-",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-18650-pack.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [],
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/battery-18650-pack.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 74,
+    "h": 19,
+    "d": 70
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F (18650 cell 18.4 x 65.2 mm; 4S1P about 74 x 65 x 19 mm plus BMS)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "massG": {
+   "v": 220,
+   "p": {
+    "source": "estimate: 4 LFP cells of about 40 g plus BMS [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "cells in a pack must live inside an enclosure [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "ipRating": {
+   "v": "IP20",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": 0,
+    "max": 45
+   },
+   "p": {
+    "source": "LFP charge range 0-45 C, discharge down to -20 C [K, general guidance]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "solar-charge-pwm"
+  ],
+  "p": {
+   "source": "apps/web/src/lab/sim/devices/battery-18650-pack.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/battery-18650-pack.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/battery-18650-pack.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Pack of 18650 cells with a protection board. Default 4S LiFePO4 (12.8 V) to suit an LFP-capable controller.",
+    "id": "Paket sel 18650 dengan papan proteksi. Bawaan LiFePO4 4S (12,8 V) agar cocok dengan pengontrol berkemampuan LFP."
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "3S Li-ion needs a Li-ion capable controller: the 10 A PWM controller does not support it.",
+     "id": "Li-ion 3S memerlukan pengontrol berkemampuan Li-ion: pengontrol PWM 10 A tidak mendukungnya."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "LFP must not charge below 0 C. Voltage is flat from 20 to 90 %, so it cannot show charge.",
+     "id": "LFP tidak boleh diisi di bawah 0 C. Tegangan datar dari 20 sampai 90 %, jadi tidak bisa menunjukkan muatan."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Cell capacity (IFR18650 about 1.5 Ah) and BMS cut-offs are typical values, not from one datasheet.",
+     "id": "Kapasitas sel (IFR18650 sekitar 1,5 Ah) dan batas BMS adalah nilai umum, bukan dari satu lembar data."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   }
+  ]
+ }
+}

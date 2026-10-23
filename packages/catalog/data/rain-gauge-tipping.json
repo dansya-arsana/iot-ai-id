@@ -1,0 +1,226 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "rain-gauge-tipping",
+  "name": {
+   "v": "Tipping-bucket rain gauge (reed, SEN-15901 class)",
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "environment",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "SparkFun",
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf (passive reed contact; the MCU pull-up sets the level)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "SEN-15901",
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf (passive reed contact; the MCU pull-up sets the level)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 0,
+    "max": 5.5
+   },
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf (passive reed contact; the MCU pull-up sets the level)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 0,
+    "peak": 0
+   },
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "SIG",
+    "func": [
+     "digital-in"
+    ],
+    "note": "reed lead, INPUT_PULLUP"
+   },
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND",
+    "func": [
+     "ground"
+    ],
+    "note": "reed lead"
+   },
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "digital"
+   ],
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 120,
+    "h": 90,
+    "d": 120
+   },
+   "p": {
+    "source": "https://core-electronics.com.au/weather-meter-kit.html (funnel 110-130 mm; 120 mm chosen)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": true,
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -40,
+    "max": 60
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md D2 (unverified, check the gauge sheet)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "esp32-devkit",
+   "arduino-uno-r3",
+   "arduino-nano",
+   "rpi-pico"
+  ],
+  "p": {
+   "source": "packages/catalog/data (curated by M4, unverified until Pro design checks)",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/rain-gauge-tipping.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/rain-gauge-tipping.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "One reed closure per 0.2794 mm of rain; count pulses on an interrupt pin.",
+    "id": "Satu penutupan reed per 0,2794 mm hujan; hitung pulsa pada pin interupsi."
+   },
+   "p": {
+    "source": "https://cdn.sparkfun.com/assets/d/1/e/0/6/DS-15901-Weather_Meter.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "The reed bounces for about 1 ms: debounce 20-50 ms. The 100 ms closure length is an assumption of the lab model, not a datasheet value.",
+     "id": "Reed memantul sekitar 1 ms: debounce 20-50 ms. Panjang penutupan 100 ms adalah asumsi model lab, bukan nilai datasheet."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md D2",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Other gauges use 0.2, 0.3 or 0.5 mm per tip: set mmPerTip to your gauge.",
+     "id": "Penakar lain memakai 0,2, 0,3, atau 0,5 mm per jungkitan: atur mmPerTip sesuai penakar Anda."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md D2",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

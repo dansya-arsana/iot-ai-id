@@ -1,0 +1,193 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "enclosure-ip65",
+  "name": {
+   "v": "IP65 junction box with cable glands",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/enclosure-ip65.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "part",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/enclosure-ip65.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "generic ABS (Hammond 1554 as the cited example)",
+   "p": {
+    "source": "https://uk.farnell.com/hammond/1554x2gysl/enclosure-pc-200mmx300mmx200mm/dp/3649408",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 0.1,
+    "max": 48
+   },
+   "p": {
+    "source": "passive housing, no electrical rating [K]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 0,
+    "peak": 0
+   },
+   "p": {
+    "source": "passive housing, draws no current",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "pins": [],
+ "protocols": {
+  "supported": {
+   "v": [],
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/enclosure-ip65.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 200,
+    "h": 75,
+    "d": 120
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F (generic ABS 200 x 120 x 75 mm [U]; Hammond 1554X2GY 299.7 x 198.1 x 89.9 mm per https://uk.farnell.com/hammond/1554x2gysl/enclosure-pc-200mmx300mmx200mm/dp/3649408)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": true,
+   "p": {
+    "source": "IP65 = dust-tight and water jets, IEC 60529 [K]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "ipRating": {
+   "v": "IP65",
+   "p": {
+    "source": "IEC 60529 [K]; docs/research/pro-parts-briefs.md Group F",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -25,
+    "max": 60
+   },
+   "p": {
+    "source": "typical ABS enclosure range [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "solar-charge-pwm",
+   "battery-18650-pack",
+   "battery-lifepo4-12v",
+   "din-rail-terminals"
+  ],
+  "p": {
+   "source": "apps/web/src/lab/sim/devices/enclosure-ip65.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/enclosure-ip65.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/enclosure-ip65.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Passive IP65 box. Glands on the bottom face, gland size must match the cable diameter.",
+    "id": "Kotak IP65 pasif. Gland di sisi bawah, ukuran gland harus sesuai diameter kabel."
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Gland clamping ranges (PG7 3-6.5 mm, PG9 4-8, M16 4-8, M20 6-12) are typical, not from a maker sheet.",
+     "id": "Rentang jepit gland (PG7 3-6,5 mm, PG9 4-8, M16 4-8, M20 6-12) adalah nilai umum, bukan dari lembar pabrikan."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "Add a breather plug: condensation inside a sealed box is common in the tropics.",
+     "id": "Tambahkan sumbat napas: kondensasi di dalam kotak tertutup umum di daerah tropis."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

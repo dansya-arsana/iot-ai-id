@@ -1,0 +1,445 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "rpi-lora-hat",
+  "name": {
+   "v": "LoRa/GPS HAT for Raspberry Pi (SX1276)",
+   "p": {
+    "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "kind": {
+   "v": "radio",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 3.3,
+    "max": 5.25
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "logicLevelV": {
+   "v": 3.3,
+   "p": {
+    "source": "Raspberry Pi GPIO is 3.3 V",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 60,
+    "peak": 150
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "3V3_1",
+    "func": [
+     "power"
+    ],
+    "note": "header pin 1, 3.3 V"
+   },
+   "p": {
+    "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "5V_2",
+    "func": [
+     "power"
+    ],
+    "note": "header pin 2, 5 V"
+   },
+   "p": {
+    "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_6",
+    "func": [
+     "ground"
+    ],
+    "note": "header pin 6, ground"
+   },
+   "p": {
+    "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO4",
+    "func": [
+     "irq"
+    ],
+    "note": "header pin 7, radio DIO0"
+   },
+   "p": {
+    "source": "https://github.com/wklenk/lmic-rpi-lora-gps-hat",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO14",
+    "func": [
+     "uart-tx"
+    ],
+    "note": "header pin 8, GPS serial"
+   },
+   "p": {
+    "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO15",
+    "func": [
+     "uart-rx"
+    ],
+    "note": "header pin 10, GPS serial"
+   },
+   "p": {
+    "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO17",
+    "func": [
+     "reset"
+    ],
+    "note": "header pin 11, radio RESET"
+   },
+   "p": {
+    "source": "https://github.com/wklenk/lmic-rpi-lora-gps-hat",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO23",
+    "func": [
+     "irq"
+    ],
+    "note": "header pin 16, radio DIO1"
+   },
+   "p": {
+    "source": "https://github.com/JaapBraam/single_chan_pkt_fwd",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO24",
+    "func": [
+     "irq"
+    ],
+    "note": "header pin 18, radio DIO2"
+   },
+   "p": {
+    "source": "https://github.com/JaapBraam/single_chan_pkt_fwd",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO10",
+    "func": [
+     "spi-mosi"
+    ],
+    "note": "header pin 19, SPI0 MOSI"
+   },
+   "p": {
+    "source": "https://github.com/wklenk/lmic-rpi-lora-gps-hat",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO9",
+    "func": [
+     "spi-miso"
+    ],
+    "note": "header pin 21, SPI0 MISO"
+   },
+   "p": {
+    "source": "https://github.com/wklenk/lmic-rpi-lora-gps-hat",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO25",
+    "func": [
+     "spi-cs"
+    ],
+    "note": "header pin 22, radio NSS, a manual chip select (not CE0)"
+   },
+   "p": {
+    "source": "https://github.com/wklenk/lmic-rpi-lora-gps-hat",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO11",
+    "func": [
+     "spi-sck"
+    ],
+    "note": "header pin 23, SPI0 SCLK"
+   },
+   "p": {
+    "source": "https://github.com/wklenk/lmic-rpi-lora-gps-hat",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "ANT",
+    "func": [
+     "nc"
+    ],
+    "note": "SMA antenna jack"
+   },
+   "p": {
+    "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "spi",
+    "lora",
+    "uart"
+   ],
+   "p": {
+    "source": "https://github.com/wklenk/lmic-rpi-lora-gps-hat",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "freqMHz": {
+   "v": {
+    "min": 862,
+    "max": 1020
+   },
+   "p": {
+    "source": "https://www.semtech.com/products/wireless-rf/lora-connect/sx1276",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 65,
+    "h": 56.5,
+    "d": 18
+   },
+   "p": {
+    "source": "https://github.com/raspberrypi/hats",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "default: a HAT lives inside the gateway enclosure",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": 0,
+    "max": 50
+   },
+   "p": {
+    "source": "Raspberry Pi 4 product brief (host limit)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "rpi-4b",
+   "rpi-5"
+  ],
+  "p": {
+   "source": "docs/research/pro-parts-briefs.md",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/rpi-lora-hat.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/rpi-lora-hat.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "A single-channel LoRa and GPS HAT (Semtech SX1276, 868/915 MHz class) for the Raspberry Pi 40-pin header. Used at 920-923 MHz it fits the Indonesian plan. Model only here.",
+    "id": "HAT LoRa dan GPS satu kanal (Semtech SX1276, kelas 868/915 MHz) untuk header 40 pin Raspberry Pi. Dipakai di 920-923 MHz, cocok dengan rencana Indonesia. Hanya model di sini."
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Single channel and one spreading factor: fine for point-to-point LoRa between our nodes, not a full LoRaWAN gateway.",
+     "id": "Satu kanal dan satu spreading factor: cukup untuk LoRa titik-ke-titik antar node kita, bukan gateway LoRaWAN penuh."
+    },
+    "p": {
+     "source": "https://github.com/JaapBraam/single_chan_pkt_fwd",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Chip select is GPIO25 (pin 22), a manual pin, not CE0: software must drive it.",
+     "id": "Chip select adalah GPIO25 (pin 22), pin manual, bukan CE0: perangkat lunak harus mengendalikannya."
+    },
+    "p": {
+     "source": "https://github.com/wklenk/lmic-rpi-lora-gps-hat",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "Boards older than v1.3 need DIO1 and DIO2 bridged by hand.",
+     "id": "Papan lebih lama dari v1.3 butuh DIO1 dan DIO2 dijumper manual."
+    },
+    "p": {
+     "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "Pin map comes from community sources and differs between board revisions: check your board before wiring.",
+     "id": "Peta pin berasal dari sumber komunitas dan berbeda antar revisi papan: cek papan Anda sebelum memasang."
+    },
+    "p": {
+     "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "Never transmit without the antenna on the SMA jack.",
+     "id": "Jangan pernah memancar tanpa antena di jack SMA."
+    },
+    "p": {
+     "source": "https://wiki.linksprite.com/index.php/LoRa/GPS_HAT_for_Raspberry_pi",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

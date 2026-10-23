@@ -1,0 +1,877 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "rpi-4b",
+  "name": {
+   "v": "Raspberry Pi 4 Model B",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "board",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "manufacturer": {
+   "v": "Raspberry Pi Ltd",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "Raspberry Pi 4 Model B",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 4.75,
+    "max": 5.25
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "logicLevelV": {
+   "v": 3.3,
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 600,
+    "peak": 3000
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md (typical and peak are estimates)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "3V3_1",
+    "func": [
+     "power"
+    ],
+    "note": "3.3 V from the board regulator (keep the total below about 500 mA)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "5V_2",
+    "func": [
+     "power"
+    ],
+    "note": "5 V straight from the USB-C input (also powers the Pi when fed here)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO2",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "i2c-sda"
+    ],
+    "note": "ALT0-5: SDA1, SA3, LCD_VSYNC, SPI3_MOSI, CTS2, SDA3"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "5V_4",
+    "func": [
+     "power"
+    ],
+    "note": "5 V straight from the USB-C input (also powers the Pi when fed here)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO3",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "i2c-scl"
+    ],
+    "note": "ALT0-5: SCL1, SA2, LCD_HSYNC, SPI3_SCLK, RTS2, SCL3"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_6",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO4",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: GPCLK0, SA1, DPI_D0, SPI4_CE0_N, TXD3, SDA3"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO14",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "uart-tx"
+    ],
+    "note": "ALT0-5: TXD0, SD6, DPI_D10, SPI5_MOSI, CTS5, TXD1"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_9",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO15",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "uart-rx"
+    ],
+    "note": "ALT0-5: RXD0, SD7, DPI_D11, SPI5_SCLK, RTS5, RXD1"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO17",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: -, SD9, DPI_D13, RTS0, SPI1_CE1_N, RTS1"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO18",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm"
+    ],
+    "note": "ALT0-5: PCM_CLK, SD10, DPI_D14, SPI6_CE0_N, SPI1_CE0_N, PWM0_0"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO27",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: SD0_DAT3, TE1, DPI_D23, SD1_DAT3, ARM_TMS, SPI6_CE1_N"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_14",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO22",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: SD0_CLK, SD14, DPI_D18, SD1_CLK, ARM_TRST, SDA6"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO23",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: SD0_CMD, SD15, DPI_D19, SD1_CMD, ARM_RTCK, SCL6"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "3V3_17",
+    "func": [
+     "power"
+    ],
+    "note": "3.3 V from the board regulator (keep the total below about 500 mA)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO24",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: SD0_DAT0, SD16, DPI_D20, SD1_DAT0, ARM_TDO, SPI3_CE1_N"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO10",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-mosi"
+    ],
+    "note": "ALT0-5: SPI0_MOSI, SD2, DPI_D6, BSCSL_SDA_MOSI, CTS4, SDA5"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_20",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO9",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-miso"
+    ],
+    "note": "ALT0-5: SPI0_MISO, SD1, DPI_D5, BSCSL_MISO, RXD4, SCL4"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO25",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: SD0_DAT1, SD17, DPI_D21, SD1_DAT1, ARM_TCK, SPI4_CE1_N"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO11",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-sck"
+    ],
+    "note": "ALT0-5: SPI0_SCLK, SD3, DPI_D7, BSCSL_SCL_SCLK, RTS4, SCL5"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO8",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-cs"
+    ],
+    "note": "ALT0-5: SPI0_CE0_N, SD0, DPI_D4, BSCSL_CE_N, TXD4, SDA4"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_25",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO7",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-cs"
+    ],
+    "note": "ALT0-5: SPI0_CE1_N, SWE_N, DPI_D3, SPI4_SCLK, RTS3, SCL4"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO0",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "i2c-sda"
+    ],
+    "note": "ALT0-5: SDA0, SA5, PCLK, SPI3_CE0_N, TXD2, SDA6"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO1",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "i2c-scl"
+    ],
+    "note": "ALT0-5: SCL0, SA4, DE, SPI3_MISO, RXD2, SCL6"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO5",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: GPCLK1, SA0, DPI_D1, SPI4_MISO, RXD3, SCL3"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_30",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO6",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: GPCLK2, SOE_N, DPI_D2, SPI4_MOSI, CTS3, SDA4"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO12",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm"
+    ],
+    "note": "ALT0-5: PWM0_0, SD4, DPI_D8, SPI5_CE0_N, TXD5, SDA5"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO13",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm"
+    ],
+    "note": "ALT0-5: PWM0_1, SD5, DPI_D9, SPI5_MISO, RXD5, SCL5"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_34",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO19",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm"
+    ],
+    "note": "ALT0-5: PCM_FS, SD11, DPI_D15, SPI6_MISO, SPI1_MISO, PWM0_1"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO16",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: -, SD8, DPI_D12, CTS0, SPI1_CE2_N, CTS1"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO26",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: SD0_DAT2, TE0, DPI_D22, SD1_DAT2, ARM_TDI, SPI5_CE1_N"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO20",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: PCM_DIN, SD12, DPI_D16, SPI6_MOSI, SPI1_MOSI, GPCLK0"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_39",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO21",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "ALT0-5: PCM_DOUT, SD13, DPI_D17, SPI6_SCLK, SPI1_SCLK, GPCLK1"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/bcm2711/bcm2711-peripherals.pdf (section 5.3), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "i2c",
+    "spi",
+    "uart",
+    "pwm",
+    "wifi",
+    "ble",
+    "digital"
+   ],
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 85,
+    "h": 56,
+    "d": 17
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "massG": {
+   "v": 46,
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": 0,
+    "max": 50
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "drivers": [
+  {
+   "v": {
+    "boardFamily": "rpi",
+    "lib": "gpiozero",
+    "snippet": "from gpiozero import LED\nled = LED(17)\nled.on()",
+    "verify": "untested"
+   },
+   "p": {
+    "source": "written by us for the catalog, not compiled or run",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ ],
+ "compatibleWith": {
+  "v": [],
+  "p": {
+   "source": "none declared yet",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Quad-core Linux computer with a 40-pin header, used as the farm gateway. GPIO is 3.3 V and not 5 V tolerant. Model only here.",
+    "id": "Komputer Linux quad-core dengan header 40 pin, dipakai sebagai gateway kebun. GPIO 3,3 V dan tidak tahan 5 V. Hanya model di sini."
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "GPIO0 and GPIO1 are the HAT ID EEPROM bus: leave them free unless you are a HAT.",
+     "id": "GPIO0 dan GPIO1 adalah bus EEPROM ID HAT: biarkan kosong kecuali Anda HAT."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "On Pi 4, RPi.GPIO, gpiozero, spidev and smbus2 all work.",
+     "id": "Di Pi 4, RPi.GPIO, gpiozero, spidev, dan smbus2 semuanya berfungsi."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Connector positions in the 3D model are approximate until checked against the mechanical drawing.",
+     "id": "Posisi konektor di model 3D masih perkiraan sampai dicek ke gambar mekanik."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-product-brief.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

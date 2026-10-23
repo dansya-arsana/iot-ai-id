@@ -33,7 +33,7 @@ function boot(name:string,c:Circuit){
  r.load(fx.variant,{},c,fx.toolchain);r.start();
  return r;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const ext=(s:{kind:string}|undefined):Record<string,any>=>{assert.ok(s&&s.kind==='ext');return (s as unknown as {v:Record<string,unknown>}).v;};
 
 /** Master side of the TM1637 bus on a fake board: edges are sent to the model with cycle stamps 40 cycles apart. */

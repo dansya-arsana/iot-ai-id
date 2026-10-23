@@ -102,7 +102,7 @@ const hwLine=(h:HardwareReference)=>`<a href="/hardware/${h.id}/">${esc(h.name)}
 render({path:'/partner',title:'Partner with us | AIoT',description:'Device makers, schools and buyers: send an inquiry to AIoT. Field testing in Indonesia, localization, distribution and real-world data. Reply within one working day.',
  body:`<main>${nav}<h1>Partner with AIoT</h1><p>${esc(pitch)}</p><p>Device makers (vendors), Indonesian schools (Lab Mitra) and buyers can send an inquiry through the form on this page. We reply within one working day by email or WhatsApp (+62 812-114-040).</p></main>`});
 /** Invitation-only for the public (see apps/web/src/preview.tsx): no content, noindex, absent from sitemap and llms*.txt. Members and staff reach the real pages after signing in. */
-const invitationOnly=[['/products','Products'],['/builders','Builders'],['/bench','PhysicalBench'],['/arena','Arena'],['/build','Build'],['/sites','Sites'],['/design','Design system'],['/lab','Arduino lab']];
+const invitationOnly=[['/products','Products'],['/builders','Builders'],['/bench','PhysicalBench'],['/arena','Arena'],['/build','Build'],['/sites','Sites'],['/design','Design system'],['/lab','Arduino lab'],['/pro','Pro workspace'],['/pro/dev','Pro workspace']];
 for(const l of LESSONS)invitationOnly.push([`/lab/${l.id}`,'Arduino lab']);
 invitationOnly.push(['/lab/parts','Arduino lab']);
 for(const [path,name] of invitationOnly)render({path,noindex:true,title:`${name} is invitation-only | AIoT`,description:'By invitation.',body:`<main><h1>${esc(name)} is invitation-only.</h1><p>We are opening AIoT to partners and schools in stages. Invited members sign in to see it.</p><p><a href="/partner">Request access</a> · <a href="/masuk">Sign in</a></p></main>`});

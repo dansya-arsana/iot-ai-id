@@ -1,0 +1,366 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "max485",
+  "name": {
+   "v": "MAX485 TTL to RS-485 module",
+   "p": {
+    "source": "https://protosupplies.com/product/max485-ttl-to-rs-485-interface-module/",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "bus",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "Analog Devices (Maxim) chip, generic module",
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "MAX485",
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 4.75,
+    "max": 5.25
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "logicLevelV": {
+   "v": 5,
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 10,
+    "peak": 30
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "RO",
+    "func": [
+     "uart-rx"
+    ],
+    "note": "Receiver out, swings to VCC (5 V)"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "RE",
+    "func": [
+     "rs485-de"
+    ],
+    "note": "Receive enable, active low"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "DE",
+    "func": [
+     "rs485-de"
+    ],
+    "note": "Driver enable, active high"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "DI",
+    "func": [
+     "uart-tx"
+    ],
+    "note": "Driver input"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "VCC",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "B",
+    "func": [
+     "nc"
+    ],
+    "note": "Bus D-"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "A",
+    "func": [
+     "nc"
+    ],
+    "note": "Bus D+"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GND",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "A_T",
+    "func": [
+     "nc"
+    ],
+    "note": "Screw terminal A"
+   },
+   "p": {
+    "source": "https://protosupplies.com/product/max485-ttl-to-rs-485-interface-module/",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "B_T",
+    "func": [
+     "nc"
+    ],
+    "note": "Screw terminal B"
+   },
+   "p": {
+    "source": "https://protosupplies.com/product/max485-ttl-to-rs-485-interface-module/",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "uart",
+    "rs485"
+   ],
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 44,
+    "h": 14,
+    "d": 12
+   },
+   "p": {
+    "source": "https://protosupplies.com/product/max485-ttl-to-rs-485-interface-module/ ; https://makerselectronics.com/ar/product/max485-ttl-to-rs485-converter-module/ (vendors list 44x13 to 45x20)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": 0,
+    "max": 70
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "soil-npk-rs485",
+   "esp32-s3-devkitc",
+   "arduino-uno",
+   "arduino-nano"
+  ],
+  "p": {
+   "source": "docs/research/pro-parts-briefs.md",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/max485.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/max485.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Half-duplex 5 V TTL to RS-485 converter module for Modbus and long cables. DE high transmits, RE low receives; usually bridged. Has a 120 ohm terminator across A/B (some 100 ohm): keep it only at the two ends of the bus.",
+    "id": "Modul konverter TTL 5 V ke RS-485 half-duplex untuk Modbus dan kabel panjang. DE high mengirim, RE low menerima; biasanya dijumper. Ada terminator 120 ohm di A/B (sebagian 100 ohm): pasang hanya di dua ujung bus."
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf ; https://protosupplies.com/product/max485-ttl-to-rs-485-interface-module/",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "RO swings to 5 V: with an ESP32 or Raspberry Pi that is a 5 V input on a 3.3 V pin. Add a divider or use a MAX3485 module.",
+     "id": "RO naik sampai 5 V: pada ESP32 atau Raspberry Pi itu masukan 5 V ke pin 3,3 V. Tambahkan pembagi tegangan atau pakai modul MAX3485."
+    },
+    "p": {
+     "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "high"
+    }
+   },
+   {
+    "v": {
+     "en": "Never leave DE high when you want to listen: the driver blocks the bus. Switch back to receive right after the last byte.",
+     "id": "Jangan biarkan DE high saat ingin mendengar: pengirim menahan bus. Kembali ke mode terima segera setelah byte terakhir."
+    },
+    "p": {
+     "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX1487-MAX491.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Dimensions differ between vendors (44 x 13 to 45 x 20 mm): measure your module before drilling.",
+     "id": "Ukuran berbeda antar penjual (44 x 13 sampai 45 x 20 mm): ukur modul Anda sebelum mengebor."
+    },
+    "p": {
+     "source": "https://protosupplies.com/product/max485-ttl-to-rs-485-interface-module/ ; https://makerselectronics.com/ar/product/max485-ttl-to-rs485-converter-module/",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   }
+  ]
+ }
+}

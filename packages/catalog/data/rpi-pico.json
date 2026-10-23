@@ -1,0 +1,958 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "rpi-pico",
+  "name": {
+   "v": "Raspberry Pi Pico",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "board",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "manufacturer": {
+   "v": "Raspberry Pi Ltd",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "SC0915",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 1.8,
+    "max": 5.5
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "logicLevelV": {
+   "v": 3.3,
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 25,
+    "peak": 100
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md (typical and peak are estimates)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "GP0",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI0 RX, UART0 TX, I2C0 SDA, PWM0A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP1",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI0 CSn, UART0 RX, I2C0 SCL, PWM0B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_3",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP2",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI0 SCK, UART0 CTS, I2C1 SDA, PWM1A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP3",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI0 TX, UART0 RTS, I2C1 SCL, PWM1B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP4",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI0 RX, UART1 TX, I2C0 SDA, PWM2A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP5",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI0 CSn, UART1 RX, I2C0 SCL, PWM2B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_8",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP6",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI0 SCK, UART1 CTS, I2C1 SDA, PWM3A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP7",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI0 TX, UART1 RTS, I2C1 SCL, PWM3B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP8",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI1 RX, UART1 TX, I2C0 SDA, PWM4A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP9",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI1 CSn, UART1 RX, I2C0 SCL, PWM4B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_13",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP10",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI1 SCK, UART1 CTS, I2C1 SDA, PWM5A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP11",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI1 TX, UART1 RTS, I2C1 SCL, PWM5B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP12",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI1 RX, UART0 TX, I2C0 SDA, PWM6A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP13",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI1 CSn, UART0 RX, I2C0 SCL, PWM6B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_18",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP14",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI1 SCK, UART0 CTS, I2C1 SDA, PWM7A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP15",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI1 TX, UART0 RTS, I2C1 SCL, PWM7B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP16",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI0 RX, UART0 TX, I2C0 SDA, PWM0A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP17",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI0 CSn, UART0 RX, I2C0 SCL, PWM0B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_23",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP18",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI0 SCK, UART0 CTS, I2C1 SDA, PWM1A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP19",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI0 TX, UART0 RTS, I2C1 SCL, PWM1B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP20",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI0 RX, UART1 TX, I2C0 SDA, PWM2A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP21",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-scl"
+    ],
+    "note": "SPI0 CSn, UART1 RX, I2C0 SCL, PWM2B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_28",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP22",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "i2c-sda"
+    ],
+    "note": "SPI0 SCK, UART1 CTS, I2C1 SDA, PWM3A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "RUN",
+    "func": [
+     "reset"
+    ],
+    "note": "Reset: pull low to reset the RP2040"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP26",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "adc",
+     "i2c-sda"
+    ],
+    "note": "SPI1 SCK, UART1 CTS, I2C1 SDA, PWM5A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP27",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "adc",
+     "i2c-scl"
+    ],
+    "note": "SPI1 TX, UART1 RTS, I2C1 SCL, PWM5B"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "AGND",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GP28",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm",
+     "adc",
+     "i2c-sda"
+    ],
+    "note": "SPI1 RX, UART0 TX, I2C0 SDA, PWM6A"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf (2.19.2, computed)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "ADC_VREF",
+    "func": [
+     "power"
+    ],
+    "note": "ADC reference, 3.3 V through a filter"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "3V3_OUT",
+    "func": [
+     "power"
+    ],
+    "note": "3.3 V output, about 300 mA"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "3V3_EN",
+    "func": [
+     "reset"
+    ],
+    "note": "Pull low to switch the 3.3 V regulator off"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_38",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "VSYS",
+    "func": [
+     "power"
+    ],
+    "note": "System supply in, 1.8 to 5.5 V (buck-boost)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "VBUS",
+    "func": [
+     "power"
+    ],
+    "note": "USB 5 V"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "SWCLK",
+    "func": [
+     "digital-in"
+    ],
+    "note": "SWD clock pad"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_D",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "SWDIO",
+    "func": [
+     "digital-in"
+    ],
+    "note": "SWD data pad"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "i2c",
+    "spi",
+    "uart",
+    "pwm",
+    "analog",
+    "digital"
+   ],
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 51,
+    "h": 21,
+    "d": 4
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "massG": {
+   "v": 3,
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -20,
+    "max": 85
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "drivers": [
+  {
+   "v": {
+    "boardFamily": "rp2040",
+    "lib": "micropython machine",
+    "snippet": "from machine import Pin\nled = Pin(25, Pin.OUT)\nled.on()",
+    "verify": "untested"
+   },
+   "p": {
+    "source": "written by us for the catalog, not compiled or run",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ ],
+ "compatibleWith": {
+  "v": [],
+  "p": {
+   "source": "none declared yet",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "RP2040 microcontroller board with 26 GPIO, 3 ADC inputs, 2 UART, 2 SPI, 2 I2C and 16 PWM channels. Model only here.",
+    "id": "Papan mikrokontroler RP2040 dengan 26 GPIO, 3 input ADC, 2 UART, 2 SPI, 2 I2C, dan 16 kanal PWM. Hanya model di sini."
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "GPIO is 3.3 V and not 5 V tolerant.",
+     "id": "GPIO 3,3 V dan tidak tahan 5 V."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "On the Pico W the on-board LED is on the Wi-Fi chip, not GP25.",
+     "id": "Di Pico W LED papan ada di chip Wi-Fi, bukan GP25."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Pull 3V3_EN low and the 3.3 V rail switches off.",
+     "id": "Tarik 3V3_EN ke low dan rel 3,3 V mati."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

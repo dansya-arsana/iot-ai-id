@@ -1,0 +1,487 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "lora-ra02",
+  "name": {
+   "v": "Ai-Thinker Ra-02 LoRa module (SX1278, 433 MHz)",
+   "p": {
+    "source": "https://docs.ai-thinker.com/en/Ra-02/",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "radio",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "Ai-Thinker",
+   "p": {
+    "source": "https://docs.ai-thinker.com/en/Ra-02/",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "Ra-02",
+   "p": {
+    "source": "https://docs.ai-thinker.com/en/Ra-02/",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 2.5,
+    "max": 3.7
+   },
+   "p": {
+    "source": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-02_V1.1%20Specification-20171219.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "logicLevelV": {
+   "v": 3.3,
+   "p": {
+    "source": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-02_V1.1%20Specification-20171219.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 12,
+    "peak": 120,
+    "sleepUa": 0.2
+   },
+   "p": {
+    "source": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-02_V1.1%20Specification-20171219.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "GND",
+    "func": [
+     "ground"
+    ],
+    "note": "pad 1"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GND2",
+    "func": [
+     "ground"
+    ],
+    "note": "pad 2"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "3V3",
+    "func": [
+     "power"
+    ],
+    "note": "pad 3"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "RESET",
+    "func": [
+     "reset"
+    ],
+    "note": "pad 4"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "DIO0",
+    "func": [
+     "irq"
+    ],
+    "note": "pad 5"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "DIO1",
+    "func": [
+     "irq"
+    ],
+    "note": "pad 6"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "DIO2",
+    "func": [
+     "irq"
+    ],
+    "note": "pad 7"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "DIO3",
+    "func": [
+     "irq"
+    ],
+    "note": "pad 8"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GND3",
+    "func": [
+     "ground"
+    ],
+    "note": "pad 9"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "DIO4",
+    "func": [
+     "irq"
+    ],
+    "note": "pad 10"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "DIO5",
+    "func": [
+     "irq"
+    ],
+    "note": "pad 11"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "SCK",
+    "func": [
+     "spi-sck"
+    ],
+    "note": "pad 12"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "MISO",
+    "func": [
+     "spi-miso"
+    ],
+    "note": "pad 13"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "MOSI",
+    "func": [
+     "spi-mosi"
+    ],
+    "note": "pad 14"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "NSS",
+    "func": [
+     "spi-cs"
+    ],
+    "note": "pad 15, active low"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  {
+   "v": {
+    "name": "GND4",
+    "func": [
+     "ground"
+    ],
+    "note": "pad 16"
+   },
+   "p": {
+    "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "spi",
+    "lora"
+   ],
+   "p": {
+    "source": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-02_V1.1%20Specification-20171219.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "freqMHz": {
+   "v": {
+    "min": 410,
+    "max": 525
+   },
+   "p": {
+    "source": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-02_V1.1%20Specification-20171219.pdf ; Semtech SX1278 datasheet",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 17,
+    "h": 16,
+    "d": 3.2
+   },
+   "p": {
+    "source": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-02_V1.1%20Specification-20171219.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "massG": {
+   "v": 1,
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "default: the bare module needs an enclosure",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -40,
+    "max": 85
+   },
+   "p": {
+    "source": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-02_V1.1%20Specification-20171219.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [],
+  "p": {
+   "source": "Learn lab only: not offered to Pro designs (band error in Indonesia)",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "high"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/lora-ra02.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/lora-ra02.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "A 433 MHz LoRa radio (Semtech SX1278) on a 17 x 16 mm stamp module. Kept for the Learn lab only. 433 MHz is not the Indonesian LoRa band (AS923-2, 920-923 MHz): in Pro it is a band error. Use lora-rfm95w.",
+    "id": "Radio LoRa 433 MHz (Semtech SX1278) pada modul stamp 17 x 16 mm. Dipertahankan hanya untuk Lab Belajar. 433 MHz bukan pita LoRa Indonesia (AS923-2, 920-923 MHz): di Pro ini galat pita. Pakai lora-rfm95w."
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Learn only. In Pro this part is a band error: the radio tunes 410-525 MHz and cannot reach 920-923 MHz. Choose lora-rfm95w.",
+     "id": "Hanya untuk belajar. Di Pro part ini galat pita: radio menala 410-525 MHz dan tidak bisa mencapai 920-923 MHz. Pilih lora-rfm95w."
+    },
+    "p": {
+     "source": "https://resources.lora-alliance.org/technical-specifications/rp002-1-0-4-regional-parameters",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "high"
+    }
+   },
+   {
+    "v": {
+     "en": "3.3 V only, not 5 V tolerant. A Uno needs a level shifter and a 3.3 V supply.",
+     "id": "Hanya 3,3 V, tidak tahan 5 V. Uno butuh level shifter dan catu 3,3 V."
+    },
+    "p": {
+     "source": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-02_V1.1%20Specification-20171219.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Pad order differs between sources: confirm it against the spec PDF before soldering. Whether the Ra-01H (868/915) fits this footprint is unconfirmed.",
+     "id": "Urutan pad berbeda antar sumber: cocokkan dengan PDF spesifikasi sebelum solder. Apakah Ra-01H (868/915) cocok di footprint ini belum dikonfirmasi."
+    },
+    "p": {
+     "source": "https://shillehtek.com/blogs/shillehtek-product-manuals/sx1278-lora-433mhz-transceiver-module-manual",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "Never transmit without an antenna on the IPEX connector.",
+     "id": "Jangan pernah memancar tanpa antena di konektor IPEX."
+    },
+    "p": {
+     "source": "https://docs.ai-thinker.com/en/Ra-02/",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

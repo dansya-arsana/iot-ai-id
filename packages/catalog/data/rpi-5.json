@@ -1,0 +1,877 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "rpi-5",
+  "name": {
+   "v": "Raspberry Pi 5",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "board",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "manufacturer": {
+   "v": "Raspberry Pi Ltd",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "Raspberry Pi 5",
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 4.75,
+    "max": 5.25
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "logicLevelV": {
+   "v": 3.3,
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 800,
+    "peak": 5000
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md (typical and peak are estimates)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "3V3_1",
+    "func": [
+     "power"
+    ],
+    "note": "3.3 V from the board regulator (keep the total below about 500 mA)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "5V_2",
+    "func": [
+     "power"
+    ],
+    "note": "5 V straight from the USB-C input (also powers the Pi when fed here)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO2",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "i2c-sda"
+    ],
+    "note": "RP1: I2C1_SDA (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "5V_4",
+    "func": [
+     "power"
+    ],
+    "note": "5 V straight from the USB-C input (also powers the Pi when fed here)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO3",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "i2c-scl"
+    ],
+    "note": "RP1: I2C1_SCL (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_6",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO4",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1: GPCLK0 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO14",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "uart-tx"
+    ],
+    "note": "RP1: UART0_TX (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_9",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO15",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "uart-rx"
+    ],
+    "note": "RP1: UART0_RX (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO17",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1 function table not recorded"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO18",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm"
+    ],
+    "note": "RP1: PCM_CLK, SPI1_CE0, PWM0_CH2 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO27",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1 function table not recorded"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_14",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO22",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1 function table not recorded"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO23",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1 function table not recorded"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "3V3_17",
+    "func": [
+     "power"
+    ],
+    "note": "3.3 V from the board regulator (keep the total below about 500 mA)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO24",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1 function table not recorded"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO10",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-mosi"
+    ],
+    "note": "RP1: SPI0_MOSI (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_20",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO9",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-miso"
+    ],
+    "note": "RP1: SPI0_MISO (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO25",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1 function table not recorded"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO11",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-sck"
+    ],
+    "note": "RP1: SPI0_SCLK (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO8",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-cs"
+    ],
+    "note": "RP1: SPI0_CE0 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_25",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO7",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "spi-cs"
+    ],
+    "note": "RP1: SPI0_CE1 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO0",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "i2c-sda"
+    ],
+    "note": "RP1: I2C0_SDA, ID_SD (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO1",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "i2c-scl"
+    ],
+    "note": "RP1: I2C0_SCL, ID_SC (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO5",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1: GPCLK1 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_30",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO6",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1: GPCLK2 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO12",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm"
+    ],
+    "note": "RP1: PWM0_CH0 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO13",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm"
+    ],
+    "note": "RP1: PWM0_CH1 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_34",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO19",
+    "func": [
+     "digital-in",
+     "digital-out",
+     "pwm"
+    ],
+    "note": "RP1: PCM_FS, SPI1_MISO, PWM0_CH3 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO16",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1: SPI1_CE2 (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO26",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1 function table not recorded"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO20",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1: PCM_DIN, SPI1_MOSI (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND_39",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GPIO21",
+    "func": [
+     "digital-in",
+     "digital-out"
+    ],
+    "note": "RP1: PCM_DOUT, SPI1_SCLK (partial table)"
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf (GPIO bank 0), https://pinout.xyz",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "i2c",
+    "spi",
+    "uart",
+    "pwm",
+    "wifi",
+    "ble",
+    "digital"
+   ],
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 85,
+    "h": 56,
+    "d": 17
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "massG": {
+   "v": 45,
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": 0,
+    "max": 50
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "drivers": [
+  {
+   "v": {
+    "boardFamily": "rpi",
+    "lib": "gpiozero",
+    "snippet": "from gpiozero import LED\nled = LED(17)\nled.on()",
+    "verify": "untested"
+   },
+   "p": {
+    "source": "written by us for the catalog, not compiled or run",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ ],
+ "compatibleWith": {
+  "v": [],
+  "p": {
+   "source": "none declared yet",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Faster Linux computer with the RP1 I/O chip and a 40-pin header, used as the farm gateway. 5 V / 5 A supply. Model only here.",
+    "id": "Komputer Linux lebih cepat dengan chip I/O RP1 dan header 40 pin, dipakai sebagai gateway kebun. Catu 5 V / 5 A. Hanya model di sini."
+   },
+   "p": {
+    "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "The legacy RPi.GPIO does not work on Pi 5: use gpiozero or lgpio (spidev and smbus2 are unchanged).",
+     "id": "RPi.GPIO lama tidak berfungsi di Pi 5: pakai gpiozero atau lgpio (spidev dan smbus2 tetap)."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "On a 3 A supply the USB ports are limited to 600 mA in total.",
+     "id": "Pada catu 3 A port USB dibatasi total 600 mA."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "The RP1 alt-function table is only partly recorded (header defaults).",
+     "id": "Tabel fungsi alt RP1 baru sebagian dicatat (bawaan header)."
+    },
+    "p": {
+     "source": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,295 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "solar-charge-pwm",
+  "name": {
+   "v": "PWM solar charge controller 10 A, 12/24 V",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/solar-charge-pwm.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "part",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/solar-charge-pwm.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "Renogy (Wanderer 10A class)",
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "mpn": {
+   "v": "WND10",
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 8,
+    "max": 50
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (PV input max 50 V DC; battery side 12/24 V)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 10,
+    "peak": 10000
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (10 A rated charge current; self-consumption about 10 mA [U])",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "PV+",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (screw terminals)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "PV-",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (screw terminals)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "BAT+",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (screw terminals)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "BAT-",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (screw terminals)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "LOAD+",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (screw terminals)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "LOAD-",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (screw terminals)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [],
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/solar-charge-pwm.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 119,
+    "h": 27.5,
+    "d": 75
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "massG": {
+   "v": 122,
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "indoor or inside an enclosure: the controller is not weatherproof [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "ipRating": {
+   "v": "IP20",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F (assumed, enclosure required [U])",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -35,
+    "max": 45
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf (Renogy product page says -25 C: sources disagree)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "solar-panel",
+   "battery-18650-pack",
+   "battery-lifepo4-12v"
+  ],
+  "p": {
+   "source": "apps/web/src/lab/sim/devices/solar-charge-pwm.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/solar-charge-pwm.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/solar-charge-pwm.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "10 A PWM charge controller for sealed, gel, flooded or LFP 12/24 V batteries.",
+    "id": "Pengontrol pengisi PWM 10 A untuk baterai 12/24 V tipe sealed, gel, flooded atau LFP."
+   },
+   "p": {
+    "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Not for 3S Li-ion NMC. Set LFP mode by hand; 12/24 V auto-detect is for non-lithium only.",
+     "id": "Bukan untuk Li-ion NMC 3S. Atur mode LFP manual; deteksi 12/24 V otomatis hanya untuk non-lithium."
+    },
+    "p": {
+     "source": "https://uk.renogy.com/cdn/shop/files/WND10-Datasheet.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "high"
+    }
+   },
+   {
+    "v": {
+     "en": "Connect the battery first, then the panel, then the load. Common-negative or common-positive switching is not confirmed.",
+     "id": "Sambungkan baterai dulu, lalu panel, lalu beban. Pensaklaran negatif atau positif bersama belum dipastikan."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   }
+  ]
+ }
+}

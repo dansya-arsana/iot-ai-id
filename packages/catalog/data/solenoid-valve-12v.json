@@ -1,0 +1,247 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "solenoid-valve-12v",
+  "name": {
+   "v": "Solenoid valve 12 V, normally closed, 1/2\"",
+   "p": {
+    "source": "https://www.adafruit.com/product/997",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "actuator",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "Adafruit",
+   "p": {
+    "source": "https://www.adafruit.com/product/997 (12 V DC nominal, works down to about 6 V, slower; +-10% band is ours)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "997",
+   "p": {
+    "source": "https://www.adafruit.com/product/997 (12 V DC nominal, works down to about 6 V, slower; +-10% band is ours)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 10.8,
+    "max": 13.2
+   },
+   "p": {
+    "source": "https://www.adafruit.com/product/997 (12 V DC nominal, works down to about 6 V, slower; +-10% band is ours)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 320,
+    "peak": 320
+   },
+   "p": {
+    "source": "https://www.adafruit.com/product/997 (about 320 mA at 12 V, 160 mA at 6 V)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "+",
+    "func": [
+     "power"
+    ],
+    "note": "coil +, red lead"
+   },
+   "p": {
+    "source": "https://www.adafruit.com/product/997",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "-",
+    "func": [
+     "ground"
+    ],
+    "note": "coil -, black lead"
+   },
+   "p": {
+    "source": "https://www.adafruit.com/product/997",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "digital"
+   ],
+   "p": {
+    "source": "https://www.adafruit.com/product/997 (switch with a relay or MOSFET)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 76,
+    "h": 51,
+    "d": 57
+   },
+   "p": {
+    "source": "https://www.adafruit.com/product/997 + https://digikey.cn/en/products/detail/adafruit-industries-llc/997/6827136",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "massG": {
+   "v": 122,
+   "p": {
+    "source": "https://www.adafruit.com/product/997 (4.3 oz)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "https://www.adafruit.com/product/997 (water only, 0-75 C; not weather-rated)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": 0,
+    "max": 75
+   },
+   "p": {
+    "source": "https://www.adafruit.com/product/997",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "relay-module",
+   "diode",
+   "irf520-mosfet-module",
+   "esp32-devkit"
+  ],
+  "p": {
+   "source": "packages/catalog/data (curated by M4, unverified until Pro design checks)",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/solenoid-valve-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/solenoid-valve-12v.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "12 V normally closed water valve, open 0.15 s or less, close 0.3 s or less, 0.02-0.8 MPa.",
+    "id": "Katup air 12 V normally closed, buka 0,15 s atau kurang, tutup 0,3 s atau kurang, 0,02-0,8 MPa."
+   },
+   "p": {
+    "source": "https://www.adafruit.com/product/997",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Needs at least about 20 kPa (3 PSI) to seal: not for gravity tanks under about 2 m of head (20 kPa) without a direct-acting valve.",
+     "id": "Butuh minimal sekitar 20 kPa (3 PSI) untuk menutup rapat: tidak untuk tangki gravitasi di bawah tinggi sekitar 2 m (20 kPa) tanpa katup direct-acting."
+    },
+    "p": {
+     "source": "https://digikey.cn/en/products/detail/adafruit-industries-llc/997/6827136",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Inductive load: add a 1N4007 flyback diode across the coil (cathode to +).",
+     "id": "Beban induktif: pasang dioda flyback 1N4007 pada koil (katoda ke +)."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md group E",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Flow is one-directional: follow the arrow on the body.",
+     "id": "Aliran satu arah: ikuti panah pada badan."
+    },
+    "p": {
+     "source": "https://www.adafruit.com/product/997",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "high"
+    }
+   }
+  ]
+ }
+}

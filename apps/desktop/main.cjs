@@ -24,9 +24,9 @@ else {
       backend = startBackend(resources, userData, log, consentSecret);
       await waitReady(backend);
       const url = `http://127.0.0.1:${PORT}`;
-      ipcMain.handle('aiot:consent', (event, port) => {
+      ipcMain.handle('aiot:consent', (event, port, opts) => {
         if (!window || event.sender !== window.webContents || new URL(event.senderFrame.url).origin !== url) return null;
-        return askConsent(dialog, window, consentSecret, port);
+        return askConsent(dialog, window, consentSecret, port, opts);
       });
       window = new BrowserWindow({width: 1440, height: 960, minWidth: 1000, minHeight: 650,
         title: 'AIoT', webPreferences: {nodeIntegration: false, contextIsolation: true, sandbox: true, preload: join(app.getAppPath(), 'preload.cjs')}});

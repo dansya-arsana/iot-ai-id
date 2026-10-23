@@ -1,0 +1,279 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "bh1750",
+  "name": {
+   "v": "BH1750 light sensor (GY-302 module)",
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "light",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "ROHM",
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html (module: 3.3 V LDO; bare chip 2.4-3.6 V per https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "BH1750FVI",
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html (module: 3.3 V LDO; bare chip 2.4-3.6 V per https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 3,
+    "max": 5.5
+   },
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html (module: 3.3 V LDO; bare chip 2.4-3.6 V per https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 0.2,
+    "peak": 0.2
+   },
+   "p": {
+    "source": "https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf (chip about 0.12 mA typical)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "VCC",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "GND",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "SCL",
+    "func": [
+     "i2c-scl"
+    ]
+   },
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "SDA",
+    "func": [
+     "i2c-sda"
+    ]
+   },
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "ADDR",
+    "func": [
+     "digital-in"
+    ],
+    "note": "low/open 0x23, high 0x5C"
+   },
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "i2c"
+   ],
+   "p": {
+    "source": "https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "i2cAddresses": {
+   "v": [
+    35,
+    92
+   ],
+   "p": {
+    "source": "https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 18.5,
+    "h": 1.6,
+    "d": 13.9
+   },
+   "p": {
+    "source": "https://probots.co.in/light-intensity-bh1750-sensor-for-arduino-raspberry-pi-gy-302.html (another listing: 19.25 x 14.4 mm, https://github.com/Erriez/ErriezBH1750)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md D1 (outdoors needs a diffuser dome)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -40,
+    "max": 85
+   },
+   "p": {
+    "source": "https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "esp32-devkit",
+   "arduino-uno-r3",
+   "arduino-nano",
+   "raspberry-pi-4"
+  ],
+  "p": {
+   "source": "packages/catalog/data (curated by M4, unverified until Pro design checks)",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/bh1750.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/bh1750.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Ambient light sensor, 1-65535 lx per count scale, I2C address 0x23 or 0x5C.",
+    "id": "Sensor cahaya sekitar, I2C alamat 0x23 atau 0x5C."
+   },
+   "p": {
+    "source": "https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Full sun reaches about 100 klx: in H mode at MTreg 69 the count clips at 54612 lx. Use MTreg 31 or L mode outdoors.",
+     "id": "Matahari penuh sekitar 100 klx: mode H pada MTreg 69 terpotong di 54612 lx. Pakai MTreg 31 atau mode L di luar."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md D1",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "The module has its own LDO and pull-ups; do not apply module voltage to a bare chip (2.4-3.6 V).",
+     "id": "Modul punya LDO dan pull-up sendiri; jangan beri tegangan modul pada chip telanjang (2,4-3,6 V)."
+    },
+    "p": {
+     "source": "https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

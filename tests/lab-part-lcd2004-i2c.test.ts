@@ -32,7 +32,7 @@ function boot(name:string,c:Circuit){
  r.load(fx.variant,{},c,fx.toolchain);r.start();
  return r;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const ext=(s:{kind:string}|undefined):Record<string,any>=>{assert.ok(s&&s.kind==='ext');return (s as unknown as {v:Record<string,unknown>}).v;};
 
 /** Host side of the PCF8574 backpack: every byte is an I2C write to the slave the board registered. */

@@ -1,0 +1,228 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "solar-panel",
+  "name": {
+   "v": "Solar panel 10-20 W, 12 V class",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/solar-panel.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "part",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/solar-panel.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "generic (ACOPOWER HY-12M-20W class)",
+   "p": {
+    "source": "https://www.acopower.com/products/hy-12m-20w",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 0.1,
+    "max": 22
+   },
+   "p": {
+    "source": "https://www.acopower.com/products/hy-12m-20w (Voc about 21.6-22 V)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 1140,
+    "peak": 1230
+   },
+   "p": {
+    "source": "https://www.acopower.com/products/hy-12m-20w (Imp 1.14 A, Isc 1.23 A, 20 W model)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "PV+",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/solar-panel.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "PV-",
+    "func": [
+     "ground"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/solar-panel.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [],
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/solar-panel.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 345,
+    "h": 20,
+    "d": 470
+   },
+   "p": {
+    "source": "https://www.acopower.com/products/hy-12m-20w (345 x 470 x 20 mm; 10 W model about 340 x 230 mm [U])",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "massG": {
+   "v": 2200,
+   "p": {
+    "source": "estimate for a 20 W aluminium-framed panel [U], no sheet cited",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": true,
+   "p": {
+    "source": "https://www.acopower.com/products/hy-12m-20w",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "ipRating": {
+   "v": "IP65",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F (junction box rating class [U])",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -40,
+    "max": 85
+   },
+   "p": {
+    "source": "typical PV module operating range [U], no sheet cited",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "solar-charge-pwm"
+  ],
+  "p": {
+   "source": "apps/web/src/lab/sim/devices/solar-panel.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/solar-panel.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/solar-panel.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "36-cell 12 V panel, 10 W or 20 W, for charging a 12 V battery through a charge controller.",
+    "id": "Panel 36 sel 12 V, 10 W atau 20 W, untuk mengisi baterai 12 V lewat pengontrol pengisi."
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Open-circuit voltage is about 22 V: the controller PV input must be rated above it.",
+     "id": "Tegangan terbuka sekitar 22 V: masukan PV pengontrol harus berrating di atasnya."
+    },
+    "p": {
+     "source": "https://www.acopower.com/products/hy-12m-20w",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   {
+    "v": {
+     "en": "Spec sheets of the same class differ by a few percent; the 10 W figures are not from one sheet.",
+     "id": "Lembar data kelas yang sama berbeda beberapa persen; angka 10 W tidak dari satu lembar."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md Group F",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   }
+  ]
+ }
+}

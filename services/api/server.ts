@@ -20,10 +20,13 @@ import {JevProvider,cliAvailability} from '../orchestrator/provider.js';
 import {terminateActiveProcesses} from '../orchestrator/process.js';
 import {FixtureAgent} from '../orchestrator/fixture.js';
 import {createHardware} from './lab-hardware.js';
+import {createProHardware,esp32Bridge} from './pro-hardware.js';
+import {createProTelemetry} from './pro-telemetry.js';
 import {arduinoCliBridge} from '../../runtime/local-bridge/uno.js';
 import {fixtureGenerator,handleInternalLabSpec,providerGenerator,type SpecGenerator} from './lab-spec.js';
 import {INTERNAL_SPEC_PATH} from '../../packages/ops-contract/index.js';
 import {PRO_MESSAGES_PATH,PRO_CONFIG_PATH,handleProMessages,handleProConfig,type ProModelDeps} from './pro-model.js';
+import {evidenceStatusImpl} from './pro-evidence-tool.js';
 import {installPro} from '../ops/pro-wiring.js';
 import {httpProLlm} from '../ops/pro-agent.js';
 import {opsPath,pipeOpsStream} from '../ops/transport.js';
@@ -53,7 +56,7 @@ reconcileRemoteJobs(engine);
 const sites=new SiteEngine(store);
 let opsLocal:Ops|undefined;
 /** Pro architect in the local runtime: production tools, and the model proxy reached over loopback with the internal token (no token: the agent reports it is not configured). */
-const withPro=(ops:Ops)=>{installPro(ops,{llm:httpProLlm(`http://127.0.0.1:${port}`,process.env.OPS_API_INTERNAL_TOKEN)});return ops;};
+const withPro=(ops:Ops)=>{installPro(ops,{impls:{evidence_status:evidenceStatusImpl(ops)},llm:httpProLlm(`http://127.0.0.1:${port}`,process.env.OPS_API_INTERNAL_TOKEN)});return ops;};
 /** Desktop/dev: business ops run in-process next to the workspace DB. Cloud sets OPS_URL and proxies to the ops service. */
 const localOps=()=>opsLocal??=withPro(new Ops(new OpsStore(process.env.OPS_DB??resolve(dirname(process.env.IOT_DB_PATH??resolve('.data/iot.sqlite')),'ops.sqlite')),parseRoles(process.env.OPS_ROLES),undefined,undefined,{llm:{available:()=>fixture||deployment==='local'||!!process.env.OPS_API_INTERNAL_TOKEN,call:labSpec},openExamples:deployment==='local'}));
 type OpsOut={status:number;data:unknown;redirect?:string;setCookie?:string|string[];headers?:Record<string,string>;text?:{type:string;body:string;filename?:string}};
@@ -74,6 +77,10 @@ async function opsUpstream(method:string,path:string,user:string,payload:unknown
 const cloudRefusal='Provider not available in cloud; use the desktop app for your own keys.';
 const trusted=new Map<string,number>();
 const labHardware=createHardware({bridge:arduinoCliBridge,trusted});
+// Pro hardware and telemetry: loopback and session gated like the lab bridge, never mounted in the cloud. Flash needs a one-time native consent token bound to port and sha.
+const proArtifact=(sha:string)=>{const r=localOps().store.db.prepare('SELECT bytes FROM pro_artifacts_bin WHERE sha=?').get(sha) as {bytes:Uint8Array}|undefined;return r?Buffer.from(r.bytes):undefined;};
+const proHardware=createProHardware({bridge:esp32Bridge,artifact:proArtifact});
+const proTelemetry=createProTelemetry({settingsPath:resolve(dirname(process.env.IOT_DB_PATH??resolve('.data/iot.sqlite')),'pro-telemetry.json')});
 const origins=new Set([`http://127.0.0.1:${port}`,`http://localhost:${port}`,`http://127.0.0.1:${webPort}`,`http://localhost:${webPort}`]);
 function json(res:ServerResponse,status:number,data:unknown){res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));}
 async function body(req:IncomingMessage){let text='';for await(const chunk of req){text+=chunk;if(text.length>100000)throw new Error('Request too large');}return text?JSON.parse(text):{};}
@@ -99,6 +106,7 @@ const server=createServer(async(req,res)=>{try{
  if(path==='/api'&&req.method==='GET'){json(res,200,{name:'iot.ai.id local API',version:'v1',auth:'GET /api/session then X-IOT-Session header; loopback Host/Origin only',endpoints:{'GET /api':'this directory','GET /api/session':'local session token','GET|POST|PATCH /api/ops/*':'business ops: inquiries, organizations, products, lab tasks, payouts (role-checked)','ALL /ops/v1/portal/*':'Lab Mitra school portal (cookie session, X-AIoT-Portal header on writes)','ALL /ops/v1/staff/*':'staff login for the admin host (cookie session, X-AIoT-Staff header on writes)','ALL /ops/v1/member/*':'member login and installer link for the public site (cookie session, X-AIoT-Member header on writes)','POST /ops/v1/inquiries':'public inquiry form (rate-limited)','GET /ops/v1/catalog':'public distributor catalog','GET /ops/v1/labs':'public Lab Mitra board','GET /api/status':'runtime, simulators, knowledge, counts','GET /api/backoffice':'operator dashboard aggregate (coordinator proxy)','GET /api/comparisons':'agent vs human challenge attempts','GET /api/hardware':'board + component manifests','GET /api/challenges':'challenge catalog with scenarios','GET /api/remote-jobs':'active remote jobs','POST /api/remote-jobs':'enqueue local remote job (node use)','POST /api/remote-jobs/:id/approve':'human approval (physical requires trusted port)','POST /api/remote-jobs/:id/renew':'extend approval window','GET /api/sites':'locations and farm planning profiles','POST /api/sites':'create site snapshot','GET /api/sites/:id':'site and derived evidence status','PUT /api/sites/:id':'CAS {expectedRevision,snapshot}','GET /api/projects/:id/sites':'validated site memberships','GET /api/projects':'list projects','POST /api/projects':'create {goal, entryPoint?, actor?, challengeId?, challengeVersion?}','GET /api/projects/:id/challenge':'challenge scenario verdicts judged from evidence','GET /api/projects/:id':'full project state','GET /api/projects/:id/events?after=':'ordered event replay','GET /api/projects/:id/episode?purpose=':'episode export','POST /api/projects/:id/chat':'design/debug chat revision','POST /api/projects/:id/components':'catalog add/remove draft','POST /api/projects/:id/wiring':'strict external wiring snapshot revision','POST /api/projects/:id/run':'simulation or physical run','POST /api/projects/:id/retry':'repair retest','POST /api/projects/:id/replan':'regenerate plan','POST /api/projects/:id/actions':'human action record','POST /api/projects/:id/environment':'environment record','POST /api/projects/:id/rights':'rights attestation','POST /api/runtime/trust':'authorize a USB port for 20 minutes'},agent:{mcp:'npm run api:mcp (MCP stdio server over this API)',docs:'/api route in the web app'}});return;}
  if(path.startsWith('/api/')){
  authorize(req);
+ if(path.startsWith('/api/pro/hardware/')||path.startsWith('/api/pro/telemetry/')){if(deployment==='cloud'){json(res,404,{error:'Not found'});return;}const url=new URL(req.url??'/','http://127.0.0.1');const tel=path.startsWith('/api/pro/telemetry/');const r=tel?await proTelemetry.handle(req.method??'GET',path.slice('/api/pro/telemetry'.length),url.searchParams,()=>body(req)):await proHardware.handle(req.method??'GET',path,url.searchParams,()=>body(req));json(res,r.status,r.data);return;}
  if(path.startsWith('/api/lab/hardware/')){if(deployment==='cloud'){json(res,404,{error:'Not found'});return;}const url=new URL(req.url??'/','http://127.0.0.1');const r=await labHardware.handle(req.method??'GET',path,url.searchParams,()=>body(req));json(res,r.status,r.data);return;}
  if(path.startsWith('/api/ops/')){const sub='/ops/v1/admin/'+path.slice('/api/ops/'.length);const user=String(req.headers['x-remote-user']??'');const payload=req.method==='GET'?undefined:await body(req);
   const result=process.env.OPS_URL?await opsUpstream(req.method??'GET',sub,user,payload):await localOps().handle({method:req.method??'GET',path:sub,body:payload,ip:'local',admin:{user}});sendOps(res,result);return;}
@@ -171,6 +179,6 @@ const server=createServer(async(req,res)=>{try{
  const types:Record<string,string>={'.html':'text/html','.js':'text/javascript','.css':'text/css','.woff2':'font/woff2','.svg':'image/svg+xml','.json':'application/json'};res.writeHead(200,{'Content-Type':types[extname(file)]??'application/octet-stream','X-Content-Type-Options':'nosniff'});res.end(await readFile(file));
  }catch(error){const errorStatus=error instanceof RevisionConflict?409:/Daily AI limit/.test(safeError(error))?429:/authorization|Untrusted/.test(safeError(error))?403:/not found/.test(safeError(error))?404:400;const text=error instanceof Error&&error.message==='Local session authorization required'?'Local session authorization required':(req.url??'').startsWith('/api/ai-settings')?'Pengaturan AI gagal. Periksa format key atau integritas penyimpanan.':safeError(error);json(res,errorStatus,{error:text});}});
 server.listen(port,bindHost,()=>console.log(`IOT AI ID API: http://${bindHost==='0.0.0.0'?'127.0.0.1':bindHost}:${port}`));
-for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{terminateActiveProcesses();server.close(()=>{store.close();process.exit(0);});});
+for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{terminateActiveProcesses();proTelemetry.stop();server.close(()=>{store.close();process.exit(0);});});
 // A first-entry probe prevents fan-out when the knowledge backend is unavailable.
 background((async()=>{const records=store.hardwareLibrary();if(!records.length)return;const remember=async(record:typeof records[number])=>{const receipt=await engine.knowledge.remember('hardware-catalog/'+record.id,hardwareKnowledgeDocument(record));store.insert('knowledge_receipts','system',{id:id(),operation:'seed_catalog',referenceId:record.id,referenceVersion:record.version,...receipt,createdAt:now()});return receipt;};const first=await remember(records[0]);if(first.status!=='stored')return;let cursor=1;await Promise.all(Array.from({length:3},async()=>{while(cursor<records.length){const record=records[cursor++];await remember(record);}}));})());

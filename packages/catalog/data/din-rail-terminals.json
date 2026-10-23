@@ -1,0 +1,347 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "din-rail-terminals",
+  "name": {
+   "v": "DIN rail with 6 feed-through terminal blocks",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "part",
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "generic (UT 2,5 class)",
+   "p": {
+    "source": "Phoenix Contact UT 2,5 class (item 3044076), page not fetched",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 0.1,
+    "max": 48
+   },
+   "p": {
+    "source": "Phoenix Contact UT 2,5 class (item 3044076), page not fetched (rated 800 V; lab limit 48 V)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 0,
+    "peak": 24000
+   },
+   "p": {
+    "source": "Phoenix Contact UT 2,5 class (item 3044076), page not fetched (24 A per block [U])",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "T1A",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T1B",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T2A",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T2B",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T3A",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T3B",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T4A",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T4B",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T5A",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T5B",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T6A",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "T6B",
+    "func": [
+     "power"
+    ]
+   },
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [],
+   "p": {
+    "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 35,
+    "h": 48,
+    "d": 72
+   },
+   "p": {
+    "source": "TS35 rail 35 x 7.5 mm [K, IEC 60715]; six blocks at 5.2 mm pitch plus end stops; Phoenix Contact UT 2,5 class (item 3044076), page not fetched",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "mount inside an enclosure [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "ipRating": {
+   "v": "IP20",
+   "p": {
+    "source": "Phoenix Contact UT 2,5 class (item 3044076), page not fetched (finger-safe screw terminals)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -40,
+    "max": 105
+   },
+   "p": {
+    "source": "Phoenix Contact UT 2,5 class (item 3044076), page not fetched [U]",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "enclosure-ip65"
+  ],
+  "p": {
+   "source": "apps/web/src/lab/sim/devices/din-rail-terminals.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/din-rail-terminals.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "35 mm rail with six feed-through blocks and an optional jumper bar for shared power or ground rails.",
+    "id": "Rel 35 mm dengan enam terminal tembus dan batang jumper opsional untuk rel daya atau ground bersama."
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md Group F",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Ratings are for a 2.5 mm2 class block; check your block sheet before sizing fuses and wire.",
+     "id": "Nilai untuk blok kelas 2,5 mm2; periksa lembar data blok Anda sebelum menentukan sekring dan kabel."
+    },
+    "p": {
+     "source": "Phoenix Contact UT 2,5 class (item 3044076), page not fetched",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   }
+  ]
+ }
+}

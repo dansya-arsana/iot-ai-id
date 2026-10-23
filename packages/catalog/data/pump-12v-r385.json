@@ -1,0 +1,208 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "pump-12v-r385",
+  "name": {
+   "v": "12 V diaphragm pump (R385 class)",
+   "p": {
+    "source": "https://robotshop.com/en/6-12v-r385-dc-diaphragm-pump.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "actuator",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 6,
+    "max": 12
+   },
+   "p": {
+    "source": "https://robotshop.com/en/6-12v-r385-dc-diaphragm-pump.html (6-12 V; sheets agree)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 600,
+    "peak": 2000
+   },
+   "p": {
+    "source": "https://robotshop.com/en/6-12v-r385-dc-diaphragm-pump.html + https://www.electrokit.com/en/vattenpump-6-12v-med-slang (0.5-0.7 A loaded, 0.23 A no-load; surge up to about 2 A. Vendor sheets disagree, midpoint used)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "+",
+    "func": [
+     "power"
+    ],
+    "note": "motor +, red lead"
+   },
+   "p": {
+    "source": "https://robotshop.com/en/6-12v-r385-dc-diaphragm-pump.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "-",
+    "func": [
+     "ground"
+    ],
+    "note": "motor -, black lead"
+   },
+   "p": {
+    "source": "https://robotshop.com/en/6-12v-r385-dc-diaphragm-pump.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "digital"
+   ],
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md E2 (switch with a relay or MOSFET)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 90,
+    "h": 35,
+    "d": 40
+   },
+   "p": {
+    "source": "https://kitronik.co.uk/products/2567-water-pump-6v-12v-with-1m-silicone-tube (about 90 x 40 x 35 mm)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": false,
+   "p": {
+    "source": "https://robotshop.com/en/6-12v-r385-dc-diaphragm-pump.html (not submersible)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": 0,
+    "max": 80
+   },
+   "p": {
+    "source": "https://robotshop.com/en/6-12v-r385-dc-diaphragm-pump.html (liquid up to 80 C)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "relay-module",
+   "diode",
+   "esp32-devkit",
+   "solenoid-valve-12v"
+  ],
+  "p": {
+   "source": "packages/catalog/data (curated by M4, unverified until Pro design checks)",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/pump-12v-r385.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/pump-12v-r385.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "12 V diaphragm pump, about 1.5 L/min (range 1-3), self-priming with a filled hose.",
+    "id": "Pompa diafragma 12 V, sekitar 1,5 L/menit (rentang 1-3), self-priming dengan selang terisi."
+   },
+   "p": {
+    "source": "https://robotshop.com/en/6-12v-r385-dc-diaphragm-pump.html",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "Start surge up to about 2 A: size the relay, fuse and supply for it.",
+     "id": "Lonjakan awal hingga sekitar 2 A: ukur relay, sekring, dan catu untuk itu."
+    },
+    "p": {
+     "source": "https://www.thingbits.in/products/r385-6-12v-dc-mini-diaphragm-pump",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "Not submersible. Running it dry wears the diaphragm. Add a flyback diode.",
+     "id": "Tidak tahan terendam. Berjalan kering merusak diafragma. Pasang dioda flyback."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md E2",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

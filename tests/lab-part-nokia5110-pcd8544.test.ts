@@ -27,7 +27,7 @@ const circuit=(net:Partial<Record<string,BoardPin>>,props:Record<string,string|n
 
 const fixture=(n:string):{toolchain:string;variant:FirmwareVariant}=>JSON.parse(readFileSync(new URL(`./fixtures/firmware/${n}.json`,import.meta.url),'utf8'));
 const part=(id:string,kind:string,net:Partial<Record<string,BoardPin>>,props:Record<string,string|number|boolean>={}):PartSpec=>({id,kind,net,props});
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const ext=(s:{kind:string}|undefined):Record<string,any>=>{assert.ok(s&&s.kind==='ext');return (s as unknown as {v:Record<string,unknown>}).v;};
 const NET={CE:'D10',DC:'D9',RST:'D8',CLK:'D13',DIN:'D11'} as const;
 

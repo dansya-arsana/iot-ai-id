@@ -1,0 +1,231 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "soil-capacitive-v2",
+  "name": {
+   "v": "Capacitive soil moisture sensor v2.0",
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "soil",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 3.3,
+    "max": 5.5
+   },
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "logicLevelV": {
+   "v": 3,
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 5,
+    "peak": 20
+   },
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "GND",
+    "func": [
+     "ground"
+    ],
+    "note": "PH2.0 pin 1, verify on your board"
+   },
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "VCC",
+    "func": [
+     "power"
+    ],
+    "note": "PH2.0 pin 2"
+   },
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  {
+   "v": {
+    "name": "AOUT",
+    "func": [
+     "adc"
+    ],
+    "note": "PH2.0 pin 3, high = dry"
+   },
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "analog"
+   ],
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 23,
+    "h": 98,
+    "d": 4
+   },
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193 ; https://makerselectronics.com/product/capacitive-soil-moisture-sensor-v2-0 (others list 102 x 23 or 92.1 x 23.5)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": true,
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -10,
+    "max": 60
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "esp32-s3-devkitc",
+   "arduino-uno",
+   "arduino-nano"
+  ],
+  "p": {
+   "source": "docs/research/pro-parts-briefs.md",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/soil-capacitive-v2.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/soil-capacitive-v2.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Corrosion-free capacitive soil moisture probe v2.0 with a PH2.0 3-pin cable. Output falls as soil gets wetter (about 2.5 V dry, 1.3 V wet on a 5 V supply). Calibrate dry and wet readings per probe and per soil.",
+    "id": "Probe kelembapan tanah kapasitif v2.0 tanpa korosi dengan kabel PH2.0 3 pin. Keluaran turun saat tanah makin basah (sekitar 2,5 V kering, 1,3 V basah pada catu 5 V). Kalibrasi nilai kering dan basah untuk tiap probe dan tanah."
+   },
+   "p": {
+    "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193 ; https://makerselectronics.com/product/capacitive-soil-moisture-sensor-v2-0",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "NE555 clones do not oscillate reliably below about 4.5 V: on 3.3 V the output sticks near the dry value. Use a TLC555 board or a 5 V supply.",
+     "id": "Klon NE555 tidak berosilasi andal di bawah sekitar 4,5 V: pada 3,3 V keluaran macet di dekat nilai kering. Pakai papan TLC555 atau catu 5 V."
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
+   {
+    "v": {
+     "en": "Insert only up to the white line and seal the top edge with lacquer, or water creeps into the electronics.",
+     "id": "Tancapkan hanya sampai garis putih dan segel tepi atas dengan pernis, kalau tidak air merembes ke elektronik."
+    },
+    "p": {
+     "source": "https://wiki.dfrobot.com/Capacitive_Soil_Moisture_Sensor_SKU_SEN0193",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   }
+  ]
+ }
+}

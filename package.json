@@ -39,6 +39,7 @@
     "@xyflow/react": "^12.12.0",
     "arduino-mcp-server": "0.2.8",
     "avr8js": "^0.21.1",
+    "mqtt": "^5.16.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router-dom": "^7.18.4",

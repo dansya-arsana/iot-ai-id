@@ -1,0 +1,259 @@
+{
+ "schemaVersion": 1,
+ "identity": {
+  "id": "ds18b20-probe",
+  "name": {
+   "v": "DS18B20 waterproof temperature probe",
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "kind": {
+   "v": "temperature",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "manufacturer": {
+   "v": "Analog Devices (Maxim) chip, generic probe",
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "mpn": {
+   "v": "DS18B20",
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "electrical": {
+  "supplyV": {
+   "v": {
+    "min": 3,
+    "max": 5.5
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "logicLevelV": {
+   "v": 3.3,
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "currentMa": {
+   "v": {
+    "typ": 1,
+    "peak": 1.5
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "pins": [
+  {
+   "v": {
+    "name": "VDD",
+    "func": [
+     "power"
+    ],
+    "note": "Red wire"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "DQ",
+    "func": [
+     "onewire"
+    ],
+    "note": "Yellow wire; needs a 4.7 k pull-up to VDD"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  {
+   "v": {
+    "name": "GND",
+    "func": [
+     "ground"
+    ],
+    "note": "Black wire"
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ ],
+ "protocols": {
+  "supported": {
+   "v": [
+    "onewire"
+   ],
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "mechanical": {
+  "sizeMm": {
+   "v": {
+    "w": 6,
+    "h": 50,
+    "d": 6
+   },
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md (6 mm stainless tube, length varies by vendor)",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  }
+ },
+ "environment": {
+  "outdoor": {
+   "v": true,
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "medium"
+   }
+  },
+  "ipRating": {
+   "v": "IP67",
+   "p": {
+    "source": "docs/research/pro-parts-briefs.md",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "low"
+   }
+  },
+  "tempC": {
+   "v": {
+    "min": -55,
+    "max": 125
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "drivers": [],
+ "compatibleWith": {
+  "v": [
+   "resistor",
+   "esp32-s3-devkitc",
+   "arduino-uno",
+   "arduino-nano"
+  ],
+  "p": {
+   "source": "docs/research/pro-parts-briefs.md",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
+ },
+ "model3d": {
+  "kind": {
+   "v": "procedural",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/ds18b20.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "status": {
+   "v": "draft",
+   "p": {
+    "source": "apps/web/src/lab/scene/parts/ds18b20.ts",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  }
+ },
+ "untrusted": {
+  "summary": {
+   "v": {
+    "en": "Stainless-tube DS18B20 on a 3-wire cable for soil, water and enclosure temperature. 3.0-5.5 V, -55 to +125 C, +-0.5 C over -10 to +85 C, 750 ms at 12 bit. Same lab kind as ds18b20 with the probe package selected.",
+    "id": "DS18B20 dalam tabung stainless dengan kabel 3 kawat untuk suhu tanah, air, dan kotak panel. 3,0-5,5 V, -55 sampai +125 C, +-0,5 C pada -10 sampai +85 C, 750 ms pada 12 bit. Kind lab sama dengan ds18b20 dengan kemasan probe."
+   },
+   "p": {
+    "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+    "verifiedBy": "import",
+    "at": "2026-10-23",
+    "confidence": "high"
+   }
+  },
+  "pitfalls": [
+   {
+    "v": {
+     "en": "DQ needs a 4.7 k resistor to VDD (3V3 on an ESP32); without it the bus reads 85 C or nothing.",
+     "id": "DQ butuh resistor 4,7 k ke VDD (3V3 pada ESP32); tanpanya bus terbaca 85 C atau tidak terbaca."
+    },
+    "p": {
+     "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "high"
+    }
+   },
+   {
+    "v": {
+     "en": "Power-on reading is 85 C: ignore the first conversion result.",
+     "id": "Pembacaan saat menyala adalah 85 C: abaikan hasil konversi pertama."
+    },
+    "p": {
+     "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "high"
+    }
+   }
+  ]
+ }
+}

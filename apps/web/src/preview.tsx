@@ -27,7 +27,7 @@ async function probeMember(live:()=>boolean):Promise<MemberMe|null>{
  return null;
 }
 /** Gated routes. A grant opens the page for a signed-in member; `null` pages need the staff workspace or the desktop app, so no grant opens them in the cloud. */
-const GATES:Record<string,MemberGrant|null>={'/products':'products','/builders':'builders','/bench':'bench','/arena':'arena','/lab':'lab','/build':null,'/sites':null,'/site':null,'/design':null};
+const GATES:Record<string,MemberGrant|null>={'/products':'products','/builders':'builders','/bench':'bench','/arena':'arena','/lab':'lab','/pro/dev':null,'/pro':'pro','/build':null,'/sites':null,'/site':null,'/design':null};
 const gateKey=(to:string)=>Object.keys(GATES).find(p=>to===p||to.startsWith(p+'/')||to.startsWith(p+'?'));
 export const isGated=(to:string)=>gateKey(to)!==undefined;
 /** The grants a member can hold, with the page each one opens (profile cards). */
