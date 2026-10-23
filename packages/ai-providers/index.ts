@@ -1,5 +1,14 @@
 /** AI provider registry shared by API and web. Pure data and validation; no secrets, no I/O. */
 import {z} from 'zod';
+import {KillSwitchSchema} from '../pro-contract/agent.js';
+import {PRO_MODELS,PRO_DEFAULT_MODEL} from '../pro-contract/pricing.js';
+export {PRO_MODELS,PRO_DEFAULT_MODEL};
+/** Effort steers adaptive thinking. Claude 5.5 rejects thinking.budget_tokens with HTTP 400 (docs: build-with-claude/thinking), so there is no token budget setting. */
+export const PRO_EFFORTS=['low','medium','high','xhigh','max'] as const;
+export type ProEffort=typeof PRO_EFFORTS[number];
+export const PRO_DEFAULT_EFFORT:ProEffort='high';
+export const BuilderPreferencesSchema=z.object({model:z.enum(PRO_MODELS).default(PRO_DEFAULT_MODEL),effort:z.enum(PRO_EFFORTS).default(PRO_DEFAULT_EFFORT),thinkingDisplay:z.enum(['summarized','omitted']).default('summarized'),killSwitch:KillSwitchSchema.optional()}).strict();
+export type BuilderPreferences=z.infer<typeof BuilderPreferencesSchema>;
 export type DeploymentMode='cloud'|'local';
 export type Protocol='openai-responses'|'anthropic'|'openai-chat'|'cli';
 export type FrontierId='openai'|'anthropic'|'minimax'|'zai'|'custom'|'codex-cli'|'claude-cli';
@@ -25,5 +34,5 @@ export function validateBaseUrl(value:string):string{
  if(url.search||url.hash||value.includes('?')||value.includes('#'))throw new Error('Base URL must not contain a query string or fragment');
  return url.href.replace(/\/+$/,'');
 }
-export const AiPreferencesSchema=z.object({active:z.enum(FRONTIER_IDS).optional(),models:z.partialRecord(z.enum(FRONTIER_IDS),z.string().min(1).max(120).regex(/^[\w.:/-]+$/)).default({}),customBaseUrl:z.string().max(300).refine(v=>{try{validateBaseUrl(v);return true;}catch{return false;}},'Base URL invalid').optional()}).strict();
+export const AiPreferencesSchema=z.object({active:z.enum(FRONTIER_IDS).optional(),models:z.partialRecord(z.enum(FRONTIER_IDS),z.string().min(1).max(120).regex(/^[\w.:/-]+$/)).default({}),customBaseUrl:z.string().max(300).refine(v=>{try{validateBaseUrl(v);return true;}catch{return false;}},'Base URL invalid').optional(),builder:BuilderPreferencesSchema.optional()}).strict();
 export type AiPreferences=z.infer<typeof AiPreferencesSchema>;

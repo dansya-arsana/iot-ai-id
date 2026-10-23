@@ -13,7 +13,7 @@ Pro use cases vary without limit, and the 4-field farm is only a sample. A fixed
 - ops runs the loop. Each model call goes to the api `POST /internal/pro/messages` (ADR 011 token guard, at most 2 MB, model in the allowlist, max_tokens and thinking caps), which streams Anthropic SSE back.
 - The loop runs until `end_turn` or a limit (40 tool calls, 15 min or the USD cap).
 - Parallel tool_use blocks run concurrently (at most 4 server tools at a time).
-- Extended interleaved thinking is on. Thinking blocks are persisted unmodified, as the API requires while tool use continues; the UI collapses them.
+- Thinking is adaptive (M3 docs check, 2026-10-23: Claude 5.5 rejects `thinking.type:"enabled"` with `budget_tokens`, and "disabled", with HTTP 400). The api sets `thinking:{type:'adaptive',display:'summarized'}` and `output_config.effort` (low, medium, high, xhigh, max) from the admin AI settings; interleaved thinking is automatic and needs no beta header. Any `thinkingBudget` in the plan is superseded by `effort`; ops never sends thinking parameters. Thinking blocks are persisted unmodified, as the API requires while tool use continues; the UI collapses them.
 - Browser: `POST /ops/v1/member/pro/projects/:id/turns` returns 202 `{turnId}`; then `GET .../turns/:turnId/events` (SSE) and `POST .../turns/:turnId/tool-results`.
 - nginx owner step: `proxy_buffering off` on that SSE location.
 - Fixture mode replays `fixtures/agent/*.jsonl`.
@@ -78,7 +78,9 @@ The 20-tool table (same as plan §3):
 - `envFallback` is reported as a boolean only.
 - No key reaches ops, the browser, logs or MCP. The audit log records fingerprints only.
 
-### 7. Budgets and quotas
+### 7. Budgets and quotas (superseded by the founder decision of 2026-10-23)
+
+No billing budgets or per-member quotas for now. Only technical safety remains: at most 40 tool calls and 15 minutes per turn; one global monthly USD kill-switch (default USD 1000, admin can disable it) that ends a turn with `stopReason:'kill_switch'`; and concurrency (1 turn per member and per project, 4 in total). Usage is recorded per member and per project (tokens, USD estimate at the pinned price) so billing can attach later. The model, effort and kill-switch are owned by the api admin settings; ops mirrors them for 15 s through `GET /internal/pro/config`. Opus 5.5 is selectable and allowed for members. The original design is kept below for when payments arrive.
 
 - USD is reserved before each model call (input estimate plus max_tokens at the pinned price) and settled to actual usage.
 - Per-turn, per-member-day and global-month caps (the defaults are founder Q2), plus compile quotas and concurrency (1 ESP32 compile, 2 Python; 1 turn per subject, 2 globally).
@@ -135,4 +137,10 @@ The 20-tool table (same as plan §3):
 ## Open items
 
 - Founder questions: see plan §14, Q1–Q4.
-- Record the measured image sizes, compile times and live-smoke USD here in M3.
+- M3 acceptance (2026-10-23, offline; no live Anthropic call was made):
+  - Fixture end to end (`tests/pro-wiring.test.ts`): the farm conversation drives the real loop with the real tool implementations over the production wiring, runs 12 distinct tools, and saves a gated r1 whose `/verification` map is stamped by the server (verified items present; the compile item stays unverified because the sandbox is off in the test).
+  - `npm run check`: 1412 unit tests (1411 on the first run; `desktop-lifecycle` is a known load flake and passes alone), lint, tokens and build green. Full Playwright: 184 of 184 passed in 27.6 min, including `44-catalog-provenance`. `scripts/ci/smoke-image.sh` on colima: passed (catalog 200, Pro and catalog member routes 401, `/internal/pro/config` 503 without the token).
+  - Sandbox (Apple silicon, linux/arm64, from M3-E): esp32 image 1.85 GB (cold build 27 min 46 s), python image 18.5 MB; compile in a fresh container, no cache: esp32 blink 6.4 s, esp32s3 7.3 s, esp32 with WiFi.h 15.0 s, uno 0.8 s, python lint 0.16 s. x86_64 production numbers are not measured.
+  - Pinned prices (USD per MTok): Sonnet 5.5 2 in, 10 out, 2.5 cache write, 0.10 cache read; Opus 5.5 4, 20, 5, 0.20. Live-smoke USD is still owed: staff run one real turn on each model and record the cost here.
+  - Known gaps, deliberately left: `render` only opens the view (layout checks arrive with M5/M8); `evidence_status` reports the checklist as all open (M7); `catalog_propose` supports a partId plus a JSON pointer leaf, not `newPart`; `site_climate` is region-level and low confidence (BMKG data later); the SSE route ignores `Last-Event-ID` (clients resume with `events/:after`).
+- Deploy needs for Pro: api env `OPS_API_INTERNAL_TOKEN` (already used by ADR 011) and, if wanted, `ANTHROPIC_API_KEY` in provider.env (the vault wins); ops env `IOT_API_INTERNAL_URL=http://iot-ai-api:8787` and the same `OPS_API_INTERNAL_TOKEN`; the sandbox images `aiot-pro-esp32:3.3.12` and `aiot-pro-py:1` (`scripts/pro-sandbox/`) plus the Lab image on the host that runs ops, and a docker runner reachable from the ops container (as for the Lab compiler). Without them compile_code answers `pending` and every compiled item stays unverified. Grant `pro` to invited members in the backoffice. Run `deploy-ops.sh` (nginx changed: `iot_pro` zone, SSE location, staff catalog route, `/internal/` closed on the api host) and a normal web deploy.

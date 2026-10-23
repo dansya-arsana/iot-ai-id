@@ -1,0 +1,1586 @@
+{
+ "site": {
+  "name": "Kebun Demo 4 lahan",
+  "regionId": "jatim",
+  "gridPower": "unreliable",
+  "internet": "wifi",
+  "stress": [
+   "heat",
+   "power"
+  ],
+  "peakSunHours": 3.5,
+  "plan": {
+   "widthM": 400,
+   "heightM": 300
+  }
+ },
+ "fields": [
+  {
+   "id": "melon",
+   "name": "Melon",
+   "crop": "melon",
+   "areaM2": 4000,
+   "plan": {
+    "x": -120,
+    "y": -100,
+    "w": 100,
+    "h": 100
+   },
+   "distanceToGatewayM": 400,
+   "distanceSource": "user"
+  },
+  {
+   "id": "mango",
+   "name": "Mango",
+   "crop": "mango",
+   "areaM2": 9000,
+   "plan": {
+    "x": 20,
+    "y": -100,
+    "w": 100,
+    "h": 100
+   },
+   "distanceToGatewayM": 900,
+   "distanceSource": "user"
+  },
+  {
+   "id": "chili",
+   "name": "Chili",
+   "crop": "chili",
+   "areaM2": 2500,
+   "plan": {
+    "x": -120,
+    "y": 40,
+    "w": 100,
+    "h": 100
+   },
+   "distanceToGatewayM": 1400,
+   "distanceSource": "user"
+  },
+  {
+   "id": "rice",
+   "name": "Rice",
+   "crop": "rice",
+   "areaM2": 12000,
+   "plan": {
+    "x": 20,
+    "y": 40,
+    "w": 100,
+    "h": 100
+   },
+   "distanceToGatewayM": 2100,
+   "distanceSource": "user"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "node-melon",
+   "role": "field",
+   "fieldId": "melon",
+   "board": "esp32-devkitc",
+   "parts": [
+    {
+     "id": "soil-moisture-capacitive-1",
+     "kind": "soil-moisture-capacitive",
+     "role": "sensor",
+     "qty": 1,
+     "purpose": {
+      "en": "Soil moisture",
+      "id": "Kelembapan tanah"
+     },
+     "mount": "field",
+     "cableM": 3
+    },
+    {
+     "id": "ds18b20-1",
+     "kind": "ds18b20",
+     "role": "sensor",
+     "qty": 1,
+     "purpose": {
+      "en": "Soil temperature",
+      "id": "Suhu tanah"
+     },
+     "mount": "field",
+     "cableM": 3
+    },
+    {
+     "id": "lora-rfm95w-1",
+     "kind": "lora-rfm95w",
+     "role": "radio",
+     "qty": 1,
+     "purpose": {
+      "en": "Uplink to gateway",
+      "id": "Uplink ke gateway"
+     },
+     "mount": "enclosure"
+    },
+    {
+     "id": "battery-18650-pack-1",
+     "kind": "battery-18650-pack",
+     "role": "power",
+     "qty": 1,
+     "purpose": {
+      "en": "Node battery",
+      "id": "Baterai node"
+     },
+     "mount": "enclosure"
+    }
+   ],
+   "pins": [
+    {
+     "boardPin": "GPIO34",
+     "gpio": 34,
+     "func": "adc",
+     "part": "soil-moisture-capacitive-1",
+     "partPin": "AOUT",
+     "symbol": "PIN_SOIL_1"
+    },
+    {
+     "boardPin": "GPIO4",
+     "gpio": 4,
+     "func": "onewire",
+     "part": "ds18b20-1",
+     "partPin": "DQ",
+     "symbol": "PIN_DS18B20"
+    },
+    {
+     "boardPin": "GPIO5",
+     "gpio": 5,
+     "func": "spi-cs",
+     "part": "lora-rfm95w-1",
+     "partPin": "NSS",
+     "symbol": "PIN_LORA_CS"
+    },
+    {
+     "boardPin": "GPIO14",
+     "gpio": 14,
+     "func": "reset",
+     "part": "lora-rfm95w-1",
+     "partPin": "RST",
+     "symbol": "PIN_LORA_RST"
+    },
+    {
+     "boardPin": "GPIO26",
+     "gpio": 26,
+     "func": "irq",
+     "part": "lora-rfm95w-1",
+     "partPin": "DIO0",
+     "symbol": "PIN_LORA_DIO0"
+    }
+   ],
+   "wires": [
+    {
+     "id": "W1",
+     "from": {
+      "part": "soil-moisture-capacitive-1",
+      "pin": "AOUT"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO34"
+     },
+     "func": "signal",
+     "color": "yellow",
+     "label": "W1 · GPIO34 → AOUT (soil)",
+     "lengthM": 3,
+     "awg": 22,
+     "cable": "3-core-shielded",
+     "connectors": {
+      "from": "screw-terminal",
+      "to": "header"
+     },
+     "viaGland": true
+    },
+    {
+     "id": "W2",
+     "from": {
+      "part": "ds18b20-1",
+      "pin": "DQ"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO4"
+     },
+     "func": "signal",
+     "color": "green",
+     "label": "W2 · GPIO4 → DQ (DS18B20)",
+     "lengthM": 3,
+     "awg": 22,
+     "cable": "3-core-shielded",
+     "connectors": {
+      "from": "screw-terminal",
+      "to": "header"
+     },
+     "viaGland": true
+    },
+    {
+     "id": "W3",
+     "from": {
+      "part": "lora-rfm95w-1",
+      "pin": "NSS"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO5"
+     },
+     "func": "signal",
+     "color": "blue",
+     "label": "W3 · GPIO5 → NSS (LoRa)",
+     "lengthM": 0.1,
+     "awg": 26,
+     "cable": "dupont",
+     "connectors": {
+      "from": "header",
+      "to": "header"
+     },
+     "viaGland": false
+    }
+   ],
+   "power": {
+    "source": "battery",
+    "supplyV": 3.7,
+    "budget": {
+     "avgMa": 12,
+     "peakMa": 140,
+     "dailyWh": 1.1
+    },
+    "battery": {
+     "chemistry": "li-ion-18650",
+     "series": 1,
+     "parallel": 2,
+     "capacityWh": 14.8,
+     "autonomyDays": 13
+    },
+    "ok": true
+   },
+   "enclosure": {
+    "ip": "IP65",
+    "mount": "pole",
+    "sizeMm": {
+     "w": 120,
+     "h": 80,
+     "d": 55
+    },
+    "glands": 2
+   },
+   "rules": [
+    {
+     "id": "rule-1",
+     "when": {
+      "part": "soil-moisture-capacitive-1",
+      "metric": "soil-moisture-pct",
+      "op": "<",
+      "value": 30
+     },
+     "then": {
+      "part": "ds18b20-1",
+      "action": "pulse",
+      "durationS": 5
+     },
+     "reason": {
+      "en": "Log a reading when soil is dry",
+      "id": "Catat bacaan saat tanah kering"
+     }
+    }
+   ],
+   "sampleEveryS": 300,
+   "rationale": {
+    "en": "Monitor the Melon field.",
+    "id": "Pantau lahan Melon."
+   }
+  },
+  {
+   "id": "node-mango",
+   "role": "field",
+   "fieldId": "mango",
+   "board": "esp32-devkitc",
+   "parts": [
+    {
+     "id": "soil-moisture-capacitive-1",
+     "kind": "soil-moisture-capacitive",
+     "role": "sensor",
+     "qty": 1,
+     "purpose": {
+      "en": "Soil moisture",
+      "id": "Kelembapan tanah"
+     },
+     "mount": "field",
+     "cableM": 3
+    },
+    {
+     "id": "ds18b20-1",
+     "kind": "ds18b20",
+     "role": "sensor",
+     "qty": 1,
+     "purpose": {
+      "en": "Soil temperature",
+      "id": "Suhu tanah"
+     },
+     "mount": "field",
+     "cableM": 3
+    },
+    {
+     "id": "lora-rfm95w-1",
+     "kind": "lora-rfm95w",
+     "role": "radio",
+     "qty": 1,
+     "purpose": {
+      "en": "Uplink to gateway",
+      "id": "Uplink ke gateway"
+     },
+     "mount": "enclosure"
+    },
+    {
+     "id": "battery-18650-pack-1",
+     "kind": "battery-18650-pack",
+     "role": "power",
+     "qty": 1,
+     "purpose": {
+      "en": "Node battery",
+      "id": "Baterai node"
+     },
+     "mount": "enclosure"
+    }
+   ],
+   "pins": [
+    {
+     "boardPin": "GPIO34",
+     "gpio": 34,
+     "func": "adc",
+     "part": "soil-moisture-capacitive-1",
+     "partPin": "AOUT",
+     "symbol": "PIN_SOIL_1"
+    },
+    {
+     "boardPin": "GPIO4",
+     "gpio": 4,
+     "func": "onewire",
+     "part": "ds18b20-1",
+     "partPin": "DQ",
+     "symbol": "PIN_DS18B20"
+    },
+    {
+     "boardPin": "GPIO5",
+     "gpio": 5,
+     "func": "spi-cs",
+     "part": "lora-rfm95w-1",
+     "partPin": "NSS",
+     "symbol": "PIN_LORA_CS"
+    },
+    {
+     "boardPin": "GPIO14",
+     "gpio": 14,
+     "func": "reset",
+     "part": "lora-rfm95w-1",
+     "partPin": "RST",
+     "symbol": "PIN_LORA_RST"
+    },
+    {
+     "boardPin": "GPIO26",
+     "gpio": 26,
+     "func": "irq",
+     "part": "lora-rfm95w-1",
+     "partPin": "DIO0",
+     "symbol": "PIN_LORA_DIO0"
+    }
+   ],
+   "wires": [
+    {
+     "id": "W4",
+     "from": {
+      "part": "soil-moisture-capacitive-1",
+      "pin": "AOUT"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO34"
+     },
+     "func": "signal",
+     "color": "yellow",
+     "label": "W4 · GPIO34 → AOUT (soil)",
+     "lengthM": 3,
+     "awg": 22,
+     "cable": "3-core-shielded",
+     "connectors": {
+      "from": "screw-terminal",
+      "to": "header"
+     },
+     "viaGland": true
+    },
+    {
+     "id": "W5",
+     "from": {
+      "part": "ds18b20-1",
+      "pin": "DQ"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO4"
+     },
+     "func": "signal",
+     "color": "green",
+     "label": "W5 · GPIO4 → DQ (DS18B20)",
+     "lengthM": 3,
+     "awg": 22,
+     "cable": "3-core-shielded",
+     "connectors": {
+      "from": "screw-terminal",
+      "to": "header"
+     },
+     "viaGland": true
+    },
+    {
+     "id": "W6",
+     "from": {
+      "part": "lora-rfm95w-1",
+      "pin": "NSS"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO5"
+     },
+     "func": "signal",
+     "color": "blue",
+     "label": "W6 · GPIO5 → NSS (LoRa)",
+     "lengthM": 0.1,
+     "awg": 26,
+     "cable": "dupont",
+     "connectors": {
+      "from": "header",
+      "to": "header"
+     },
+     "viaGland": false
+    }
+   ],
+   "power": {
+    "source": "battery",
+    "supplyV": 3.7,
+    "budget": {
+     "avgMa": 12,
+     "peakMa": 140,
+     "dailyWh": 1.1
+    },
+    "battery": {
+     "chemistry": "li-ion-18650",
+     "series": 1,
+     "parallel": 2,
+     "capacityWh": 14.8,
+     "autonomyDays": 13
+    },
+    "ok": true
+   },
+   "enclosure": {
+    "ip": "IP65",
+    "mount": "pole",
+    "sizeMm": {
+     "w": 120,
+     "h": 80,
+     "d": 55
+    },
+    "glands": 2
+   },
+   "rules": [
+    {
+     "id": "rule-1",
+     "when": {
+      "part": "soil-moisture-capacitive-1",
+      "metric": "soil-moisture-pct",
+      "op": "<",
+      "value": 30
+     },
+     "then": {
+      "part": "ds18b20-1",
+      "action": "pulse",
+      "durationS": 5
+     },
+     "reason": {
+      "en": "Log a reading when soil is dry",
+      "id": "Catat bacaan saat tanah kering"
+     }
+    }
+   ],
+   "sampleEveryS": 300,
+   "rationale": {
+    "en": "Monitor the Mango field.",
+    "id": "Pantau lahan Mango."
+   }
+  },
+  {
+   "id": "node-chili",
+   "role": "field",
+   "fieldId": "chili",
+   "board": "esp32-devkitc",
+   "parts": [
+    {
+     "id": "soil-moisture-capacitive-1",
+     "kind": "soil-moisture-capacitive",
+     "role": "sensor",
+     "qty": 1,
+     "purpose": {
+      "en": "Soil moisture",
+      "id": "Kelembapan tanah"
+     },
+     "mount": "field",
+     "cableM": 3
+    },
+    {
+     "id": "ds18b20-1",
+     "kind": "ds18b20",
+     "role": "sensor",
+     "qty": 1,
+     "purpose": {
+      "en": "Soil temperature",
+      "id": "Suhu tanah"
+     },
+     "mount": "field",
+     "cableM": 3
+    },
+    {
+     "id": "lora-rfm95w-1",
+     "kind": "lora-rfm95w",
+     "role": "radio",
+     "qty": 1,
+     "purpose": {
+      "en": "Uplink to gateway",
+      "id": "Uplink ke gateway"
+     },
+     "mount": "enclosure"
+    },
+    {
+     "id": "battery-18650-pack-1",
+     "kind": "battery-18650-pack",
+     "role": "power",
+     "qty": 1,
+     "purpose": {
+      "en": "Node battery",
+      "id": "Baterai node"
+     },
+     "mount": "enclosure"
+    }
+   ],
+   "pins": [
+    {
+     "boardPin": "GPIO34",
+     "gpio": 34,
+     "func": "adc",
+     "part": "soil-moisture-capacitive-1",
+     "partPin": "AOUT",
+     "symbol": "PIN_SOIL_1"
+    },
+    {
+     "boardPin": "GPIO4",
+     "gpio": 4,
+     "func": "onewire",
+     "part": "ds18b20-1",
+     "partPin": "DQ",
+     "symbol": "PIN_DS18B20"
+    },
+    {
+     "boardPin": "GPIO5",
+     "gpio": 5,
+     "func": "spi-cs",
+     "part": "lora-rfm95w-1",
+     "partPin": "NSS",
+     "symbol": "PIN_LORA_CS"
+    },
+    {
+     "boardPin": "GPIO14",
+     "gpio": 14,
+     "func": "reset",
+     "part": "lora-rfm95w-1",
+     "partPin": "RST",
+     "symbol": "PIN_LORA_RST"
+    },
+    {
+     "boardPin": "GPIO26",
+     "gpio": 26,
+     "func": "irq",
+     "part": "lora-rfm95w-1",
+     "partPin": "DIO0",
+     "symbol": "PIN_LORA_DIO0"
+    }
+   ],
+   "wires": [
+    {
+     "id": "W7",
+     "from": {
+      "part": "soil-moisture-capacitive-1",
+      "pin": "AOUT"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO34"
+     },
+     "func": "signal",
+     "color": "yellow",
+     "label": "W7 · GPIO34 → AOUT (soil)",
+     "lengthM": 3,
+     "awg": 22,
+     "cable": "3-core-shielded",
+     "connectors": {
+      "from": "screw-terminal",
+      "to": "header"
+     },
+     "viaGland": true
+    },
+    {
+     "id": "W8",
+     "from": {
+      "part": "ds18b20-1",
+      "pin": "DQ"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO4"
+     },
+     "func": "signal",
+     "color": "green",
+     "label": "W8 · GPIO4 → DQ (DS18B20)",
+     "lengthM": 3,
+     "awg": 22,
+     "cable": "3-core-shielded",
+     "connectors": {
+      "from": "screw-terminal",
+      "to": "header"
+     },
+     "viaGland": true
+    },
+    {
+     "id": "W9",
+     "from": {
+      "part": "lora-rfm95w-1",
+      "pin": "NSS"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO5"
+     },
+     "func": "signal",
+     "color": "blue",
+     "label": "W9 · GPIO5 → NSS (LoRa)",
+     "lengthM": 0.1,
+     "awg": 26,
+     "cable": "dupont",
+     "connectors": {
+      "from": "header",
+      "to": "header"
+     },
+     "viaGland": false
+    }
+   ],
+   "power": {
+    "source": "battery",
+    "supplyV": 3.7,
+    "budget": {
+     "avgMa": 12,
+     "peakMa": 140,
+     "dailyWh": 1.1
+    },
+    "battery": {
+     "chemistry": "li-ion-18650",
+     "series": 1,
+     "parallel": 2,
+     "capacityWh": 14.8,
+     "autonomyDays": 13
+    },
+    "ok": true
+   },
+   "enclosure": {
+    "ip": "IP65",
+    "mount": "pole",
+    "sizeMm": {
+     "w": 120,
+     "h": 80,
+     "d": 55
+    },
+    "glands": 2
+   },
+   "rules": [
+    {
+     "id": "rule-1",
+     "when": {
+      "part": "soil-moisture-capacitive-1",
+      "metric": "soil-moisture-pct",
+      "op": "<",
+      "value": 30
+     },
+     "then": {
+      "part": "ds18b20-1",
+      "action": "pulse",
+      "durationS": 5
+     },
+     "reason": {
+      "en": "Log a reading when soil is dry",
+      "id": "Catat bacaan saat tanah kering"
+     }
+    }
+   ],
+   "sampleEveryS": 300,
+   "rationale": {
+    "en": "Monitor the Chili field.",
+    "id": "Pantau lahan Chili."
+   }
+  },
+  {
+   "id": "node-rice",
+   "role": "field",
+   "fieldId": "rice",
+   "board": "esp32-devkitc",
+   "parts": [
+    {
+     "id": "soil-moisture-capacitive-1",
+     "kind": "soil-moisture-capacitive",
+     "role": "sensor",
+     "qty": 1,
+     "purpose": {
+      "en": "Soil moisture",
+      "id": "Kelembapan tanah"
+     },
+     "mount": "field",
+     "cableM": 3
+    },
+    {
+     "id": "ds18b20-1",
+     "kind": "ds18b20",
+     "role": "sensor",
+     "qty": 1,
+     "purpose": {
+      "en": "Soil temperature",
+      "id": "Suhu tanah"
+     },
+     "mount": "field",
+     "cableM": 3
+    },
+    {
+     "id": "lora-rfm95w-1",
+     "kind": "lora-rfm95w",
+     "role": "radio",
+     "qty": 1,
+     "purpose": {
+      "en": "Uplink to gateway",
+      "id": "Uplink ke gateway"
+     },
+     "mount": "enclosure"
+    },
+    {
+     "id": "battery-18650-pack-1",
+     "kind": "battery-18650-pack",
+     "role": "power",
+     "qty": 1,
+     "purpose": {
+      "en": "Node battery",
+      "id": "Baterai node"
+     },
+     "mount": "enclosure"
+    }
+   ],
+   "pins": [
+    {
+     "boardPin": "GPIO34",
+     "gpio": 34,
+     "func": "adc",
+     "part": "soil-moisture-capacitive-1",
+     "partPin": "AOUT",
+     "symbol": "PIN_SOIL_1"
+    },
+    {
+     "boardPin": "GPIO4",
+     "gpio": 4,
+     "func": "onewire",
+     "part": "ds18b20-1",
+     "partPin": "DQ",
+     "symbol": "PIN_DS18B20"
+    },
+    {
+     "boardPin": "GPIO5",
+     "gpio": 5,
+     "func": "spi-cs",
+     "part": "lora-rfm95w-1",
+     "partPin": "NSS",
+     "symbol": "PIN_LORA_CS"
+    },
+    {
+     "boardPin": "GPIO14",
+     "gpio": 14,
+     "func": "reset",
+     "part": "lora-rfm95w-1",
+     "partPin": "RST",
+     "symbol": "PIN_LORA_RST"
+    },
+    {
+     "boardPin": "GPIO26",
+     "gpio": 26,
+     "func": "irq",
+     "part": "lora-rfm95w-1",
+     "partPin": "DIO0",
+     "symbol": "PIN_LORA_DIO0"
+    }
+   ],
+   "wires": [
+    {
+     "id": "W10",
+     "from": {
+      "part": "soil-moisture-capacitive-1",
+      "pin": "AOUT"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO34"
+     },
+     "func": "signal",
+     "color": "yellow",
+     "label": "W10 · GPIO34 → AOUT (soil)",
+     "lengthM": 3,
+     "awg": 22,
+     "cable": "3-core-shielded",
+     "connectors": {
+      "from": "screw-terminal",
+      "to": "header"
+     },
+     "viaGland": true
+    },
+    {
+     "id": "W11",
+     "from": {
+      "part": "ds18b20-1",
+      "pin": "DQ"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO4"
+     },
+     "func": "signal",
+     "color": "green",
+     "label": "W11 · GPIO4 → DQ (DS18B20)",
+     "lengthM": 3,
+     "awg": 22,
+     "cable": "3-core-shielded",
+     "connectors": {
+      "from": "screw-terminal",
+      "to": "header"
+     },
+     "viaGland": true
+    },
+    {
+     "id": "W12",
+     "from": {
+      "part": "lora-rfm95w-1",
+      "pin": "NSS"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO5"
+     },
+     "func": "signal",
+     "color": "blue",
+     "label": "W12 · GPIO5 → NSS (LoRa)",
+     "lengthM": 0.1,
+     "awg": 26,
+     "cable": "dupont",
+     "connectors": {
+      "from": "header",
+      "to": "header"
+     },
+     "viaGland": false
+    }
+   ],
+   "power": {
+    "source": "battery",
+    "supplyV": 3.7,
+    "budget": {
+     "avgMa": 12,
+     "peakMa": 140,
+     "dailyWh": 1.1
+    },
+    "battery": {
+     "chemistry": "li-ion-18650",
+     "series": 1,
+     "parallel": 2,
+     "capacityWh": 14.8,
+     "autonomyDays": 13
+    },
+    "ok": true
+   },
+   "enclosure": {
+    "ip": "IP65",
+    "mount": "pole",
+    "sizeMm": {
+     "w": 120,
+     "h": 80,
+     "d": 55
+    },
+    "glands": 2
+   },
+   "rules": [
+    {
+     "id": "rule-1",
+     "when": {
+      "part": "soil-moisture-capacitive-1",
+      "metric": "soil-moisture-pct",
+      "op": "<",
+      "value": 30
+     },
+     "then": {
+      "part": "ds18b20-1",
+      "action": "pulse",
+      "durationS": 5
+     },
+     "reason": {
+      "en": "Log a reading when soil is dry",
+      "id": "Catat bacaan saat tanah kering"
+     }
+    }
+   ],
+   "sampleEveryS": 300,
+   "rationale": {
+    "en": "Monitor the Rice field.",
+    "id": "Pantau lahan Rice."
+   }
+  },
+  {
+   "id": "gateway",
+   "role": "gateway",
+   "board": "esp32-devkitc",
+   "parts": [
+    {
+     "id": "lora-rfm95w-1",
+     "kind": "lora-rfm95w",
+     "role": "radio",
+     "qty": 1,
+     "purpose": {
+      "en": "LoRa receiver",
+      "id": "Penerima LoRa"
+     },
+     "mount": "enclosure"
+    }
+   ],
+   "pins": [
+    {
+     "boardPin": "GPIO5",
+     "gpio": 5,
+     "func": "spi-cs",
+     "part": "lora-rfm95w-1",
+     "partPin": "NSS",
+     "symbol": "PIN_LORA_CS"
+    }
+   ],
+   "wires": [
+    {
+     "id": "W13",
+     "from": {
+      "part": "lora-rfm95w-1",
+      "pin": "NSS"
+     },
+     "to": {
+      "part": "board",
+      "pin": "GPIO5"
+     },
+     "func": "signal",
+     "color": "blue",
+     "label": "W13 · GPIO5 → NSS (LoRa)",
+     "lengthM": 0.1,
+     "awg": 26,
+     "cable": "dupont",
+     "connectors": {
+      "from": "header",
+      "to": "header"
+     },
+     "viaGland": false
+    }
+   ],
+   "power": {
+    "source": "mains",
+    "supplyV": 5,
+    "budget": {
+     "avgMa": 130,
+     "peakMa": 260,
+     "dailyWh": 15.6
+    },
+    "ok": true
+   },
+   "enclosure": {
+    "ip": "IP54",
+    "mount": "wall",
+    "sizeMm": {
+     "w": 150,
+     "h": 100,
+     "d": 60
+    },
+    "glands": 2
+   },
+   "rules": [],
+   "sampleEveryS": 60,
+   "rationale": {
+    "en": "Receives LoRa uplinks and forwards over Wi-Fi.",
+    "id": "Menerima uplink LoRa dan meneruskan lewat Wi-Fi."
+   }
+  }
+ ],
+ "links": [
+  {
+   "id": "link-node-melon-gateway",
+   "from": "node-melon",
+   "to": "gateway",
+   "distanceM": 400,
+   "params": {
+    "medium": "lora",
+    "band": "AS923-2",
+    "freqMHz": 921.4,
+    "sf": 8,
+    "bwKHz": 125,
+    "txPowerDbm": 14,
+    "codingRate": "4/5"
+   },
+   "estimate": {
+    "marginDb": 26,
+    "ok": true,
+    "basis": {
+     "en": "Estimate (free-space plus rural margin)",
+     "id": "Estimasi (ruang bebas plus margin pedesaan)"
+    }
+   }
+  },
+  {
+   "id": "link-node-mango-gateway",
+   "from": "node-mango",
+   "to": "gateway",
+   "distanceM": 900,
+   "params": {
+    "medium": "lora",
+    "band": "AS923-2",
+    "freqMHz": 921.4,
+    "sf": 8,
+    "bwKHz": 125,
+    "txPowerDbm": 14,
+    "codingRate": "4/5"
+   },
+   "estimate": {
+    "marginDb": 22,
+    "ok": true,
+    "basis": {
+     "en": "Estimate (free-space plus rural margin)",
+     "id": "Estimasi (ruang bebas plus margin pedesaan)"
+    }
+   }
+  },
+  {
+   "id": "link-node-chili-gateway",
+   "from": "node-chili",
+   "to": "gateway",
+   "distanceM": 1400,
+   "params": {
+    "medium": "lora",
+    "band": "AS923-2",
+    "freqMHz": 921.4,
+    "sf": 10,
+    "bwKHz": 125,
+    "txPowerDbm": 14,
+    "codingRate": "4/5"
+   },
+   "estimate": {
+    "marginDb": 14,
+    "ok": true,
+    "basis": {
+     "en": "Estimate (free-space plus rural margin)",
+     "id": "Estimasi (ruang bebas plus margin pedesaan)"
+    }
+   }
+  },
+  {
+   "id": "link-node-rice-gateway",
+   "from": "node-rice",
+   "to": "gateway",
+   "distanceM": 2100,
+   "params": {
+    "medium": "lora",
+    "band": "AS923-2",
+    "freqMHz": 921.4,
+    "sf": 10,
+    "bwKHz": 125,
+    "txPowerDbm": 14,
+    "codingRate": "4/5"
+   },
+   "estimate": {
+    "marginDb": 12,
+    "ok": true,
+    "basis": {
+     "en": "Estimate (free-space plus rural margin)",
+     "id": "Estimasi (ruang bebas plus margin pedesaan)"
+    }
+   }
+  }
+ ],
+ "code": [
+  {
+   "id": "code-node-melon-main-ino",
+   "nodeId": "node-melon",
+   "board": "esp32-devkitc",
+   "language": "arduino-cpp",
+   "filename": "main.ino",
+   "content": "// fixture source\nvoid setup(){Serial.begin(115200);Serial.println(\"AIOT_BOOT_BANNER\");}\nvoid loop(){}\n",
+   "configSha256": "6900c821dbc9ee09e23f326599dea8e5e0329eb9dc91399ac5bec8d60628d761",
+   "pinsReferenced": [
+    {
+     "symbol": "PIN_SOIL_1",
+     "pin": "GPIO34",
+     "lines": [
+      1
+     ]
+    }
+   ],
+   "libraries": [
+    {
+     "name": "RadioLib",
+     "version": "7.1.0"
+    }
+   ],
+   "verify": {
+    "status": "compiled",
+    "toolchain": "arduino-cli esp32:esp32@3.0.7",
+    "at": "2026-10-14T10:00:00.000Z",
+    "sha256": "decf1933f7a5b99628cb92611e02dea79e2addfa76b32473a7d08037769bcf06",
+    "bytes": 280000,
+    "diagnostics": []
+   }
+  },
+  {
+   "id": "code-node-mango-main-ino",
+   "nodeId": "node-mango",
+   "board": "esp32-devkitc",
+   "language": "arduino-cpp",
+   "filename": "main.ino",
+   "content": "// fixture source\nvoid setup(){Serial.begin(115200);Serial.println(\"AIOT_BOOT_BANNER\");}\nvoid loop(){}\n",
+   "configSha256": "5bf9578382494efdd8ab5f7c66c288f9a66ed5057f4e2d06cf277e4e82c922eb",
+   "pinsReferenced": [
+    {
+     "symbol": "PIN_SOIL_1",
+     "pin": "GPIO34",
+     "lines": [
+      1
+     ]
+    }
+   ],
+   "libraries": [
+    {
+     "name": "RadioLib",
+     "version": "7.1.0"
+    }
+   ],
+   "verify": {
+    "status": "compiled",
+    "toolchain": "arduino-cli esp32:esp32@3.0.7",
+    "at": "2026-10-14T10:00:00.000Z",
+    "sha256": "43b6158f8a4351277d043fb4a1a931ddc93407a3a568378aa0d0246457fa161a",
+    "bytes": 280000,
+    "diagnostics": []
+   }
+  },
+  {
+   "id": "code-node-chili-main-ino",
+   "nodeId": "node-chili",
+   "board": "esp32-devkitc",
+   "language": "arduino-cpp",
+   "filename": "main.ino",
+   "content": "// fixture source\nvoid setup(){Serial.begin(115200);Serial.println(\"AIOT_BOOT_BANNER\");}\nvoid loop(){}\n",
+   "configSha256": "9f7defb5b11830c28e77db4f1765074c16b92e24376ab0515bceae72b9e78417",
+   "pinsReferenced": [
+    {
+     "symbol": "PIN_SOIL_1",
+     "pin": "GPIO34",
+     "lines": [
+      1
+     ]
+    }
+   ],
+   "libraries": [
+    {
+     "name": "RadioLib",
+     "version": "7.1.0"
+    }
+   ],
+   "verify": {
+    "status": "compiled",
+    "toolchain": "arduino-cli esp32:esp32@3.0.7",
+    "at": "2026-10-14T10:00:00.000Z",
+    "sha256": "14476ef75d77fd0746a0ffdb4fb5cd9b645b3e4c434f3b2e672b45c64bdbded7",
+    "bytes": 280000,
+    "diagnostics": []
+   }
+  },
+  {
+   "id": "code-node-rice-main-ino",
+   "nodeId": "node-rice",
+   "board": "esp32-devkitc",
+   "language": "arduino-cpp",
+   "filename": "main.ino",
+   "content": "// fixture source\nvoid setup(){Serial.begin(115200);Serial.println(\"AIOT_BOOT_BANNER\");}\nvoid loop(){}\n",
+   "configSha256": "e3e34a3b63ebb35bda6037a96553d3e061df34bbdbc97a3de39b10358d48aeda",
+   "pinsReferenced": [
+    {
+     "symbol": "PIN_SOIL_1",
+     "pin": "GPIO34",
+     "lines": [
+      1
+     ]
+    }
+   ],
+   "libraries": [
+    {
+     "name": "RadioLib",
+     "version": "7.1.0"
+    }
+   ],
+   "verify": {
+    "status": "compiled",
+    "toolchain": "arduino-cli esp32:esp32@3.0.7",
+    "at": "2026-10-14T10:00:00.000Z",
+    "sha256": "5e52eb7bfd0d9f2f565eea6ccd338aa8e16102f69b4ee74d6a42856ead0ebb86",
+    "bytes": 280000,
+    "diagnostics": []
+   }
+  }
+ ],
+ "bom": {
+  "lines": [
+   {
+    "key": "esp32-devkitc",
+    "kind": "esp32-devkitc",
+    "name": {
+     "en": "ESP32 DevKitC",
+     "id": "ESP32 DevKitC"
+    },
+    "unit": "pcs",
+    "qty": 5,
+    "perNode": [
+     {
+      "nodeId": "gateway",
+      "qty": 1
+     }
+    ],
+    "priceIdr": {
+     "unit": {
+      "min": 70000,
+      "max": 120000
+     },
+     "total": {
+      "min": 350000,
+      "max": 600000
+     }
+    },
+    "priceSource": {
+     "table": "prices.ts",
+     "checkedAt": "2026-10-14"
+    },
+    "optional": false
+   },
+   {
+    "key": "lora-rfm95w",
+    "kind": "lora-rfm95w",
+    "name": {
+     "en": "RFM95W LoRa module",
+     "id": "RFM95W LoRa module"
+    },
+    "unit": "pcs",
+    "qty": 5,
+    "perNode": [
+     {
+      "nodeId": "gateway",
+      "qty": 1
+     }
+    ],
+    "priceIdr": {
+     "unit": {
+      "min": 90000,
+      "max": 150000
+     },
+     "total": {
+      "min": 450000,
+      "max": 750000
+     }
+    },
+    "priceSource": {
+     "table": "prices.ts",
+     "checkedAt": "2026-10-14"
+    },
+    "optional": false
+   },
+   {
+    "key": "soil-moisture-capacitive",
+    "kind": "soil-moisture-capacitive",
+    "name": {
+     "en": "Capacitive soil moisture sensor",
+     "id": "Capacitive soil moisture sensor"
+    },
+    "unit": "pcs",
+    "qty": 4,
+    "perNode": [
+     {
+      "nodeId": "gateway",
+      "qty": 1
+     }
+    ],
+    "priceIdr": {
+     "unit": {
+      "min": 25000,
+      "max": 60000
+     },
+     "total": {
+      "min": 100000,
+      "max": 240000
+     }
+    },
+    "priceSource": {
+     "table": "prices.ts",
+     "checkedAt": "2026-10-14"
+    },
+    "optional": false
+   },
+   {
+    "key": "ds18b20",
+    "kind": "ds18b20",
+    "name": {
+     "en": "DS18B20 waterproof probe",
+     "id": "DS18B20 waterproof probe"
+    },
+    "unit": "pcs",
+    "qty": 4,
+    "perNode": [
+     {
+      "nodeId": "gateway",
+      "qty": 1
+     }
+    ],
+    "priceIdr": {
+     "unit": {
+      "min": 20000,
+      "max": 45000
+     },
+     "total": {
+      "min": 80000,
+      "max": 180000
+     }
+    },
+    "priceSource": {
+     "table": "prices.ts",
+     "checkedAt": "2026-10-14"
+    },
+    "optional": false
+   },
+   {
+    "key": "battery-18650-pack",
+    "kind": "battery-18650-pack",
+    "name": {
+     "en": "18650 Li-ion pack, 1S",
+     "id": "18650 Li-ion pack, 1S"
+    },
+    "unit": "pcs",
+    "qty": 4,
+    "perNode": [
+     {
+      "nodeId": "gateway",
+      "qty": 1
+     }
+    ],
+    "priceIdr": {
+     "unit": {
+      "min": 40000,
+      "max": 90000
+     },
+     "total": {
+      "min": 160000,
+      "max": 360000
+     }
+    },
+    "priceSource": {
+     "table": "prices.ts",
+     "checkedAt": "2026-10-14"
+    },
+    "optional": false
+   }
+  ],
+  "totalIdr": {
+   "min": 1140000,
+   "max": 2130000
+  }
+ },
+ "checks": [
+  {
+   "code": "link.margin.warning",
+   "severity": "warning",
+   "scope": {
+    "linkId": "link-node-chili-gateway"
+   },
+   "en": "L3 margin is 14 dB (est.), below the 18 dB target.",
+   "id": "Margin L3 14 dB (est.), di bawah target 18 dB.",
+   "ref": "L3"
+  }
+ ],
+ "checklist": [
+  {
+   "id": "procure:esp32-devkitc",
+   "phase": "procure",
+   "order": 0,
+   "title": {
+    "en": "Buy ESP32 DevKitC",
+    "id": "Beli ESP32 DevKitC"
+   }
+  },
+  {
+   "id": "flash:node-melon",
+   "phase": "flash",
+   "nodeId": "node-melon",
+   "order": 10,
+   "title": {
+    "en": "Flash node-melon",
+    "id": "Flash node-melon"
+   }
+  },
+  {
+   "id": "flash:node-mango",
+   "phase": "flash",
+   "nodeId": "node-mango",
+   "order": 11,
+   "title": {
+    "en": "Flash node-mango",
+    "id": "Flash node-mango"
+   }
+  },
+  {
+   "id": "flash:node-chili",
+   "phase": "flash",
+   "nodeId": "node-chili",
+   "order": 12,
+   "title": {
+    "en": "Flash node-chili",
+    "id": "Flash node-chili"
+   }
+  },
+  {
+   "id": "flash:node-rice",
+   "phase": "flash",
+   "nodeId": "node-rice",
+   "order": 13,
+   "title": {
+    "en": "Flash node-rice",
+    "id": "Flash node-rice"
+   }
+  }
+ ],
+ "tests": [
+  {
+   "id": "test:link:node-chili-gateway",
+   "phase": "link",
+   "linkId": "link-node-chili-gateway",
+   "title": {
+    "en": "Range test",
+    "id": "Uji jangkauan"
+   },
+   "steps": [
+    {
+     "en": "Power node and gateway",
+     "id": "Nyalakan node dan gateway"
+    }
+   ],
+   "expect": {
+    "en": "Packets received",
+    "id": "Paket diterima"
+   }
+  }
+ ],
+ "summary": {
+  "en": "Four-field farm with a LoRa gateway.",
+  "id": "Kebun empat lahan dengan gateway LoRa."
+ },
+ "verification": {
+  "/nodes/0/wires/0": {
+   "status": "verified",
+   "by": "validate_netlist",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "8bbaa1aa1fc7a7b3ad80233fff797194bbda78cf034e2189e99bd3e637e7cb7d"
+  },
+  "/nodes/1/wires/0": {
+   "status": "verified",
+   "by": "validate_netlist",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "44f87b83008758904d2dcf3449077a65848eee268e324baded87426864496356"
+  },
+  "/nodes/2/wires/0": {
+   "status": "verified",
+   "by": "validate_netlist",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "93f54967db10b6caa1c3bdfc34cd1225750733f053380a7b0ee615c6aba15db9"
+  },
+  "/nodes/3/wires/0": {
+   "status": "verified",
+   "by": "validate_netlist",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "7a28f42b510f09d5b819d3981a2ef3bab14b3826293105ac2831b6e27f93baa3"
+  },
+  "/nodes/4/wires/0": {
+   "status": "verified",
+   "by": "validate_netlist",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "69e997eca0a8b36aa97787ad3bf4aa69442dc68e292f14f69623572281583826"
+  },
+  "/links/0": {
+   "status": "unverified",
+   "by": "estimate_link",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "24294c942c0a0e7c2d4373be437cecd66fcd168e08358213a5c93df368fccfa8",
+   "note": "LoRa margin is an estimate"
+  },
+  "/links/1": {
+   "status": "unverified",
+   "by": "estimate_link",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "b64fdf42d433493dd517590ddef09f7814912683f06d41b5992c1b9c7652bc75",
+   "note": "LoRa margin is an estimate"
+  },
+  "/links/2": {
+   "status": "unverified",
+   "by": "estimate_link",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "c7faba4d369cbe55ea1a0f4160b859d77e8f920d1b8b40431eb366b535aaae8f",
+   "note": "LoRa margin is an estimate"
+  },
+  "/links/3": {
+   "status": "unverified",
+   "by": "estimate_link",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "4b1c4e5762641b0605e8cf2c0e111c930d4e3a5cdefbaa7193e5a6aac2ced736",
+   "note": "LoRa margin is an estimate"
+  },
+  "/code/0": {
+   "status": "verified",
+   "by": "compile_code",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "decf1933f7a5b99628cb92611e02dea79e2addfa76b32473a7d08037769bcf06"
+  },
+  "/code/1": {
+   "status": "verified",
+   "by": "compile_code",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "43b6158f8a4351277d043fb4a1a931ddc93407a3a568378aa0d0246457fa161a"
+  },
+  "/code/2": {
+   "status": "verified",
+   "by": "compile_code",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "14476ef75d77fd0746a0ffdb4fb5cd9b645b3e4c434f3b2e672b45c64bdbded7"
+  },
+  "/code/3": {
+   "status": "verified",
+   "by": "compile_code",
+   "at": "2026-10-14T10:00:00.000Z",
+   "inputsSha": "5e52eb7bfd0d9f2f565eea6ccd338aa8e16102f69b4ee74d6a42856ead0ebb86"
+  }
+ },
+ "meta": {
+  "version": 1,
+  "generatedAt": "2026-10-14T10:00:00.000Z",
+  "lang": "en",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "catalogVersion": "fixture-1"
+ }
+}

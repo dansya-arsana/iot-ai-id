@@ -1,0 +1,18 @@
+# Pro compile sandbox, ESP32 / ESP32-S3 (plan §7 M3-E). Compile only, never execute.
+# Self-contained (no dependency on the lab image). Toolchain is pinned; the core is baked in at build time,
+# so the container needs no network at run time. SDK lives in /opt/arduino (world readable) for a read-only root.
+#   docker build -f scripts/pro-sandbox/Dockerfile.esp32 -t aiot-pro-esp32:3.3.12 scripts/pro-sandbox
+FROM debian:bookworm-slim
+ARG ESP32_CORE=3.3.12
+ARG IDX=https://espressif.github.io/arduino-esp32/package_esp32_index.json
+RUN apt-get update -qq && apt-get install -y -qq curl ca-certificates python3 python3-serial >/dev/null && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh -s 1.5.1
+ENV ARDUINO_DIRECTORIES_DATA=/opt/arduino/data ARDUINO_DIRECTORIES_USER=/opt/arduino/user \
+    ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS=$IDX ARDUINO_UPDATER_ENABLE_NOTIFICATION=false
+RUN mkdir -p /opt/arduino/data /opt/arduino/user \
+ && arduino-cli core update-index && arduino-cli core install esp32:esp32@${ESP32_CORE} \
+ && rm -rf /opt/arduino/data/staging /opt/arduino/data/tmp /opt/arduino/data/downloads \
+ && chmod -R a+rX /opt/arduino
+ENV ARDUINO_DIRECTORIES_DOWNLOADS=/work/dl
+USER 65534:65534
+WORKDIR /work

@@ -2,16 +2,19 @@ import {useEffect,useState,useRef} from 'react';
 import {api,post} from './api';
 import {useLang} from './i18n';
 import {Button,Eyebrow,Input,Notice,Select,Spinner,Tag} from './ui';
+import {PRO_DEFAULT_EFFORT,PRO_DEFAULT_MODEL,PRO_EFFORTS,PRO_MODELS} from '../../../packages/ai-providers/index';
+import {DEFAULT_KILL_SWITCH} from '../../../packages/pro-contract/agent';
 type Status={configured:boolean;fingerprint?:string;testStatus:string;testedAt?:string};
-type Prefs={active?:string;models:Record<string,string>;customBaseUrl?:string};
+type Builder={model:string;effort:string;thinkingDisplay:string;killSwitch?:{enabled:boolean;monthlyUsd:number}};
+type Prefs={active?:string;models:Record<string,string>;customBaseUrl?:string;builder?:Builder};
 type Entry={id:string;label:string;protocol:string;models:string[];keyUrl?:string;scope:string;available?:boolean};
-type Settings={scope:string;deployment:'cloud'|'local';preferences:Prefs;registry:Entry[];providers:Record<string,Status>};
+type Settings={envFallback?:{anthropic?:boolean};scope:string;deployment:'cloud'|'local';preferences:Prefs;registry:Entry[];providers:Record<string,Status>};
 type Tone='info'|'ok'|'warn'|'error';
 export function AiSettings(){
  const{tr,lang}=useLang();
  const section=useRef<HTMLElement>(null);
  useEffect(()=>{if(window.location.hash==='#bo-ai')section.current?.scrollIntoView();},[]);
- const [settings,setSettings]=useState<Settings>();const [keys,setKeys]=useState<Record<string,string>>({});const [busy,setBusy]=useState<string>();const [message,setMessage]=useState<{text:string;tone:Tone}>();const [custom,setCustom]=useState<{url?:string;model?:string}>({});
+ const [settings,setSettings]=useState<Settings>();const [keys,setKeys]=useState<Record<string,string>>({});const [busy,setBusy]=useState<string>();const [message,setMessage]=useState<{text:string;tone:Tone}>();const [custom,setCustom]=useState<{url?:string;model?:string}>({});const [cap,setCap]=useState<string>();
  useEffect(()=>{api<Settings>('/ai-settings').then(setSettings).catch(()=>setMessage({tone:'warn',text:tr('AI settings could not be loaded.','Pengaturan AI gagal dimuat.')}));},[]);// eslint-disable-line react-hooks/exhaustive-deps -- load once on mount
  async function action(provider:string,operation:'save'|'test'|'delete'){
   setBusy(provider);setMessage(undefined);const key=keys[provider]??'';setKeys(values=>({...values,[provider]:''}));
@@ -30,6 +33,11 @@ export function AiSettings(){
  const cliEntries=(settings?.registry??[]).filter(entry=>entry.protocol==='cli');
  const cards=[...entries.map(entry=>({id:entry.id,label:entry.label,entry})),{id:'typesafe',label:'TypeSafe / Jev',entry:undefined}];
  const activeRadio=(id:string,label:string,disabled:boolean)=><label className="bo-ai-radio"><input type="radio" name="bo-ai-active" checked={prefs.active===id} disabled={disabled||!!busy} onChange={()=>void savePrefs({...prefs,active:id})}/>{label}</label>;
+ const builder:Builder={model:PRO_DEFAULT_MODEL,effort:PRO_DEFAULT_EFFORT,thinkingDisplay:'summarized',...prefs.builder};
+ const kill=builder.killSwitch??DEFAULT_KILL_SWITCH;
+ const saveBuilder=(patch:Partial<Builder>)=>void savePrefs({...prefs,builder:{...builder,...patch}});
+ const capValue=cap??String(kill.monthlyUsd);const capNumber=Number(capValue);const capValid=Number.isFinite(capNumber)&&capNumber>0&&capNumber<=1_000_000;
+ const anthropicKey=settings?.providers?.anthropic;
  return <section ref={section} id="bo-ai" className="bo-ai-settings bo-panel" aria-label={tr('AI settings','Pengaturan AI')}>
   <div className="bo-panel-head"><div><Eyebrow>{tr('Owner only','Khusus pemilik')}</Eyebrow><h2>{tr('AI settings','Pengaturan AI')}</h2></div></div>
   <div className="bo-ai-intro">
@@ -59,6 +67,17 @@ export function AiSettings(){
     </form>;})}
   </div>
   {local&&cliEntries.length>0&&<fieldset className="bo-ai-cli"><legend>{tr('Signed in on this computer','Login di komputer ini')}</legend>{cliEntries.map(entry=><div key={entry.id}>{activeRadio(entry.id,tr(`Use ${entry.id==='codex-cli'?'Codex':'Claude Code'} signed in on this computer`,`Pakai ${entry.id==='codex-cli'?'Codex':'Claude Code'} yang login di komputer ini`),!entry.available)}{!entry.available&&<Tag>{tr('Not found','Tidak ditemukan')}</Tag>}</div>)}</fieldset>}
+  {settings&&<fieldset className="bo-ai-pro" aria-label={tr('Pro architect model','Model arsitek Pro')}>
+   <legend>{tr('Pro architect (agent)','Arsitek Pro (agen)')}</legend>
+   <p className="bo-muted">{tr('One global choice for every member. Thinking is adaptive and always streamed; Claude 5.5 does not accept a token budget, so depth is set by effort. No per-member quota yet: usage is recorded per member and project.','Satu pilihan global untuk semua anggota. Thinking bersifat adaptif dan selalu di-stream; Claude 5.5 tidak menerima budget token, jadi kedalaman diatur lewat effort. Belum ada kuota per anggota: pemakaian dicatat per anggota dan proyek.')}</p>
+   <p>{anthropicKey?.configured?<Tag tone="ok">{tr('Anthropic key: vault (wins)','Key Anthropic: vault (diutamakan)')}</Tag>:settings.envFallback?.anthropic?<Tag tone="warn">{tr('Anthropic key: server environment fallback','Key Anthropic: fallback environment server')}</Tag>:<Tag tone="error">{tr('No Anthropic key. Pro cannot run.','Belum ada key Anthropic. Pro tidak bisa berjalan.')}</Tag>}</p>
+   <Select id="bo-pro-model" label={tr('Model','Model')} value={builder.model} disabled={!!busy} onChange={event=>saveBuilder({model:event.target.value})}>{PRO_MODELS.map(model=><option key={model} value={model}>{model}</option>)}</Select>
+   <Select id="bo-pro-effort" label={tr('Thinking effort','Effort thinking')} hint={tr('Higher thinks more and costs more. Changing it mid-project resets the prompt cache.','Lebih tinggi berpikir lebih banyak dan lebih mahal. Mengubahnya di tengah proyek mereset cache prompt.')} value={builder.effort} disabled={!!busy} onChange={event=>saveBuilder({effort:event.target.value})}>{PRO_EFFORTS.map(effort=><option key={effort} value={effort}>{effort}</option>)}</Select>
+   <Select id="bo-pro-display" label={tr('Thinking text','Teks thinking')} value={builder.thinkingDisplay} disabled={!!busy} onChange={event=>saveBuilder({thinkingDisplay:event.target.value})}><option value="summarized">{tr('Summarized (shown, collapsible)','Ringkasan (ditampilkan, bisa dilipat)')}</option><option value="omitted">{tr('Hidden','Disembunyikan')}</option></Select>
+   <label className="bo-ai-radio"><input type="checkbox" checked={kill.enabled} disabled={!!busy} onChange={event=>saveBuilder({killSwitch:{enabled:event.target.checked,monthlyUsd:capValid?capNumber:kill.monthlyUsd}})}/>{tr('Global monthly USD kill-switch','Kill-switch USD bulanan global')}</label>
+   <Input id="bo-pro-cap" label={tr('Monthly cap (USD, all members)','Batas bulanan (USD, semua anggota)')} hint={tr('Safety stop, not a quota. Turns end when month-to-date spend reaches it.','Pengaman, bukan kuota. Giliran berhenti saat pengeluaran bulan berjalan mencapainya.')} type="number" min={1} max={1000000} value={capValue} disabled={!!busy||!kill.enabled} onChange={event=>setCap(event.target.value)}/>
+   <div className="bo-ai-actions"><Button size="sm" variant="secondary" disabled={!!busy||!capValid||capNumber===kill.monthlyUsd} onClick={()=>{saveBuilder({killSwitch:{enabled:kill.enabled,monthlyUsd:capNumber}});setCap(undefined);}}>{tr('Save cap','Simpan batas')}</Button></div>
+  </fieldset>}
   <div className="bo-ai-result" aria-live="polite">{busy?<span className="bo-ai-busy"><Spinner label={tr('Processing','Memproses')}/>{tr('Processing…','Memproses…')}</span>:message&&<Notice tone={message.tone}>{message.text}</Notice>}</div>
  </section>;
 }

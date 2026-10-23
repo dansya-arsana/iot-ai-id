@@ -1,6 +1,7 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
+import {registerProTools,opsCaller} from './mcp-pro-tools.js';
 
 /** Local MCP surface over the loopback API so agents (Jev or external) can drive the same evidence-bound operations as the web workbench. No physical flashing from MCP: physical runs still require the human USB trust + approval flow. */
 const url=process.env.IOT_API_URL??'http://127.0.0.1:8787';
@@ -37,4 +38,6 @@ server.registerTool('send_chat',{description:'Send a design revision or a debug 
 });
 server.registerTool('get_challenge_progress',{description:'Judge the project challenge scenarios from stored evidence: pass/fail/pending per scenario, plus overall state. The system judges; nobody can claim done without evidence.',inputSchema:{projectId:z.string().uuid()}},async({projectId})=>text(await call('/api/projects/'+projectId+'/challenge','GET')));
 server.registerTool('run_simulation',{description:'Start a simulation experiment (template-model default; wokwi-cli only when locally configured). Returns accepted; poll get_project for the verification result. Physical runs are intentionally NOT available here.',inputSchema:{projectId:z.string().uuid(),backend:z.enum(['template-model','wokwi-cli']).default('template-model'),fault:z.enum(['none','sda']).default('none')},},async({projectId,backend,fault})=>text(await call('/api/projects/'+projectId+'/run','POST',{mode:'simulation',backend,fault})));
+/** Pro agentic tools (registry): pure in-process, service tools via loopback ops. Enabled only when IOT_OPS_URL is set. */
+if(process.env.IOT_OPS_URL)registerProTools(server as any,{ops:opsCaller(process.env.IOT_OPS_URL,process.env.OPS_OWNER_TOKEN??process.env.IOT_OPS_TOKEN)});
 await server.connect(new StdioServerTransport());

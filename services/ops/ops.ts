@@ -12,6 +12,9 @@ import {Auth} from './auth.js';
 import {StaffDirectory,handleStaff,handleStaffAdmin} from './staff.js';
 import {MemberDirectory,handleMember,handleMemberAdmin} from './members.js';
 import {LabAi,handleLab,type LabDeps} from './lab-ai.js';
+import {handleCatalog} from './catalog.js';
+import {handleProAdmin} from './pro.js';
+import {installPro,handleProInstalled,callTool} from './pro-wiring.js';
 import {
  InquiryInputSchema,InquiryUpdateSchema,OrganizationInputSchema,OrganizationUpdateSchema,ProductInputSchema,ProductUpdateSchema,TaskInputSchema,TaskActionSchema,
  SchoolAdminInputSchema,ReasonSchema,PersonUpdateSchema,BatchCreateSchema,BatchPaidSchema,INQUIRY_STATUSES,ORG_TYPES,PRODUCT_STATUSES,TASK_STATUSES,can,permissions,resolveRole,payoutSplit,productErrors,publicProduct,taskTransition,
@@ -85,6 +88,8 @@ export class Ops{
   if(path.startsWith('/ops/v1/portal/'))return handlePortal(this,call);
   if(path.startsWith('/ops/v1/staff/'))return handleStaff(this,call);
   if(path.startsWith('/ops/v1/lab/')||path.startsWith('/ops/v1/member/lab/'))return handleLab(this,call);// Lab AI builder (ADR 011); the member/ alias is where the member cookie is sent.
+  if(path.startsWith('/ops/v1/catalog/')||path.startsWith('/ops/v1/member/catalog/'))return handleCatalog(this,call);// Parts catalog (plan M2): staff review, member search and proposals. The query string is kept on call.path.
+  if(path.startsWith('/ops/v1/member/pro/'))return handleProInstalled(this,call);// Pro architect (ADR 012).
   if(path.startsWith('/ops/v1/member/'))return handleMember(this,call);
   if(!path.startsWith('/ops/v1/admin/'))return{status:404,data:{error:'Not found'}};
 
@@ -97,6 +102,16 @@ export class Ops{
 
   if(resource==='staff'){const r=await handleStaffAdmin(this,call,role,by,id,sub);if(r)return r;}
   if(resource==='members'){const r=await handleMemberAdmin(this,call,role,by,id,sub);if(r)return r;}
+  if(resource==='pro'){
+   // Owner-token loopback for the MCP bridge: POST /ops/v1/admin/pro/tools/:name {input,subject?}. Same dispatcher, same checks; the subject must own the project.
+   if(id==='tools'&&sub&&method==='POST'){
+    if(role!=='owner')return{status:403,data:{error:'Only the owner may call Pro tools directly'}};
+    const b=(body&&typeof body==='object'?body:{}) as {input?:unknown;subject?:unknown};
+    const r=await callTool(installPro(this),typeof b.subject==='string'&&/^(member|staff):[\w-]{1,64}$/.test(b.subject)?b.subject:'staff:'+by,sub,b.input);
+    return r.ok?{status:200,data:r.output}:{status:r.error.status,data:{error:r.error.code,message:r.error.message}};
+   }
+   installPro(this);return handleProAdmin(this,call,role,by,rest.slice(1));
+  }
   if(resource==='me'&&method==='GET')return{status:200,data:{user:by,role,permissions:permissions(role)}};
   if(resource==='summary'&&method==='GET')return{status:200,data:this.summary()};
 

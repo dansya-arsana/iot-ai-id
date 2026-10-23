@@ -27,6 +27,9 @@ check(){ # name got want
   if [ "$2" = "$3" ]; then echo "ok   $1 -> $2"; else echo "FAIL $1 -> $2 (want $3)"; fail=1; fi; }
 check ops:/ops/v1/catalog "$(status "$OPS" http://127.0.0.1:8791/ops/v1/catalog)" "$EXPECT_CATALOG"
 check ops:/ops/v1/member/lab/examples "$(status "$OPS" http://127.0.0.1:8791/ops/v1/member/lab/examples)" "$EXPECT_EXAMPLES"
+check ops:/ops/v1/member/catalog/search "$(status "$OPS" "http://127.0.0.1:8791/ops/v1/member/catalog/search?q=lora")" 401
+check ops:/ops/v1/member/pro/quota "$(status "$OPS" http://127.0.0.1:8791/ops/v1/member/pro/quota)" 401
+check api:/internal/pro/config "$(status "$API" http://127.0.0.1:8787/internal/pro/config)" 503 # disabled without OPS_API_INTERNAL_TOKEN
 check api:/api/session "$(status "$API" http://127.0.0.1:8787/api/session)" 200
 [ $fail = 0 ] || { docker logs "$OPS" 2>&1 | tail -20; docker logs "$API" 2>&1 | tail -20; exit 1; }
 echo "smoke passed"

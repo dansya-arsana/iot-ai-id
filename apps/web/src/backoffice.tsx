@@ -1,5 +1,6 @@
 import {AiSettings} from './ai-settings';
 import {BusinessOps,opsSections} from './backoffice-ops';
+import {CatalogAdmin,catalogSection} from './backoffice-catalog';
 import {useEffect, useState, useCallback, useRef, type ReactNode} from 'react';
 import {Link} from 'react-router-dom';
 import {ArrowClockwiseIcon, ArrowUpRightIcon, PlusIcon} from '@phosphor-icons/react';
@@ -20,6 +21,7 @@ const ALL_STATUSES = 'Semua status';
 const sections: {hash: string; en: string; id: string}[] = [
   {hash:'#bo-ringkasan', en:'Overview', id:'Ringkasan'},
   ...opsSections,
+  catalogSection,
   {hash:'#bo-eksperimen', en:'Experiments', id:'Eksperimen'},
   {hash:'#bo-proyek', en:'Projects', id:'Proyek'},
   {hash:'#bo-runtime', en:'Runtime', id:'Runtime'},
@@ -247,6 +249,7 @@ export function Backoffice({staff}: {staff?: {me: StaffMe; onSignOut: () => void
           </Panel>
         </div>
         <BusinessOps/>
+        <CatalogAdmin canWrite={!staff || staff.me.role === 'owner' || staff.me.role === 'ops'}/>
         <AiSettings/>
         <p className="bo-foot">{tr('Local operator backoffice. Numbers come from the same SQLite artefacts as the workspace; physical verification counts physical evidence only.','Backoffice operator lokal. Angka dihitung dari artefak SQLite yang sama dengan workspace; verifikasi fisik hanya dihitung dari bukti fisik.')}</p>
       </main>

@@ -1,0 +1,1302 @@
+{
+ "catalogVersion": "fixture-1",
+ "parts": [
+  {
+   "schemaVersion": 1,
+   "identity": {
+    "id": "esp32-devkitc",
+    "name": {
+     "v": "ESP32 DevKitC",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "kind": {
+     "v": "board",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "electrical": {
+    "supplyV": {
+     "v": {
+      "min": 4.5,
+      "max": 5.5
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "logicLevelV": {
+     "v": 3.3,
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "currentMa": {
+     "v": {
+      "typ": 80,
+      "peak": 240
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "pins": [
+    {
+     "v": {
+      "name": "3V3",
+      "func": [
+       "power"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GND",
+      "func": [
+       "ground"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GPIO4",
+      "func": [
+       "digital-in",
+       "digital-out",
+       "onewire"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GPIO34",
+      "func": [
+       "adc"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GPIO21",
+      "func": [
+       "i2c-sda"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GPIO22",
+      "func": [
+       "i2c-scl"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GPIO5",
+      "func": [
+       "spi-cs"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GPIO14",
+      "func": [
+       "reset"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GPIO26",
+      "func": [
+       "irq"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   ],
+   "protocols": {
+    "supported": {
+     "v": [
+      "wifi",
+      "ble",
+      "i2c",
+      "spi",
+      "uart",
+      "analog"
+     ],
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "mechanical": {
+    "sizeMm": {
+     "v": {
+      "w": 55,
+      "h": 28,
+      "d": 13
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "environment": {
+    "outdoor": {
+     "v": false,
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "tempC": {
+     "v": {
+      "min": -20,
+      "max": 70
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "drivers": [
+    {
+     "v": {
+      "boardFamily": "esp32",
+      "lib": "Arduino core",
+      "snippet": "void setup(){Serial.begin(115200);}",
+      "verify": "compiled"
+     },
+     "p": {
+      "source": "packages/hardware-contract",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   ],
+   "compatibleWith": {
+    "v": [
+     "lora-rfm95w",
+     "soil-moisture-capacitive",
+     "ds18b20"
+    ],
+    "p": {
+     "source": "packages/hardware-library",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "high"
+    }
+   },
+   "price": {
+    "v": {
+     "minIdr": 70000,
+     "maxIdr": 120000,
+     "checkedAt": "2026-10-14"
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "medium"
+    }
+   },
+   "model3d": {
+    "kind": {
+     "v": "procedural",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "status": {
+     "v": "draft",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "untrusted": {
+    "summary": {
+     "v": {
+      "en": "Dual-core ESP32 development board.",
+      "id": "Papan pengembangan ESP32 dual-core."
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "pitfalls": [
+     {
+      "v": {
+       "en": "GPIO34 to 39 are input only.",
+       "id": "GPIO34 sampai 39 hanya input."
+      },
+      "p": {
+       "source": "docs/research/agri-domain.md",
+       "verifiedBy": "import",
+       "at": "2026-10-14",
+       "confidence": "medium"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "schemaVersion": 1,
+   "identity": {
+    "id": "lora-rfm95w",
+    "name": {
+     "v": "RFM95W LoRa module",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "kind": {
+     "v": "radio",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "electrical": {
+    "supplyV": {
+     "v": {
+      "min": 1.8,
+      "max": 3.7
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "logicLevelV": {
+     "v": 3.3,
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "currentMa": {
+     "v": {
+      "typ": 12,
+      "peak": 120
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "pins": [
+    {
+     "v": {
+      "name": "3V3",
+      "func": [
+       "power"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GND",
+      "func": [
+       "ground"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "SCK",
+      "func": [
+       "spi-sck"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "MOSI",
+      "func": [
+       "spi-mosi"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "MISO",
+      "func": [
+       "spi-miso"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "NSS",
+      "func": [
+       "spi-cs"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "RST",
+      "func": [
+       "reset"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "DIO0",
+      "func": [
+       "irq"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   ],
+   "protocols": {
+    "supported": {
+     "v": [
+      "spi",
+      "lora"
+     ],
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "freqMHz": {
+     "v": {
+      "min": 862,
+      "max": 1020
+     },
+     "p": {
+      "source": "datasheet (Semtech SX1276)",
+      "verifiedBy": "staff:seed",
+      "at": "2026-10-14",
+      "confidence": "medium"
+     }
+    }
+   },
+   "mechanical": {
+    "sizeMm": {
+     "v": {
+      "w": 16,
+      "h": 16,
+      "d": 2
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "environment": {
+    "outdoor": {
+     "v": true,
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "tempC": {
+     "v": {
+      "min": -20,
+      "max": 70
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "drivers": [],
+   "compatibleWith": {
+    "v": [
+     "esp32-devkitc"
+    ],
+    "p": {
+     "source": "packages/hardware-library",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "high"
+    }
+   },
+   "price": {
+    "v": {
+     "minIdr": 90000,
+     "maxIdr": 150000,
+     "checkedAt": "2026-10-14"
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "medium"
+    }
+   },
+   "model3d": {
+    "kind": {
+     "v": "procedural",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "status": {
+     "v": "draft",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "untrusted": {
+    "summary": {
+     "v": {
+      "en": "SX1276 LoRa transceiver, used at 920-923 MHz in Indonesia.",
+      "id": "Transceiver LoRa SX1276, dipakai pada 920-923 MHz di Indonesia."
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "pitfalls": [
+     {
+      "v": {
+       "en": "Needs a matched antenna before transmit.",
+       "id": "Wajib memakai antena yang sesuai sebelum mengirim."
+      },
+      "p": {
+       "source": "docs/research/agri-domain.md",
+       "verifiedBy": "import",
+       "at": "2026-10-14",
+       "confidence": "medium"
+      }
+     },
+     {
+      "v": {
+       "en": "3.3 V logic only.",
+       "id": "Hanya logika 3,3 V."
+      },
+      "p": {
+       "source": "docs/research/agri-domain.md",
+       "verifiedBy": "import",
+       "at": "2026-10-14",
+       "confidence": "medium"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "schemaVersion": 1,
+   "identity": {
+    "id": "soil-moisture-capacitive",
+    "name": {
+     "v": "Capacitive soil moisture sensor",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "kind": {
+     "v": "sensor",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "electrical": {
+    "supplyV": {
+     "v": {
+      "min": 3.3,
+      "max": 5.5
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "currentMa": {
+     "v": {
+      "typ": 5,
+      "peak": 10
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "pins": [
+    {
+     "v": {
+      "name": "VCC",
+      "func": [
+       "power"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GND",
+      "func": [
+       "ground"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "AOUT",
+      "func": [
+       "adc"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   ],
+   "protocols": {
+    "supported": {
+     "v": [
+      "analog"
+     ],
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "mechanical": {
+    "sizeMm": {
+     "v": {
+      "w": 98,
+      "h": 23,
+      "d": 4
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "environment": {
+    "outdoor": {
+     "v": true,
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "tempC": {
+     "v": {
+      "min": -20,
+      "max": 70
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "drivers": [],
+   "compatibleWith": {
+    "v": [
+     "esp32-devkitc"
+    ],
+    "p": {
+     "source": "packages/hardware-library",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "high"
+    }
+   },
+   "price": {
+    "v": {
+     "minIdr": 25000,
+     "maxIdr": 60000,
+     "checkedAt": "2026-10-14"
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "medium"
+    }
+   },
+   "model3d": {
+    "kind": {
+     "v": "procedural",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "status": {
+     "v": "draft",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "untrusted": {
+    "summary": {
+     "v": {
+      "en": "Analog capacitive soil moisture probe.",
+      "id": "Probe kelembapan tanah kapasitif analog."
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "pitfalls": [
+     {
+      "v": {
+       "en": "Seal the top edge against water.",
+       "id": "Segel tepi atas dari air."
+      },
+      "p": {
+       "source": "docs/research/agri-domain.md",
+       "verifiedBy": "import",
+       "at": "2026-10-14",
+       "confidence": "medium"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "schemaVersion": 1,
+   "identity": {
+    "id": "ds18b20",
+    "name": {
+     "v": "DS18B20 waterproof probe",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "kind": {
+     "v": "sensor",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "electrical": {
+    "supplyV": {
+     "v": {
+      "min": 3,
+      "max": 5.5
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "currentMa": {
+     "v": {
+      "typ": 1,
+      "peak": 1.5
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "pins": [
+    {
+     "v": {
+      "name": "VCC",
+      "func": [
+       "power"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "GND",
+      "func": [
+       "ground"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "DQ",
+      "func": [
+       "onewire"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   ],
+   "protocols": {
+    "supported": {
+     "v": [
+      "onewire"
+     ],
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "mechanical": {
+    "sizeMm": {
+     "v": {
+      "w": 6,
+      "h": 50,
+      "d": 6
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "environment": {
+    "outdoor": {
+     "v": true,
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "tempC": {
+     "v": {
+      "min": -20,
+      "max": 70
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "drivers": [],
+   "compatibleWith": {
+    "v": [
+     "esp32-devkitc"
+    ],
+    "p": {
+     "source": "packages/hardware-library",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "high"
+    }
+   },
+   "price": {
+    "v": {
+     "minIdr": 20000,
+     "maxIdr": 45000,
+     "checkedAt": "2026-10-14"
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "medium"
+    }
+   },
+   "model3d": {
+    "kind": {
+     "v": "procedural",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "status": {
+     "v": "draft",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "untrusted": {
+    "summary": {
+     "v": {
+      "en": "One-wire digital temperature probe.",
+      "id": "Probe suhu digital one-wire."
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "pitfalls": [
+     {
+      "v": {
+       "en": "Needs a 4.7 k pull-up on DQ.",
+       "id": "Perlu pull-up 4,7 k pada DQ."
+      },
+      "p": {
+       "source": "docs/research/agri-domain.md",
+       "verifiedBy": "import",
+       "at": "2026-10-14",
+       "confidence": "medium"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "schemaVersion": 1,
+   "identity": {
+    "id": "battery-18650-pack",
+    "name": {
+     "v": "18650 Li-ion pack, 1S",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "kind": {
+     "v": "power",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "electrical": {
+    "supplyV": {
+     "v": {
+      "min": 3,
+      "max": 4.2
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "currentMa": {
+     "v": {
+      "typ": 0,
+      "peak": 3000
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "pins": [
+    {
+     "v": {
+      "name": "BAT+",
+      "func": [
+       "power"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    {
+     "v": {
+      "name": "BAT-",
+      "func": [
+       "ground"
+      ]
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   ],
+   "protocols": {
+    "supported": {
+     "v": [
+      "digital"
+     ],
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "mechanical": {
+    "sizeMm": {
+     "v": {
+      "w": 77,
+      "h": 21,
+      "d": 21
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "environment": {
+    "outdoor": {
+     "v": false,
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "tempC": {
+     "v": {
+      "min": -20,
+      "max": 70
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "drivers": [],
+   "compatibleWith": {
+    "v": [
+     "esp32-devkitc"
+    ],
+    "p": {
+     "source": "packages/hardware-library",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "high"
+    }
+   },
+   "price": {
+    "v": {
+     "minIdr": 40000,
+     "maxIdr": 90000,
+     "checkedAt": "2026-10-14"
+    },
+    "p": {
+     "source": "docs/research/pro-parts-briefs.md",
+     "verifiedBy": "import",
+     "at": "2026-10-14",
+     "confidence": "medium"
+    }
+   },
+   "model3d": {
+    "kind": {
+     "v": "procedural",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "status": {
+     "v": "draft",
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    }
+   },
+   "untrusted": {
+    "summary": {
+     "v": {
+      "en": "Single 18650 Li-ion cell holder pack for sensor-only nodes.",
+      "id": "Holder satu sel Li-ion 18650 untuk node sensor saja."
+     },
+     "p": {
+      "source": "packages/hardware-library",
+      "verifiedBy": "import",
+      "at": "2026-10-14",
+      "confidence": "high"
+     }
+    },
+    "pitfalls": [
+     {
+      "v": {
+       "en": "Charge only with a Li-ion charger, never a PWM lead-acid controller.",
+       "id": "Isi hanya dengan charger Li-ion, jangan controller PWM aki."
+      },
+      "p": {
+       "source": "docs/research/agri-domain.md",
+       "verifiedBy": "import",
+       "at": "2026-10-14",
+       "confidence": "medium"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

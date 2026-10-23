@@ -25,7 +25,10 @@
     "desktop:package": "npm run build && tsx scripts/package-desktop.ts",
     "check:tokens": "tsx scripts/check-design-tokens.ts",
     "lab:firmware": "tsx scripts/build-lab-firmware.ts",
-    "lab:new-part": "tsx scripts/lab-new-part.ts"
+    "lab:new-part": "tsx scripts/lab-new-part.ts",
+    "catalog:import": "tsx scripts/catalog-import.ts",
+    "catalog:check": "tsx scripts/catalog-import.ts --check",
+    "catalog:export": "tsx scripts/catalog-export.ts"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",
