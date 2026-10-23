@@ -1,0 +1,55 @@
+.code-tab{display:grid;grid-template-columns:220px 1fr;height:100%;min-height:0;background:var(--ds-surface-raised);font-size:13px}
+.code-empty{padding:var(--ds-6);color:var(--ds-ink-2)}
+.code-files{border-right:1px solid var(--ds-line);overflow:auto;padding:var(--ds-2) 0;background:var(--ds-surface)}
+.code-group{padding-bottom:var(--ds-3)}
+.code-group-head{display:flex;justify-content:space-between;align-items:center;padding:var(--ds-2) var(--ds-4);font:10px var(--ds-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ds-ink-3)}
+.code-file{display:flex;justify-content:space-between;gap:var(--ds-2);width:100%;text-align:left;background:none;border:0;padding:7px var(--ds-4);color:var(--ds-ink)}
+.code-file:hover{background:var(--ds-sunken)}
+.code-file.is-active{background:var(--ds-inverse);color:var(--ds-on-inverse)}
+.code-file-name{font-family:var(--ds-mono);font-size:12.5px;overflow:hidden;text-overflow:ellipsis}
+.code-file-state{font:10.5px var(--ds-mono);color:var(--ds-ink-3)}
+.code-file-state.is-ok{color:var(--ds-ok)}.code-file-state.is-error{color:var(--ds-error)}
+.code-file.is-active .code-file-state{color:var(--ds-signal)}
+.code-view{display:flex;flex-direction:column;min-width:0;min-height:0}
+.code-head{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ds-2);padding:var(--ds-3) var(--ds-4);border-bottom:1px solid var(--ds-line)}
+.code-title{font-family:var(--ds-mono);font-size:14px;margin-right:var(--ds-2)}
+.code-meta{margin-left:auto;font:11px var(--ds-mono);color:var(--ds-ink-3)}
+.code-pill{display:inline-flex;align-items:center;height:24px;padding:0 var(--ds-3);border-radius:var(--ds-radius-pill);font:11px var(--ds-mono);border:1px solid var(--ds-line);white-space:nowrap}
+.code-pill.is-ok{background:var(--ds-ok-soft);color:var(--ds-ok);border-color:transparent}
+.code-pill.is-warn{background:var(--ds-warn-soft);color:var(--ds-warn);border-color:transparent}
+.code-pill.is-error{background:var(--ds-error-soft);color:var(--ds-error);border-color:transparent}
+.code-pill.is-muted{color:var(--ds-ink-2)}
+.code-pill.is-dashed{border-style:dashed;border-color:var(--ds-line-strong);background:none}
+.code-copy{border:1px solid var(--ds-line-strong);background:var(--ds-surface-raised);color:var(--ds-ink);border-radius:var(--ds-radius-1);padding:3px 10px;font-size:12px}
+.code-copy.is-primary{background:var(--ds-inverse);color:var(--ds-on-inverse);border-color:var(--ds-inverse);height:32px;padding:0 var(--ds-4);font-weight:600;border-radius:var(--ds-radius-2)}
+.code-copy.is-ghost{border:0;background:none;color:var(--ds-ink-2);text-transform:none;letter-spacing:0;font:11px var(--ds-font);text-decoration:underline}
+.code-copy.is-block{position:absolute;right:var(--ds-3);top:0;opacity:0;font-size:11px;padding:1px 8px}
+.code-line:hover .code-copy.is-block,.code-copy.is-block:focus-visible{opacity:1}
+.code-body{display:grid;grid-template-columns:1fr 280px;flex:1;min-height:0}
+.code-scroll{position:relative;overflow:auto;min-height:0;min-width:0}
+.code-src{margin:0;padding:var(--ds-2) 0;font:12.5px/1.65 var(--ds-mono);color:var(--ds-ink)}
+.code-line{display:flex;position:relative;min-width:max-content;padding-right:96px}
+.code-line.has-error{background:var(--ds-error-soft)}.code-line.has-warning{background:var(--ds-warn-soft)}
+.code-ln{flex:none;width:44px;text-align:right;padding-right:var(--ds-4);color:var(--ds-ink-3);user-select:none}
+.code-text{white-space:pre}
+.tk-comment{color:var(--ds-ink-3)}.tk-string{color:var(--ds-ok)}.tk-pre{color:var(--ds-ink-2);font-weight:600}
+.tk-kw{color:var(--ds-ink);font-weight:600}.tk-type{color:var(--ds-ink-2);font-weight:600}.tk-num{color:var(--ds-warn)}
+.code-pin{color:inherit;text-decoration:underline;text-decoration-color:var(--ds-ok);text-decoration-thickness:2px;text-underline-offset:3px;cursor:pointer}
+.code-pin:hover{background:var(--ds-ok-soft)}
+.code-tip{position:sticky;left:50%;bottom:var(--ds-3);width:max-content;max-width:320px;display:flex;flex-direction:column;gap:2px;margin:0 0 var(--ds-3) auto;margin-right:var(--ds-4);padding:var(--ds-3);background:var(--ds-surface-raised);border:1px solid var(--ds-line);border-radius:var(--ds-radius-2);box-shadow:0 6px 24px color-mix(in srgb,var(--ds-ink) 14%,transparent);color:var(--ds-ink-2);pointer-events:none}
+.code-tip b{color:var(--ds-ink)}
+.code-eyebrow{font:10px var(--ds-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ds-ink-3)}
+.code-eyebrow-pins{display:flex;justify-content:space-between;margin-top:var(--ds-4)}
+.code-side{border-left:1px solid var(--ds-line);padding:var(--ds-4);overflow:auto;background:var(--ds-surface)}
+.code-dl{display:grid;grid-template-columns:78px 1fr;gap:6px var(--ds-2);margin:var(--ds-3) 0 0;font-size:12px}
+.code-dl dt{color:var(--ds-ink-3)}.code-dl dd{margin:0;font-family:var(--ds-mono);word-break:break-word}
+.code-pins{list-style:none;margin:var(--ds-2) 0 0;padding:0}
+.code-pins button{display:grid;grid-template-columns:1fr auto 44px 16px;gap:var(--ds-2);width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--ds-line);padding:5px 0;font:11.5px var(--ds-mono);color:var(--ds-ink)}
+.code-pins button:hover,.code-pins button.is-hover{background:var(--ds-sunken)}
+.code-pin-gpio,.code-pin-w{color:var(--ds-ink-2)}
+.code-pins .is-ok{color:var(--ds-ok)}.code-pins .is-warn{color:var(--ds-warn)}
+.code-muted{color:var(--ds-ink-3);margin-top:var(--ds-2)}
+.code-note{margin:var(--ds-4) 0 0;padding:var(--ds-3);background:var(--ds-sunken);border-radius:var(--ds-radius-2);color:var(--ds-ink-2);font-size:12px;line-height:1.45}
+.code-log{border-top:1px solid var(--ds-line);padding:var(--ds-2) var(--ds-4);font:11.5px var(--ds-mono);color:var(--ds-ink-2);background:var(--ds-surface)}
+.code-log.is-error{color:var(--ds-error);background:var(--ds-error-soft)}
+@media (max-width:900px){.code-tab{grid-template-columns:1fr;grid-template-rows:auto 1fr}.code-files{border-right:0;border-bottom:1px solid var(--ds-line);max-height:120px}.code-body{grid-template-columns:1fr}.code-side{border-left:0;border-top:1px solid var(--ds-line)}}

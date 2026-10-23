@@ -19,7 +19,7 @@ test('workspace shows the farm tree, the 3D node and the site plan, and the chat
  await page.screenshot({path:`${OUT}/02-site-plan.png`});
  await page.getByTestId('pro-tab-3d').click();
  await page.getByPlaceholder('Ask for a change…').fill("I'm building IoT for my farm. It has 4 fields: mango, melon, banana and chili.");
- await page.getByRole('button',{name:'Send'}).first().click();
+ await page.getByRole('button',{name:/Regenerate/}).first().click();
  await expect(page.getByTestId('pro-chat')).toBeVisible();
  await page.getByTestId('pro-chat').getByRole('button',{name:/send/i}).click();
  await expect(page.getByTestId('pchat-revision')).toBeVisible({timeout:30000});

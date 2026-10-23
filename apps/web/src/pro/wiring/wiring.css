@@ -1,0 +1,92 @@
+/* Wiring tab: tokens only. Wire insulation colours are data colours; where no token exists the hsl() is noted. */
+.wr-root{--wr-red:var(--lab-stop);--wr-black:var(--ds-ink);--wr-yellow:var(--lab-pwm);--wr-green:var(--lab-live-ink);--wr-grey:var(--ds-ink-3);--wr-white:var(--lab-raised);
+ --wr-orange:color-mix(in srgb,var(--lab-pwm) 55%,var(--lab-stop));
+ /* no token for these three insulation colours */
+ --wr-blue:hsl(218 70% 46%);--wr-purple:hsl(268 45% 48%);--wr-brown:hsl(28 45% 32%);
+ display:flex;flex-direction:column;min-height:0;height:100%;overflow:auto;background:var(--lab-stage);color:var(--ds-ink);font-family:var(--ds-mono);font-size:11px}
+.wr-root *{box-sizing:border-box}
+.wr-empty{padding:var(--ds-6);color:var(--ds-ink-3);font-family:var(--ds-font);font-size:13px}
+.wr-eyebrow{font-family:var(--ds-mono);font-size:10.5px;letter-spacing:var(--ds-track-label);text-transform:uppercase;color:var(--ds-ink-3);font-weight:400;margin:0}
+.wr-eyebrow span{margin-left:var(--ds-2);color:var(--ds-ink-2)}
+.wr-bar{display:flex;align-items:center;gap:var(--ds-4);padding:var(--ds-2) var(--ds-4);border-bottom:1px solid var(--ds-line);background:var(--ds-surface);flex-wrap:wrap;position:sticky;top:0;z-index:2}
+.wr-nodes,.wr-seg{display:flex;gap:2px;background:var(--ds-sunken);border-radius:var(--ds-radius-1);padding:2px}
+.wr-nodes button,.wr-seg button{border:0;background:none;padding:3px 10px;border-radius:var(--ds-radius-1);font-family:var(--ds-mono);font-size:11px;color:var(--ds-ink-2);cursor:pointer}
+.wr-nodes button.is-active,.wr-seg button.is-active{background:var(--ds-surface-raised);color:var(--ds-ink);box-shadow:var(--lab-shadow-1)}
+.wr-title{display:flex;align-items:center;gap:var(--ds-3);flex:1;min-width:0}
+.wr-pill{border:1px solid var(--ds-line-strong);border-radius:var(--ds-radius-pill);padding:2px 10px;color:var(--ds-ink-2);white-space:nowrap}
+.wr-actions{display:flex;gap:var(--ds-2)}
+.wr-btn{border:1px solid var(--ds-line-strong);background:var(--ds-surface-raised);border-radius:var(--ds-radius-1);padding:3px 12px;font-family:var(--ds-mono);font-size:11px;cursor:pointer}
+.wr-root button:focus-visible,.wr-root [role=button]:focus-visible{outline:2px solid var(--lab-focus);outline-offset:1px}
+.wr-print-title{display:none}
+.wr-scroll{overflow:auto;flex:none;max-height:none;background:var(--lab-stage)}
+.wr-svg{display:block;max-width:100%;height:auto;font-family:var(--ds-mono);font-size:10px}
+.wr-bg{fill:var(--lab-stage)}
+.wr-zone{fill:none;stroke:var(--ds-ink-3);stroke-width:1.2;stroke-dasharray:6 4}
+.wr-zone-label{fill:var(--ds-ink-3);font-size:9.5px;letter-spacing:.1em}
+.wr-box{fill:var(--lab-raised);stroke:var(--ds-ink);stroke-width:1.2}
+.wr-block{cursor:pointer;outline:none}
+.wr-block.is-board .wr-box{fill:var(--lab-card);stroke-width:1.6}
+.wr-block.is-sel .wr-box,.wr-block:focus-visible .wr-box{stroke:var(--lab-live-ink);stroke-width:2.6}
+.wr-ref{font-weight:600;fill:var(--ds-ink);font-size:11px}
+.wr-name{font-family:var(--ds-font);font-weight:600;fill:var(--ds-ink);font-size:11px}
+.wr-sub{fill:var(--ds-ink-3);font-size:9px}
+.wr-port circle{fill:var(--ds-ink)}.wr-port text{fill:var(--ds-ink-2);font-size:9.5px}
+.wr-port.is-hot circle{fill:var(--lab-live-ink)}.wr-port.is-hot text{fill:var(--ds-ink);font-weight:600}
+.wr-hit{fill:none;stroke:transparent;stroke-width:12;pointer-events:stroke}
+.wr-casing{fill:none;stroke:var(--ds-ink);stroke-width:4.4;stroke-linejoin:round;stroke-linecap:round}
+.wr-core{fill:none;stroke:var(--wr-grey);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.wr-c-red .wr-core{stroke:var(--wr-red)}.wr-c-black .wr-core{stroke:var(--wr-black)}.wr-c-yellow .wr-core{stroke:var(--wr-yellow)}
+.wr-c-blue .wr-core{stroke:var(--wr-blue)}.wr-c-green .wr-core{stroke:var(--wr-green)}.wr-c-orange .wr-core{stroke:var(--wr-orange)}
+.wr-c-purple .wr-core{stroke:var(--wr-purple)}.wr-c-white .wr-core{stroke:var(--wr-white)}.wr-c-brown .wr-core{stroke:var(--wr-brown)}.wr-c-grey .wr-core{stroke:var(--wr-grey)}
+.wr-wire{cursor:pointer;outline:none}
+.wr-wire.is-dim{opacity:.18}
+.wr-wire.is-hot .wr-casing{stroke:var(--lab-live);stroke-width:9;opacity:.5}
+.wr-wire.is-hot .wr-core{stroke-width:3}
+.wr-wire.is-hot .wr-core,.wr-wire.is-hot .wr-casing{filter:none}
+.wr-wire:focus-visible .wr-casing{stroke:var(--lab-focus);stroke-width:7;opacity:.4}
+.wr-chip-bg{fill:var(--lab-raised);stroke:var(--ds-ink);stroke-width:1.2}
+.wr-wire.is-unv .wr-chip-bg,.wr-chip-bg.is-unv{stroke-dasharray:3 2}
+.wr-wire.is-hot .wr-chip-bg{fill:var(--lab-live-soft);stroke-width:1.8}
+.wr-chip-g text{fill:var(--ds-ink);font-size:9.5px;font-weight:600}
+.wr-ok{fill:var(--ds-ok)}
+.wr-tb rect{fill:var(--lab-card);stroke:var(--ds-ink);stroke-width:1.2}
+.wr-tb circle{fill:var(--lab-raised);stroke:var(--ds-ink);stroke-width:1.2}
+.wr-tb g.is-hot circle{fill:var(--lab-live-soft);stroke-width:2}
+.wr-tb text{fill:var(--ds-ink);font-size:8.5px}.wr-tb .wr-tb-ref{font-weight:600;font-size:9.5px}
+.wr-gland rect{fill:var(--ds-sunken);stroke:var(--ds-ink-2)}.wr-gland text{fill:var(--ds-ink-3);font-size:8.5px}
+.wr-legend text{fill:var(--ds-ink-2);font-size:9.5px}
+.wr-legend .wr-zone-label{fill:var(--ds-ink-3)}
+/* tables */
+.wr-tables{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);border-top:1px solid var(--ds-line);background:var(--ds-surface)}
+.wr-table-wrap{padding:var(--ds-3) var(--ds-4);min-width:0;overflow-x:auto}
+.wr-table-wrap+.wr-table-wrap{border-left:1px solid var(--ds-line)}
+.wr-table{width:100%;border-collapse:collapse;margin-top:var(--ds-2)}
+.wr-table th{font-weight:400;text-align:left;color:var(--ds-ink-3);font-size:10px;letter-spacing:var(--ds-track-label);text-transform:uppercase;padding:4px 8px;border-bottom:1px solid var(--ds-line)}
+.wr-table td{padding:5px 8px;border-bottom:1px solid var(--ds-line);white-space:nowrap}
+.wr-table tbody tr{cursor:pointer}
+.wr-table tr.is-hot{background:var(--lab-live-tint)}
+.wr-note{color:var(--ds-ink-3)}
+.wr-tag{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.wr-sw{display:inline-block;width:14px;height:6px;border-radius:1px;background:var(--wr-grey);border:1px solid var(--ds-ink)}
+.wr-sw.wr-c-red{background:var(--wr-red)}.wr-sw.wr-c-black{background:var(--wr-black)}.wr-sw.wr-c-yellow{background:var(--wr-yellow)}.wr-sw.wr-c-blue{background:var(--wr-blue)}
+.wr-sw.wr-c-green{background:var(--wr-green)}.wr-sw.wr-c-orange{background:var(--wr-orange)}.wr-sw.wr-c-purple{background:var(--wr-purple)}.wr-sw.wr-c-white{background:var(--wr-white)}.wr-sw.wr-c-brown{background:var(--wr-brown)}
+.wr-chip{display:inline-block;vertical-align:middle;border-radius:var(--ds-radius-pill);padding:1px 8px;font-size:10px}
+.wr-chip.is-ok{background:var(--ds-ok-soft);color:var(--ds-ok)}.wr-chip.is-warn{background:var(--ds-warn-soft);color:var(--ds-warn)}
+@media (max-width:900px){.wr-tables{grid-template-columns:1fr}.wr-table-wrap+.wr-table-wrap{border-left:0;border-top:1px solid var(--ds-line)}}
+/* A4 print: only the wiring root is visible; workspace chrome collapses. */
+@page{size:A4 landscape;margin:10mm}
+@media print{
+ body.wr-printing *{visibility:hidden}
+ body.wr-printing .wr-root,body.wr-printing .wr-root *{visibility:visible}
+ body.wr-printing .pro-app,body.wr-printing .pro-center,body.wr-printing .pro-canvas,body.wr-printing .pro-dock,body.wr-printing .pro-dock-body{position:static!important;display:block!important;overflow:visible!important;height:auto!important;inset:auto!important}
+ body.wr-printing .wr-root{position:absolute;left:0;top:0;width:100%;height:auto;overflow:visible;background:none;color:var(--ds-ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .wr-bar,.wr-actions{display:none!important}
+ .wr-print-title{display:flex;justify-content:space-between;border-bottom:1.5px solid var(--ds-ink);padding:0 0 4px;margin-bottom:6px;font-family:var(--ds-mono);font-size:10px}
+ .wr-scroll{overflow:visible}
+ .wr-svg{width:100%;height:auto;max-height:118mm}
+ .wr-tables{grid-template-columns:1fr 1.3fr;break-inside:avoid;background:none;font-size:8px}
+ .wr-table td,.wr-table th{padding:2px 5px}
+ .wr-table tbody tr.is-hot{background:none}
+ .wr-wire.is-hot .wr-casing{stroke:var(--ds-ink);stroke-width:4.4;opacity:1}
+ .wr-wire.is-dim{opacity:1}
+}

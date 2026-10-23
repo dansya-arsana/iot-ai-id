@@ -3,7 +3,7 @@ import type {SystemSpec} from '../../../../../packages/pro-contract/system-spec'
 
 export class ProApiError extends Error{constructor(message:string,readonly status:number){super(message);}}
 export interface ProProject{id:string;name:string;headRevision:number;updatedAt?:string;createdAt?:string}
-export interface RevisionMeta{revision:number;specSha:string;reason:string;by:string;at:string}
+export interface RevisionMeta{revision:number;specSha:string;reason:string;by:string;at:string;/** Saved with draft:true: not verified, never shown as verified, ignored by the Build Sheet. */draft?:boolean}
 export interface RevisionView extends RevisionMeta{spec:SystemSpec;checks:SystemSpec['checks'];verification:SystemSpec['verification']}
 
 async function call<T>(path:string,method='GET',body?:unknown):Promise<T>{

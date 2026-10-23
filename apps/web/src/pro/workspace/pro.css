@@ -92,9 +92,9 @@
 
 /* centre */
 .pro-center{grid-area:center;display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--ds-ground)}
-.pro-canvas{flex:1;min-height:0;position:relative}
+.pro-canvas{flex:1;min-height:0;position:relative;overflow:hidden}
 .pro-canvas-empty,.pro-dock-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--ds-2);height:100%}
-.pro-dock{height:240px;border-top:1px solid var(--ds-line);background:var(--ds-surface);display:flex;flex-direction:column}
+.pro-dock{height:clamp(240px,34vh,340px);flex:none;position:relative;z-index:1;border-top:1px solid var(--ds-line);background:var(--ds-surface);display:flex;flex-direction:column}
 .pro-dock-empty{flex-direction:row;justify-content:flex-start;padding:0 var(--ds-4);height:56px;gap:var(--ds-4)}
 .pro-dock-tabs{display:flex;gap:var(--ds-4);padding:0 var(--ds-4);border-bottom:1px solid var(--ds-line)}
 .pro-dock-tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 0;display:flex;gap:6px;color:var(--ds-ink-2)}
@@ -111,4 +111,31 @@
 /* /pro page shell: the workspace fills the viewport; the chat is a drawer over its right edge, opened by the top-bar prompt. */
 .pro-shell{position:fixed;inset:0}
 .pro-chat-drawer{position:fixed;top:var(--pro-top,52px);right:0;bottom:var(--pro-status,28px);width:min(400px,100vw);z-index:20;background:var(--ds-surface);border-left:1px solid var(--ds-line);overflow:hidden;display:flex;flex-direction:column;min-height:0}
-.pro-chat-close{position:absolute;top:6px;right:8px;z-index:2;width:28px;height:28px;border:1px solid var(--ds-line);border-radius:var(--ds-radius-0);background:var(--ds-surface);font-size:16px;line-height:1}
+.pro-chat-head{flex:none;display:flex;align-items:center;justify-content:space-between;height:40px;padding:0 var(--ds-3) 0 var(--ds-4);border-bottom:1px solid var(--ds-line)}
+.pro-chat-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.pro-chat-close{width:28px;height:28px;border:1px solid var(--ds-line);border-radius:var(--ds-radius-0);background:var(--ds-surface);font-size:16px;line-height:1}
+
+/* dock: tab counts, maximise, honest draft label */
+.pro-dock-count{font:10.5px var(--ds-mono);color:var(--ds-ink-3);font-weight:400}
+.pro-dock-tabs button.is-active .pro-dock-count{color:var(--ds-ink-2)}
+.pro-dock-tabs .pro-dock-max{margin-left:auto;padding:0 var(--ds-2);border-bottom:0;font-size:15px;color:var(--ds-ink-2)}
+.pro-dock.is-max{height:min(78%,calc(100vh - 160px));flex:none}
+.pro-center:has(.pro-dock.is-max) .pro-canvas{flex:1 1 0;min-height:120px}
+.pro-draft{font:600 9.5px var(--ds-mono);letter-spacing:var(--ds-track-label);padding:2px 6px;margin-left:var(--ds-2);border:1px dashed var(--ds-warn);border-radius:var(--ds-radius-1);color:var(--ds-warn);background:var(--ds-warn-soft)}
+.pro-prompt-go kbd{margin-left:6px;color:var(--ds-ink-3)}
+
+/* phone: the dock panel (checklist, BOM, ...) is the page; the 3D view, tree and properties need a wider screen */
+@media (max-width:700px){
+ .pro-app{grid-template-columns:minmax(0,1fr);grid-template-areas:"top" "center" "status"}
+ .pro-tree,.pro-props,.pro-canvas,.pro-prompt,.pro-pill,.pro-build,.pro-dock-max{display:none}
+ .pro-top{gap:var(--ds-2);padding:0 var(--ds-3)}
+ .pro-dock,.pro-dock.is-max{flex:1;height:auto;border-top:0}
+ .pro-dock-tabs{overflow-x:auto;gap:var(--ds-3);flex:none}
+ .pro-dock-tabs button{white-space:nowrap}
+ .pro-status span:not(:first-child){display:none}
+}
+
+/* centre view tabs (3D assembly / Site plan) */
+.pro-canvas-tabs{display:flex;gap:var(--ds-3);padding:var(--ds-2) var(--ds-4);border-bottom:1px solid var(--ds-line);background:var(--ds-surface)}
+.pro-canvas-tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:4px 0;color:var(--ds-ink-2)}
+.pro-canvas-tabs button.is-active{border-bottom-color:var(--ds-ink);color:var(--ds-ink);font-weight:600}
