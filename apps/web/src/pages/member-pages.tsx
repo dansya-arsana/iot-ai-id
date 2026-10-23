@@ -83,7 +83,7 @@ export function MemberLogin(){
     </>}
     <Button type="submit" disabled={busy}>{busy?<><Spinner label={tr('Please wait','Mohon tunggu')}/>{tr('Please wait…','Mohon tunggu…')}</>:submitLabel}</Button>
    </form>
-   <p className="al-msg mp-help"><InfoIcon size={18} weight="bold" aria-hidden="true"/><span>{tr('No invitation yet?','Belum punya undangan?')} <Link to="/partner">{tr('Request access','Minta akses')}</Link></span></p>
+   <p className="al-msg mp-help"><InfoIcon size={18} weight="bold" aria-hidden="true"/><span>{tr('No invitation yet?','Belum punya undangan?')} <Link to="/partner">{tr('Request access','Minta akses')}</Link><br/>{tr('AIoT staff?','Staf AIoT?')} <a href="https://admin.iot.ai.id/">{tr('Sign in at admin.iot.ai.id','Masuk di admin.iot.ai.id')}</a></span></p>
   </Card>
  </PageShell>;
 }
