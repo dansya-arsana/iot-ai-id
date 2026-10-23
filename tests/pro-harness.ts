@@ -25,16 +25,16 @@ export function harness(deps:ProDeps={}){
   if(withPro){const cur=ops.store.get<any>('members',m.data.member.id)!;ops.store.put('members',{...cur,grants:['pro']});}
   return{cookie:/aiot_member=([^;]*)/.exec([a!.setCookie??[]].flat().join('\n'))?.[1]??'',id:m.data.member.id as string};
  }
- const call=async(method:string,path:string,body?:unknown,who:{member?:string;staff?:string;csrf?:boolean}={}):Promise<R>=>{
+ const call=async(method:string,path:string,body?:unknown,who:{member?:string;staff?:string;csrf?:boolean;/** In-process api path on the desktop local host (sets trustedLocal). */local?:boolean}={}):Promise<R>=>{
   const cookie=[who.member?`aiot_member=${who.member}`:'',who.staff?`aiot_admin=${who.staff}`:''].filter(Boolean).join('; ')||undefined;
   const csrf=who.csrf!==false;
-  return (await pro.handle({method,path:'/ops/v1/member/pro/'+path,body,ip:'5.5.5.5',headers:{cookie,'x-aiot-member':who.member&&csrf?'1':'','x-aiot-staff':who.staff&&csrf?'1':''}}))as R;
+  return (await pro.handle({method,path:'/ops/v1/member/pro/'+path,body,ip:'5.5.5.5',...(who.local?{trustedLocal:true}:{}),headers:{cookie,'x-aiot-member':who.member&&csrf?'1':'','x-aiot-staff':who.staff&&csrf?'1':''}}))as R;
  };
  return{ops,pro,clock,admin,staff,member,call};
 }
 
 /** Waits for a turn to finish by polling the JSON event route; returns every event. */
-export async function runTurn(h:Pick<ReturnType<typeof harness>,'call'>,pid:string,who:{member?:string;staff?:string},message='design a farm',extra:Record<string,unknown>={}){
+export async function runTurn(h:Pick<ReturnType<typeof harness>,'call'>,pid:string,who:{member?:string;staff?:string;local?:boolean},message='design a farm',extra:Record<string,unknown>={}){
  const start=await h.call('POST',`projects/${pid}/turns`,{message,...extra},who);
  if(start.status!==202)return{start,events:[] as AgentEvent[],turnId:''};
  const turnId=start.data.turnId as string;const events:AgentEvent[]=[];let after=-1;

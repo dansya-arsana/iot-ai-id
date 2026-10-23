@@ -37,7 +37,7 @@ export class OpsStore{
 }
 
 /** `headers` are lowercase request headers (portal cookie and CSRF); `plainLoopback` is true only for plain-http requests straight from this machine. */
-export type OpsCall={method:string;path:string;body?:unknown;ip:string;admin?:{user:string};headers?:Record<string,string|undefined>;plainLoopback?:boolean};
+export type OpsCall={method:string;path:string;body?:unknown;ip:string;admin?:{user:string};headers?:Record<string,string|undefined>;plainLoopback?:boolean;/** Set only by the in-process api path for requests from the desktop local host. Gates Pro clientTools. Never set from request data. */trustedLocal?:boolean};
 /** `text` replaces the JSON body (CSV export); `setCookie` is a full Set-Cookie value; `headers` are extra response headers (staff check). */
 export type OpsResult={status:number;data:unknown;setCookie?:string|string[];headers?:Record<string,string>;/** 302 target (member installer). */redirect?:string;text?:{type:string;body:string;filename?:string}};
 

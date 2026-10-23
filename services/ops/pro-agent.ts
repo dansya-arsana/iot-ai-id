@@ -18,6 +18,7 @@ import {
 import {KillSwitchSchema,type KillSwitch} from '../../packages/pro-contract/agent.js';
 import {PRO_PRICING,costMicros,type ProPrice} from '../../packages/pro-contract/pricing.js';
 import {PRO_TOOL_NAMES,anthropicTools,getTool} from '../../packages/pro-tools/registry.js';
+import {wrapOutput} from './pro-tools.js';
 import type {Pro} from './pro.js';
 
 // ---------- public types ----------
@@ -43,6 +44,8 @@ export interface ProAgentDeps{
  pricing:Record<string,ProPrice|null>;
  retryDelaysMs:number[];historyCharBudget:number;
  limits:{maxToolCalls:number;maxTurnMs:number;clientToolTimeoutMs:number};
+ /** Per-turn hard USD cap in micro-USD (admin setting, default USD 3). */
+ turnCapMicros:()=>number;
 }
 export interface TurnStart{id:string;projectId:string;subject:string;model:string;lang:'en'|'id';clientTools:string[];message:string}
 
@@ -60,8 +63,9 @@ export function buildSystemPrompt(lang:'en'|'id',skills:{name:string;summary:str
 
 How you work
 - You decide which tools to call and in what order. Think first, then use tools to check facts you would otherwise guess: catalog parts, compatibility, pin allocation, netlist, power, radio link, climate, compiled code, prices.
-- Save the design with save_revision (a JSON Patch subset, at most 200 operations, against the baseRevision shown in <project_state>). The server derives ids, W-numbers, checklist ids, BOM totals and every "verified" stamp. You never set those.
-- If save_revision fails the gate, read the issues, fix the patch and save again. Nothing is written until the gate passes.
+- Call get_spec_schema before your first save_revision. It gives the exact shape you may write, a complete valid example, the id patterns, the enum values and the length limits. Do not guess the shape.
+- Save the design with save_revision (a JSON Patch subset, at most 200 operations, against the baseRevision shown in <project_state>). The server derives ids, W-numbers, checklist ids, BOM totals and every "verified" stamp. You never set those; ops on server-owned paths are ignored with a warning.
+- If save_revision fails the schema, it returns every issue at once with the expected value and an example: fix them all in one patch. Use draft:true to save progress that is not valid or verified yet (drafts are never shown as verified and the Build Sheet ignores them); finish with a save without draft, which runs the full gate. Nothing verified is written until the gate passes.
 - Only items the tools verified count as verified. Say plainly which items are unverified and why. Never claim an item is verified, tested or flashed unless a tool result says so.
 - Link margins and prices are estimates; label them as estimates.
 - LoRa in Indonesia uses 920-923 MHz. The default module is the RFM95W. Never design with a 433 MHz module (for example RA-02) in Pro.
@@ -238,6 +242,19 @@ const mapLimit=async<T,R>(items:T[],limit:number,fn:(t:T,i:number)=>Promise<R>):
  await Promise.all(Array.from({length:Math.min(limit,items.length)},async()=>{for(;;){const i=next++;if(i>=items.length)return;out[i]=await fn(items[i]!,i);}}));
  return out;
 };
+/** Serial lines and telemetry come from outside the platform: reduced to the schema's keys, then wrapped as {untrusted} by wrapOutput (same as telemetry). */
+export function normalizeClientOutput(name:string,out:unknown):unknown{
+ if(!out||typeof out!=='object'||Array.isArray(out))return out;
+ const o=out as Record<string,unknown>;
+ const int=(v:unknown)=>typeof v==='number'&&Number.isFinite(v)&&v>=0?Math.floor(v):0;
+ if(name==='serial_read'&&Array.isArray(o.lines))return{lines:o.lines.slice(0,200).map((l,i)=>{
+  if(typeof l==='string')return{n:i,t:0,text:l};
+  const x=(l&&typeof l==='object'?l:{}) as Record<string,unknown>;
+  return{n:int(x.n??i),t:int(x.t??x.ts),text:typeof x.text==='string'?x.text:typeof x.line==='string'?x.line:String(x.text??'')};
+ }),open:typeof o.open==='boolean'?o.open:false};
+ if(name==='telemetry_read'&&Array.isArray(o.messages))return{messages:o.messages.slice(0,500).map(m=>{const x=(m&&typeof m==='object'?m:{}) as Record<string,unknown>;return{topic:String(x.topic??'').slice(0,200),at:int(x.at),payload:typeof x.payload==='string'?x.payload:JSON.stringify(x.payload)??''};})};
+ return out;
+}
 const cap=(s:string,n:number)=>s.length>n?s.slice(0,n)+'…[truncated]':s;
 const sleep=(ms:number,signal:AbortSignal)=>new Promise<void>(res=>{if(!ms||signal.aborted)return res();const t=setTimeout(res,ms);signal.addEventListener('abort',()=>{clearTimeout(t);res();},{once:true});});
 
@@ -261,6 +278,7 @@ export class ProAgent{
    pricing:deps.pricing??PRO_PRICING,
    retryDelaysMs:deps.retryDelaysMs??[1000,3000],
    historyCharBudget:deps.historyCharBudget??300_000,
+   turnCapMicros:deps.turnCapMicros??(()=>Math.round(pro.turnCapUsd()*1_000_000)),
    limits:{maxToolCalls:TURN_LIMITS.maxToolCalls,maxTurnMs:TURN_LIMITS.maxTurnMs,clientToolTimeoutMs:TURN_LIMITS.clientToolTimeoutMs,...deps.limits},
   };
  }
@@ -405,6 +423,16 @@ export class ProAgent{
      messages:withCacheBreakpoint(assembleHistory(this.rows(t.projectId),t.id,this.deps.historyCharBudget)),
      ...(budget>0?{thinking:{type:'enabled' as const,budget_tokens:budget}}:{}),
     };
+    // Per-turn USD hard cap: reserve this call's worst case (estimated input at the dearest input price plus max_tokens of output) before it is made.
+    const price=this.deps.pricing[t.model],capMicros=this.deps.turnCapMicros();
+    if(price&&usd!==null&&capMicros>0){
+     const inputEst=Math.ceil(JSON.stringify([req.system,req.tools,req.messages]).length/3);
+     const reserve=Math.ceil(inputEst*Math.max(price.inputPerMTok,price.cacheWrite5mPerMTok)+req.max_tokens*price.outputPerMTok);
+     if(usd+reserve>capMicros){
+      this.emit(t.id,{type:'text_delta',text:`Stopped: this turn reached its cost cap of USD ${(capMicros/1e6).toFixed(2)} (spent ${(usd/1e6).toFixed(2)}). Saved revisions are kept; ask me to continue in a new message.`});
+      return this.finish(t.id,'budget');
+     }
+    }
     let msg:ModelMessage;
     try{msg=await this.callModel(t,req,live);}
     catch(e){
@@ -447,9 +475,9 @@ export class ProAgent{
  }
 
  private emitRevision(turnId:string,output:unknown){
-  const o=output as {revision?:number;specSha?:string;verification?:{verified?:number;unverified?:unknown[];failed?:number}};
+  const o=output as {revision?:number;specSha?:string;draft?:boolean;verification?:{verified?:number;unverified?:unknown[];failed?:number}};
   if(typeof o?.revision!=='number'||typeof o.specSha!=='string')return;
-  this.emit(turnId,{type:'revision_saved',revision:o.revision,specSha:o.specSha,verified:o.verification?.verified??0,unverified:o.verification?.unverified?.length??0,failed:o.verification?.failed??0});
+  this.emit(turnId,{type:'revision_saved',revision:o.revision,specSha:o.specSha,verified:o.verification?.verified??0,unverified:o.verification?.unverified?.length??0,failed:o.verification?.failed??0,...(o.draft?{draft:true}:{})});
  }
 
  /** Validates, authorizes and runs one tool call. Never throws. */
@@ -467,7 +495,7 @@ export class ProAgent{
    if(def.runsAt==='client'){
     const r=await this.clientCall(t,live,callId,name,input.data);
     if(!r.ok)return r;
-    const out=def.output.safeParse(r.output);
+    const out=def.output.safeParse(wrapOutput(name,normalizeClientOutput(name,r.output)));
     return out.success?{ok:true,output:out.data}:bad('invalid_output','The app returned a malformed result.');
    }
    const r=await this.deps.tools.run({subject:t.subject,projectId:t.projectId,turnId:t.id,callId,lang:t.lang,signal:live.ctrl.signal},name,input.data);

@@ -88,6 +88,7 @@ The full table is in ADR 012 §2. Columns: # | name | input (sketch) | output (s
 | 18 | `serial_read` | port, sinceLine?, maxLines≤200, baud? | lines[{n, t, text}] (untrusted), open | no | none | port trust (20 min window) | client | yes (local only) |
 | 19 | `telemetry_read` | projectId, nodeId?, sinceMs, max≤500 | messages[{topic, at, payload≤4KB}] (untrusted) | no | none | none | client | yes (local only) |
 | 20 | `evidence_status` | projectId, revision? | items[{itemId, state open/suggested/ticked, by human/evidence, evidenceRef}], anomalies[{nodeId, code, en, id, severity}] | yes | none | none | ops | yes |
+| 21 | `get_spec_schema` | none | jsonSchema (model-writable SystemSpec, compact), example (one complete valid spec), serverOwned paths, patterns, enums, limits | yes | none | none | server (pure) | yes |
 
 - Ticks from evidence are written by the evidence pipeline (M7), never by a model tool.
 - Actuator commands over MQTT (for example, opening a valve) are NOT a tool. They are backlog and need their own consent design.
@@ -97,7 +98,7 @@ The full table is in ADR 012 §2. Columns: # | name | input (sketch) | output (s
 | # | Milestone | Track | Time box | Depends on | Done when |
 |---|---|---|---|---|---|
 | Step 0 | Inputs copied to `docs/research/`; ADR 012 | — | done | — | no temp-file paths |
-| M2.0 | Contract freeze: PartRecord and provenance, SystemSpec as a revision artifact plus SpecPatch plus `verification`, the 20-tool registry (schemas only), agent event protocol, farm fixtures | all | ≤2 h | — | contract tests green |
+| M2.0 | Contract freeze: PartRecord and provenance, SystemSpec as a revision artifact plus SpecPatch plus `verification`, the 21-tool registry (schemas only), agent event protocol, farm fixtures | all | ≤2 h | — | contract tests green |
 | M2 | **Verified catalog:** merge the 4 sources, provenance on every field, overlay plus proposals, import/verify workflow, staff provenance UI, "Tested in AIoT lab" badge | A | 1 d | M2.0 | no-drift test green; staff page shows provenance |
 | M3 | **Agent loop and tools:** api model proxy (stream, thinking, vault/env key, Sonnet/Opus); ops loop (history, budgets, SSE, client tools); pure tools; sandbox `compile_code`; `save_revision` gate; MCP; skills | B | 1 d, plus a 0.5 d live smoke on day 2 | M2.0 (catalog fixture until M2 merges) | the fixture farm conversation yields a gated r1 offline; one staff live smoke run |
 | M4 | Board and field parts (the old M3, D7), each with a catalog record | A | 0.5–1 d | M2, lab gate | lab contract test and catalog contract test green |

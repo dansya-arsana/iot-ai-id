@@ -51,7 +51,7 @@ function partsMemo(get:()=>PartRecord[],ttlMs=5000){
 export function proStore(pro:Pro):ProToolStore{
  const view=(projectId:string,n:number):StoredRevision|undefined=>{
   const v=pro.revisionView(projectId,n);
-  return v?{revision:n,spec:v.spec,verification:v.verification}:undefined;
+  return v?{revision:n,spec:v.spec,verification:v.verification,...(v.draft?{draft:true}:{})}:undefined;
  };
  return{
   owns:(subject,projectId)=>!!pro.project(projectId,subject),
@@ -129,7 +129,7 @@ export function makeImpls(o:{lookup:PartLookup;parts:()=>PartRecord[];catalogVer
   load_skill:(i:{name:string})=>{const s=loadSkill(i.name);if(!s)throw new Error('skill not found');return{name:s.name,version:s.version,sha256:s.sha256,body:s.body};},
   ...(o.compiler?{compile_code:(i:{target:ProTarget;file:{name:string;content:string}})=>o.compiler!.compile(i.target,i.file)}:{}),
   // Layout checks (overlap, A4 fit) arrive with the 3D and build-sheet views; until then render only opens the view.
-  render:(i:{projectId:string;revision:number;view:string})=>({ok:!!o.store.revision(i.projectId,i.revision),viewUrl:`/pro/${i.projectId}?rev=${i.revision}&view=${i.view}`,layoutIssues:[]}),
+  render:(i:{projectId:string;revision:number;view:string})=>({ok:(r=>!!r&&!r.draft)(o.store.revision(i.projectId,i.revision)),viewUrl:`/pro/${i.projectId}?rev=${i.revision}&view=${i.view}`,layoutIssues:[]}),
   // Evidence and telemetry arrive in M7; the checklist is reported from the saved spec, all open.
   evidence_status:(i:{projectId:string;revision?:number})=>{
    const rev=i.revision?o.store.revision(i.projectId,i.revision):o.store.head(i.projectId);

@@ -53,7 +53,8 @@ test('agent events: fixture transcript parses, seq is ordered, covers 8+ tools a
  assert.equal(ev.at(-1)?.type,'done');
  for(const e of ev)assert.ok((AGENT_EVENT_TYPES as readonly string[]).includes(e.type));
  assert.match(sseFrame(ev[0]),/^event: thinking_delta\ndata: \{/);
- assert.equal(AgentEventSchema.safeParse({seq:0,type:'done',stopReason:'budget'}).success,false);
+ assert.equal(AgentEventSchema.safeParse({seq:0,type:'done',stopReason:'budget'}).success,true);
+ assert.equal(AgentEventSchema.safeParse({seq:0,type:'done',stopReason:'bogus'}).success,false);
  assert.throws(()=>parseEventsJsonl('{"seq":0,"type":"nope"}'));
 });
 test('turn request, limits and kill-switch (technical only, no quotas)',()=>{

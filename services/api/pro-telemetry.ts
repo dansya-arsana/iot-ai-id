@@ -11,12 +11,17 @@ export interface MqttConnectOptions{url:string;username?:string;password?:string
 /** Injectable so tests and CI never need a broker or the `mqtt` package. */
 export type MqttConnector=(o:MqttConnectOptions)=>MqttLink;
 export interface TelemetryMessage{topic:string;nodeId:string|null;at:number;payload:string;truncated:boolean}
-const SettingsIn=z.object({url:z.string().max(200).regex(/^(mqtt|mqtts|ws|wss):\/\/[^\s]+$/),username:z.string().max(100).optional(),password:z.string().max(200).optional()}).strict();
+const SettingsIn=z.object({url:z.string().max(200).regex(/^(mqtt|mqtts):\/\/[^\s@]+$/,'broker url must be mqtt:// or mqtts:// without credentials'),username:z.string().max(100).optional(),password:z.string().max(200).optional()}).strict();
 const StartIn=z.object({projectId:z.string().regex(/^[A-Za-z0-9_-]{1,64}$/)}).strict();
 interface Stored{url:string;username?:string;password?:string}
+/** Only mqtt and mqtts, no credentials in the URL (they have their own fields). Also applied to files written by older builds. */
+export const isBrokerUrl=(u:unknown):u is string=>typeof u==='string'&&u.length<=200&&/^(mqtt|mqtts):\/\/[^\s@]+$/.test(u);
+/** Error text from the mqtt library can echo the URL or password; neither is ever kept or shown. */
+export const redactSecrets=(msg:string,password?:string):string=>{let m=msg.replace(/(\w+:\/\/)[^\s/@]*@/g,'$1***@');if(password&&password.length>=3)m=m.split(password).join('***');return m.slice(0,200);};
 /** Real connector. The `mqtt` package is loaded lazily; the integrator adds it to package.json. */
 export const mqttConnector:MqttConnector=o=>{
  let client:any=null,ended=false;const pending:Array<()=>void>=[];
+ if(!isBrokerUrl(o.url)){queueMicrotask(()=>o.onState('error','broker url must be mqtt:// or mqtts://'));return{subscribe(){},end(){}};}
  import('mqtt' as string).then((m:any)=>{
   if(ended)return;const lib=m.default??m;
   client=lib.connect(o.url,{username:o.username,password:o.password,reconnectPeriod:5000,connectTimeout:10000});
@@ -29,7 +34,7 @@ export const mqttConnector:MqttConnector=o=>{
 export function createProTelemetry(options:{settingsPath:string;connector?:MqttConnector;now?:()=>number}){
  const connector=options.connector??mqttConnector,now=options.now??Date.now;
  let link:MqttLink|null=null,projectId:string|null=null,state:'idle'|'connecting'|'connected'|'error'='idle',lastError:string|undefined,ring:TelemetryMessage[]=[];
- const load=async():Promise<Stored|null>=>{try{return JSON.parse(await readFile(options.settingsPath,'utf8'));}catch{return null;}};
+ const load=async():Promise<Stored|null>=>{try{const j=JSON.parse(await readFile(options.settingsPath,'utf8')) as Stored;return isBrokerUrl(j?.url)?j:null;}catch{return null;}};
  const stop=()=>{link?.end();link=null;projectId=null;state='idle';};
  const status=()=>({state,projectId,error:lastError,buffered:ring.length});
  async function handle(method:string,path:string,query:URLSearchParams,readBody:()=>Promise<unknown>):Promise<HwResult>{
@@ -52,7 +57,7 @@ export function createProTelemetry(options:{settingsPath:string;connector?:MqttC
      ring.push({topic,nodeId:topic.slice(root.length).split('/')[0]||null,at:now(),payload:buf.toString('utf8'),truncated:payload.length>TELEMETRY_PAYLOAD_MAX});
      if(ring.length>TELEMETRY_RING)ring.shift();
     },
-    onState(st,message){if(st==='connected'){state='connected';link?.subscribe(`${root}#`,e=>{if(e){state='error';lastError=e.message;}});}else if(st==='error'){state='error';lastError=message;}else if(state==='connected')state='connecting';}});
+    onState(st,message){if(st==='connected'){state='connected';link?.subscribe(`${root}#`,e=>{if(e){state='error';lastError=redactSecrets(e.message,s.password);}});}else if(st==='error'){state='error';lastError=message===undefined?undefined:redactSecrets(message,s.password);}else if(state==='connected')state='connecting';}});
    return{status:200,data:status()};
   }
   if(path==='/stop'&&method==='POST'){stop();return{status:200,data:status()};}

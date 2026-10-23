@@ -4,7 +4,7 @@
  * The key comes from the CredentialVault at the dev server's secrets dir; it is read only inside the proxy handler and never printed.
  * The dev server ports are not touched: the proxy listens on an ephemeral loopback port with a throwaway token.
  *   npx tsx scripts/pro-live-smoke.ts [claude-sonnet-5-5|claude-opus-5-5 ...]
- * Cost cap: USD 2 per turn (checked before every model call; the turn then ends with an error).
+ * Cost cap: USD 2 per turn here (checked before every model call; the turn then ends with an error); the agent also has its own per-turn hard cap (default USD 3, stopReason 'budget').
  */
 import {createServer} from 'node:http';
 import {randomBytes} from 'node:crypto';
@@ -68,7 +68,7 @@ async function runModel(model:string){
    events.push(e);after=e.seq;
    if(e.type==='tool_call')console.log(`  tool_call ${e.name}`);
    else if(e.type==='tool_result'&&!e.ok)console.log(`  tool_result ${e.name} FAILED ${JSON.stringify(e.output).slice(0,e.name==='save_revision'?240:500)}`);
-   else if(e.type==='revision_saved')console.log(`  revision_saved r${e.revision} verified=${e.verified} unverified=${e.unverified} failed=${e.failed}`);
+   else if(e.type==='revision_saved')console.log(`  revision_saved r${e.revision}${e.draft?' (DRAFT)':''} verified=${e.verified} unverified=${e.unverified} failed=${e.failed}`);
    else if(e.type==='usage'){spentMicros+=e.usdMicros??0;console.log(`  usage in=${e.inputTokens} out=${e.outputTokens} cr=${e.cacheReadTokens} cw=${e.cacheWriteTokens} usd=${((e.usdMicros??0)/1e6).toFixed(4)}`);}
    else if(e.type==='error')console.log(`  ERROR ${e.code}: ${e.message}`);
    else if(e.type==='done')console.log(`  done stopReason=${e.stopReason}`);
@@ -80,7 +80,17 @@ async function runModel(model:string){
  const results=events.filter(e=>e.type==='tool_result') as Extract<AgentEvent,{type:'tool_result'}>[];
  const counts:Record<string,number>={};for(const c of calls)counts[c.name]=(counts[c.name]??0)+1;
  const failedTools:Record<string,number>={};for(const r of results)if(!r.ok)failedTools[r.name]=(failedTools[r.name]??0)+1;
- const saved=[...events].reverse().find(e=>e.type==='revision_saved') as Extract<AgentEvent,{type:'revision_saved'}>|undefined;
+ const savedAll=events.filter(e=>e.type==='revision_saved') as Extract<AgentEvent,{type:'revision_saved'}>[];
+ const saved=[...savedAll].reverse().find(e=>!e.draft);
+ // save_revision attempts (calls, in order) up to and including the one that produced the first non-draft verified revision
+ const saveCalls=new Map<string,number>();let attempts=0;let attemptsToFirstVerified:number|null=null;
+ for(const e of events){
+  if(e.type==='tool_call'&&e.name==='save_revision'){saveCalls.set(e.callId,++attempts);}
+  else if(e.type==='tool_result'&&e.name==='save_revision'&&e.ok&&attemptsToFirstVerified===null){
+   const o=e.output as {draft?:boolean;verification?:{verified?:number}}|undefined;
+   if(!o?.draft&&(o?.verification?.verified??0)>0)attemptsToFirstVerified=saveCalls.get(e.callId)??null;
+  }
+ }
  const reasons:Record<string,number>={};
  if(saved){
   const v=pro.revisionView(pid,saved.revision);
@@ -91,6 +101,7 @@ async function runModel(model:string){
  const summary={
   model,distinctTools:Object.keys(counts),toolCallCounts:counts,totalToolCalls:calls.length,failedToolResults:failedTools,
   revision:saved?.revision??null,
+  saveRevision:{attempts,draftsSaved:savedAll.filter(x=>x.draft).length,failedAttempts:failedTools.save_revision??0,attemptsToFirstNonDraftVerifiedRevision:attemptsToFirstVerified},
   verification:saved?{verified:saved.verified,unverified:saved.unverified,failed:saved.failed,topUnverifiedReasons:Object.entries(reasons).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([reason,n])=>({reason,n}))}:null,
   tokens:{input:sum(e=>e.inputTokens),output:sum(e=>e.outputTokens),cacheRead:sum(e=>e.cacheReadTokens),cacheWrite:sum(e=>e.cacheWriteTokens)},
   usdEstimate:Number((sum(e=>e.usdMicros??0)/1e6).toFixed(4)),
@@ -99,6 +110,7 @@ async function runModel(model:string){
   errors:events.filter(e=>e.type==='error').map(e=>(e as {code:string;message:string}).code+': '+(e as {message:string}).message),
  };
  console.log(JSON.stringify(summary,null,2));
+ console.log(`save_revision attempts to the first non-draft verified revision: ${attemptsToFirstVerified??'never (no non-draft verified revision)'} (total attempts ${attempts}, drafts ${savedAll.filter(x=>x.draft).length})`);
  server.close();rmSync(dir,{recursive:true,force:true});
  return summary;
 }

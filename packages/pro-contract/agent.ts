@@ -14,6 +14,9 @@ export const PRO_PROMPT_CHARS=2000;
 // ---------- technical limits ----------
 export const TURN_LIMITS={maxToolCalls:40,maxTurnMs:15*60_000,maxParallelServerTools:4,clientToolTimeoutMs:120_000} as const;
 export const KILL_SWITCH_DEFAULT_USD=1000;
+/** Per-turn hard USD cap (admin-configurable, default USD 3). Each model call reserves its estimated cost first; the turn stops with 'budget' instead of overrunning. Saved revisions are kept. */
+export const TURN_USD_CAP_DEFAULT=3;
+export const TurnCapSchema=z.number().min(0.1).max(1000);
 /** Admin-configurable, global, monthly. enabled:false turns the switch off. Not a quota: it is a safety stop. */
 export const KillSwitchSchema=z.object({enabled:z.boolean(),monthlyUsd:z.number().positive().max(1_000_000)}).strict();
 export type KillSwitch=z.infer<typeof KillSwitchSchema>;
@@ -52,7 +55,7 @@ export const TurnAcceptedSchema=z.object({turnId:z.string().min(1).max(80)}).str
 export const ProModelSchema=z.enum(PRO_MODELS);
 
 // ---------- SSE events ----------
-export const STOP_REASONS=['end_turn','tool_limit','time_limit','kill_switch','max_tokens','cancelled','error'] as const;
+export const STOP_REASONS=['end_turn','tool_limit','time_limit','kill_switch','budget','max_tokens','cancelled','error'] as const;
 export type StopReason=typeof STOP_REASONS[number];
 const base={seq:z.number().int().nonnegative()};
 const callId=z.string().min(1).max(80);
@@ -62,7 +65,7 @@ export const AgentEventSchema=z.discriminatedUnion('type',[
  z.object({...base,type:z.literal('tool_call'),callId,name:z.string().min(1).max(60),input:z.unknown()}).strict(),
  z.object({...base,type:z.literal('tool_result'),callId,name:z.string().min(1).max(60),ok:z.boolean(),output:z.unknown(),ms:z.number().int().nonnegative().optional()}).strict(),
  z.object({...base,type:z.literal('client_tool_request'),callId,name:z.enum(CLIENT_TOOL_NAMES),input:z.unknown(),timeoutMs:z.number().int().positive().max(TURN_LIMITS.clientToolTimeoutMs)}).strict(),
- z.object({...base,type:z.literal('revision_saved'),revision:z.number().int().positive(),specSha:z.string().regex(/^[0-9a-f]{64}$/),verified:z.number().int().nonnegative(),unverified:z.number().int().nonnegative(),failed:z.number().int().nonnegative()}).strict(),
+ z.object({...base,type:z.literal('revision_saved'),revision:z.number().int().positive(),specSha:z.string().regex(/^[0-9a-f]{64}$/),verified:z.number().int().nonnegative(),unverified:z.number().int().nonnegative(),failed:z.number().int().nonnegative(),/** A draft is never verified and never reaches the Build Sheet. */draft:z.boolean().optional()}).strict(),
  z.object({...base,type:z.literal('usage'),model:z.string().min(1).max(80),inputTokens:z.number().int().nonnegative(),outputTokens:z.number().int().nonnegative(),cacheReadTokens:z.number().int().nonnegative(),cacheWriteTokens:z.number().int().nonnegative(),usdMicros:z.number().int().nonnegative().nullable()}).strict(),
  z.object({...base,type:z.literal('done'),stopReason:z.enum(STOP_REASONS)}).strict(),
  z.object({...base,type:z.literal('error'),code:z.string().min(1).max(40),message:z.string().max(400)}).strict(),

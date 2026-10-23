@@ -8,7 +8,7 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {z} from 'zod';
 import {
- DEFAULT_KILL_SWITCH,KillSwitchSchema,TURN_LIMITS,TurnRequestSchema,UsageRecordSchema,killSwitchTripped,
+ DEFAULT_KILL_SWITCH,KillSwitchSchema,TURN_LIMITS,TURN_USD_CAP_DEFAULT,TurnCapSchema,TurnRequestSchema,UsageRecordSchema,killSwitchTripped,
  type KillSwitch,type UsageRecord,
 } from '../../packages/pro-contract/agent.js';
 import {EMPTY_SPEC_DOC,PatchError,SpecPatchSchema,applySpecPatch,type SpecPatch} from '../../packages/pro-contract/patch.js';
@@ -82,6 +82,8 @@ CREATE TABLE IF NOT EXISTS pro_ticks(project_id TEXT NOT NULL,item_id TEXT NOT N
 CREATE TABLE IF NOT EXISTS pro_evidence(id INTEGER PRIMARY KEY AUTOINCREMENT,project_id TEXT NOT NULL,node_id TEXT,kind TEXT NOT NULL,payload TEXT NOT NULL,at TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS pro_evidence_project ON pro_evidence(project_id,id);
 CREATE TABLE IF NOT EXISTS pro_artifacts(sha256 TEXT PRIMARY KEY,kind TEXT NOT NULL,bytes BLOB NOT NULL,at TEXT NOT NULL);`);
+  // drafts (save_revision draft:true) are revisions that are not verified; older databases get the column here
+  if(!(this.db.prepare('PRAGMA table_info(pro_revisions)').all() as {name:string}[]).some(c=>c.name==='draft'))this.db.exec('ALTER TABLE pro_revisions ADD COLUMN draft INTEGER NOT NULL DEFAULT 0');
   this.agent=new ProAgent(this,deps);
   this.agent.recoverOrphans();
  }
@@ -116,6 +118,8 @@ CREATE TABLE IF NOT EXISTS pro_artifacts(sha256 TEXT PRIMARY KEY,kind TEXT NOT N
   const d=this.deps.thinkingBudget?.();if(typeof d==='number')return d;
   return this.setting('thinking_budget',z.number().int().min(0).max(32_000))??DEFAULT_THINKING_BUDGET;
  }
+ /** Per-turn hard USD cap in micro-USD: admin setting, default USD 3. */
+ turnCapUsd():number{return this.setting('turn_cap_usd',TurnCapSchema)??TURN_USD_CAP_DEFAULT;}
  monthUsdMicros(month=this.month()):number{
   return (this.db.prepare('SELECT COALESCE(SUM(usd_micros),0) AS n FROM pro_usage WHERE month=?').get(month) as {n:number}).n;
  }
@@ -141,10 +145,12 @@ CREATE TABLE IF NOT EXISTS pro_artifacts(sha256 TEXT PRIMARY KEY,kind TEXT NOT N
  }
  revisionView(projectId:string,revision:number){
   const r=this.revisionRow(projectId,revision);if(!r)return undefined;
-  return{revision,spec:JSON.parse(String(r.spec)),verification:JSON.parse(String(r.verification)),checks:JSON.parse(String(r.checks)),specSha:String(r.spec_sha),reason:String(r.reason),by:String(r.by),at:String(r.at)};
+  return{revision,spec:JSON.parse(String(r.spec)),verification:JSON.parse(String(r.verification)),checks:JSON.parse(String(r.checks)),specSha:String(r.spec_sha),reason:String(r.reason),by:String(r.by),at:String(r.at),draft:!!r.draft};
  }
+ /** Latest revision that is not a draft: what the workspace and the Build Sheet show. */
+ finalHead(projectId:string):number{return (this.db.prepare('SELECT COALESCE(MAX(revision),0) AS n FROM pro_revisions WHERE project_id=? AND draft=0').get(projectId) as {n:number}).n;}
  revisions(projectId:string){
-  return (this.db.prepare('SELECT revision,spec_sha,reason,by,at FROM pro_revisions WHERE project_id=? ORDER BY revision DESC').all(projectId) as Record<string,unknown>[]).map(r=>({revision:Number(r.revision),specSha:String(r.spec_sha),reason:String(r.reason),by:String(r.by),at:String(r.at)}));
+  return (this.db.prepare('SELECT revision,spec_sha,reason,by,at,draft FROM pro_revisions WHERE project_id=? ORDER BY revision DESC').all(projectId) as Record<string,unknown>[]).map(r=>({revision:Number(r.revision),specSha:String(r.spec_sha),reason:String(r.reason),by:String(r.by),at:String(r.at),draft:!!r.draft}));
  }
  private tally(spec:unknown,extra?:{path:string;reason:string}[]){
   const map=((spec&&typeof spec==='object'&&(spec as {verification?:unknown}).verification)||{}) as Record<string,{status?:string;note?:string}>;
@@ -186,12 +192,12 @@ CREATE TABLE IF NOT EXISTS pro_artifacts(sha256 TEXT PRIMARY KEY,kind TEXT NOT N
  }
 
  /** Atomic compare-and-insert of revision `n` for the dispatcher's save_revision. False when `n` is not head+1 (lost the race). */
- insertRevision(projectId:string,row:{revision:number;spec:{verification?:unknown;checks?:unknown};specSha:string;reason:string;subject:string;model:string}):boolean{
+ insertRevision(projectId:string,row:{revision:number;spec:{verification?:unknown;checks?:unknown};specSha:string;reason:string;subject:string;model:string;draft?:boolean}):boolean{
   const at=this.now().toISOString();
   return this.ops.store.tx(()=>{
    const cur=(this.db.prepare('SELECT head_revision FROM pro_projects WHERE id=?').get(projectId) as {head_revision:number}|undefined)?.head_revision;
    if(cur===undefined||cur!==row.revision-1)return false;
-   this.db.prepare('INSERT INTO pro_revisions(project_id,revision,spec,verification,checks,spec_sha,reason,by,at) VALUES(?,?,?,?,?,?,?,?,?)').run(projectId,row.revision,JSON.stringify(row.spec),JSON.stringify(row.spec.verification??{}),JSON.stringify(row.spec.checks??[]),row.specSha,row.reason.slice(0,200),row.subject,at);
+   this.db.prepare('INSERT INTO pro_revisions(project_id,revision,spec,verification,checks,spec_sha,reason,by,at,draft) VALUES(?,?,?,?,?,?,?,?,?,?)').run(projectId,row.revision,JSON.stringify(row.spec),JSON.stringify(row.spec.verification??{}),JSON.stringify(row.spec.checks??[]),row.specSha,row.reason.slice(0,200),row.subject,at,row.draft?1:0);
    this.db.prepare('UPDATE pro_projects SET head_revision=?,updated_at=? WHERE id=?').run(row.revision,at,projectId);
    return true;
   });
@@ -199,7 +205,7 @@ CREATE TABLE IF NOT EXISTS pro_artifacts(sha256 TEXT PRIMARY KEY,kind TEXT NOT N
 
  // ----- tool surface for the dispatcher (pro-tools.ts) and the default host -----
  /** `save_revision` as a tool: the projectId must be the turn's own project (checked by the loop and again here). */
- async toolSaveRevision(ctx:Pick<ToolCtx,'subject'|'projectId'>,input:{projectId:string;baseRevision:number;ops:SpecPatch;reason:string}):Promise<ToolRun>{
+ async toolSaveRevision(ctx:Pick<ToolCtx,'subject'|'projectId'>,input:{projectId:string;baseRevision:number;ops:SpecPatch;reason:string;draft?:boolean}):Promise<ToolRun>{
   if(input.projectId!==ctx.projectId)return{ok:false,output:{error:'project_mismatch'}};
   const r=await this.saveRevision(ctx.projectId,ctx.subject,input,ctx.subject);
   if(!r.ok)return{ok:false,output:{error:r.code,message:r.message,...(r.issues?{issues:r.issues}:{}),...(r.headRevision!==undefined?{headRevision:r.headRevision}:{})}};
@@ -289,7 +295,7 @@ ON CONFLICT(turn_id) DO UPDATE SET model=excluded.model,input_tokens=excluded.in
   const project=this.project(id!,who.subject);
   if(!project)return err(404,'Project not found');
   if(rest.length===2){
-   if(method==='GET')return{status:200,data:{project,head:project.headRevision?this.revisionView(project.id,project.headRevision):null}};
+   if(method==='GET')return{status:200,data:{project,head:this.finalHead(project.id)?this.revisionView(project.id,this.finalHead(project.id)):null}};
    if(method==='DELETE'){this.db.prepare('UPDATE pro_projects SET archived=1,updated_at=? WHERE id=?').run(this.now().toISOString(),project.id);return{status:200,data:{ok:true}};}
    return err(405,'Method not allowed');
   }
@@ -298,7 +304,7 @@ ON CONFLICT(turn_id) DO UPDATE SET model=excluded.model,input_tokens=excluded.in
    if(rest.length===4){const n=Number(tid);const v=Number.isInteger(n)&&n>0?this.revisionView(project.id,n):undefined;return v?{status:200,data:v}:err(404,'Revision not found');}
   }
   if(b==='messages'&&rest.length===3&&method==='GET')return{status:200,data:{messages:this.agent.displayMessages(project.id)}};
-  if(b==='turns'&&rest.length===3&&method==='POST')return this.startTurn(who,project,body);
+  if(b==='turns'&&rest.length===3&&method==='POST')return this.startTurn(who,project,body,call.trustedLocal===true);
   if(b==='turns'&&tid){
    const turn=this.turn(tid,project.id);
    if(!turn)return err(404,'Turn not found');
@@ -320,7 +326,8 @@ ON CONFLICT(turn_id) DO UPDATE SET model=excluded.model,input_tokens=excluded.in
   return{id:String(r.id),projectId:String(r.project_id),subject:String(r.subject),status:r.status as 'running'|'done',...(r.stop_reason?{stopReason:String(r.stop_reason)}:{}),model:String(r.model),lang:r.lang as 'en'|'id',clientTools:JSON.parse(String(r.client_tools)),startedAt:String(r.started_at)};
  }
 
- private async startTurn(who:ProWho,project:ProjectRow,body:unknown):Promise<OpsResult>{
+ /** `trustedLocal` is set only by the in-process api path on the desktop local host. Ops cannot know the host, so every other request loses its clientTools. */
+ private async startTurn(who:ProWho,project:ProjectRow,body:unknown,trustedLocal=false):Promise<OpsResult>{
   const p=TurnRequestSchema.safeParse(body);
   if(!p.success)return err(400,p.error.issues[0]?.message??'Invalid request');
   await this.refreshRemote();
@@ -330,11 +337,12 @@ ON CONFLICT(turn_id) DO UPDATE SET model=excluded.model,input_tokens=excluded.in
   const running=(this.db.prepare(`SELECT COUNT(*) AS n FROM pro_turns WHERE status='running' AND project_id=?`).get(project.id) as {n:number}).n;
   if(running||this.runningFor(who.subject)>=perSubject)return err(409,'A turn is already running. Wait for it to finish or cancel it.',{kind:'turn_in_progress'});
   if(this.runningFor()>=global)return err(429,'The Pro agent is busy. Try again in a minute.',{kind:'busy'});
+  const clientTools=trustedLocal?p.data.clientTools:[];
   const id=randomUUID(),at=this.now().toISOString(),model=this.model();
   this.ops.store.tx(()=>{
-   this.db.prepare(`INSERT INTO pro_turns(id,project_id,subject,status,model,lang,client_tools,tool_calls,started_at) VALUES(?,?,?, 'running',?,?,?,0,?)`).run(id,project.id,who.subject,model,p.data.lang,JSON.stringify(p.data.clientTools),at);
+   this.db.prepare(`INSERT INTO pro_turns(id,project_id,subject,status,model,lang,client_tools,tool_calls,started_at) VALUES(?,?,?, 'running',?,?,?,0,?)`).run(id,project.id,who.subject,model,p.data.lang,JSON.stringify(clientTools),at);
   });
-  this.agent.start({id,projectId:project.id,subject:who.subject,model,lang:p.data.lang,clientTools:p.data.clientTools,message:p.data.message});
+  this.agent.start({id,projectId:project.id,subject:who.subject,model,lang:p.data.lang,clientTools,message:p.data.message});
   return{status:202,data:{turnId:id}};
  }
 
@@ -356,6 +364,7 @@ const AdminSettingsSchema=z.object({
  model:z.enum(PRO_MODELS).optional(),
  thinkingBudget:z.number().int().min(0).max(32_000).refine(n=>n===0||n>=1024,{error:'Thinking budget is 0 (off) or at least 1024'}).optional(),
  killSwitch:KillSwitchSchema.optional(),
+ turnCapUsd:TurnCapSchema.optional(),
 }).strict().refine(v=>Object.values(v).some(x=>x!==undefined),{error:'Nothing to change'});
 
 /** /ops/v1/admin/pro/{settings,usage}. Owner only: these decide spend. `rest` are the segments after `pro`. */
@@ -370,9 +379,10 @@ export function handleProAdmin(ops:Ops,call:OpsCall,role:Role,by:string,rest:str
    if(p.data.model)pro['putSetting']('model',p.data.model);
    if(p.data.thinkingBudget!==undefined)pro['putSetting']('thinking_budget',p.data.thinkingBudget);
    if(p.data.killSwitch)pro['putSetting']('kill_switch',p.data.killSwitch);
+   if(p.data.turnCapUsd!==undefined)pro['putSetting']('turn_cap_usd',p.data.turnCapUsd);
    void by;
   }else if(call.method!=='GET')return err(405,'Method not allowed');
-  return{status:200,data:{model:pro.model(),models:PRO_MODELS,thinkingBudget:pro.thinkingBudget(),killSwitch:pro.killSwitchState(),limits:TURN_LIMITS}};
+  return{status:200,data:{model:pro.model(),models:PRO_MODELS,thinkingBudget:pro.thinkingBudget(),killSwitch:pro.killSwitchState(),turnCapUsd:pro.turnCapUsd(),limits:TURN_LIMITS}};
  }
  if(what==='usage'&&rest.length===1&&call.method==='GET')return{status:200,data:pro.usageSummary()};
  return err(404,'Not found');

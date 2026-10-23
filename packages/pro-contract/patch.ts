@@ -16,12 +16,27 @@ export type PatchOp=z.infer<typeof PatchOpSchema>;
 export const SpecPatchSchema=z.array(PatchOpSchema).min(1).max(PATCH_MAX_OPS);
 export type SpecPatch=z.infer<typeof SpecPatchSchema>;
 
-/** Paths the server derives; a patch touching them is rejected (the model never sets them). */
+/** Paths the server derives. Strict `applySpecPatch` rejects a patch touching them; `splitServerOwned` drops those ops with a warning (the model never sets them). */
 const SERVER_OWNED:RegExp[]=[
  /^\/verification(\/|$)/,/^\/meta(\/|$)/,/^\/checklist(\/|$)/,/^\/bom\/totalIdr(\/|$)/,/^\/bom\/lines\/\d+\/(priceIdr|priceSource)(\/|$)/,
  /^\/nodes\/\d+\/wires\/\d+\/id$/,/^\/code\/\d+\/(verify|configSha256|pinsReferenced)(\/|$)/,/^\/links\/\d+\/estimate(\/|$)/,/^\/nodes\/\d+\/power\/(budget|ok)(\/|$)/,
 ];
 export const isServerOwnedPath=(path:string):boolean=>SERVER_OWNED.some(r=>r.test(path));
+/** Human-readable form of the list above (shown by get_spec_schema). `*` is an array index. */
+export const SERVER_OWNED_PATHS:readonly string[]=[
+ '/verification','/meta','/checklist','/bom/totalIdr','/bom/lines/*/priceIdr','/bom/lines/*/priceSource',
+ '/nodes/*/wires/*/id','/code/*/verify','/code/*/configSha256','/code/*/pinsReferenced','/links/*/estimate','/nodes/*/power/budget','/nodes/*/power/ok',
+];
+export type IgnoredOp={opIndex:number;path:string;message:string};
+/** Lenient mode: ops on server-owned paths are dropped and reported, the rest is kept in order. */
+export function splitServerOwned(ops:SpecPatch):{ops:SpecPatch;ignored:IgnoredOp[]}{
+ const ignored:IgnoredOp[]=[],kept:PatchOp[]=[];
+ ops.forEach((op,i)=>{
+  if(isServerOwnedPath(op.path))ignored.push({opIndex:i,path:op.path,message:`${op.path} is derived by the server; this op was ignored. Send the parent object whole, or leave it out.`});
+  else kept.push(op);
+ });
+ return {ops:kept as SpecPatch,ignored};
+}
 
 export class PatchError extends Error{constructor(readonly code:'bad_path'|'server_owned'|'bad_index'|'missing'|'too_many_ops'|'whole_document',message:string,readonly opIndex?:number){super(message);this.name='PatchError';}}
 

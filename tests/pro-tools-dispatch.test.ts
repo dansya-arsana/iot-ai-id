@@ -69,10 +69,11 @@ test('save_revision: r1, stale base 409, then r2; verification stamps present',a
  const g=await d.call(ctx,'get_revision',{projectId:'p1',revision:1,path:'/summary'}) as {ok:true;output:{spec:{en:string}}};
  assert.equal(g.output.spec.en,fixture.summary.en);
 });
-test('save_revision: server-owned paths, bad patch and invalid spec are rejected and nothing is stored',async()=>{
+test('save_revision: server-owned paths are ignored with a warning; bad patch and invalid spec are rejected and nothing is stored',async()=>{
  const {d,m}=mk();
  const own=await save(d,0,[{op:'add',path:'/verification',value:{}}]) as {error:{code:string}};
- assert.equal(own.error.code,'patch_server_owned');
+ assert.equal(own.error.code,'patch_empty');
+ assert.equal(m.revs.size,0);
  const bad=await save(d,0,[{op:'replace',path:'/nodes/9/id',value:'x'}]) as {error:{code:string}};
  assert.match(bad.error.code,/^patch_/);
  const {d:d2,m:m2}=mk({derive:doc=>({...doc})});

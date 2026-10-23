@@ -33,11 +33,11 @@ test('start needs config; subscribes read-only to project root; filters by proje
  const rec:any=(await s.call('GET','/messages',undefined,'sinceMs=1000')).data;assert.equal(rec.messages.length,1);
 });
 test('payload truncated at 4KB and ring capped at 500',async()=>{
- const s=await setup();await s.call('PUT','/settings',{url:'ws://h'});await s.call('POST','/start',{projectId:'p'});
+ const s=await setup();await s.call('PUT','/settings',{url:'mqtt://h'});await s.call('POST','/start',{projectId:'p'});
  s.opts().onMessage('aiot/p/n/x',Buffer.alloc(5000,65));
  for(let i=0;i<600;i++)s.opts().onMessage('aiot/p/n/y',Buffer.from(String(i)));
  const r:any=(await s.call('GET','/messages',undefined,'max=9999')).data;assert.equal(r.messages.length,500);
- const s2=await setup();await s2.call('PUT','/settings',{url:'ws://h'});await s2.call('POST','/start',{projectId:'p'});
+ const s2=await setup();await s2.call('PUT','/settings',{url:'mqtt://h'});await s2.call('POST','/start',{projectId:'p'});
  s2.opts().onMessage('aiot/p/n/x',Buffer.alloc(5000,65));
  const m:any=((await s2.call('GET','/messages')).data as any).messages[0];assert.equal(m.payload.length,4096);assert.equal(m.truncated,true);
 });

@@ -2,6 +2,7 @@ import {z} from 'zod';
 import {mcpTools} from '../../packages/pro-tools/registry.js';
 import type {ToolDef} from '../../packages/pro-tools/types.js';
 import {loadSkill} from '../../packages/pro-skills/index.js';
+import {getSpecSchema} from '../../packages/pro-tools/impl/spec-schema.js';
 
 /** Registers the pro-tools registry on an MCP server (D14). Pure tools run in-process, service tools go to ops over loopback. device_flash and client-only tools are never registered. */
 export type PureImpl=(input:any)=>unknown|Promise<unknown>;
@@ -25,7 +26,7 @@ const shape=(t:ToolDef):Record<string,z.ZodType>=>{
 export async function runProTool(t:ToolDef,input:unknown,deps:ProMcpDeps):Promise<unknown>{
  const parsed=t.input.parse(input);
  if(t.runsAt==='pure'){
-  const impl=t.name==='load_skill'?loadSkillImpl:deps.pure?.[t.name];
+  const impl=t.name==='load_skill'?loadSkillImpl:t.name==='get_spec_schema'?getSpecSchema:deps.pure?.[t.name];
   if(impl)return impl(parsed);
   // The parts catalog and its overlay live in ops, so pure tools without a local implementation run there (same dispatcher, same checks).
   return deps.ops(t.name,parsed);

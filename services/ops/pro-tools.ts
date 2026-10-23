@@ -6,7 +6,8 @@
  */
 import {getTool,type ProToolName} from '../../packages/pro-tools/registry.js';
 import {verifySpec,sha256,type GateVerifiers} from '../../packages/pro-tools/verify-spec.js';
-import {applySpecPatch,EMPTY_SPEC_DOC,PatchError} from '../../packages/pro-contract/patch.js';
+import {applySpecPatch,splitServerOwned,EMPTY_SPEC_DOC,PatchError} from '../../packages/pro-contract/patch.js';
+import {getSpecSchema,prefillServerFields,describeIssues} from '../../packages/pro-tools/impl/spec-schema.js';
 import {SystemSpecSchema,PRO_LIMITS,SYSTEM_SPEC_VERSION,type SystemSpec,type ItemVerification} from '../../packages/pro-contract/system-spec.js';
 
 export type ToolCtx={
@@ -21,14 +22,14 @@ export type ToolCtx={
 export type ToolError={code:string;message:string;status:number;details?:unknown};
 export type ToolResult={ok:true;output:unknown;ms:number}|{ok:false;error:ToolError;ms:number};
 export type Impl=(input:never,ctx:ToolCtx)=>unknown|Promise<unknown>;
-export type StoredRevision={revision:number;spec:SystemSpec|Record<string,unknown>;verification?:Record<string,ItemVerification>};
+export type StoredRevision={revision:number;spec:SystemSpec|Record<string,unknown>;verification?:Record<string,ItemVerification>;/** Not verified; never shown as verified and ignored by the Build Sheet. */draft?:boolean};
 export interface ProToolStore{
  /** True when the project belongs to the subject. */
  owns(subject:string,projectId:string):boolean;
  head(projectId:string):StoredRevision|undefined;
  revision(projectId:string,n:number):StoredRevision|undefined;
  /** Atomic insert of revision `n`; false when `n` is already taken (lost the race). */
- insert(projectId:string,row:{revision:number;spec:SystemSpec;specSha:string;reason:string;subject:string;model:string}):boolean;
+ insert(projectId:string,row:{revision:number;spec:SystemSpec;specSha:string;reason:string;subject:string;model:string;draft?:boolean}):boolean;
  propose?(subject:string,input:unknown):{proposalId:string};
 }
 export interface ProToolDeps{
@@ -113,7 +114,7 @@ export class ProToolDispatcher{
   if(!this.take(ctx.subject,name))return done(err('rate_limited','Too many calls to this tool. Wait a few minutes.',429));
   let out:unknown;
   try{
-   const impl=this.deps.impls?.[name as ProToolName];
+   const impl=this.deps.impls?.[name as ProToolName]??(name==='get_spec_schema'?getSpecSchema:undefined);
    if(impl)out=await (impl as (i:unknown,c:ToolCtx)=>unknown)(input,ctx);
    else if(name==='save_revision'||name==='get_revision'||name==='catalog_propose'){
     const r=name==='save_revision'?await this.saveRevision(ctx,input):name==='get_revision'?this.getRevision(input):this.propose(ctx,input);
@@ -147,7 +148,7 @@ export class ProToolDispatcher{
   if(path){const r=readPointer(rev.spec,path);if(!r.found)return err('bad_path','Path not found in this revision.',404);spec=r.value;}
   const ver=rev.verification??(isObj(rev.spec)&&isObj(rev.spec.verification)?rev.spec.verification as Record<string,ItemVerification>:undefined);
   const verification=ver&&path?Object.fromEntries(Object.entries(ver).filter(([k])=>k===path||k.startsWith(path+'/'))):ver;
-  return {ok:true as const,output:{revision:rev.revision,spec,...(verification?{verification}:{})}};
+  return {ok:true as const,output:{revision:rev.revision,spec,...(rev.draft?{draft:true}:{}),...(verification?{verification}:{})}};
  }
 
  /** apply patch -> derive -> schema -> gate -> insert r+1. Nothing is stored unless the whole chain passes the schema. */
@@ -156,24 +157,43 @@ export class ProToolDispatcher{
   if(!store)return err('not_available','Storage is not available.',503);
   const head=store.head(pid),headRev=head?.revision??0;
   if(input.baseRevision!==headRev)return err('stale_revision',`baseRevision is ${String(input.baseRevision)} but the head is ${headRev}. Read the head with get_revision and rebase the patch.`,409,{headRevision:headRev});
-  let doc=applySpecPatch(head?.spec??EMPTY_SPEC_DOC(),input.ops as never) as Record<string,unknown>;
+  const draft=input.draft===true;
+  // Server-owned paths are IGNORED with a warning (the model must not be punished for guessing a derived path).
+  const split=splitServerOwned(input.ops as never);
+  const warnings=split.ignored.map(i=>({path:i.path.slice(0,300),message:i.message.slice(0,400)}));
+  if(!split.ops.length)return err('patch_empty',`Every op touched a server-owned path and was ignored: ${split.ignored.map(i=>i.path).join(', ').slice(0,300)}. Send the parent object whole (for example /nodes/0/power) or other fields.`,422,{warnings});
+  let doc=applySpecPatch(head?.spec??EMPTY_SPEC_DOC(),split.ops) as Record<string,unknown>;
   // Server-owned: anything the model could have placed there is rebuilt.
   doc.verification={};doc.checks=[];
+  prefillServerFields(doc,this.clock().toISOString());
   if(this.deps.derive)doc=await this.deps.derive(doc,ctx);
   const m=isObj(doc.meta)?doc.meta:{};
   const usage=isObj(m.usage)?m.usage:undefined;
   doc.meta={...ctx.meta,version:SYSTEM_SPEC_VERSION,generatedAt:this.clock().toISOString(),...(typeof m.promptSha256==='string'?{promptSha256:m.promptSha256}:{}),...(usage?{usage}:{})};
   if(JSON.stringify(doc).length>PRO_LIMITS.specBytes)return err('spec_too_large','The spec is larger than 512 KB.',400);
   const v=SystemSpecSchema.safeParse(doc);
-  if(!v.success)return err('spec_invalid','The spec does not pass the schema. Fix these and save again.',422,v.error.issues.slice(0,20).map(i=>({path:'/'+i.path.join('/'),message:i.message})));
+  const headRev1=headRev+1;
+  if(draft){
+   // A draft is stored as is (no gate, no verification), so progress survives and the next patch builds on it.
+   const issues=v.success?[]:describeIssues(v.error.issues as never);
+   const stored={...doc,verification:{},checks:[]} as unknown as SystemSpec;
+   const dsha=sha256(JSON.stringify(stored));
+   if(!store.insert(pid,{revision:headRev1,spec:stored,specSha:dsha,reason:input.reason as string,subject:ctx.subject,model:ctx.meta.model,draft:true}))
+    return err('stale_revision','Another save won the race. Read the head with get_revision and retry.',409);
+   return {ok:true as const,output:{revision:headRev1,specSha:dsha,draft:true,verification:{verified:0,unverified:[],failed:0},checks:[],...(warnings.length?{warnings}:{}),issues}};
+  }
+  if(!v.success){
+   const issues=describeIssues(v.error.issues as never);
+   return err('spec_invalid',`The spec does not pass the schema: ${issues.length} issue(s), all listed. Fix them in one patch and save again (draft:true keeps progress).${warnings.length?` Ignored server-owned paths: ${warnings.map(w=>w.path).join(', ').slice(0,200)}.`:''}`,422,issues);
+  }
   const prev=head?.verification??(isObj(head?.spec)&&isObj((head?.spec as Record<string,unknown>).verification)?(head?.spec as {verification:Record<string,ItemVerification>}).verification:undefined);
   const gate=await verifySpec(v.data,prev,this.deps.verifiers??{},this.clock());
   const final=SystemSpecSchema.safeParse(gate.spec);
-  if(!final.success)return err('spec_invalid','The verified spec does not pass the schema.',422,final.error.issues.slice(0,5).map(i=>({path:'/'+i.path.join('/'),message:i.message})));
+  if(!final.success)return err('spec_invalid','The verified spec does not pass the schema.',422,describeIssues(final.error.issues as never,20));
   const specSha=sha256(JSON.stringify(final.data));
-  const revision=headRev+1;
+  const revision=headRev1;
   if(!store.insert(pid,{revision,spec:final.data,specSha,reason:input.reason as string,subject:ctx.subject,model:ctx.meta.model}))
    return err('stale_revision','Another save won the race. Read the head with get_revision and retry.',409);
-  return {ok:true as const,output:{revision,specSha,verification:{verified:gate.counts.verified,unverified:gate.unverified.slice(0,200).map(u=>({path:u.path,reason:u.reason.slice(0,300)})),failed:gate.counts.failed},checks:gate.checks}};
+  return {ok:true as const,output:{revision,specSha,verification:{verified:gate.counts.verified,unverified:gate.unverified.slice(0,200).map(u=>({path:u.path,reason:u.reason.slice(0,300)})),failed:gate.counts.failed},checks:gate.checks,...(warnings.length?{warnings}:{})}};
  }
 }

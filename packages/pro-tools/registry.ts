@@ -1,5 +1,5 @@
 /**
- * The 20-tool registry (ADR 012 §2, plan §3). Schemas only: no implementation, no I/O.
+ * The 21-tool registry (ADR 012 §2, plan §3). Schemas only: no implementation, no I/O.
  * One registry, two surfaces: Anthropic `tools` (anthropicTools) and MCP (mcpTools). Order is fixed.
  * Free text from outside the platform comes back inside `untrusted` fields (D18).
  */
@@ -63,13 +63,14 @@ const price_bom=defineTool({name:'price_bom',description:'Price BOM lines from t
  input:z.object({lines:z.array(z.object({partId:Slug,qty:z.number().positive().max(10_000)}).strict()).min(1).max(PRO_LIMITS.bomLines)}).strict(),
  output:z.object({lines:z.array(z.object({partId:Slug,qty:z.number(),minIdr:z.number().int(),maxIdr:z.number().int(),checkedAt:z.string(),source:z.string()}).strict()),totals:z.object({minIdr:z.number().int(),maxIdr:z.number().int()}).strict(),missing:z.array(Slug)}).strict(),
  deterministic:true,effect:'none',consent:'none',runsAt:'pure',access:'member',mcp:true});
-const save_revision=defineTool({name:'save_revision',description:'Apply a SpecPatch (JSON Patch subset, at most 200 ops) to the head revision. Writes r+1 and never overwrites; 409 when baseRevision is stale. The server derives ids, totals and verification stamps.',
- input:z.object({projectId,baseRevision:z.number().int().nonnegative(),ops:SpecPatchSchema,reason:z.string().min(1).max(200)}).strict(),
- output:z.object({revision:z.number().int().positive(),specSha:sha,verification:z.object({verified:z.number().int(),unverified:z.array(z.object({path:z.string(),reason:z.string().max(300)}).strict()),failed:z.number().int().optional()}).strict(),checks:z.array(CheckSchema).max(PRO_LIMITS.checks)}).strict(),
+const SaveIssue=z.object({path:z.string().max(300),message:z.string().max(400),expected:z.string().max(400).optional(),example:z.unknown().optional()}).strict();
+const save_revision=defineTool({name:'save_revision',description:'Apply a SpecPatch (JSON Patch subset, at most 200 ops) to the head revision. Writes r+1 and never overwrites; 409 when baseRevision is stale. The server derives ids, totals and verification stamps. Ops on server-owned paths are ignored with a warning. A failed schema check returns ALL issues at once. draft:true stores a non-verified draft (never shown as verified, ignored by the Build Sheet) so you can save progress and fix iteratively; a final save without draft runs the full gate. Call get_spec_schema before your first save.',
+ input:z.object({projectId,baseRevision:z.number().int().nonnegative(),ops:SpecPatchSchema,reason:z.string().min(1).max(200),draft:z.boolean().optional()}).strict(),
+ output:z.object({revision:z.number().int().positive(),specSha:sha,draft:z.boolean().optional(),verification:z.object({verified:z.number().int(),unverified:z.array(z.object({path:z.string(),reason:z.string().max(300)}).strict()),failed:z.number().int().optional()}).strict(),checks:z.array(CheckSchema).max(PRO_LIMITS.checks),warnings:z.array(z.object({path:z.string().max(300),message:z.string().max(400)}).strict()).max(200).optional(),issues:z.array(SaveIssue).max(200).optional()}).strict(),
  deterministic:false,effect:'write',consent:'none',runsAt:'ops',access:'member',mcp:true});
 const get_revision=defineTool({name:'get_revision',description:'Read a revision (default: head) or one subtree by JSON pointer.',
  input:z.object({projectId,revision:z.number().int().positive().optional(),path:z.string().max(240).optional()}).strict(),
- output:z.object({revision:z.number().int().positive(),spec:z.unknown(),verification:z.record(z.string(),ItemVerificationSchema).optional()}).strict(),
+ output:z.object({revision:z.number().int().positive(),spec:z.unknown(),draft:z.boolean().optional(),verification:z.record(z.string(),ItemVerificationSchema).optional()}).strict(),
  deterministic:true,effect:'none',consent:'none',runsAt:'ops',access:'member',mcp:true});
 const render=defineTool({name:'render',description:'Open a view in the workspace (3d, wiring, checklist, build_sheet). Returns layout issues (overlap, A4 fit) only.',
  input:z.object({projectId,revision:z.number().int().positive(),view:z.enum(['3d','wiring','checklist','build_sheet']),nodeId:Slug.optional()}).strict(),
@@ -103,11 +104,15 @@ const evidence_status=defineTool({name:'evidence_status',description:'Checklist 
  input:z.object({projectId,revision:z.number().int().positive().optional()}).strict(),
  output:z.object({items:z.array(z.object({itemId:z.string().max(160),state:z.enum(['open','suggested','ticked']),by:z.enum(['human','evidence']).optional(),evidenceRef:z.string().max(120).optional()}).strict()).max(PRO_LIMITS.checklistItems),anomalies:z.array(z.object({nodeId:Slug,code:z.string().max(48),en:z.string().max(300),id:z.string().max(300),severity:Severity}).strict()).max(100)}).strict(),
  deterministic:true,effect:'none',consent:'none',runsAt:'ops',access:'member',mcp:true});
+const get_spec_schema=defineTool({name:'get_spec_schema',description:'Return the SystemSpec shape you may write: compact JSON Schema, one minimal complete VALID example, server-owned paths, id patterns, enum values and length limits. Pure and deterministic. Call it before your first save_revision.',
+ input:z.object({}).strict(),
+ output:z.object({jsonSchema:z.record(z.string(),z.unknown()),example:z.unknown(),serverOwned:z.object({patchPathsIgnored:z.array(z.string()),rebuiltByServer:z.array(z.string()),serverFillsWhenOmitted:z.array(z.string())}).strict(),patterns:z.record(z.string(),z.string()),enums:z.record(z.string(),z.array(z.string())),limits:z.record(z.string(),z.number()),notes:z.array(z.string())}).strict(),
+ deterministic:true,effect:'none',consent:'none',runsAt:'pure',access:'member',mcp:true});
 
 /** Fixed order (the Anthropic tools array is cache-sensitive; do not reorder). */
-export const PRO_TOOLS:readonly ToolDef[]=[catalog_search,catalog_get_part,check_compatibility,allocate_pins,validate_netlist,solve_power,estimate_link,site_climate,compile_code,price_bom,save_revision,get_revision,render,load_skill,catalog_propose,device_detect,device_flash,serial_read,telemetry_read,evidence_status];
+export const PRO_TOOLS:readonly ToolDef[]=[catalog_search,catalog_get_part,check_compatibility,allocate_pins,validate_netlist,solve_power,estimate_link,site_climate,compile_code,price_bom,save_revision,get_revision,render,load_skill,catalog_propose,device_detect,device_flash,serial_read,telemetry_read,evidence_status,get_spec_schema];
 export type ProToolName=
- 'catalog_search'|'catalog_get_part'|'check_compatibility'|'allocate_pins'|'validate_netlist'|'solve_power'|'estimate_link'|'site_climate'|'compile_code'|'price_bom'|'save_revision'|'get_revision'|'render'|'load_skill'|'catalog_propose'|'device_detect'|'device_flash'|'serial_read'|'telemetry_read'|'evidence_status';
+ 'catalog_search'|'catalog_get_part'|'check_compatibility'|'allocate_pins'|'validate_netlist'|'solve_power'|'estimate_link'|'site_climate'|'compile_code'|'price_bom'|'save_revision'|'get_revision'|'render'|'load_skill'|'catalog_propose'|'device_detect'|'device_flash'|'serial_read'|'telemetry_read'|'evidence_status'|'get_spec_schema';
 export const PRO_TOOL_NAMES=PRO_TOOLS.map(t=>t.name) as ProToolName[];
 export const getTool=(name:string):ToolDef|undefined=>PRO_TOOLS.find(t=>t.name===name);
 
