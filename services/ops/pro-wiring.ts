@@ -7,7 +7,8 @@ import type {Ops} from './ops.js';
 import {Pro,proFor,hasPro,type ProDeps} from './pro.js';
 import {type ProToolHost,type ToolRun} from './pro-agent.js';
 import {ProToolDispatcher,type Impl,type ProToolStore,type StoredRevision,type ToolCtx as DispatchCtx,type ToolResult} from './pro-tools.js';
-import {ProCompiler,DockerProRunner,type ProTarget} from './pro-compile.js';
+import {ProCompiler,type ProTarget} from './pro-compile.js';
+import {proRunnerFromEnv} from './compile-http.js';
 import {catalogFor} from './catalog.js';
 import {searchParts,verifiedShare,type PartRecord} from '../../packages/catalog/index.js';
 import {loadSkill,skillIndex} from '../../packages/pro-skills/index.js';
@@ -166,7 +167,7 @@ export function installPro(ops:Ops,o:ProWiringOptions={}):Pro{
  const lookup=o.lookup??memo!.lookup;
  const parts=o.parts??(memo?memo.list:()=>[]);
  const catalogVersion=o.catalogVersion??'import';
- const compiler=o.compiler===false?undefined:o.compiler??new ProCompiler(ops.store.db,new DockerProRunner(),ops.clock);
+ const compiler=o.compiler===false?undefined:o.compiler??new ProCompiler(ops.store.db,proRunnerFromEnv(),ops.clock);
  // Late-bound: the dispatcher needs the store, the store needs Pro, Pro needs the tool host.
  // eslint-disable-next-line prefer-const -- assigned after the dispatcher that closes over it
  let pro!:Pro;

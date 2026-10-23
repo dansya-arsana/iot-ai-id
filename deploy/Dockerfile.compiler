@@ -1,0 +1,39 @@
+# Compile sidecar (ADR 011/012): arduino-cli (AVR + ESP32) and the Python lint behind a small HTTP server.
+# No docker.sock anywhere. Run it on an `internal: true` network (no egress), read-only root, tmpfs /tmp (see deploy/compose.yml).
+# Build context is the repo root:  docker build -f deploy/Dockerfile.compiler -t aiot-compiler:1 .
+# Stage 1 downloads the toolchain (needs network); stage 2 carries only the baked SDK, so the image has no curl and no package manager use at run time.
+FROM node:24.13.1-bookworm-slim AS toolchain
+ARG ARDUINO_CLI=1.5.1
+ARG AVR_CORE=1.8.8
+ARG SERVO_LIB=1.3.0
+ARG ESP32_CORE=3.3.12
+ARG ESP32_INDEX=https://espressif.github.io/arduino-esp32/package_esp32_index.json
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends curl ca-certificates python3 python3-serial >/dev/null && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh -s ${ARDUINO_CLI}
+ENV ARDUINO_DIRECTORIES_DATA=/opt/arduino/data ARDUINO_DIRECTORIES_USER=/opt/arduino/user \
+    ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS=${ESP32_INDEX} ARDUINO_UPDATER_ENABLE_NOTIFICATION=false
+RUN mkdir -p /opt/arduino/data /opt/arduino/user \
+ && arduino-cli core update-index \
+ && arduino-cli core install arduino:avr@${AVR_CORE} \
+ && arduino-cli core install esp32:esp32@${ESP32_CORE} \
+ && arduino-cli lib install Servo@${SERVO_LIB} \
+ && rm -rf /opt/arduino/data/staging /opt/arduino/data/tmp /opt/arduino/data/downloads \
+ && chmod -R a+rX /opt/arduino
+
+FROM node:24.13.1-bookworm-slim
+# python3 for lint.py and for the esp32 core's image tools; python3-serial as in scripts/pro-sandbox/Dockerfile.esp32.
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends python3 python3-serial >/dev/null \
+ && rm -rf /var/lib/apt/lists/* /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+ && useradd --system --uid 10001 --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin compiler
+COPY --from=toolchain /usr/local/bin/arduino-cli /usr/local/bin/arduino-cli
+COPY --from=toolchain /opt/arduino /opt/arduino
+COPY scripts/pro-sandbox/lint.py /opt/lint.py
+COPY services/compiler/server.ts /app/server.ts
+RUN chmod 0444 /opt/lint.py /app/server.ts && echo '{"type":"module"}' > /app/package.json
+ENV ARDUINO_DIRECTORIES_DATA=/opt/arduino/data ARDUINO_DIRECTORIES_USER=/opt/arduino/user \
+    ARDUINO_UPDATER_ENABLE_NOTIFICATION=false COMPILER_HOST=0.0.0.0 COMPILER_PORT=8795 NODE_ENV=production
+USER 10001:10001
+WORKDIR /app
+EXPOSE 8795
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD ["node","-e","fetch('http://127.0.0.1:8795/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+CMD ["node","/app/server.ts"]

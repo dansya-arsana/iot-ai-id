@@ -58,12 +58,33 @@ services:
       OPS_HOST: 0.0.0.0
       OPS_PORT: 8791
       OPS_DB: /data/ops.sqlite
+      OPS_COMPILER_URL: http://compiler:8795
     volumes:
       - ops_data:/data
     networks:
       gateway:
         aliases: [iot-ai-ops]
       ops: {}
+      compile: {}
+  # Compile sidecar (ADR 011/012): arduino-cli + Python lint over HTTP. No docker.sock, no internet egress at run time.
+  # Only ops can reach it, over the internal `compile` network. COMPILER_TOKEN (>= 32 chars) comes from ops.env.
+  compiler:
+    build:
+      context: ../
+      dockerfile: deploy/Dockerfile.compiler
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:exec,size=512m,mode=1777
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 2g
+    cpus: 1.5
+    pids_limit: 256
+    env_file: /opt/iot-ai-id/secrets/compiler.env
+    networks:
+      compile: {}
   knowledge:
     build:
       context: ../
@@ -80,6 +101,8 @@ networks:
     name: prod-client_default
   knowledge: {}
   ops: {}
+  compile:
+    internal: true
 volumes:
   iot_data:
   coordinator_data:

@@ -38,7 +38,7 @@ const CONTAINER_SCRIPT=[
  'echo "@@LOG"; head -c 8192 /work/log',
 ].join('; ');
 
-export type RunResult={ok:true;hex:string;dump:string}|{ok:false;log:string;timedOut?:boolean};
+export type RunResult={ok:true;hex:string;dump:string}|{ok:false;log:string;timedOut?:boolean;unavailable?:boolean};
 export interface CompileRunner{readonly toolchain:string;available():Promise<boolean>;run(source:string):Promise<RunResult>}
 
 /** Splits the container's stdout (see CONTAINER_SCRIPT). Exported for tests. */
@@ -190,6 +190,7 @@ export class LabCompiler{
   if(!await this.slot())return{ok:false,kind:'unavailable',message:'The compiler is busy. Try again in a few seconds.',diagnostics:[]};
   let r:RunResult;
   try{r=await this.runner.run(source);}finally{this.release();}
+  if(!r.ok&&r.unavailable)return{ok:false,kind:'unavailable',message:r.log,diagnostics:[]};
   if(!r.ok)return{ok:false,kind:'compile',message:r.timedOut?'The compile took too long.':'The sketch did not compile.',diagnostics:r.timedOut?[{line:0,message:r.log}]:parseDiagnostics(r.log)};
   const flash=parseHex(r.hex);
   if(flash.length===0||flash.length>FLASH_MAX)return{ok:false,kind:'compile',message:'The sketch does not fit.',diagnostics:[{line:0,message:flash.length?`The program is ${flash.length} bytes; the board holds ${FLASH_MAX}.`:'The compiler produced an empty program.'}]};

@@ -15,7 +15,8 @@ import {parseCircuitSpec,type SpecIssue} from '../../apps/web/src/lab/circuit-sp
 import {cookieValue} from './http.js';
 import {MEMBER_COOKIE} from './members.js';
 import {STAFF_COOKIE} from './staff.js';
-import {LabCompiler,DockerRunner} from './lab-compile.js';
+import {LabCompiler} from './lab-compile.js';
+import {labRunnerFromEnv} from './compile-http.js';
 import {RateLimit,type Ops,type OpsCall,type OpsResult} from './ops.js';
 
 export type LabLlm={
@@ -53,7 +54,7 @@ export class LabAi{
  constructor(readonly ops:Ops,deps:Partial<LabDeps>={}){
   const db=ops.store.db;
   this.deps={
-   compiler:deps.compiler??new LabCompiler(db,new DockerRunner(),ops.clock),
+   compiler:deps.compiler??new LabCompiler(db,labRunnerFromEnv(),ops.clock),
    llm:deps.llm??httpLlm(),
    examplesDir:deps.examplesDir??EXAMPLES_DIR,
    memberQuota:deps.memberQuota??Number(process.env.OPS_LAB_AI_MEMBER_QUOTA??LAB_AI_DAILY_MEMBER_QUOTA),
