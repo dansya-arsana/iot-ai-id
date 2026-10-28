@@ -6,6 +6,7 @@ import {useLang} from './i18n';
 import {DotMark} from './brand/dot-mark';
 import {SiteHeader,SiteFooter} from './site-shell';
 import {GlobalHero,EntryPath} from './hero-map';
+import {GenerateEntry} from './landing-generate';
 import './landing-new.css';
 const partnership='/partnership-brief.txt';
 const copy={
@@ -90,6 +91,8 @@ export function Landing(){
   <SiteHeader overlay data-enter/>
   <main id="landing-main" tabIndex={-1}>
    {lang==='en'?<GlobalHero/>:<section className="rl-hero" aria-labelledby="landing-title"><img className="rl-capsule" data-enter src="/assets/landing/hero-capsule.png" alt="Concept render: a robotic hand holding an ESP32 board inside a glass test capsule" width="1024" height="1024" fetchPriority="high"/><div className="rl-hero-copy" data-enter><p className="rl-eyebrow">{t.eyebrow}</p><h1 id="landing-title"><Lines lines={t.title}/></h1><p className="rl-hero-description">{t.lead}</p><Link className="rl-button rl-button-dark" to="/partner" data-cta="hero-partner">{t.heroCta} <ArrowRightIcon size={18}/></Link></div><div className="rl-specimens">{[['FN-01','card-field-node'],['TS-01','card-tactile']].map(([code,img],i)=><figure className="rl-specimen rl-brackets" data-enter key={code}><img src={`/assets/landing/${img}.png`} alt={`Concept render: ${t.specimens[i]}`} width="768" height="1024" loading="lazy"/><figcaption><b>{code}</b><span>{t.specimens[i]}</span></figcaption></figure>)}</div><div className="rl-hero-bottom"><span>{t.renders}</span><a href="#gap">{t.scroll}</a></div></section>}
+
+   <GenerateEntry/>
 
    {/* composition: negantropy-refusal — corner-loaded flipped split with bracketed metrics */}
    <section id="gap" className="rl-section rl-gap"><div className="rl-gap-left" data-reveal><p className="rl-index">( {t.gapIndex} )<i/>{t.gapMeta}</p><p>{t.gapText}</p></div><div className="rl-gap-right" data-reveal><h2><Lines lines={t.gapTitle}/></h2><dl>{t.gapMetrics.map(([v,l])=><div key={l}><dt>[ {v} ]</dt><dd>{l}</dd></div>)}</dl><small>{t.gapNote}</small></div></section>

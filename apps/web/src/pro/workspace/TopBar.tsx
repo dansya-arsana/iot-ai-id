@@ -9,9 +9,13 @@ export interface TopBarProps{
  /** Per-turn USD cap and recent per-turn USD (null when unknown); Workspace may pass them, defaults apply otherwise. */
  turnCapUsd?:number;recentTurnUsd?:(number|null)[];
 }
+/** The landing brief (`aiot:brief`, set by landing-generate.tsx) prefills the prompt once; it is never sent without the member pressing Generate. */
+function takeBrief():string{
+ try{const b=sessionStorage.getItem('aiot:brief')??'';sessionStorage.removeItem('aiot:brief');return b;}catch{return '';}
+}
 export function TopBar(p:TopBarProps){
  const {spec,revision,projectId}=useProSpec();
- const [menu,setMenu]=useState(false),[text,setText]=useState('');
+ const [menu,setMenu]=useState(false),[text,setText]=useState(takeBrief);
  const box=useRef<HTMLDivElement>(null);
  useEffect(()=>{if(!menu)return;const off=(e:MouseEvent)=>{if(!box.current?.contains(e.target as Node))setMenu(false);};document.addEventListener('mousedown',off);return()=>document.removeEventListener('mousedown',off);},[menu]);
  const errors=spec?.checks.filter(c=>c.severity==='error').length??0,warns=spec?.checks.filter(c=>c.severity==='warning').length??0;
