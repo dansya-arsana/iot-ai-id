@@ -182,7 +182,7 @@ export function installPro(ops:Ops,o:ProWiringOptions={}):Pro{
  };
  const verifiers=o.verifiers??makeVerifiers(lookup,compiler);
  const createProject=(subject:string,name:string)=>{const max=o.maxProjectsPerSubject??200;if(pro.projects(subject).length>=max)throw new Error('project cap');return pro.createProject(subject,name);};
- const dispatcher=o.dispatcher??new ProToolDispatcher({store,createProject,verifiers,derive:o.derive??makeDerive(lookup),clock:()=>ops.clock(),impls:{...makeImpls({lookup,parts,catalogVersion,compiler,store}),...o.impls}});
+ const dispatcher=o.dispatcher??new ProToolDispatcher({store,createProject,lookup,verifiers,derive:o.derive??makeDerive(lookup),clock:()=>ops.clock(),impls:{...makeImpls({lookup,parts,catalogVersion,compiler,store}),...o.impls}});
  pro=proFor(ops,{tools:host,skills:skillIndex,...o});
  wiring.set(pro,{dispatcher,catalogVersion});
  return pro;

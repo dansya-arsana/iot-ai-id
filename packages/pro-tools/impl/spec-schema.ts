@@ -47,18 +47,18 @@ export const SPEC_EXAMPLE={
  nodes:[
   {id:'node-melon',role:'field',fieldId:'melon',board:'esp32-devkitc',
    parts:[
-    {id:'soil-moisture-capacitive-1',kind:'soil-moisture-capacitive',role:'sensor',qty:1,purpose:bi('Soil moisture','Kelembapan tanah'),mount:'field',cableM:3},
+    {id:'soil-moisture-capacitive-1',kind:'soil-capacitive-v2',role:'sensor',qty:1,purpose:bi('Soil moisture','Kelembapan tanah'),mount:'field',cableM:3},
     {id:'lora-rfm95w-1',kind:'lora-rfm95w',role:'radio',qty:1,purpose:bi('Uplink to gateway','Uplink ke gateway'),mount:'enclosure'},
    ],
    pins:[
     {boardPin:'GPIO34',gpio:34,func:'adc',part:'soil-moisture-capacitive-1',partPin:'AOUT',symbol:'PIN_SOIL_1'},
     {boardPin:'GPIO5',gpio:5,func:'spi-cs',part:'lora-rfm95w-1',partPin:'NSS',symbol:'PIN_LORA_CS'},
-    {boardPin:'GPIO14',gpio:14,func:'reset',part:'lora-rfm95w-1',partPin:'RST',symbol:'PIN_LORA_RST'},
+    {boardPin:'GPIO14',gpio:14,func:'reset',part:'lora-rfm95w-1',partPin:'RESET',symbol:'PIN_LORA_RST'},
    ],
    wires:[
     {id:'W1',from:{part:'soil-moisture-capacitive-1',pin:'AOUT'},to:{part:'board',pin:'GPIO34'},func:'signal',color:'yellow',label:'W1 · GPIO34 → AOUT (soil)',lengthM:3,awg:22,cable:'3-core-shielded',connectors:{from:'screw-terminal',to:'header'},viaGland:true},
     {id:'W2',from:{part:'lora-rfm95w-1',pin:'NSS'},to:{part:'board',pin:'GPIO5'},func:'signal',color:'blue',label:'W2 · GPIO5 → NSS (LoRa)',lengthM:0.1,awg:26,cable:'dupont',connectors:{from:'header',to:'header'},viaGland:false},
-    {id:'W3',from:{part:'lora-rfm95w-1',pin:'RST'},to:{part:'board',pin:'GPIO14'},func:'signal',color:'green',label:'W3 · GPIO14 → RST (LoRa)',lengthM:0.1,awg:26,cable:'dupont',connectors:{from:'header',to:'header'},viaGland:false},
+    {id:'W3',from:{part:'lora-rfm95w-1',pin:'RESET'},to:{part:'board',pin:'GPIO14'},func:'signal',color:'green',label:'W3 · GPIO14 → RESET (LoRa)',lengthM:0.1,awg:26,cable:'dupont',connectors:{from:'header',to:'header'},viaGland:false},
    ],
    power:{source:'usb',supplyV:5,budget:{avgMa:60,peakMa:140,dailyWh:7.2},ok:true},
    enclosure:{ip:'IP65',mount:'pole',sizeMm:{w:120,h:80,d:55},glands:2},
@@ -83,7 +83,7 @@ export const DEVICE_SPEC_EXAMPLE={
  fields:[],
  nodes:[
   {id:'device',role:'device',board:'esp32-devkitc',
-   parts:[{id:'oled-ssd1306-1',kind:'oled-ssd1306',role:'display',qty:1,purpose:bi('Shows the speed','Menampilkan kecepatan'),mount:'enclosure'}],
+   parts:[{id:'oled-ssd1306-1',kind:'ssd1306',role:'display',qty:1,purpose:bi('Shows the speed','Menampilkan kecepatan'),mount:'enclosure'}],
    pins:[
     {boardPin:'GPIO21',gpio:21,func:'i2c-sda',part:'oled-ssd1306-1',partPin:'SDA',symbol:'PIN_SDA'},
     {boardPin:'GPIO22',gpio:22,func:'i2c-scl',part:'oled-ssd1306-1',partPin:'SCL',symbol:'PIN_SCL'},

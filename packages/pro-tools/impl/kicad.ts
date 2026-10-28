@@ -12,6 +12,25 @@ export type ExportKicadOutput={ok:boolean;files:{name:string;bytes:number;sha256
 type Row={ox:number;oy:number;pitch:number;pins:string[]};
 type Mod={ref:string;label:string;w:number;h:number;rows:Row[];holes:{x:number;y:number;d:number}[];x:number;y:number};
 const MARGIN=5,GAP=2,COURT=0.25,PITCH=2.54,MAX_ROW_W=110;
+/**
+ * Dev-board headers for boards that are not catalog parts (published pinouts, not yet measured by staff): ESP32-DevKitC V4 (2x19, rows 25.4 mm apart),
+ * Raspberry Pi Pico W (2x20, 17.78 mm), Arduino Nano (2x15, 15.24 mm). Rows run along x; names match the board profile and rails.
+ */
+type BoardFp={w:number;h:number;rowGap:number;top:string[];bottom:string[]};
+const g=(...n:number[])=>n.map(x=>`GPIO${x}`),gp=(...n:number[])=>n.map(x=>`GP${x}`);
+const BOARD_FP:Record<string,BoardFp>={
+ 'esp32-devkitc':{w:54.4,h:27.9,rowGap:25.4,
+  top:['3V3','EN',...g(36,39,34,35,32,33,25,26,27,14,12),'GND',...g(13,9,10,11),'5V'],
+  bottom:['GND',...g(23,22,1,3,21),'GND',...g(19,18,5,17,16,4,0,2,15,8,7,6)]},
+ 'pico-w':{w:51,h:21,rowGap:17.78,
+  top:[...gp(0,1),'GND',...gp(2,3,4,5),'GND',...gp(6,7,8,9),'GND',...gp(10,11,12,13),'GND',...gp(14,15)],
+  bottom:['VBUS','VSYS','GND','3V3_EN','3V3','ADC_VREF','GP28','AGND',...gp(27,26),'RUN',...gp(22),'GND',...gp(21,20,19,18),'GND',...gp(17,16)]},
+ 'nano':{w:43.2,h:18.5,rowGap:15.24,
+  top:['D1','D0','RST','GND','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','D12'],
+  bottom:['VIN','GND','RST','5V','A7','A6','A5','A4','A3','A2','A1','A0','AREF','3V3','D13']},
+};
+const boardFootprint=(board:string)=>{const b=BOARD_FP[board];if(!b)return undefined;const ox=(b.w-(b.top.length-1)*PITCH)/2,oy=(b.h-b.rowGap)/2;
+ return {outlineMm:{w:b.w,h:b.h},rows:[{origin:{x:ox,y:oy},pitch:PITCH,pins:b.top},{origin:{x:ox,y:oy+b.rowGap},pitch:PITCH,pins:b.bottom}],holes:[] as {x:number;y:number;d:number}[]};};
 const sha=(b:Uint8Array|string)=>createHash('sha256').update(b).digest('hex');
 const uuid=(s:string)=>{const h=createHash('sha1').update(s).digest('hex');return `${h.slice(0,8)}-${h.slice(8,12)}-5${h.slice(13,16)}-a${h.slice(17,20)}-${h.slice(20,32)}`;};
 const n=(v:number)=>String(+v.toFixed(4));
@@ -58,7 +77,7 @@ export function exportKicad(input:ExportKicadInput,deps:{spec:SystemSpec;lookup:
  // 2. modules
  const mods:Mod[]=[];
  const mk=(ref:string,partId:string,label:string)=>{
-  const rec=deps.lookup(partId),fp=rec?.footprint?.v;
+  const rec=deps.lookup(partId),fp=rec?.footprint?.v??(ref==='board'?boardFootprint(partId):undefined);
   if(fp){
    const rows=fp.rows.map(r=>({ox:r.origin.x,oy:r.origin.y,pitch:r.pitch,pins:r.pins}));
    const have=new Set(rows.flatMap(r=>r.pins));
