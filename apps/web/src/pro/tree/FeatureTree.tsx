@@ -53,7 +53,7 @@ export function FeatureTree(){
   const out:ReactNode[]=[];
   const match=(...s:(string|undefined)[])=>!q||s.some(x=>x?.toLowerCase().includes(q));
   const sel=(kind:string,id:string)=>selection?.kind===kind&&selection.id===id;
-  out.push(<Row key="site" depth={0} icon="site" label={spec.site.name} meta={`${(spec.fields.reduce((a,f)=>a+f.areaM2,0)/10000).toFixed(1)} ha`} selected={selection?.kind==='site'} open={open('site')} onToggleOpen={()=>toggle('site')} onSelect={()=>select({kind:'site',id:'site'})}/>);
+  out.push(<Row key="site" depth={0} icon="site" label={spec.site.name} meta={spec.site.kind==='device'?'device':`${(spec.fields.reduce((a,f)=>a+f.areaM2,0)/10000).toFixed(1)} ha`} selected={selection?.kind==='site'} open={open('site')} onToggleOpen={()=>toggle('site')} onSelect={()=>select({kind:'site',id:'site'})}/>);
   if(!open('site')&&!q)return out;
   const nodeRows=(nodeId:string,depth:number)=>{
    const node=spec.nodes.find(n=>n.id===nodeId);if(!node)return;
@@ -75,6 +75,7 @@ export function FeatureTree(){
   };
   const gw=spec.nodes.find(n=>n.role==='gateway');
   if(gw)nodeRows(gw.id,1);
+  spec.nodes.filter(n=>n.role==='device'||(!n.fieldId&&n.role==='repeater')).forEach(n=>nodeRows(n.id,1)); // single-device mode: the node sits under the root
   spec.fields.forEach(f=>{
    const nodes=spec.nodes.filter(n=>n.fieldId===f.id);
    if(q&&!match(f.name,f.crop,refs.fields[f.id])&&!nodes.some(n=>match(n.id)||n.parts.some(p=>match(p.kind,p.purpose.en,p.id))))return;

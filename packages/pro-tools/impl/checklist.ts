@@ -48,7 +48,8 @@ export function buildChecklist(spec:ChecklistSpec):ChecklistItem[]{
   if(n.role==='gateway'){
    add('install',['gateway-mast',n.id],bi('Mount the gateway antenna on a 6-10 m mast, outside any metal structure','Pasang antena gateway di tiang 6-10 m, di luar struktur logam'),{nodeId:n.id});
    add('install',['gateway-earth',n.id],bi('Bond the mast earth electrode (5 ohm target) and fit the N-type coax arrester','Sambungkan elektroda grounding tiang (target 5 ohm) dan pasang arrester koaks tipe N'),{nodeId:n.id});
-  }else add('install',[n.fieldId??n.id,n.id],bi(`Mount ${n.id} on its ${n.enclosure.mount} with a sun shield`,`Pasang ${n.id} di ${n.enclosure.mount} dengan pelindung matahari`),{nodeId:n.id,...(n.fieldId?{fieldId:n.fieldId}:{})});
+  }else if(n.role==='device')add('install',['device-mount',n.id],bi(`Mount ${n.id} securely and fuse its 12 V feed`,`Pasang ${n.id} dengan kokoh dan beri sekring pada suplai 12 V`),{nodeId:n.id});
+  else add('install',[n.fieldId??n.id,n.id],bi(`Mount ${n.id} on its ${n.enclosure.mount} with a sun shield`,`Pasang ${n.id} di ${n.enclosure.mount} dengan pelindung matahari`),{nodeId:n.id,...(n.fieldId?{fieldId:n.fieldId}:{})});
  }
  // calibrate
  for(const n of spec.nodes)for(const p of n.parts)if(/soil|moisture/.test(p.kind))

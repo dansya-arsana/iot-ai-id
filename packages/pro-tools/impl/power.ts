@@ -52,7 +52,7 @@ export function solvePower(input:PowerInput,lookup:PartLookup):PowerOutput{
  return {avgMa:r2(avg),peakMa:r2(peak),whPerDay:r2(whPerDay),batteryWh:batteryWh===null?null:r2(batteryWh),panelW:panelW===null?null:r2(panelW),controller,issues:issues.slice(0,100)};
 }
 
-const SOURCE_MAP={'solar-battery':'solar','battery':'battery','mains':'mains','usb':'mains'} as const;
+const SOURCE_MAP={'solar-battery':'solar','battery':'battery','mains':'mains','usb':'mains','vehicle-12v':'mains'} as const; // vehicle 12 V: continuous supply while the engine runs
 /** Gate adapter: compare the stored design of a node with what the method requires. Issues only. */
 export function checkNodePower(node:ProNode,spec:Pick<SystemSpec,'site'>,lookup:PartLookup):ToolIssue[]{
  const loads=[{partId:node.board},...node.parts.flatMap(p=>Array.from({length:p.qty},()=>({partId:p.kind})))];

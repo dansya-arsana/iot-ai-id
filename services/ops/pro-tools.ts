@@ -43,6 +43,8 @@ export interface ProToolDeps{
  /** Footprint cache directory for fetch_footprint. */
  footprintCacheDir?:string;
  store?:ProToolStore;
+ /** create_project: Pro.createProject behind the per-subject project cap; throws when the cap is reached. */
+ createProject?:(subject:string,name:string)=>{id:string};
  verifiers?:GateVerifiers;
  /** D1/D2 derivation on the patched doc: W-numbers, checklist ids, BOM totals, checks. Runs before schema validation and the gate. */
  derive?:(doc:Record<string,unknown>,ctx:ToolCtx)=>Record<string,unknown>|Promise<Record<string,unknown>>;
@@ -52,7 +54,7 @@ export interface ProToolDeps{
 export type Limit={max:number;windowMs:number};
 /** Per tool and subject. Pure tools are cheap; sandbox and write tools are tight. */
 export const DEFAULT_LIMITS:Record<string,Limit>={
- compile_code:{max:20,windowMs:600_000},save_revision:{max:30,windowMs:600_000},catalog_propose:{max:10,windowMs:3_600_000},render:{max:60,windowMs:600_000},
+ compile_code:{max:20,windowMs:600_000},save_revision:{max:30,windowMs:600_000},catalog_propose:{max:10,windowMs:3_600_000},render:{max:60,windowMs:600_000},create_project:{max:10,windowMs:600_000},
  default:{max:400,windowMs:600_000},
 };
 export const MAX_OUTPUT_BYTES=100_000;
@@ -112,6 +114,10 @@ export class ProToolDispatcher{
   if(name==='get_spec_schema')return getSpecSchema as Impl;
   if(name==='live_part_lookup')return ((i:Parameters<typeof liveLookup>[0])=>liveLookup(i,process.env).then(r=>({...r,items:r.items.map(x=>({...x,description:{untrusted:x.description}}))}))) as unknown as Impl;
   if(name==='fetch_footprint')return ((i:Parameters<typeof fetchFootprint>[0])=>fetchFootprint(i,{cacheDir:this.deps.footprintCacheDir??'.data/footprints-cache'})) as unknown as Impl;
+  if(name==='create_project'&&this.deps.createProject){
+   const cp=this.deps.createProject;
+   return ((i:{name:string},c:ToolCtx)=>{const p=cp(c.subject,i.name);return{projectId:p.id,workspaceUrl:'/pro/'+p.id};}) as unknown as Impl;
+  }
   if(name==='export_kicad'&&this.deps.lookup&&this.deps.store){
    const lookup=this.deps.lookup,store=this.deps.store;
    return ((i:{projectId:string;revision?:number;nodeId:string})=>{const r=i.revision?store.revision(i.projectId,i.revision):store.head(i.projectId);if(!r||r.draft)throw new Error('revision not found');return exportKicad(i,{spec:r.spec as SystemSpec,lookup});}) as unknown as Impl;

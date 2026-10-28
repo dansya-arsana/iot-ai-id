@@ -4,7 +4,7 @@ import type {SystemSpec} from '../../../../../packages/pro-contract/system-spec'
 export const MARGIN_TARGET_DB=18;
 export type Pt={x:number;y:number};
 export type PlanField={id:string;name:string;crop:string;letter:string;areaM2:number;label:string;x:number;y:number;w:number;h:number;px:Pt[];nodeId?:string};
-export type PlanNode={id:string;tag:string;role:'field'|'gateway'|'repeater';fieldId?:string;at:Pt;warn:boolean};
+export type PlanNode={id:string;tag:string;role:'field'|'gateway'|'repeater'|'device';fieldId?:string;at:Pt;warn:boolean};
 export type PlanLink={id:string;tag:string;from:string;to:string;medium:string;distanceM:number;marginDb?:number;low:boolean;a:Pt;b:Pt;mid:Pt;angleDeg:number;text:string};
 export type SitePlanLayout={view:{minX:number;minY:number;w:number;h:number};scale:number;fields:PlanField[];nodes:PlanNode[];links:PlanLink[];gateway:Pt;gridM:number;bar:{m:number;len:number}};
 
@@ -18,7 +18,7 @@ const pillText=(tag:string,d:number,m:number|undefined,medium:string)=>{
 };
 
 export function layoutSitePlan(spec:Pick<SystemSpec,'site'|'fields'|'nodes'|'links'|'checks'>,opts:{width?:number}={}):SitePlanLayout{
- const {widthM,heightM}=spec.site.plan;
+ const {widthM,heightM}=spec.site.plan??{widthM:1,heightM:1}; // a device has no plan; the site plan is not shown for it
  const pad=Math.max(widthM,heightM)*0.04;
  const view={minX:-widthM/2-pad,minY:-heightM/2-pad,w:widthM+2*pad,h:heightM+2*pad};
  const scale=(opts.width??1000)/view.w;
@@ -38,7 +38,7 @@ export function layoutSitePlan(spec:Pick<SystemSpec,'site'|'fields'|'nodes'|'lin
  const nodes:PlanNode[]=spec.nodes.map(n=>{
   const f=n.fieldId?byField.get(n.fieldId):undefined;
   const at=n.role==='gateway'?{x:0,y:0}:f?{x:f.x+f.w/2,y:f.y+f.h/2}:{x:0,y:0};
-  const tag=n.role==='gateway'?'GW':n.role==='repeater'?`R${++rn}`:`N${++fn}`;
+  const tag=n.role==='gateway'?'GW':n.role==='repeater'?`R${++rn}`:n.role==='device'?'DV':`N${++fn}`;
   return {id:n.id,tag,role:n.role,fieldId:n.fieldId,at,warn:warnNodes.has(n.id)};
  });
  const byNode=new Map(nodes.map(n=>[n.id,n]));

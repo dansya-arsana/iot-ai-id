@@ -5,6 +5,7 @@ import {parseRoles} from '../../packages/ops-contract/index.js';
 import {Ops,OpsStore} from './ops.js';
 import {installPro} from './pro-wiring.js';
 import {opsPath,bodyLimit,pipeOpsStream} from './transport.js';
+import {handleMcp} from './mcp-remote.js';
 
 const port=Number(process.env.OPS_PORT??8791),host=process.env.OPS_HOST??'127.0.0.1';
 const token=process.env.OPS_OWNER_TOKEN??'';
@@ -18,6 +19,7 @@ createServer(async(req,res)=>{
  try{
   const {path,routed}=opsPath(req.url);
   if(path==='/health'&&req.method==='GET'){send(200,{status:'ok',admin:token?'enabled':'disabled'});return;}
+  if(path==='/mcp'){await handleMcp(ops,req,res);return;}// Remote MCP (claude-connector C1): own auth (personal access token) and a 2 MB body cap.
   const admin=path.startsWith('/ops/v1/admin/');
   if(admin&&!bearer(req.headers.authorization)){send(token?401:503,{error:token?'Admin authorization required':'Admin routes are disabled: OPS_OWNER_TOKEN is not set'});return;}
   let text='';for await(const chunk of req){text+=chunk;if(text.length>bodyLimit(path)){send(413,{error:'Request too large'});return;}}

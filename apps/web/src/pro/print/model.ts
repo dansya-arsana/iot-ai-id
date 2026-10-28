@@ -148,6 +148,8 @@ export const nodeIsSmall=(n:ProNode)=>n.pins.length<=SMALL.pins&&n.wires.length<
 export const SMALL={pins:8,wires:10,rules:2,parts:8} as const;
 export const nodePageCount=(n:ProNode)=>nodeIsSmall(n)?1:2+Math.max(Math.ceil(Math.max(0,n.pins.length-PIN_P2)/TABLE_CONT),Math.ceil(Math.max(0,n.wires.length-CABLE_P2)/TABLE_CONT));
 
+/** Single-device mode (C2): the cover shows the device, not a site plan. */
+export const showsSitePlan=(spec:Pick<SystemSpec,'site'>)=>spec.site.kind!=='device';
 /** Up to this many nodes the schedule sits on the cover; more get their own sheet(s). */
 export const SCHEDULE_ON_COVER=5,SCHEDULE_PER_PAGE=14;
 export function planPages(spec:SystemSpec,refs?:DisplayRefs):PageDesc[]{

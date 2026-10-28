@@ -7,6 +7,7 @@ import {AREAS,InstallerButton,useAccess} from '../preview';
 import {PageShell} from '../site-shell';
 import {Button,Card,CardLink,Eyebrow,Input,LinkButton,Spinner,Tag} from '../ui';
 import {OpsError,memberAuth} from '../ops-client';
+import {ClaudeConnectorCard} from './claude-connector-card';
 import './admin-landing.css';
 import './member-pages.css';
 
@@ -108,5 +109,6 @@ export function Profile(){
     ?<Card as="div" className="mp-card-area" data-testid="installer-card"><p>{tr('The workspace (Build, Sites) runs in the desktop app, next to your boards and files. Download it here.','Workspace (Build, Sites) berjalan di aplikasi desktop, di samping board dan berkas Anda. Unduh di sini.')}</p><div><InstallerButton/></div></Card>
     :<Card as="div" className="mp-card-area mp-card-locked" data-testid="installer-locked"><Tag>{tr('Invitation only','Khusus undangan')}</Tag><p>{tr('The desktop installer is not part of your account yet.','Installer desktop belum termasuk dalam akun Anda.')}</p><div><LinkButton to="/partner" size="sm" variant="secondary">{tr('Request access','Minta akses')}</LinkButton></div></Card>}
   </section>
+  {has('pro')&&<section className="mp-section" aria-labelledby="mp-claude"><Eyebrow rule>{tr('Claude connector','Konektor Claude')}</Eyebrow><h2 id="mp-claude" className="mp-h">{tr('Design from Claude','Merancang dari Claude')}</h2><ClaudeConnectorCard/></section>}
  </PageShell>;
 }

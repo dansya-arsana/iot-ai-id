@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {patFor,subjectGranted,PAT_PREFIX} from '../services/ops/pat.js';
+import {patHarness} from './ops-pat-harness.js';
+
+test('tokens: shown once, hashed, max 5, revoke, expiry; pro grant required',async()=>{
+ const h=await patHarness();
+ const m=await h.join('budi',['pro']);
+ const c=await h.member(m.session,'POST','pro/tokens',{name:'laptop-claude'});
+ assert.equal(c.status,201);assert.ok(c.data.value.startsWith(PAT_PREFIX));assert.equal(c.data.value.length,PAT_PREFIX.length+43);
+ const rows=h.ops.store.db.prepare('SELECT * FROM pro_pats').all() as Record<string,unknown>[];
+ assert.ok(!JSON.stringify(rows).includes(c.data.value),'value never stored');
+ const list=await h.member(m.session,'GET','pro/tokens');
+ assert.equal(list.data.tokens.length,1);assert.equal(list.data.tokens[0].value,undefined);assert.equal(list.data.tokens[0].expiresAt,'2027-01-26T00:00:00.000Z');
+ assert.equal(patFor(h.ops).verify(c.data.value)?.subject,'member:'+m.id);
+ assert.ok((await h.member(m.session,'GET','pro/tokens')).data.tokens[0].lastUsedAt);
+ for(let i=0;i<4;i++)assert.equal((await h.member(m.session,'POST','pro/tokens',{name:'t'+i})).status,201);
+ assert.equal((await h.member(m.session,'POST','pro/tokens',{name:'six'})).status,409);
+ assert.equal((await h.member(m.session,'DELETE','pro/tokens/'+c.data.token.id)).status,200);
+ assert.equal(patFor(h.ops).verify(c.data.value),undefined,'revoked');
+ assert.equal((await h.member(m.session,'POST','pro/tokens',{name:'again',days:1})).status,201);
+ const short=(await h.member(m.session,'GET','pro/tokens')).data.tokens[0];
+ h.clock.t+=2*86_400_000;
+ assert.ok(!patFor(h.ops).list('member:'+m.id).some(t=>t.id===short.id),'expired tokens drop off');
+ const other=await h.join('sari',['products']);
+ assert.equal((await h.member(other.session,'POST','pro/tokens',{name:'x'})).status,403);
+ assert.equal((await h.member(other.session,'DELETE','pro/tokens/'+short.id)).status,403);
+ assert.equal(subjectGranted(h.ops,'member:'+other.id),false);assert.equal(subjectGranted(h.ops,'member:'+m.id),true);
+ assert.equal(patFor(h.ops).verify('nope'),undefined);
+});

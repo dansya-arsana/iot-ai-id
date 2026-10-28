@@ -17,7 +17,7 @@ import {NodeWiring} from './NodeWiring';
 import {renderSnapshot,type Snapshot} from './snapshot';
 import {
  SCHEDULE_ON_COVER,CABLE_P2,CK_COLUMNS,PIN_P2,TABLE_CONT,cableList,checklistCounts,codeGate,collectUnverified,designators,docNo,nodeIsSmall,gateOf,idrK,idrM,isoDate,
- pinTable,planPages,powerGate,titleStatus,verifySummary,wirePointer,type Evidence,type Gate,type PageDesc
+ pinTable,planPages,showsSitePlan,powerGate,titleStatus,verifySummary,wirePointer,type Evidence,type Gate,type PageDesc
 } from './model';
 import './print.css';
 
@@ -76,15 +76,18 @@ function Cover({ctx,n}:{ctx:Ctx;n:number}){
   <div>Checks: {sev.error} errors · {sev.warning} warnings · {sev.info} notes</div>
   <div>Run on hardware: no evidence</div>
  </>;
- return <Page ctx={ctx} n={n} section="SITE AND SYSTEM" title={spec.site.name} scale="NTS" box={box}>
+ const site=showsSitePlan(spec),dev=spec.nodes[0];
+ return <Page ctx={ctx} n={n} section={site?'SITE AND SYSTEM':'DEVICE'} title={spec.site.name} scale="NTS" box={box}>
   <div className="bs-row2">
    <div className="bs-card"><div className="bs-cap">SUMMARY</div><p className="bs-lead">{spec.summary.en}</p>
-    <p className="bs-small">{spec.fields.length} fields · {fmtArea(totalHa)} · {spec.nodes.filter(x=>x.role!=='gateway').length} nodes{gw?' · 1 gateway':''} · {spec.links.length} links</p></div>
-   <div className="bs-card"><div className="bs-cap">SITE</div>
-    <dl className="bs-dl"><dt>Region</dt><dd>{spec.site.regionId??'not set'}</dd><dt>Grid power</dt><dd>{spec.site.gridPower}</dd><dt>Internet</dt><dd>{spec.site.internet}</dd><dt>Stress</dt><dd>{spec.site.stress.join(', ')||'none noted'}</dd><dt>Peak sun</dt><dd>{spec.site.peakSunHours} h/day</dd></dl></div>
+    {site?<p className="bs-small">{spec.fields.length} fields · {fmtArea(totalHa)} · {spec.nodes.filter(x=>x.role!=='gateway').length} nodes{gw?' · 1 gateway':''} · {spec.links.length} links</p>:<p className="bs-small">Single device · {dev?.board} · {dev?.parts.length??0} parts · power {dev?.power.source}</p>}</div>
+   {site?<div className="bs-card"><div className="bs-cap">SITE</div>
+    <dl className="bs-dl"><dt>Region</dt><dd>{spec.site.regionId??'not set'}</dd><dt>Grid power</dt><dd>{spec.site.gridPower??'not set'}</dd><dt>Internet</dt><dd>{spec.site.internet??'not set'}</dd><dt>Stress</dt><dd>{spec.site.stress?.join(', ')||'none noted'}</dd><dt>Peak sun</dt><dd>{spec.site.peakSunHours??'n/a'} h/day</dd></dl></div>
+   :<div className="bs-card"><div className="bs-cap">DEVICE</div>
+    <dl className="bs-dl"><dt>Board</dt><dd>{dev?.board??'not set'}</dd><dt>Power</dt><dd>{dev?.power.source??'not set'}</dd><dt>Parts</dt><dd>{dev?.parts.length??0}</dd><dt>Enclosure</dt><dd>{dev?`${dev.enclosure.ip} · ${dev.enclosure.sizeMm.w}×${dev.enclosure.sizeMm.h}×${dev.enclosure.sizeMm.d} mm`:'not set'}</dd>{spec.site.stress?.length?<><dt>Stress</dt><dd>{spec.site.stress.join(', ')}</dd></>:null}</dl></div>}
   </div>
-  <H note="sketched from the prompt, not surveyed · distances est.">SITE PLAN</H>
-  <div className="bs-site"><SitePlan spec={spec}/></div>
+  {site&&<><H note="sketched from the prompt, not surveyed · distances est.">SITE PLAN</H>
+  <div className="bs-site"><SitePlan spec={spec}/></div></>}
   <div className="bs-row2 bs-row2-wide">
    {spec.nodes.length<=SCHEDULE_ON_COVER?<div><H>NODE SCHEDULE</H><Schedule ctx={ctx} rows={[0,spec.nodes.length]}/></div>:<div><H>NODE SCHEDULE</H><p className="bs-small">{spec.nodes.length} nodes: see the schedule on the next sheet.</p></div>}
    <div><H>OPEN POINTS</H>{open?<div className="bs-warn"><b>{open.severity==='error'?'Error':'Warning'}{open.ref?` · ${open.ref}`:''}.</b> {open.en}</div>:<p className="bs-small">No open warnings or errors in the stored checks.</p>}
@@ -128,7 +131,7 @@ function NodePage({ctx,n,node,part}:{ctx:Ctx;n:number;node:ProNode;part:number})
  const wOk=node.wires.filter((_w,wi)=>gateOf(spec,wirePointer(ni,wi)).state==='verified').length;
  const pg=powerGate(spec,node);
  const nref=refs.nodes[node.id]??node.id;
- const title=`${nref} ${node.id}${f?` · Field ${refs.fields[f.id]}, ${f.crop}`:' · gateway'}`;
+ const title=`${nref} ${node.id}${f?` · Field ${refs.fields[f.id]}, ${f.crop}`:node.role==='device'?' · device':' · gateway'}`;
  const box=<>
   <b>{files[0]?`CODE · ${files.map(x=>x.c.filename).join(' + ')}`:'CODE · none on this node'}</b>
   {files.map(x=>{const g=codeGate(spec,x.i);return <div key={x.i}>{g.state==='verified'?'✓ compiled':'✕ not verified'} {x.c.verify.toolchain.split(' ').slice(0,2).join(' ')} · {x.c.verify.diagnostics.length} diagnostics</div>;})}

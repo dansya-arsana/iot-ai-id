@@ -41,9 +41,11 @@ export const CROPS=['mango','melon','banana','flowers','chili','tomato','rice','
 export const STRESS=['heat','flood','power','salt','haze','connectivity'] as const;
 /** Pro board profiles . Only esp32-devkitc and rpi-4b are needed for the farm slice. */
 export const PRO_BOARDS=['esp32-devkitc','esp32-s3-devkitc','pico-w','rpi-4b','rpi-5','uno','nano'] as const;
-export const NODE_ROLES=['field','gateway','repeater'] as const;
+export const NODE_ROLES=['field','gateway','repeater','device'] as const;
+/** 'site': fields + gateway + links (default). 'device': one self-contained product (vehicle, robot, bench tool), C2. */
+export const SITE_KINDS=['site','device'] as const;
 export const PART_ROLES=['sensor','actuator','radio','power','display','interface','protection'] as const;
-export const POWER_SOURCES=['solar-battery','mains','battery','usb'] as const;
+export const POWER_SOURCES=['solar-battery','mains','battery','usb','vehicle-12v'] as const;
 export const IP_RATINGS=['IP54','IP65','IP66','IP67'] as const;
 export const MOUNTS=['pole','wall','stake','din'] as const;
 export const MEDIA=['lora','wifi','rs485','ethernet','cellular'] as const;
@@ -70,13 +72,17 @@ export const RuleSchema=z.object({
 // STORED SYSTEMSPEC (deterministic ids and stamps, model-authored content)
 // =====================================================================================
 export const SiteSchema=z.object({
+ kind:z.enum(SITE_KINDS).optional(),               // absent = 'site'
  name:txt(80),regionId:Slug.optional(),
  location:z.object({lat:z.number().min(-11).max(7),lon:z.number().min(94).max(142)}).strict().optional(), // rounded to 0.01
- gridPower:z.enum(['none','unreliable','reliable']),internet:z.enum(['none','cellular','wifi','fiber']),
- stress:z.array(z.enum(STRESS)).max(6),
- peakSunHours:z.number().min(1).max(8),           // plan D3: 3.5 default (wet-season, ESDM)
- plan:z.object({widthM:z.number().positive(),heightM:z.number().positive()}).strict(), // gateway at (0,0), centre of plan
+ // Site climate and plan: required for kind 'site' (checked in SystemSpecSchema), optional for a single device.
+ gridPower:z.enum(['none','unreliable','reliable']).optional(),internet:z.enum(['none','cellular','wifi','fiber']).optional(),
+ stress:z.array(z.enum(STRESS)).max(6).optional(),
+ peakSunHours:z.number().min(1).max(8).optional(),           // plan D3: 3.5 default (wet-season, ESDM)
+ plan:z.object({widthM:z.number().positive(),heightM:z.number().positive()}).strict().optional(), // gateway at (0,0), centre of plan
 }).strict();
+/** Site keys a 'site' spec must carry; a device may omit them. */
+export const SITE_REQUIRED=['gridPower','internet','stress','peakSunHours','plan'] as const;
 
 export const FieldSchema=z.object({
  id:Slug,name:txt(60),crop:z.enum(CROPS),areaM2:z.number().positive(),
@@ -233,8 +239,8 @@ export const MetaSchema=z.object({
 
 export const SystemSpecSchema=z.object({
  site:SiteSchema,
- fields:z.array(FieldSchema).min(1).max(PRO_LIMITS.fields),
- nodes:z.array(NodeSchema).min(2).max(PRO_LIMITS.nodes),
+ fields:z.array(FieldSchema).max(PRO_LIMITS.fields),
+ nodes:z.array(NodeSchema).min(1).max(PRO_LIMITS.nodes),
  links:z.array(LinkSchema).max(PRO_LIMITS.links),
  code:z.array(CodeFileSchema).max(PRO_LIMITS.nodes*PRO_LIMITS.filesPerNode),
  bom:z.object({lines:z.array(BomLineSchema).max(PRO_LIMITS.bomLines),totalIdr:IdrRangeSchema}).strict(),
@@ -250,7 +256,16 @@ export const SystemSpecSchema=z.object({
  uniq(s.fields.map(f=>f.id),'fields');uniq(s.nodes.map(n=>n.id),'nodes');uniq(s.links.map(l=>l.id),'links');
  uniq(s.code.map(c=>c.id),'code');uniq(s.checklist.map(c=>c.id),'checklist');uniq(s.tests.map(t=>t.id),'tests');uniq(s.bom.lines.map(b=>b.key),'bom');
  const fields=new Set(s.fields.map(f=>f.id)),nodes=new Map(s.nodes.map(n=>[n.id,n]));
- if(s.nodes.filter(n=>n.role==='gateway').length!==1)bad(['nodes'],'exactly one gateway is required');
+ if(!isDevice(s))for(const k of SITE_REQUIRED)if(s.site[k]===undefined)bad(['site',k],`site.${k} is required for a site (only a device may omit it)`);
+ if(isDevice(s)){
+  if(s.nodes.length!==1)bad(['nodes'],'a device spec has exactly one node');
+  if(s.nodes.some(n=>n.role!=='device'))bad(['nodes'],'a device spec node has role device');
+ }else{
+  if(s.fields.length<1)bad(['fields'],'at least one field is required (or set site.kind to device)');
+  if(s.nodes.length<2)bad(['nodes'],'at least two nodes are required (or set site.kind to device)');
+  if(s.nodes.filter(n=>n.role==='gateway').length!==1)bad(['nodes'],'exactly one gateway is required');
+  s.nodes.forEach((n,i)=>{if(n.role==='device')bad(['nodes',i,'role'],'role device needs site.kind device');});
+ }
  s.nodes.forEach((n,i)=>{
   if(n.role==='field'&&(!n.fieldId||!fields.has(n.fieldId)))bad(['nodes',i,'fieldId'],`node ${n.id} needs a known fieldId`);
   const parts=new Set(n.parts.map(p=>p.id));uniq(n.parts.map(p=>p.id),`nodes.${i}.parts`);uniq(n.wires.map(w=>w.id),`nodes.${i}.wires`);
@@ -264,6 +279,8 @@ export const SystemSpecSchema=z.object({
  s.checklist.forEach((c,i)=>{if(!c.id.startsWith(c.phase+':'))bad(['checklist',i],'checklist id must start with its phase');if(c.nodeId&&!nodes.has(c.nodeId))bad(['checklist',i],'unknown nodeId');});
 });
 export type SystemSpec=z.infer<typeof SystemSpecSchema>;
+/** True for single-device mode (site.kind 'device'). */
+export function isDevice(s:{site:{kind?:string}}):boolean{return s.site.kind==='device';}
 export type ProNode=z.infer<typeof NodeSchema>;
 export type ChecklistItem=z.infer<typeof ChecklistItemSchema>;
 

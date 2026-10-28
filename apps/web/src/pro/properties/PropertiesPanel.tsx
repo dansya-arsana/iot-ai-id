@@ -27,7 +27,7 @@ export function PropertiesPanel(){
   if(sel.kind==='site'){
    const s=spec.site;
    body=<><Head eyebrow="Site" title={s.name} sub={`${spec.fields.length} fields · ${spec.nodes.length} nodes`}/>
-    <Sec title="Conditions"><KV k="Grid power" v={s.gridPower}/><KV k="Internet" v={s.internet}/><KV k="Stress" v={s.stress.join(', ')||'none'}/><KV k="Peak sun hours" v={`${s.peakSunHours} h`}/><KV k="Plan" v={`${s.plan.widthM} × ${s.plan.heightM} m`}/></Sec>
+    <Sec title="Conditions"><KV k="Grid power" v={s.gridPower??'n/a'}/><KV k="Internet" v={s.internet??'n/a'}/><KV k="Stress" v={s.stress?.join(', ')||'none'}/><KV k="Peak sun hours" v={s.peakSunHours!==undefined?`${s.peakSunHours} h`:'n/a'}/><KV k="Plan" v={s.plan?`${s.plan.widthM} × ${s.plan.heightM} m`:'n/a'}/></Sec>
     <Sec title="Summary"><p className="pro-prose">{spec.summary.en}</p></Sec></>;
   }else if(sel.kind==='field'){
    const f=spec.fields.find(x=>x.id===sel.id);

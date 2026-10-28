@@ -11,6 +11,7 @@ import {ProCompiler,type ProTarget} from './pro-compile.js';
 import {proRunnerFromEnv} from './compile-http.js';
 import {catalogFor} from './catalog.js';
 import {kicadCheck} from './kicad-check.js';
+import {handlePat} from './pat.js';
 import {searchParts,verifiedShare,type PartRecord} from '../../packages/catalog/index.js';
 import {loadSkill,skillIndex} from '../../packages/pro-skills/index.js';
 import type {ProToolName} from '../../packages/pro-tools/registry.js';
@@ -180,7 +181,8 @@ export function installPro(ops:Ops,o:ProWiringOptions={}):Pro{
   insert:(p,r)=>proStore(pro).insert(p,r),propose:(s,i)=>proStore(pro).propose!(s,i),
  };
  const verifiers=o.verifiers??makeVerifiers(lookup,compiler);
- const dispatcher=o.dispatcher??new ProToolDispatcher({store,verifiers,derive:o.derive??makeDerive(lookup),clock:()=>ops.clock(),impls:{...makeImpls({lookup,parts,catalogVersion,compiler,store}),...o.impls}});
+ const createProject=(subject:string,name:string)=>{const max=o.maxProjectsPerSubject??200;if(pro.projects(subject).length>=max)throw new Error('project cap');return pro.createProject(subject,name);};
+ const dispatcher=o.dispatcher??new ProToolDispatcher({store,createProject,verifiers,derive:o.derive??makeDerive(lookup),clock:()=>ops.clock(),impls:{...makeImpls({lookup,parts,catalogVersion,compiler,store}),...o.impls}});
  pro=proFor(ops,{tools:host,skills:skillIndex,...o});
  wiring.set(pro,{dispatcher,catalogVersion});
  return pro;
@@ -189,6 +191,8 @@ export function installPro(ops:Ops,o:ProWiringOptions={}):Pro{
 /** Route entry for `/ops/v1/member/pro/*` with the production tools installed on first use. */
 export async function handleProInstalled(ops:Ops,call:Parameters<Pro['handle']>[0]):Promise<Awaited<ReturnType<Pro['handle']>>>{
  const pro=installPro(ops);
+ const t=/^\/ops\/v1\/member\/pro\/tokens(?:\/([^/]+))?$/.exec(call.path);
+ if(t){const who=pro.caller(call);if('status' in who)return who;return handlePat(ops,call,who.subject,t[1]?[t[1]]:[]);}
  const m=/^\/ops\/v1\/member\/pro\/projects\/([^/]+)\/export-kicad$/.exec(call.path);
  if(!m||call.method!=='POST')return pro.handle(call);
  const who=pro.caller(call);

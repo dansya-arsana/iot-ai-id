@@ -46,7 +46,7 @@ export function SitePlan({spec,selection=null,hover=null,onSelect,onHover,layers
    </defs>
    <rect width={W} height={H} className="sp-ground"/>
    <rect width={W} height={H} fill="url(#sp-grid)"/>
-   <rect x={X(-spec.site.plan.widthM/2)} y={Y(-spec.site.plan.heightM/2)} width={spec.site.plan.widthM*L.scale} height={spec.site.plan.heightM*L.scale} className="sp-boundary"/>
+   {spec.site.plan&&<rect x={X(-spec.site.plan.widthM/2)} y={Y(-spec.site.plan.heightM/2)} width={spec.site.plan.widthM*L.scale} height={spec.site.plan.heightM*L.scale} className="sp-boundary"/>}
    {lay.satellite&&<text x={W/2} y={H/2} className="sp-note" textAnchor="middle">{T('Satellite imagery needs a licence','Citra satelit butuh lisensi')}</text>}
    {lay.coverage&&hasWifi&&<g className="sp-coverage" aria-hidden="true"><circle cx={gwPx.x} cy={gwPx.y} r={Math.max(60,wifiMax*1.1)*L.scale}/><text x={gwPx.x+8} y={gwPx.y-Math.max(60,wifiMax*1.1)*L.scale+14}>{T('Wi-Fi AP reach (est.)','Jangkauan Wi-Fi AP (perk.)')}</text></g>}
 

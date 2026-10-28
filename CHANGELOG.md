@@ -11,6 +11,13 @@ Each release is a local annotated git tag (`v0.x.y`). Draft the next entry with 
 - The Arduino lab is invitation-only for now: new member grant `lab` gates `/lab`, `/lab/:lesson`, `/lab/parts` and `/lab/parts/:kind` on iot.ai.id. Staff presentation mode and localhost/desktop stay open. Nav, footer and the Learn card hide Lab links without access; lab pages are noindex shells, removed from the sitemap, llms.txt and llms-full.txt. `GET /ops/v1/member/lab/examples` now requires a member with `lab` or staff (needs a deploy-ops). Backoffice grant label "Arduino lab".
 
 ### Added
+- Claude connector, C1 and C2 of `docs/plans/claude-connector-plan.md`:
+  - Remote MCP at `/mcp` on ops (Streamable HTTP). It exposes the same Pro tools through the same dispatch (authz, schemas, rate limits, untrusted wrapping, save gate). `device_flash` and client tools are never exposed.
+  - Personal access tokens (`aiot_pat_…`) for members with the `pro` grant or staff: shown once, hash only, at most 5, 90-day expiry, revoke, and an audit log that records the token id, never its value. Members manage them in a Claude connector card on `/profile`.
+  - New tool `create_project`, available over MCP only. Links become absolute when `PUBLIC_ORIGIN` is set.
+  - The owner must add an nginx location `/mcp` with `proxy_buffering off`.
+  - OAuth for claude.ai custom connectors is still to come; the connector works from Claude Code and Claude Desktop today.
+- Pro single-device mode: `site.kind:'device'` with one `device` node, no fields, gateway or links, and power `vehicle-12v`. Site climate and plan are optional for a device and still required for a site. `get_spec_schema` returns a device example. The Build Sheet shows a DEVICE card instead of SITE, and `/pro` opens the 3D view for a device.
 - Pro "Brief → Field" plan (`docs/plans/brief-to-field-plan.md`), first build of phases P1–P5. Staff-only like the rest of Pro.
   - Board layer: optional `footprint` on PartRecord, derived for 21 catalog parts from the procedural lab models (`scripts/catalog-footprints.ts`, confidence `medium` until staff measure). New tool `export_kicad` and `POST /ops/v1/member/pro/projects/:id/export-kicad` write a KiCad 9 carrier-board project for one node (female headers per module, nets unrouted, deterministic zip). A Board dock tab shows a 2D top view and the download. Not yet opened in a real KiCad.
   - KiCad sidecar (`scripts/kicad-sidecar/`) for ERC, DRC and Gerber, with Freerouting behind a flag. It is off until `KICAD_SIDECAR_URL` is set; the owner adds it to `deploy/compose.yml` per its README. JLC-format BOM and CPL CSV (`packages/pro-tools/impl/fab.ts`), and "assemble and test at a Lab Mitra" prefill for `/partner`.

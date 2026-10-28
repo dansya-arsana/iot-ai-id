@@ -37,16 +37,17 @@ function Canvas({fixture}:{fixture:boolean}){
  },[]);
  const siteSel:SiteSelection=selection&&selection.kind!=='part'?{kind:selection.kind,id:selection.id}:null;
  if(!spec)return <div className="pro-canvas-empty"><span className="pro-muted">{getProState().error??'Loading the design…'}</span></div>;
+ const tv=spec.site.kind==='device'?'3d':tab;
  return <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
   <div role="tablist" className="pro-canvas-tabs">
-   {(['3d','site'] as const).map(t=><button key={t} type="button" role="tab" aria-selected={tab===t} data-testid={'pro-tab-'+t} className={tab===t?'is-active':''} onClick={()=>setTab(t)}>{t==='3d'?'3D assembly':'Site plan'}</button>)}
+   {(spec?.site.kind==='device'?['3d'] as const:['3d','site'] as const).map(t=><button key={t} type="button" role="tab" aria-selected={tv===t} data-testid={'pro-tab-'+t} className={tv===t?'is-active':''} onClick={()=>setTab(t)}>{t==='3d'?'3D assembly':'Site plan'}</button>)}
   </div>
   <div style={{flex:1,minHeight:0,position:'relative'}}>
-   {tab==='3d'&&node&&<CadViewport key={node.id} node={node} contextLabel={'N'+(ids.indexOf(node.id)+1)}
+   {tv==='3d'&&node&&<CadViewport key={node.id} node={node} contextLabel={'N'+(ids.indexOf(node.id)+1)}
     selectedId={selection?.kind==='part'&&selection.nodeId===node.id?selection.id:null}
     onSelect={id=>select(id?{kind:'part',id,nodeId:node.id}:{kind:'node',id:node.id})}
     visibility={visibility} onVisibilityChange={onVisibilityChange}/>}
-   {tab==='site'&&<SitePlan spec={spec} selection={siteSel} onSelect={s=>select(s)}/>}
+   {tab==='site'&&spec?.site.kind!=='device'&&<SitePlan spec={spec} selection={siteSel} onSelect={s=>select(s)}/>}
   </div>
   <span hidden data-testid="pro-mode">{fixture?'fixture':'live'}</span>
  </div>;

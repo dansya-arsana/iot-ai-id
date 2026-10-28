@@ -20,8 +20,8 @@ const WritableNode=NodeSchema.extend({wires:z.array(WritableWire).max(PRO_LIMITS
 const WritableCode=CodeFileSchema.omit({verify:true,configSha256:true,pinsReferenced:true}).extend({libraries:CodeFileSchema.shape.libraries.optional()});
 export const WritableSpecSchema=z.object({
  site:SiteSchema,
- fields:z.array(FieldSchema).min(1).max(PRO_LIMITS.fields),
- nodes:z.array(WritableNode).min(2).max(PRO_LIMITS.nodes),
+ fields:z.array(FieldSchema).max(PRO_LIMITS.fields),             // site: at least 1; device: may be empty
+ nodes:z.array(WritableNode).min(1).max(PRO_LIMITS.nodes),        // site: at least 2 (one gateway); device: exactly 1 (role device)
  links:z.array(LinkSchema).max(PRO_LIMITS.links),
  code:z.array(WritableCode).max(PRO_LIMITS.nodes*PRO_LIMITS.filesPerNode),
  summary:BiSchema,
@@ -77,9 +77,35 @@ export const SPEC_EXAMPLE={
  summary:bi('One melon field with a LoRa gateway.','Satu lahan melon dengan gateway LoRa.'),
 };
 
+/** Second valid example: single-device mode (site.kind 'device', C2). One node, no fields, no gateway, no links. */
+export const DEVICE_SPEC_EXAMPLE={
+ site:{kind:'device',name:'Car speed logger',gridPower:'none',internet:'cellular',stress:['heat']},
+ fields:[],
+ nodes:[
+  {id:'device',role:'device',board:'esp32-devkitc',
+   parts:[{id:'oled-ssd1306-1',kind:'oled-ssd1306',role:'display',qty:1,purpose:bi('Shows the speed','Menampilkan kecepatan'),mount:'enclosure'}],
+   pins:[
+    {boardPin:'GPIO21',gpio:21,func:'i2c-sda',part:'oled-ssd1306-1',partPin:'SDA',symbol:'PIN_SDA'},
+    {boardPin:'GPIO22',gpio:22,func:'i2c-scl',part:'oled-ssd1306-1',partPin:'SCL',symbol:'PIN_SCL'},
+   ],
+   wires:[
+    {id:'W1',from:{part:'oled-ssd1306-1',pin:'SDA'},to:{part:'board',pin:'GPIO21'},func:'bus',color:'blue',label:'W1 · GPIO21 → SDA (OLED)',lengthM:0.1,awg:26,cable:'dupont',connectors:{from:'header',to:'header'},viaGland:false},
+    {id:'W2',from:{part:'oled-ssd1306-1',pin:'SCL'},to:{part:'board',pin:'GPIO22'},func:'bus',color:'yellow',label:'W2 · GPIO22 → SCL (OLED)',lengthM:0.1,awg:26,cable:'dupont',connectors:{from:'header',to:'header'},viaGland:false},
+   ],
+   power:{source:'vehicle-12v',supplyV:12,budget:{avgMa:90,peakMa:240,dailyWh:2.2},ok:true},
+   enclosure:{ip:'IP54',mount:'wall',sizeMm:{w:90,h:60,d:30},glands:1},
+   rules:[],sampleEveryS:10,rationale:bi('One self-contained device in the car.','Satu perangkat mandiri di mobil.')},
+ ],
+ links:[],
+ code:[{id:'code-device-main-ino',nodeId:'device',board:'esp32-devkitc',language:'arduino-cpp',filename:'main.ino',content:'void setup(){Serial.begin(115200);}\nvoid loop(){}\n'}],
+ summary:bi('A single in-car device that shows speed.','Satu perangkat di mobil yang menampilkan kecepatan.'),
+};
+
 export interface SpecGuide{
  jsonSchema:Record<string,unknown>;
  example:unknown;
+ /** Set only with {device:true} until the registry output schema lists it (needs registry.ts change). */
+ deviceExample?:unknown;
  serverOwned:{patchPathsIgnored:readonly string[];rebuiltByServer:string[];serverFillsWhenOmitted:string[]};
  patterns:Record<string,string>;
  enums:Record<string,readonly string[]>;
@@ -87,10 +113,11 @@ export interface SpecGuide{
  notes:string[];
 }
 
-export function getSpecSchema():SpecGuide{
+export function getSpecSchema(opts:{device?:boolean}={}):SpecGuide{
  return{
   jsonSchema:compact(z.toJSONSchema(WritableSpecSchema,{io:'input',unrepresentable:'any'})) as Record<string,unknown>,
   example:SPEC_EXAMPLE,
+  ...(opts.device!==false?{deviceExample:DEVICE_SPEC_EXAMPLE}:{}),
   serverOwned:{
    patchPathsIgnored:SERVER_OWNED_PATHS,
    rebuiltByServer:['/verification','/meta','/checks','/checklist','/tests','/bom (lines and totalIdr, from nodes[].parts)'],
@@ -110,7 +137,8 @@ export function getSpecSchema():SpecGuide{
    'ids: fields and nodes use slugs (lowercase, digits, hyphen); a field node is node-<fieldId>; part ids are <kind>-<n>; rules are rule-1, rule-2, ...',
    'Set power as one whole object (replace /nodes/<i>/power); /power/budget and /power/ok alone are server-owned paths and are ignored. Fill budget from solve_power.',
    'Use catalog kinds that catalog_search returned; check pins with allocate_pins and validate_netlist before saving.',
-   'Exactly one node has role gateway. Every field needs a node with that fieldId. Wire and pin rows may reference only part ids of the same node (or "board").',
+   'Two modes. site (default): exactly one node has role gateway and every field needs a node with that fieldId. device (site.kind "device", for one product such as a vehicle, robot or bench tool): fields [], links [], exactly one node with role device (id "device", no fieldId), power.source may be vehicle-12v.',
+   'In both modes: Wire and pin rows may reference only part ids of the same node (or "board").',
   ],
  };
 }

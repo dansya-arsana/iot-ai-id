@@ -106,7 +106,7 @@ const evidence_status=defineTool({name:'evidence_status',description:'Checklist 
  deterministic:true,effect:'none',consent:'none',runsAt:'ops',access:'member',mcp:true});
 const get_spec_schema=defineTool({name:'get_spec_schema',description:'Return the SystemSpec shape you may write: compact JSON Schema, one minimal complete VALID example, server-owned paths, id patterns, enum values and length limits. Pure and deterministic. Call it before your first save_revision.',
  input:z.object({}).strict(),
- output:z.object({jsonSchema:z.record(z.string(),z.unknown()),example:z.unknown(),serverOwned:z.object({patchPathsIgnored:z.array(z.string()),rebuiltByServer:z.array(z.string()),serverFillsWhenOmitted:z.array(z.string())}).strict(),patterns:z.record(z.string(),z.string()),enums:z.record(z.string(),z.array(z.string())),limits:z.record(z.string(),z.number()),notes:z.array(z.string())}).strict(),
+ output:z.object({jsonSchema:z.record(z.string(),z.unknown()),example:z.unknown(),deviceExample:z.unknown().optional(),serverOwned:z.object({patchPathsIgnored:z.array(z.string()),rebuiltByServer:z.array(z.string()),serverFillsWhenOmitted:z.array(z.string())}).strict(),patterns:z.record(z.string(),z.string()),enums:z.record(z.string(),z.array(z.string())),limits:z.record(z.string(),z.number()),notes:z.array(z.string())}).strict(),
  deterministic:true,effect:'none',consent:'none',runsAt:'pure',access:'member',mcp:true});
 
 const export_kicad=defineTool({name:'export_kicad',description:'Write a KiCad 9 carrier-board project (female headers per module, nets unrouted) for one node of a saved revision. Returns the files (name, size, sha256) and a zip as base64.',
@@ -121,11 +121,15 @@ const fetch_footprint=defineTool({name:'fetch_footprint',description:'Fetch one 
  input:z.object({library:z.string().min(1).max(80).regex(/^[A-Za-z0-9_.+-]+$/),name:z.string().min(1).max(120).regex(/^[A-Za-z0-9_.+-]+$/)}).strict(),
  output:z.object({name:z.string().max(120),sha256:sha,sexpr:z.string().max(200_000),license:z.literal('CC-BY-SA-4.0 WITH KiCad-libraries-exception'),source:z.string().max(300)}).strict(),
  deterministic:true,effect:'none',consent:'none',runsAt:'ops',access:'member',mcp:true});
+const create_project=defineTool({name:'create_project',description:'Create a new empty Pro project for the signed-in member. Returns its id and the workspace link; then call get_spec_schema and save_revision with baseRevision 0.',
+ input:z.object({name:z.string().trim().min(1).max(80)}).strict(),
+ output:z.object({projectId:z.string().min(1).max(80),workspaceUrl:z.string().max(200)}).strict(),
+ deterministic:false,effect:'write',consent:'none',runsAt:'ops',access:'member',mcp:true});
 
 /** Fixed order (the Anthropic tools array is cache-sensitive; do not reorder). */
-export const PRO_TOOLS:readonly ToolDef[]=[catalog_search,catalog_get_part,check_compatibility,allocate_pins,validate_netlist,solve_power,estimate_link,site_climate,compile_code,price_bom,save_revision,get_revision,render,load_skill,catalog_propose,device_detect,device_flash,serial_read,telemetry_read,evidence_status,get_spec_schema,export_kicad,live_part_lookup,fetch_footprint];
+export const PRO_TOOLS:readonly ToolDef[]=[catalog_search,catalog_get_part,check_compatibility,allocate_pins,validate_netlist,solve_power,estimate_link,site_climate,compile_code,price_bom,save_revision,get_revision,render,load_skill,catalog_propose,device_detect,device_flash,serial_read,telemetry_read,evidence_status,get_spec_schema,export_kicad,live_part_lookup,fetch_footprint,create_project];
 export type ProToolName=
- 'catalog_search'|'catalog_get_part'|'check_compatibility'|'allocate_pins'|'validate_netlist'|'solve_power'|'estimate_link'|'site_climate'|'compile_code'|'price_bom'|'save_revision'|'get_revision'|'render'|'load_skill'|'catalog_propose'|'device_detect'|'device_flash'|'serial_read'|'telemetry_read'|'evidence_status'|'get_spec_schema'|'export_kicad'|'live_part_lookup'|'fetch_footprint';
+ 'catalog_search'|'catalog_get_part'|'check_compatibility'|'allocate_pins'|'validate_netlist'|'solve_power'|'estimate_link'|'site_climate'|'compile_code'|'price_bom'|'save_revision'|'get_revision'|'render'|'load_skill'|'catalog_propose'|'device_detect'|'device_flash'|'serial_read'|'telemetry_read'|'evidence_status'|'get_spec_schema'|'export_kicad'|'live_part_lookup'|'fetch_footprint'|'create_project';
 export const PRO_TOOL_NAMES=PRO_TOOLS.map(t=>t.name) as ProToolName[];
 export const getTool=(name:string):ToolDef|undefined=>PRO_TOOLS.find(t=>t.name===name);
 
@@ -136,6 +140,6 @@ export const inputJsonSchema=(t:ToolDef):Record<string,unknown>=>{
 };
 /** Anthropic `tools` param. Pass the names a turn allows (default all). Client tools are included only when `clientTools` lists them. */
 export const anthropicTools=(opts:{clientTools?:readonly string[]}={}):AnthropicTool[]=>
- PRO_TOOLS.filter(t=>t.runsAt!=='client'||(opts.clientTools??[]).includes(t.name)).map(t=>({name:t.name,description:t.description,input_schema:inputJsonSchema(t)}));
+ PRO_TOOLS.filter(t=>t.name!=='create_project').filter(t=>t.runsAt!=='client'||(opts.clientTools??[]).includes(t.name)).map(t=>({name:t.name,description:t.description,input_schema:inputJsonSchema(t)}));
 /** MCP-exposed tools. `local` tools are returned only when `local:true` (stdio bridge). device_flash never. */
 export const mcpTools=(opts:{local:boolean}):ToolDef[]=>PRO_TOOLS.filter(t=>t.mcp===true||(t.mcp==='local'&&opts.local));

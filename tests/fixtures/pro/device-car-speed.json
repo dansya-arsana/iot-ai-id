@@ -1,0 +1,166 @@
+{
+  "site": {
+    "kind": "device",
+    "name": "Car speed logger",
+    "gridPower": "none",
+    "internet": "cellular",
+    "stress": [
+      "heat"
+    ]
+  },
+  "fields": [],
+  "nodes": [
+    {
+      "id": "device",
+      "role": "device",
+      "board": "esp32-devkitc",
+      "parts": [
+        {
+          "id": "oled-ssd1306-1",
+          "kind": "oled-ssd1306",
+          "role": "display",
+          "qty": 1,
+          "purpose": {
+            "en": "Shows the speed",
+            "id": "Menampilkan kecepatan"
+          },
+          "mount": "enclosure"
+        }
+      ],
+      "pins": [
+        {
+          "boardPin": "GPIO21",
+          "gpio": 21,
+          "func": "i2c-sda",
+          "part": "oled-ssd1306-1",
+          "partPin": "SDA",
+          "symbol": "PIN_SDA"
+        },
+        {
+          "boardPin": "GPIO22",
+          "gpio": 22,
+          "func": "i2c-scl",
+          "part": "oled-ssd1306-1",
+          "partPin": "SCL",
+          "symbol": "PIN_SCL"
+        }
+      ],
+      "wires": [
+        {
+          "id": "W1",
+          "from": {
+            "part": "oled-ssd1306-1",
+            "pin": "SDA"
+          },
+          "to": {
+            "part": "board",
+            "pin": "GPIO21"
+          },
+          "func": "bus",
+          "color": "blue",
+          "label": "W1 · GPIO21 → SDA (OLED)",
+          "lengthM": 0.1,
+          "awg": 26,
+          "cable": "dupont",
+          "connectors": {
+            "from": "header",
+            "to": "header"
+          },
+          "viaGland": false
+        },
+        {
+          "id": "W2",
+          "from": {
+            "part": "oled-ssd1306-1",
+            "pin": "SCL"
+          },
+          "to": {
+            "part": "board",
+            "pin": "GPIO22"
+          },
+          "func": "bus",
+          "color": "yellow",
+          "label": "W2 · GPIO22 → SCL (OLED)",
+          "lengthM": 0.1,
+          "awg": 26,
+          "cable": "dupont",
+          "connectors": {
+            "from": "header",
+            "to": "header"
+          },
+          "viaGland": false
+        }
+      ],
+      "power": {
+        "source": "vehicle-12v",
+        "supplyV": 12,
+        "budget": {
+          "avgMa": 90,
+          "peakMa": 240,
+          "dailyWh": 2.2
+        },
+        "ok": true
+      },
+      "enclosure": {
+        "ip": "IP54",
+        "mount": "wall",
+        "sizeMm": {
+          "w": 90,
+          "h": 60,
+          "d": 30
+        },
+        "glands": 1
+      },
+      "rules": [],
+      "sampleEveryS": 10,
+      "rationale": {
+        "en": "One self-contained device in the car.",
+        "id": "Satu perangkat mandiri di mobil."
+      }
+    }
+  ],
+  "links": [],
+  "code": [
+    {
+      "id": "code-device-main-ino",
+      "nodeId": "device",
+      "board": "esp32-devkitc",
+      "language": "arduino-cpp",
+      "filename": "main.ino",
+      "content": "void setup(){Serial.begin(115200);}\nvoid loop(){}\n",
+      "configSha256": "3feab4561b76dde0c58b638c57507cca206523eb076f8e68dd6d22cd7570df53",
+      "pinsReferenced": [],
+      "libraries": [],
+      "verify": {
+        "status": "pending",
+        "toolchain": "pending",
+        "at": "2026-10-28T00:00:00.000Z",
+        "sha256": "3feab4561b76dde0c58b638c57507cca206523eb076f8e68dd6d22cd7570df53",
+        "diagnostics": []
+      }
+    }
+  ],
+  "bom": {
+    "lines": [],
+    "totalIdr": {
+      "min": 0,
+      "max": 0
+    }
+  },
+  "checks": [],
+  "checklist": [],
+  "tests": [],
+  "summary": {
+    "en": "A single in-car device that shows speed.",
+    "id": "Satu perangkat di mobil yang menampilkan kecepatan."
+  },
+  "verification": {},
+  "meta": {
+    "version": 1,
+    "generatedAt": "2026-10-28T00:00:00.000Z",
+    "lang": "en",
+    "provider": "fixture",
+    "model": "fixture",
+    "catalogVersion": "fixture"
+  }
+}

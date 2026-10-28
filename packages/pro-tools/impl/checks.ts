@@ -31,7 +31,7 @@ export function runChecks(spec:CheckSpec,lookup?:PartLookup):Check[]{
  const has=(n:CheckSpec['nodes'][number],re:RegExp)=>n.parts.some(p=>re.test(p.kind));
  let loraSeen=false,agroNote=false;
 
- if(spec.site.peakSunHours>4)push(ruleIssue('PWR-07'),{});
+ if((spec.site.peakSunHours??0)>4)push(ruleIssue('PWR-07'),{});
  for(const n of spec.nodes){
   const scope:Scope={nodeId:n.id,...(n.fieldId?{fieldId:n.fieldId}:{})};
   // RF module band
@@ -47,7 +47,7 @@ export function runChecks(spec:CheckSpec,lookup?:PartLookup):Check[]{
    if(/ds18b20|dht22/.test(p.kind)&&(p.cableM??0)>20)push(ruleIssue('SEN-11',p.id),scope);
   }
   if((n.power.source==='battery'||n.power.source==='solar-battery')&&/devkit|nodemcu/.test(n.board))push(ruleIssue('PWR-02',n.id),scope);
-  if(n.role!=='gateway'&&(IP_RANK[n.enclosure.ip]??0)<65)push(ruleIssue('ENC-01',n.id),scope);
+  if(n.role!=='gateway'&&n.role!=='device'&&(IP_RANK[n.enclosure.ip]??0)<65)push(ruleIssue('ENC-01',n.id),scope);
   // crop rules
   const f=n.fieldId?fields.get(n.fieldId):undefined;
   if(f){

@@ -10,3 +10,12 @@
 .mp-card-area .ds-tag{justify-self:start}
 .mp-card-locked{background:var(--ds-sunken)}
 .mp-card-locked .ds-button{justify-self:start}
+/* Claude connector card (cc-) */
+.cc-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ds-2);min-width:0}
+.cc-label{font-size:var(--ds-text-small);font-weight:600;color:var(--ds-ink-2)}
+.cc-code{font-family:var(--ds-font-mono,monospace);font-size:var(--ds-text-small);overflow-wrap:anywhere;min-width:0;flex:1 1 200px}
+.cc-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--ds-2);font-size:var(--ds-text-small)}
+.cc-fresh{display:grid;gap:var(--ds-2);padding:var(--ds-3);background:var(--ds-sunken)}
+.cc-cmd{display:block}
+.cc-note{font-size:var(--ds-text-small)}
+.cc-error{color:var(--ds-danger)}
