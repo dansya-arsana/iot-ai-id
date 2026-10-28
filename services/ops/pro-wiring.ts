@@ -10,6 +10,7 @@ import {ProToolDispatcher,type Impl,type ProToolStore,type StoredRevision,type T
 import {ProCompiler,type ProTarget} from './pro-compile.js';
 import {proRunnerFromEnv} from './compile-http.js';
 import {catalogFor} from './catalog.js';
+import {kicadCheck} from './kicad-check.js';
 import {searchParts,verifiedShare,type PartRecord} from '../../packages/catalog/index.js';
 import {loadSkill,skillIndex} from '../../packages/pro-skills/index.js';
 import type {ProToolName} from '../../packages/pro-tools/registry.js';
@@ -64,6 +65,7 @@ export function proStore(pro:Pro):ProToolStore{
   insert:(projectId,row)=>pro.insertRevision(projectId,row),
   propose:(subject,input)=>{
    const i=input as {partId?:string;newPart?:unknown;field:string;value:string|number|boolean;sourceUrl:string;note?:string};
+   if(i.newPart){const r=catalogFor(pro.ops).submitNewPart(subject,{newPart:i.newPart,sourceUrl:i.sourceUrl,note:i.note} as never);if(!r.ok)throw new Error(r.error);return{proposalId:r.id};}
    if(!i.partId||!i.field.startsWith('/'))throw new Error('proposal needs partId and a JSON pointer field');
    const r=catalogFor(pro.ops).submitProposal(subject,{partId:i.partId,ops:[{op:'replace',path:i.field.replace(/\/v$/,''),value:{v:i.value,p:{source:i.sourceUrl.slice(0,300),verifiedBy:'import',at:pro.now().toISOString().slice(0,10),confidence:'low'}}}],reason:(i.note??'proposed by the Pro agent').slice(0,600).padEnd(3,'.'),source:i.sourceUrl});
    if(!r.ok)throw new Error(r.error);
@@ -113,6 +115,7 @@ export function makeImpls(o:{lookup:PartLookup;parts:()=>PartRecord[];catalogVer
  return{
   catalog_search:(i:{q:string;kind?:string;protocol?:string;outdoor?:boolean;testedInLab?:boolean;limit:number})=>{
    const hits=searchParts(parts(),{q:i.q,kind:i.kind,protocol:i.protocol,outdoor:i.outdoor,labTested:i.testedInLab||undefined,limit:i.limit});
+   hits.sort((a,b)=>{const pa=lookup(a.id)!,pb=lookup(b.id)!;return (pb.labTested?1:0)-(pa.labTested?1:0)||verifiedShare(pb)-verifiedShare(pa);});
    return{items:hits.map(h=>{const p=lookup(h.id)!;return{id:h.id,name:h.name,kind:h.kind,summary:p.untrusted.summary.v.en,badges:badge(p)};}),catalogVersion};
   },
   catalog_get_part:(i:{id:string;fields?:string[]})=>{
@@ -184,4 +187,15 @@ export function installPro(ops:Ops,o:ProWiringOptions={}):Pro{
 }
 
 /** Route entry for `/ops/v1/member/pro/*` with the production tools installed on first use. */
-export const handleProInstalled=(ops:Ops,call:Parameters<Pro['handle']>[0])=>installPro(ops).handle(call);
+export async function handleProInstalled(ops:Ops,call:Parameters<Pro['handle']>[0]):Promise<Awaited<ReturnType<Pro['handle']>>>{
+ const pro=installPro(ops);
+ const m=/^\/ops\/v1\/member\/pro\/projects\/([^/]+)\/export-kicad$/.exec(call.path);
+ if(!m||call.method!=='POST')return pro.handle(call);
+ const who=pro.caller(call);
+ if('status' in who)return who;
+ const r=await callTool(pro,who.subject,'export_kicad',{...(call.body as object),projectId:m[1]});
+ if(!r.ok)return{status:r.error.status??400,data:{error:r.error.message}};
+ const out=r.output as {ok:boolean;zipBase64:string;issues:unknown[]};
+ const chk=out.ok&&out.zipBase64?await kicadCheck(Buffer.from(out.zipBase64,'base64')):undefined;
+ return{status:200,data:{...out,...(chk?{issues:[...out.issues,...(chk.status==='done'?chk.issues:[])],check:{status:chk.status,...(chk.status!=='done'?{reason:chk.reason}:{})}}:{})}};
+}

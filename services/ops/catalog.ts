@@ -12,7 +12,7 @@ import {randomUUID} from 'node:crypto';
 import {existsSync,readdirSync,readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {z} from 'zod';
-import {PartRecordSchema,PartSlug,ProvenanceSchema,verifiedShare,type PartRecord} from '../../packages/catalog/schema.js';
+import {PART_PIN_FUNCS,PartRecordSchema,PartSlug,ProvenanceSchema,verifiedShare,type PartRecord} from '../../packages/catalog/schema.js';
 import {applySpecPatch,PatchError,SpecPatchSchema,type SpecPatch} from '../../packages/pro-contract/patch.js';
 import type {LabTask} from '../../packages/ops-contract/index.js';
 import {cookieValue} from './http.js';
@@ -46,6 +46,9 @@ type ProposalRow={id:string;part_id:string;ops:string;reason:string;source:strin
 const staffPatch=z.object({ops:SpecPatchSchema,note:z.string().max(300).optional()}).strict();
 const labTestedBody=z.object({schoolId:z.string().min(1).max(64).optional(),taskId:z.string().min(1).max(64)}).strict();
 const proposeBody=z.object({partId:PartSlug,ops:SpecPatchSchema.max(20),reason:z.string().trim().min(3).max(600),source:z.string().trim().min(3).max(300)}).strict();
+const NewPartDraft=z.object({name:z.string().min(1).max(80),kind:PartSlug,mpn:z.string().min(1).max(60).optional(),manufacturer:z.string().min(1).max(60).optional(),pins:z.array(z.object({name:z.string().min(1).max(16),func:z.array(z.enum(PART_PIN_FUNCS)).min(1).max(6)}).strict()).max(80).optional(),supplyV:z.object({min:z.number().nonnegative(),max:z.number().positive()}).strict().optional(),sizeMm:z.object({w:z.number().positive(),h:z.number().positive(),d:z.number().positive()}).strict().optional()}).strict();
+export type NewPartDraft=z.infer<typeof NewPartDraft>;
+const slugOf=(n:string)=>('p-'+n.toLowerCase().replace(/[^a-z0-9]+/g,'-')).replace(/-+$/,'').slice(0,28).replace(/-+$/,'');
 const approveBody=z.object({note:z.string().max(300).optional(),confidence:z.enum(['high','medium','low']).optional()}).strict().default({});
 const rejectBody=z.object({note:z.string().max(300).optional()}).strict().default({});
 
@@ -63,7 +66,8 @@ export class Catalog{
   this.db.exec(`CREATE TABLE IF NOT EXISTS catalog_overlay(id INTEGER PRIMARY KEY AUTOINCREMENT,part_id TEXT NOT NULL,ops TEXT NOT NULL,by TEXT NOT NULL,at TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS catalog_overlay_part ON catalog_overlay(part_id,id);
 CREATE TABLE IF NOT EXISTS catalog_proposals(id TEXT PRIMARY KEY,part_id TEXT NOT NULL,ops TEXT NOT NULL,reason TEXT NOT NULL,source TEXT NOT NULL,status TEXT NOT NULL,by TEXT NOT NULL,at TEXT NOT NULL,decided_by TEXT,decided_at TEXT,note TEXT);
-CREATE INDEX IF NOT EXISTS catalog_proposals_status ON catalog_proposals(status,at);`);
+CREATE INDEX IF NOT EXISTS catalog_proposals_status ON catalog_proposals(status,at);
+CREATE TABLE IF NOT EXISTS catalog_new_parts(part_id TEXT PRIMARY KEY,record TEXT NOT NULL,by TEXT NOT NULL,at TEXT NOT NULL);`);
  }
  private now(){return this.ops.clock();}
  private overlayRows(partId?:string){return(partId?this.db.prepare('SELECT * FROM catalog_overlay WHERE part_id=? ORDER BY id').all(partId):this.db.prepare('SELECT * FROM catalog_overlay ORDER BY id').all())as unknown as OverlayRow[];}
@@ -79,7 +83,13 @@ CREATE INDEX IF NOT EXISTS catalog_proposals_status ON catalog_proposals(status,
  parts():{part:PartRecord;overlay:boolean}[]{
   const rows=this.overlayRows(),by=new Map<string,OverlayRow[]>();
   for(const r of rows)(by.get(r.part_id)??by.set(r.part_id,[]).get(r.part_id)!).push(r);
-  return this.deps.base().map(b=>({part:this.merged(b,by.get(b.identity.id)??[]),overlay:by.has(b.identity.id)}));
+  const base=this.deps.base(),ids=new Set(base.map(b=>b.identity.id));
+  // Parts that staff promoted from a new-part proposal live next to the base set; the overlay can still edit them.
+  const added:PartRecord[]=[];
+  for(const r of this.db.prepare('SELECT part_id,record FROM catalog_new_parts ORDER BY at,part_id').all()as {part_id:string;record:string}[]){
+   const v=PartRecordSchema.safeParse(JSON.parse(r.record));if(v.success&&!ids.has(v.data.identity.id))added.push(v.data);
+  }
+  return[...base,...added].map(b=>({part:this.merged(b,by.get(b.identity.id)??[]),overlay:by.has(b.identity.id)}));
  }
  part(id:string){return this.parts().find(p=>p.part.identity.id===id);}
 
@@ -127,6 +137,25 @@ CREATE INDEX IF NOT EXISTS catalog_proposals_status ON catalog_proposals(status,
   const id=randomUUID();
   this.db.prepare('INSERT INTO catalog_proposals(id,part_id,ops,reason,source,status,by,at) VALUES(?,?,?,?,?,?,?,?)').run(id,p.data.partId,JSON.stringify(p.data.ops),p.data.reason,p.data.source,'pending',subject,this.now().toISOString());
   return{ok:true,id};
+ }
+
+ /** A part the catalog does not have yet. Stored as a pending proposal (never in the catalog) with every leaf at confidence 'low'; missing facts get conservative placeholders staff must confirm. */
+ submitNewPart(subject:string,input:{newPart:unknown;sourceUrl:string;note?:string}):{ok:true;id:string;partId:string}|{ok:false;error:string}{
+  const d=NewPartDraft.safeParse(input.newPart);if(!d.success)return{ok:false,error:'Invalid new part: '+d.error.issues.map(i=>i.path.join('.')+' '+i.message).join('; ')};
+  const n=d.data,at=this.now().toISOString().slice(0,10),src=input.sourceUrl.slice(0,300);
+  const L=<T,>(v:T)=>({v,p:{source:src,verifiedBy:'import',at,confidence:'low'as const}});
+  let partId=slugOf(n.name);if(!PartSlug.safeParse(partId).success)return{ok:false,error:'Name cannot become a part id'};
+  const taken=new Set(this.parts().map(x=>x.part.identity.id));for(let i=2;taken.has(partId);i++)partId=slugOf(n.name).slice(0,26)+'-'+i;
+  const rec=PartRecordSchema.safeParse({schemaVersion:1,identity:{id:partId,name:L(n.name),kind:L(n.kind),...(n.manufacturer?{manufacturer:L(n.manufacturer)}:{}),...(n.mpn?{mpn:L(n.mpn)}:{})},
+   electrical:{supplyV:L(n.supplyV??{min:3,max:5.5}),currentMa:L({typ:0,peak:0})},pins:(n.pins??[]).map(p=>L(p)),protocols:{supported:L([])},
+   mechanical:{sizeMm:L(n.sizeMm??{w:10,h:10,d:5})},environment:{outdoor:L(false),tempC:L({min:0,max:50})},drivers:[],compatibleWith:L([]),model3d:{kind:L('procedural'),status:L('draft')},
+   untrusted:{summary:L({en:(input.note??n.name).slice(0,300),id:(input.note??n.name).slice(0,300)}),pitfalls:[]}});
+  if(!rec.success)return{ok:false,error:'The part is invalid: '+rec.error.issues.slice(0,3).map(i=>i.path.join('/')+' '+i.message).join('; ')};
+  const pending=(this.db.prepare("SELECT COUNT(*) n FROM catalog_proposals WHERE by=? AND status='pending'").get(subject)as {n:number}).n;
+  if(pending>=MAX_PENDING_PER_MEMBER)return{ok:false,error:'Too many proposals are waiting for review'};
+  const id=randomUUID();
+  this.db.prepare('INSERT INTO catalog_proposals(id,part_id,ops,reason,source,status,by,at) VALUES(?,?,?,?,?,?,?,?)').run(id,partId,JSON.stringify({newPart:rec.data}),(input.note??'new part proposed by the Pro agent').slice(0,600).padEnd(3,'.'),input.sourceUrl.slice(0,300).padEnd(3,'.'),'pending',subject,this.now().toISOString());
+  return{ok:true,id,partId};
  }
 
  async handle(call:OpsCall):Promise<OpsResult>{
@@ -217,6 +246,19 @@ CREATE INDEX IF NOT EXISTS catalog_proposals_status ON catalog_proposals(status,
     return{status:200,data:{status:'rejected'}};
    }
    const b=approveBody.safeParse(body);if(!b.success)return err(400,'Invalid body');
+   if(!Array.isArray(JSON.parse(row.ops))){
+    // New-part proposal: staff verify it, leaves are re-stamped, and it joins the catalog as an addition next to the base set.
+    const draft=(JSON.parse(row.ops)as {newPart:unknown}).newPart;
+    const conf=b.data.confidence??'low';
+    const stampAll=(x:unknown):unknown=>{if(!x||typeof x!=='object')return x;if(Array.isArray(x))return x.map(stampAll);const o=x as Record<string,unknown>;if('v' in o&&ProvenanceSchema.safeParse(o.p).success)return{...o,p:{source:row.source.slice(0,300),verifiedBy:'staff:'+who.id,at:at.slice(0,10),confidence:conf}};return Object.fromEntries(Object.entries(o).map(([k,v])=>[k,stampAll(v)]));};
+    const rec=PartRecordSchema.safeParse(stampAll(draft));if(!rec.success)return err(422,'The part is invalid');
+    if(this.part(row.part_id))return err(409,'A part with this id already exists');
+    this.ops.store.tx(()=>{
+     this.db.prepare('INSERT INTO catalog_new_parts(part_id,record,by,at) VALUES(?,?,?,?)').run(row.part_id,JSON.stringify(rec.data),who.subject,at);
+     this.db.prepare("UPDATE catalog_proposals SET status='approved',decided_by=?,decided_at=?,note=? WHERE id=?").run(who.subject,at,b.data.note??null,row.id);
+    });
+    return{status:200,data:{status:'approved',part:rec.data}};
+   }
    const hit=this.part(row.part_id);if(!hit)return err(404,'Part no longer exists');
    // Approved leaves are re-stamped: staff is the verifier, the proposal source is kept, confidence defaults to medium (never above what staff chose).
    const stamped=(JSON.parse(row.ops)as SpecPatch).map(o=>{

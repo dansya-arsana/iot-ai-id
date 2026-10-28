@@ -943,5 +943,85 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 62.74,
+    "h": 26.86
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "G_1",
+      "5V",
+      "GPIO14",
+      "GPIO13",
+      "GPIO12",
+      "GPIO11",
+      "GPIO10",
+      "GPIO9",
+      "GPIO46",
+      "GPIO3",
+      "GPIO8",
+      "GPIO18",
+      "GPIO17",
+      "GPIO16",
+      "GPIO15",
+      "GPIO7",
+      "GPIO6",
+      "GPIO5",
+      "GPIO4",
+      "RST",
+      "3V3_2",
+      "3V3_1"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 24.86
+     },
+     "pitch": 2.54,
+     "pins": [
+      "G_4",
+      "G_3",
+      "GPIO19",
+      "GPIO20",
+      "GPIO21",
+      "GPIO47",
+      "GPIO48",
+      "GPIO45",
+      "GPIO0",
+      "GPIO35",
+      "GPIO36",
+      "GPIO37",
+      "GPIO38",
+      "GPIO39",
+      "GPIO40",
+      "GPIO41",
+      "GPIO42",
+      "GPIO2",
+      "GPIO1",
+      "RX",
+      "TX",
+      "G_2"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/esp32-s3-devkitc.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

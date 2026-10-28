@@ -873,5 +873,81 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 85,
+    "h": 56
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "5V_2",
+      "5V_4",
+      "GND_6",
+      "GPIO14",
+      "GPIO15",
+      "GPIO18",
+      "GND_14",
+      "GPIO23",
+      "GPIO24",
+      "GND_20",
+      "GPIO25",
+      "GPIO8",
+      "GPIO7",
+      "GPIO1",
+      "GND_30",
+      "GPIO12",
+      "GND_34",
+      "GPIO16",
+      "GPIO20",
+      "GPIO21"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 4.54
+     },
+     "pitch": 2.54,
+     "pins": [
+      "3V3_1",
+      "GPIO2",
+      "GPIO3",
+      "GPIO4",
+      "GND_9",
+      "GPIO17",
+      "GPIO27",
+      "GPIO22",
+      "3V3_17",
+      "GPIO10",
+      "GPIO9",
+      "GPIO11",
+      "GND_25",
+      "GPIO0",
+      "GPIO5",
+      "GPIO6",
+      "GPIO13",
+      "GPIO19",
+      "GPIO26",
+      "GND_39"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/rpi-5.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

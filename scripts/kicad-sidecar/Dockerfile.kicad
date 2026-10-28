@@ -1,0 +1,10 @@
+# KiCad 9 sidecar: ERC/DRC/gerber over HTTP. Separate image; never linked into the app.
+FROM kicad/kicad:9.0
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends python3 default-jre-headless && rm -rf /var/lib/apt/lists/*
+COPY server.py /app/server.py
+# Optional Freerouting (GPL-3, run as a separate java process only). Mount the jar and set FREEROUTING_JAR + ENABLE_FREEROUTING=1.
+ENV PORT=8787 HOME=/tmp
+USER kicad
+EXPOSE 8787
+CMD ["python3","/app/server.py"]

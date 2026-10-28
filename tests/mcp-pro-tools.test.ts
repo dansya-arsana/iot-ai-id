@@ -4,10 +4,10 @@ import {registerProTools,proMcpToolList,runProTool,opsCaller} from '../services/
 import {getTool} from '../packages/pro-tools/registry.js';
 
 const fake=()=>{const reg:Record<string,any>={};return {reg,server:{registerTool:(n:string,c:any,cb:any)=>{reg[n]={c,cb};}}};};
-test('registers 17 tools, never device_flash or client tools',()=>{
+test('registers 20 tools, never device_flash or client tools',()=>{
  const {reg,server}=fake();
  const names=registerProTools(server,{ops:async()=>({})});
- assert.equal(names.length,17);assert.equal(proMcpToolList().length,17);
+ assert.equal(names.length,20);assert.equal(proMcpToolList().length,20);
  for(const n of ['device_flash','device_detect','serial_read','telemetry_read'])assert.equal(reg[n],undefined,n);
  assert.ok(reg.load_skill&&reg.save_revision);
 });

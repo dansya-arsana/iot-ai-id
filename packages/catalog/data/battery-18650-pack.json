@@ -227,5 +227,43 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 74,
+    "h": 20
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "P+"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 18
+     },
+     "pitch": 2.54,
+     "pins": [
+      "P-"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/battery-18650-pack.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

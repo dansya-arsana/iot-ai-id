@@ -252,5 +252,63 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 45,
+    "h": 75
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "VCC"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 4.4
+     },
+     "pitch": 2.54,
+     "pins": [
+      "GND"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 6.8
+     },
+     "pitch": 2.54,
+     "pins": [
+      "A"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 9.2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "B"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/soil-npk-rs485.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

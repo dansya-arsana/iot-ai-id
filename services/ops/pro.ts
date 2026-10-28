@@ -252,7 +252,7 @@ ON CONFLICT(turn_id) DO UPDATE SET model=excluded.model,input_tokens=excluded.in
   return undefined;
  }
  /** Signed-in caller with the `pro` grant (or staff). Writes also need the CSRF header the member and staff routes use. */
- private caller(call:OpsCall):ProWho|OpsResult{
+ caller(call:OpsCall):ProWho|OpsResult{
   const who=this.who(call);
   if(!who)return err(401,'Please sign in.');
   const mutating=call.method!=='GET'&&call.method!=='HEAD';

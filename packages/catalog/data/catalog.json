@@ -2862,6 +2862,44 @@
      "confidence": "medium"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 74,
+      "h": 20
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "P+"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 18
+       },
+       "pitch": 2.54,
+       "pins": [
+        "P-"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/battery-18650-pack.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -3449,6 +3487,35 @@
      "confidence": "medium"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 98,
+      "h": 95
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 90.6,
+       "pins": [
+        "P+",
+        "P-"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/battery-lifepo4-12v.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -3726,6 +3793,38 @@
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "low"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 18.5,
+      "h": 4
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "VCC",
+        "GND",
+        "SCL",
+        "SDA",
+        "ADDR"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/bh1750.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
     }
    },
    "model3d": {
@@ -6554,6 +6653,54 @@
      "confidence": "medium"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "terminal",
+     "outlineMm": {
+      "w": 82,
+      "h": 48
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 15.6,
+       "pins": [
+        "T1A",
+        "T2A",
+        "T3A",
+        "T4A",
+        "T5A",
+        "T6A"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 46
+       },
+       "pitch": 15.6,
+       "pins": [
+        "T1B",
+        "T2B",
+        "T3B",
+        "T4B",
+        "T5B",
+        "T6B"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/din-rail-terminals.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -7527,6 +7674,36 @@
      "confidence": "medium"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 9.08,
+      "h": 50
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "VDD",
+        "DQ",
+        "GND"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "derived from record.pins + mechanical.sizeMm as one 2.54 mm header row (no lab model); pin order is a placeholder until measured",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "low"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -7979,6 +8156,23 @@
     ],
     "p": {
      "source": "apps/web/src/lab/sim/devices/enclosure-ip65.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "board-edge",
+     "outlineMm": {
+      "w": 200,
+      "h": 75
+     },
+     "rows": [],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/enclosure-ip65.ts",
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "medium"
@@ -10091,6 +10285,86 @@
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "low"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 62.74,
+      "h": 26.86
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "G_1",
+        "5V",
+        "GPIO14",
+        "GPIO13",
+        "GPIO12",
+        "GPIO11",
+        "GPIO10",
+        "GPIO9",
+        "GPIO46",
+        "GPIO3",
+        "GPIO8",
+        "GPIO18",
+        "GPIO17",
+        "GPIO16",
+        "GPIO15",
+        "GPIO7",
+        "GPIO6",
+        "GPIO5",
+        "GPIO4",
+        "RST",
+        "3V3_2",
+        "3V3_1"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 24.86
+       },
+       "pitch": 2.54,
+       "pins": [
+        "G_4",
+        "G_3",
+        "GPIO19",
+        "GPIO20",
+        "GPIO21",
+        "GPIO47",
+        "GPIO48",
+        "GPIO45",
+        "GPIO0",
+        "GPIO35",
+        "GPIO36",
+        "GPIO37",
+        "GPIO38",
+        "GPIO39",
+        "GPIO40",
+        "GPIO41",
+        "GPIO42",
+        "GPIO2",
+        "GPIO1",
+        "RX",
+        "TX",
+        "G_2"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/esp32-s3-devkitc.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
     }
    },
    "model3d": {
@@ -16200,6 +16474,112 @@
      "confidence": "high"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 21,
+      "h": 18
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 17,
+       "pins": [
+        "GND",
+        "GND4"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 4
+       },
+       "pitch": 17,
+       "pins": [
+        "GND2",
+        "NSS"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 6
+       },
+       "pitch": 17,
+       "pins": [
+        "3V3",
+        "MOSI"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 8
+       },
+       "pitch": 17,
+       "pins": [
+        "RESET",
+        "MISO"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 10
+       },
+       "pitch": 17,
+       "pins": [
+        "DIO0",
+        "SCK"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 12
+       },
+       "pitch": 17,
+       "pins": [
+        "DIO1",
+        "DIO5"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 14
+       },
+       "pitch": 17,
+       "pins": [
+        "DIO2",
+        "DIO4"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 16
+       },
+       "pitch": 17,
+       "pins": [
+        "DIO3",
+        "GND3"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/lora-ra02.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -16702,6 +17082,112 @@
     ],
     "p": {
      "source": "docs/research/pro-parts-briefs.md",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 20,
+      "h": 18
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 16,
+       "pins": [
+        "GND",
+        "DIO2"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 4
+       },
+       "pitch": 16,
+       "pins": [
+        "MISO",
+        "DIO1"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 6
+       },
+       "pitch": 16,
+       "pins": [
+        "MOSI",
+        "DIO0"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 8
+       },
+       "pitch": 16,
+       "pins": [
+        "SCK",
+        "3V3"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 10
+       },
+       "pitch": 16,
+       "pins": [
+        "NSS",
+        "DIO4"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 12
+       },
+       "pitch": 16,
+       "pins": [
+        "RESET",
+        "DIO3"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 14
+       },
+       "pitch": 16,
+       "pins": [
+        "DIO5",
+        "GND3"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 16
+       },
+       "pitch": 16,
+       "pins": [
+        "GND2",
+        "ANT"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/lora-rfm95w.ts",
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "medium"
@@ -17452,6 +17938,61 @@
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "low"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 44.5,
+      "h": 14
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 26,
+        "y": 2
+       },
+       "pitch": 5,
+       "pins": [
+        "A_T",
+        "B_T"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 3.5
+       },
+       "pitch": 2.54,
+       "pins": [
+        "RO",
+        "RE",
+        "DE",
+        "DI"
+       ]
+      },
+      {
+       "origin": {
+        "x": 35,
+        "y": 8.7
+       },
+       "pitch": 2.5,
+       "pins": [
+        "VCC",
+        "B",
+        "A",
+        "GND"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/max485.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
     }
    },
    "model3d": {
@@ -21425,6 +21966,44 @@
      "confidence": "low"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 90,
+      "h": 35
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "-"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 8
+       },
+       "pitch": 2.54,
+       "pins": [
+        "+"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/pump-12v-r385.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -21649,6 +22228,44 @@
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "low"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 120,
+      "h": 90
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "GND"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 8
+       },
+       "pitch": 2.54,
+       "pins": [
+        "SIG"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/rain-gauge-tipping.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
     }
    },
    "model3d": {
@@ -25446,6 +26063,82 @@
      "confidence": "low"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 85,
+      "h": 56
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "5V_2",
+        "5V_4",
+        "GND_6",
+        "GPIO14",
+        "GPIO15",
+        "GPIO18",
+        "GND_14",
+        "GPIO23",
+        "GPIO24",
+        "GND_20",
+        "GPIO25",
+        "GPIO8",
+        "GPIO7",
+        "GPIO1",
+        "GND_30",
+        "GPIO12",
+        "GND_34",
+        "GPIO16",
+        "GPIO20",
+        "GPIO21"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 4.54
+       },
+       "pitch": 2.54,
+       "pins": [
+        "3V3_1",
+        "GPIO2",
+        "GPIO3",
+        "GPIO4",
+        "GND_9",
+        "GPIO17",
+        "GPIO27",
+        "GPIO22",
+        "3V3_17",
+        "GPIO10",
+        "GPIO9",
+        "GPIO11",
+        "GND_25",
+        "GPIO0",
+        "GPIO5",
+        "GPIO6",
+        "GPIO13",
+        "GPIO19",
+        "GPIO26",
+        "GND_39"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/rpi-4b.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -26323,6 +27016,82 @@
      "confidence": "low"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 85,
+      "h": 56
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "5V_2",
+        "5V_4",
+        "GND_6",
+        "GPIO14",
+        "GPIO15",
+        "GPIO18",
+        "GND_14",
+        "GPIO23",
+        "GPIO24",
+        "GND_20",
+        "GPIO25",
+        "GPIO8",
+        "GPIO7",
+        "GPIO1",
+        "GND_30",
+        "GPIO12",
+        "GND_34",
+        "GPIO16",
+        "GPIO20",
+        "GPIO21"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 4.54
+       },
+       "pitch": 2.54,
+       "pins": [
+        "3V3_1",
+        "GPIO2",
+        "GPIO3",
+        "GPIO4",
+        "GND_9",
+        "GPIO17",
+        "GPIO27",
+        "GPIO22",
+        "3V3_17",
+        "GPIO10",
+        "GPIO9",
+        "GPIO11",
+        "GND_25",
+        "GPIO0",
+        "GPIO5",
+        "GPIO6",
+        "GPIO13",
+        "GPIO19",
+        "GPIO26",
+        "GND_39"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/rpi-5.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -26739,6 +27508,110 @@
     ],
     "p": {
      "source": "docs/research/pro-parts-briefs.md",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 65,
+      "h": 56.5
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 5.08,
+       "pins": [
+        "5V_2",
+        "GND_6"
+       ]
+      },
+      {
+       "origin": {
+        "x": 9.62,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "GPIO14",
+        "GPIO15"
+       ]
+      },
+      {
+       "origin": {
+        "x": 19.78,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "GPIO23",
+        "GPIO24"
+       ]
+      },
+      {
+       "origin": {
+        "x": 27.4,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "GPIO25"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 4.54
+       },
+       "pitch": 7.62,
+       "pins": [
+        "3V3_1",
+        "GPIO4"
+       ]
+      },
+      {
+       "origin": {
+        "x": 14.7,
+        "y": 4.54
+       },
+       "pitch": 10.16,
+       "pins": [
+        "GPIO17",
+        "GPIO10"
+       ]
+      },
+      {
+       "origin": {
+        "x": 27.4,
+        "y": 4.54
+       },
+       "pitch": 2.54,
+       "pins": [
+        "GPIO9",
+        "GPIO11"
+       ]
+      },
+      {
+       "origin": {
+        "x": 54.63,
+        "y": 34.02
+       },
+       "pitch": 2.54,
+       "pins": [
+        "ANT"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/rpi-lora-hat.ts",
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "medium"
@@ -27724,6 +28597,112 @@
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "low"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 52.26,
+      "h": 21.78
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "GP0",
+        "GP1",
+        "GND_3",
+        "GP2",
+        "GP3",
+        "GP4",
+        "GP5",
+        "GND_8",
+        "GP6",
+        "GP7",
+        "GP8",
+        "GP9",
+        "GND_13",
+        "GP10",
+        "GP11",
+        "GP12",
+        "GP13",
+        "GND_18",
+        "GP14",
+        "GP15"
+       ]
+      },
+      {
+       "origin": {
+        "x": 48.63,
+        "y": 8.35
+       },
+       "pitch": 2.54,
+       "pins": [
+        "SWCLK"
+       ]
+      },
+      {
+       "origin": {
+        "x": 48.63,
+        "y": 10.89
+       },
+       "pitch": 2.54,
+       "pins": [
+        "GND_D"
+       ]
+      },
+      {
+       "origin": {
+        "x": 48.63,
+        "y": 13.43
+       },
+       "pitch": 2.54,
+       "pins": [
+        "SWDIO"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 19.78
+       },
+       "pitch": 2.54,
+       "pins": [
+        "VBUS",
+        "VSYS",
+        "GND_38",
+        "3V3_EN",
+        "3V3_OUT",
+        "ADC_VREF",
+        "GP28",
+        "AGND",
+        "GP27",
+        "GP26",
+        "RUN",
+        "GP22",
+        "GND_28",
+        "GP21",
+        "GP20",
+        "GP19",
+        "GP18",
+        "GND_23",
+        "GP17",
+        "GP16"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/rpi-pico.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
     }
    },
    "model3d": {
@@ -29808,6 +30787,36 @@
      "confidence": "low"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 23,
+      "h": 98
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2,
+       "pins": [
+        "GND",
+        "VCC",
+        "AOUT"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/soil-capacitive-v2.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -30242,6 +31251,64 @@
      "confidence": "medium"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 45,
+      "h": 75
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "VCC"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 4.4
+       },
+       "pitch": 2.54,
+       "pins": [
+        "GND"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 6.8
+       },
+       "pitch": 2.54,
+       "pins": [
+        "A"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 9.2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "B"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/soil-npk-rs485.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -30549,6 +31616,57 @@
      "confidence": "medium"
     }
    },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 119,
+      "h": 27.5
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 13,
+       "pins": [
+        "PV+",
+        "PV-"
+       ]
+      },
+      {
+       "origin": {
+        "x": 34,
+        "y": 2
+       },
+       "pitch": 13,
+       "pins": [
+        "BAT+",
+        "BAT-"
+       ]
+      },
+      {
+       "origin": {
+        "x": 66,
+        "y": 2
+       },
+       "pitch": 13,
+       "pins": [
+        "LOAD+",
+        "LOAD-"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/solar-charge-pwm.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
    "model3d": {
     "kind": {
      "v": "procedural",
@@ -30772,6 +31890,35 @@
     ],
     "p": {
      "source": "apps/web/src/lab/sim/devices/solar-panel.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 345,
+      "h": 20
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 22,
+       "pins": [
+        "PV+",
+        "PV-"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/solar-panel.ts",
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "medium"
@@ -31180,6 +32327,44 @@
      "verifiedBy": "import",
      "at": "2026-10-23",
      "confidence": "low"
+    }
+   },
+   "footprint": {
+    "v": {
+     "kind": "module-headers",
+     "outlineMm": {
+      "w": 76,
+      "h": 51
+     },
+     "rows": [
+      {
+       "origin": {
+        "x": 2,
+        "y": 2
+       },
+       "pitch": 2.54,
+       "pins": [
+        "-"
+       ]
+      },
+      {
+       "origin": {
+        "x": 2,
+        "y": 14
+       },
+       "pitch": 2.54,
+       "pins": [
+        "+"
+       ]
+      }
+     ],
+     "holes": []
+    },
+    "p": {
+     "source": "apps/web/src/lab/scene/parts/solenoid-valve-12v.ts",
+     "verifiedBy": "import",
+     "at": "2026-10-23",
+     "confidence": "medium"
     }
    },
    "model3d": {

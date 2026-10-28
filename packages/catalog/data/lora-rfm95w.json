@@ -515,5 +515,111 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 20,
+    "h": 18
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 16,
+     "pins": [
+      "GND",
+      "DIO2"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 4
+     },
+     "pitch": 16,
+     "pins": [
+      "MISO",
+      "DIO1"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 6
+     },
+     "pitch": 16,
+     "pins": [
+      "MOSI",
+      "DIO0"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 8
+     },
+     "pitch": 16,
+     "pins": [
+      "SCK",
+      "3V3"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 10
+     },
+     "pitch": 16,
+     "pins": [
+      "NSS",
+      "DIO4"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 12
+     },
+     "pitch": 16,
+     "pins": [
+      "RESET",
+      "DIO3"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 14
+     },
+     "pitch": 16,
+     "pins": [
+      "DIO5",
+      "GND3"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 16
+     },
+     "pitch": 16,
+     "pins": [
+      "GND2",
+      "ANT"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/lora-rfm95w.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

@@ -1,4 +1,5 @@
 import {useProSpec} from '../api/spec-store';
+import {StageStrip} from './stage-strip';
 
 export function StatusBar(){
  const {spec,revision,status,error}=useProSpec();
@@ -10,6 +11,7 @@ export function StatusBar(){
   <span>SystemSpec v{spec.meta.version} · r{revision} · {errors?`${errors} errors`:'valid'}</span>
   <span>Checks {ok}/{v.length} verified{bad?` · ${bad} failed`:''}</span>
   <span>Code: {compiled} compiled · {linted} linted</span>
+  <StageStrip spec={spec}/>
   <span className="pro-status-end">AI-generated design · review before you build</span>
  </footer>;
 }

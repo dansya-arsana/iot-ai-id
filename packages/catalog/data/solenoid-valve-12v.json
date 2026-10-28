@@ -243,5 +243,43 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 76,
+    "h": 51
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "-"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 14
+     },
+     "pitch": 2.54,
+     "pins": [
+      "+"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/solenoid-valve-12v.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

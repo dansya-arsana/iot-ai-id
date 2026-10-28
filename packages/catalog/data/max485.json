@@ -362,5 +362,60 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 44.5,
+    "h": 14
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 26,
+      "y": 2
+     },
+     "pitch": 5,
+     "pins": [
+      "A_T",
+      "B_T"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 3.5
+     },
+     "pitch": 2.54,
+     "pins": [
+      "RO",
+      "RE",
+      "DE",
+      "DI"
+     ]
+    },
+    {
+     "origin": {
+      "x": 35,
+      "y": 8.7
+     },
+     "pitch": 2.5,
+     "pins": [
+      "VCC",
+      "B",
+      "A",
+      "GND"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/max485.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

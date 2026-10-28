@@ -954,5 +954,111 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 52.26,
+    "h": 21.78
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "GP0",
+      "GP1",
+      "GND_3",
+      "GP2",
+      "GP3",
+      "GP4",
+      "GP5",
+      "GND_8",
+      "GP6",
+      "GP7",
+      "GP8",
+      "GP9",
+      "GND_13",
+      "GP10",
+      "GP11",
+      "GP12",
+      "GP13",
+      "GND_18",
+      "GP14",
+      "GP15"
+     ]
+    },
+    {
+     "origin": {
+      "x": 48.63,
+      "y": 8.35
+     },
+     "pitch": 2.54,
+     "pins": [
+      "SWCLK"
+     ]
+    },
+    {
+     "origin": {
+      "x": 48.63,
+      "y": 10.89
+     },
+     "pitch": 2.54,
+     "pins": [
+      "GND_D"
+     ]
+    },
+    {
+     "origin": {
+      "x": 48.63,
+      "y": 13.43
+     },
+     "pitch": 2.54,
+     "pins": [
+      "SWDIO"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 19.78
+     },
+     "pitch": 2.54,
+     "pins": [
+      "VBUS",
+      "VSYS",
+      "GND_38",
+      "3V3_EN",
+      "3V3_OUT",
+      "ADC_VREF",
+      "GP28",
+      "AGND",
+      "GP27",
+      "GP26",
+      "RUN",
+      "GP22",
+      "GND_28",
+      "GP21",
+      "GP20",
+      "GP19",
+      "GP18",
+      "GND_23",
+      "GP17",
+      "GP16"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/rpi-pico.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

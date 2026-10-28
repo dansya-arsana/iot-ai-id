@@ -291,5 +291,56 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 119,
+    "h": 27.5
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 13,
+     "pins": [
+      "PV+",
+      "PV-"
+     ]
+    },
+    {
+     "origin": {
+      "x": 34,
+      "y": 2
+     },
+     "pitch": 13,
+     "pins": [
+      "BAT+",
+      "BAT-"
+     ]
+    },
+    {
+     "origin": {
+      "x": 66,
+      "y": 2
+     },
+     "pitch": 13,
+     "pins": [
+      "LOAD+",
+      "LOAD-"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/solar-charge-pwm.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

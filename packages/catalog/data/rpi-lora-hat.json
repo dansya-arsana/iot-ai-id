@@ -441,5 +441,109 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 65,
+    "h": 56.5
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 5.08,
+     "pins": [
+      "5V_2",
+      "GND_6"
+     ]
+    },
+    {
+     "origin": {
+      "x": 9.62,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "GPIO14",
+      "GPIO15"
+     ]
+    },
+    {
+     "origin": {
+      "x": 19.78,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "GPIO23",
+      "GPIO24"
+     ]
+    },
+    {
+     "origin": {
+      "x": 27.4,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "GPIO25"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 4.54
+     },
+     "pitch": 7.62,
+     "pins": [
+      "3V3_1",
+      "GPIO4"
+     ]
+    },
+    {
+     "origin": {
+      "x": 14.7,
+      "y": 4.54
+     },
+     "pitch": 10.16,
+     "pins": [
+      "GPIO17",
+      "GPIO10"
+     ]
+    },
+    {
+     "origin": {
+      "x": 27.4,
+      "y": 4.54
+     },
+     "pitch": 2.54,
+     "pins": [
+      "GPIO9",
+      "GPIO11"
+     ]
+    },
+    {
+     "origin": {
+      "x": 54.63,
+      "y": 34.02
+     },
+     "pitch": 2.54,
+     "pins": [
+      "ANT"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/rpi-lora-hat.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

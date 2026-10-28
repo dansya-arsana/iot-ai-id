@@ -343,5 +343,53 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "terminal",
+   "outlineMm": {
+    "w": 82,
+    "h": 48
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 15.6,
+     "pins": [
+      "T1A",
+      "T2A",
+      "T3A",
+      "T4A",
+      "T5A",
+      "T6A"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 46
+     },
+     "pitch": 15.6,
+     "pins": [
+      "T1B",
+      "T2B",
+      "T3B",
+      "T4B",
+      "T5B",
+      "T6B"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/din-rail-terminals.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

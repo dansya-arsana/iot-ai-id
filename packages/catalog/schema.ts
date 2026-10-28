@@ -41,6 +41,13 @@ export const DriverSchema=z.object({
  verify:z.enum(['compiled','linted','untested']),
 }).strict();
 
+/** Carrier-board footprint (mm, origin = top-left of the module outline; pins named as in `pins`). Geometry only, no vendor data. */
+export const FootprintSchema=z.object({
+ kind:z.enum(['module-headers','terminal','board-edge']),
+ outlineMm:z.object({w:z.number().positive(),h:z.number().positive()}).strict(),
+ rows:z.array(z.object({origin:z.object({x:z.number(),y:z.number()}).strict(),pitch:z.number().positive(),pins:z.array(z.string().min(1).max(16)).min(1).max(80)}).strict()).max(8),
+ holes:z.array(z.object({x:z.number(),y:z.number(),d:z.number().positive()}).strict()).max(16),
+}).strict();
 export const PartRecordSchema=z.object({
  schemaVersion:z.literal(CATALOG_SCHEMA_VERSION),
  identity:z.object({id:PartSlug,name:F(txt(80)),kind:F(PartSlug),manufacturer:F(txt(60)).optional(),mpn:F(txt(60)).optional()}).strict(),
@@ -56,6 +63,7 @@ export const PartRecordSchema=z.object({
  drivers:z.array(F(DriverSchema)).max(8),
  compatibleWith:F(z.array(PartSlug).max(60)),
  price:F(z.object({minIdr:z.number().int().nonnegative(),maxIdr:z.number().int().nonnegative(),checkedAt:z.string().regex(/^\d{4}-\d{2}-\d{2}$/)}).strict()).optional(),
+ footprint:F(FootprintSchema).optional(),
  model3d:z.object({kind:F(z.enum(['procedural','glb','none'])),status:F(z.enum(['none','draft','verified']))}).strict(),
  /** Set only by staff, citing a verified Lab Mitra task id (ADR 010). */
  labTested:z.object({schoolId:txt(64),taskId:txt(64),at:z.string().regex(/^\d{4}-\d{2}-\d{2}/),by:txt(64)}).strict().optional(),

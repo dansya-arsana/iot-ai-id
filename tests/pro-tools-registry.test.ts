@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {z} from 'zod';
 import {PRO_TOOLS,PRO_TOOL_NAMES,getTool,anthropicTools,mcpTools,inputJsonSchema} from '../packages/pro-tools/registry.js';
 
-const EXPECTED=['catalog_search','catalog_get_part','check_compatibility','allocate_pins','validate_netlist','solve_power','estimate_link','site_climate','compile_code','price_bom','save_revision','get_revision','render','load_skill','catalog_propose','device_detect','device_flash','serial_read','telemetry_read','evidence_status','get_spec_schema'];
-test('registry has the 21 tools in fixed order with unique snake_case names',()=>{
+const EXPECTED=['catalog_search','catalog_get_part','check_compatibility','allocate_pins','validate_netlist','solve_power','estimate_link','site_climate','compile_code','price_bom','save_revision','get_revision','render','load_skill','catalog_propose','device_detect','device_flash','serial_read','telemetry_read','evidence_status','get_spec_schema','export_kicad','live_part_lookup','fetch_footprint'];
+test('registry has the 24 tools in fixed order with unique snake_case names',()=>{
  assert.deepEqual([...PRO_TOOL_NAMES],EXPECTED);
- assert.equal(new Set(PRO_TOOL_NAMES).size,21);
+ assert.equal(new Set(PRO_TOOL_NAMES).size,24);
  for(const n of PRO_TOOL_NAMES)assert.match(n,/^[a-z][a-z0-9_]*$/);
 });
 test('every input converts to a JSON Schema object without transforms; every output is a zod type',()=>{
@@ -29,11 +29,11 @@ test('device_flash needs native consent, is physical, client only and never MCP'
 test('client and local tools are gated; MCP local tools only on the local bridge',()=>{
  for(const t of PRO_TOOLS.filter(x=>x.runsAt==='client'))assert.equal(t.access,'member-local',t.name);
  const names=(o:{clientTools?:string[]})=>anthropicTools(o).map(t=>t.name);
- assert.equal(names({}).length,17);
+ assert.equal(names({}).length,20);
  assert.ok(!names({}).includes('device_flash'));
  assert.ok(names({clientTools:['device_flash']}).includes('device_flash'));
  assert.deepEqual(mcpTools({local:false}).map(t=>t.name).filter(n=>['device_detect','serial_read','telemetry_read'].includes(n)),[]);
- assert.equal(mcpTools({local:true}).length,20);
+ assert.equal(mcpTools({local:true}).length,23);
 });
 test('flags match the plan table',()=>{
  const g=(n:string)=>getTool(n)!;

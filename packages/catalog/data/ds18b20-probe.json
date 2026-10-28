@@ -255,5 +255,35 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 9.08,
+    "h": 50
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "VDD",
+      "DQ",
+      "GND"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "derived from record.pins + mechanical.sizeMm as one 2.54 mm header row (no lab model); pin order is a placeholder until measured",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "low"
+  }
  }
 }

@@ -7,6 +7,10 @@
 import {getTool,type ProToolName} from '../../packages/pro-tools/registry.js';
 import {verifySpec,sha256,type GateVerifiers} from '../../packages/pro-tools/verify-spec.js';
 import {applySpecPatch,splitServerOwned,EMPTY_SPEC_DOC,PatchError} from '../../packages/pro-contract/patch.js';
+import {liveLookup} from './parts-live.js';
+import {fetchFootprint} from './footprint-fetch.js';
+import {exportKicad} from '../../packages/pro-tools/impl/kicad.js';
+import type {PartLookup} from '../../packages/pro-tools/impl/common.js';
 import {getSpecSchema,prefillServerFields,describeIssues} from '../../packages/pro-tools/impl/spec-schema.js';
 import {SystemSpecSchema,PRO_LIMITS,SYSTEM_SPEC_VERSION,type SystemSpec,type ItemVerification} from '../../packages/pro-contract/system-spec.js';
 
@@ -34,6 +38,10 @@ export interface ProToolStore{
 }
 export interface ProToolDeps{
  impls?:Partial<Record<ProToolName,Impl>>;
+ /** Part lookup for export_kicad (the composition root passes the catalog lookup). */
+ lookup?:PartLookup;
+ /** Footprint cache directory for fetch_footprint. */
+ footprintCacheDir?:string;
  store?:ProToolStore;
  verifiers?:GateVerifiers;
  /** D1/D2 derivation on the patched doc: W-numbers, checklist ids, BOM totals, checks. Runs before schema validation and the gate. */
@@ -48,6 +56,8 @@ export const DEFAULT_LIMITS:Record<string,Limit>={
  default:{max:400,windowMs:600_000},
 };
 export const MAX_OUTPUT_BYTES=100_000;
+/** Tools whose result is a file bundle; they get a larger cap. */
+export const OUTPUT_BYTES_OVERRIDE:Record<string,number>={export_kicad:2_900_000,fetch_footprint:250_000};
 const err=(code:string,message:string,status:number,details?:unknown):{ok:false;error:ToolError}=>({ok:false,error:{code,message,status,...(details!==undefined?{details}:{})}});
 // eslint-disable-next-line no-control-regex
 const CTRL=/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
@@ -97,6 +107,18 @@ export class ProToolDispatcher{
   return true;
  }
 
+ /** Built-in impls: pure get_spec_schema, plus env/fs-backed live_part_lookup and fetch_footprint, and export_kicad over the stored revision. */
+ private builtin(name:string):Impl|undefined{
+  if(name==='get_spec_schema')return getSpecSchema as Impl;
+  if(name==='live_part_lookup')return ((i:Parameters<typeof liveLookup>[0])=>liveLookup(i,process.env).then(r=>({...r,items:r.items.map(x=>({...x,description:{untrusted:x.description}}))}))) as unknown as Impl;
+  if(name==='fetch_footprint')return ((i:Parameters<typeof fetchFootprint>[0])=>fetchFootprint(i,{cacheDir:this.deps.footprintCacheDir??'.data/footprints-cache'})) as unknown as Impl;
+  if(name==='export_kicad'&&this.deps.lookup&&this.deps.store){
+   const lookup=this.deps.lookup,store=this.deps.store;
+   return ((i:{projectId:string;revision?:number;nodeId:string})=>{const r=i.revision?store.revision(i.projectId,i.revision):store.head(i.projectId);if(!r||r.draft)throw new Error('revision not found');return exportKicad(i,{spec:r.spec as SystemSpec,lookup});}) as unknown as Impl;
+  }
+  return undefined;
+ }
+
  async call(ctx:ToolCtx,name:string,raw:unknown):Promise<ToolResult>{
   const t0=Date.now(),done=(r:{ok:true;output:unknown}|{ok:false;error:ToolError}):ToolResult=>({...r,ms:Date.now()-t0}) as ToolResult;
   const tool=getTool(name);
@@ -114,7 +136,7 @@ export class ProToolDispatcher{
   if(!this.take(ctx.subject,name))return done(err('rate_limited','Too many calls to this tool. Wait a few minutes.',429));
   let out:unknown;
   try{
-   const impl=this.deps.impls?.[name as ProToolName]??(name==='get_spec_schema'?getSpecSchema:undefined);
+   const impl=this.deps.impls?.[name as ProToolName]??this.builtin(name);
    if(impl)out=await (impl as (i:unknown,c:ToolCtx)=>unknown)(input,ctx);
    else if(name==='save_revision'||name==='get_revision'||name==='catalog_propose'){
     const r=name==='save_revision'?await this.saveRevision(ctx,input):name==='get_revision'?this.getRevision(input):this.propose(ctx,input);
@@ -129,7 +151,7 @@ export class ProToolDispatcher{
   out=wrapOutput(name,out);
   const checked=tool.output.safeParse(out);
   if(!checked.success)return done(err('output_invalid','The tool returned an invalid result.',502,checked.error.issues.slice(0,3).map(i=>i.path.join('.')+': '+i.message)));
-  if(JSON.stringify(checked.data).length>MAX_OUTPUT_BYTES)return done(err('output_too_large','The result is too large; narrow the request.',502));
+  if(JSON.stringify(checked.data).length>(OUTPUT_BYTES_OVERRIDE[name]??MAX_OUTPUT_BYTES))return done(err('output_too_large','The result is too large; narrow the request.',502));
   return done({ok:true,output:checked.data});
  }
 

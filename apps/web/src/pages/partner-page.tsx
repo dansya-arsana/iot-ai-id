@@ -36,7 +36,7 @@ export function Partner(){
  const contextRows=[['Region',context.region&&REGION[context.region].name],['Place',context.site&&HOTSPOT[context.site].name],['I build',context.build&&BUILD_LABEL[context.build]],['Stressor',context.stressor&&STRESS_LABEL[context.stressor]],['Month',context.month&&MONTH_LABEL[context.month]]].filter((r):r is [string,string]=>!!r[1]);
  const initial=new URLSearchParams(search).get('kind');
  const [kind,setKind]=useState<Kind>((INQUIRY_KINDS as readonly string[]).includes(initial??'')?initial as Kind:'vendor');
- const [form,setForm]=useState(empty);const [busy,setBusy]=useState(false);
+ const [form,setForm]=useState(()=>({...empty,message:(new URLSearchParams(search).get('msg')??'').slice(0,2000)}));const [busy,setBusy]=useState(false);
  const [errors,setErrors]=useState<Record<string,string>>({});const [failure,setFailure]=useState('');const [done,setDone]=useState<{reference?:string}>();
  const set=(key:keyof typeof empty)=>(e:{target:{value:string}})=>setForm(f=>({...f,[key]:e.target.value}));
  const waText=(ref?:string)=>lang==='id'?`Halo AIoT, saya ${form.name||'…'}${form.organization?` dari ${form.organization}`:''}.${ref?` Referensi inquiry: ${ref}.`:''} ${form.message}`.trim():`Hello AIoT, this is ${form.name||'…'}${form.organization?` from ${form.organization}`:''}.${ref?` Inquiry reference: ${ref}.`:''} ${form.message}`.trim();

@@ -222,5 +222,43 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "module-headers",
+   "outlineMm": {
+    "w": 120,
+    "h": 90
+   },
+   "rows": [
+    {
+     "origin": {
+      "x": 2,
+      "y": 2
+     },
+     "pitch": 2.54,
+     "pins": [
+      "GND"
+     ]
+    },
+    {
+     "origin": {
+      "x": 2,
+      "y": 8
+     },
+     "pitch": 2.54,
+     "pins": [
+      "SIG"
+     ]
+    }
+   ],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/rain-gauge-tipping.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }

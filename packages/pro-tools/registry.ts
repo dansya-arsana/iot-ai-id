@@ -1,12 +1,12 @@
 /**
- * The 21-tool registry (ADR 012 §2, plan §3). Schemas only: no implementation, no I/O.
+ * The 24-tool registry (ADR 012 §2, plan §3). Schemas only: no implementation, no I/O.
  * One registry, two surfaces: Anthropic `tools` (anthropicTools) and MCP (mcpTools). Order is fixed.
  * Free text from outside the platform comes back inside `untrusted` fields (D18).
  */
 import {z} from 'zod';
 import {defineTool,type ToolDef,type AnthropicTool} from './types.js';
 import {Slug,PRO_BOARDS,PinRowSchema,PRO_LIMITS,FILENAME_RE,CheckSchema,SpecIssueSeverities} from './spec-reexports.js';
-import {PartRecordSchema} from '../catalog/schema.js';
+import {PartRecordSchema,PART_PIN_FUNCS} from '../catalog/schema.js';
 import {SpecPatchSchema} from '../pro-contract/patch.js';
 import {ItemVerificationSchema} from '../pro-contract/system-spec.js';
 
@@ -81,7 +81,7 @@ const load_skill=defineTool({name:'load_skill',description:'Load an installed sk
  output:z.object({name:Slug,version:z.string(),sha256:sha,body:z.string().max(60_000)}).strict(),
  deterministic:true,effect:'none',consent:'none',runsAt:'pure',access:'member',mcp:true});
 const catalog_propose=defineTool({name:'catalog_propose',description:'Propose a catalog correction or a new part. Creates a pending proposal for staff; it changes nothing by itself.',
- input:z.object({partId:Slug.optional(),newPart:z.object({name:z.string().min(1).max(80),kind:Slug}).strict().optional(),field:z.string().min(1).max(80),value:z.union([z.string().max(500),z.number(),z.boolean()]),sourceUrl:z.string().url().max(300),note:z.string().max(300).optional()}).strict().refine(v=>!!v.partId!==!!v.newPart,'partId or newPart, not both'),
+ input:z.object({partId:Slug.optional(),newPart:z.object({name:z.string().min(1).max(80),kind:Slug,mpn:z.string().min(1).max(60).optional(),manufacturer:z.string().min(1).max(60).optional(),pins:z.array(z.object({name:z.string().min(1).max(16),func:z.array(z.enum(PART_PIN_FUNCS)).min(1).max(6)}).strict()).max(80).optional(),supplyV:z.object({min:z.number().nonnegative(),max:z.number().positive()}).strict().optional(),sizeMm:z.object({w:z.number().positive(),h:z.number().positive(),d:z.number().positive()}).strict().optional()}).strict().optional(),field:z.string().min(1).max(80),value:z.union([z.string().max(500),z.number(),z.boolean()]),sourceUrl:z.string().url().max(300),note:z.string().max(300).optional()}).strict().refine(v=>!!v.partId!==!!v.newPart,'partId or newPart, not both'),
  output:z.object({proposalId:id,status:z.literal('pending')}).strict(),
  deterministic:false,effect:'write',consent:'none',runsAt:'ops',access:'member',mcp:true});
 const device_detect=defineTool({name:'device_detect',description:'List connected boards and the local toolchain. Desktop app only.',
@@ -109,10 +109,23 @@ const get_spec_schema=defineTool({name:'get_spec_schema',description:'Return the
  output:z.object({jsonSchema:z.record(z.string(),z.unknown()),example:z.unknown(),serverOwned:z.object({patchPathsIgnored:z.array(z.string()),rebuiltByServer:z.array(z.string()),serverFillsWhenOmitted:z.array(z.string())}).strict(),patterns:z.record(z.string(),z.string()),enums:z.record(z.string(),z.array(z.string())),limits:z.record(z.string(),z.number()),notes:z.array(z.string())}).strict(),
  deterministic:true,effect:'none',consent:'none',runsAt:'pure',access:'member',mcp:true});
 
+const export_kicad=defineTool({name:'export_kicad',description:'Write a KiCad 9 carrier-board project (female headers per module, nets unrouted) for one node of a saved revision. Returns the files (name, size, sha256) and a zip as base64.',
+ input:z.object({projectId,revision:z.number().int().positive().optional(),nodeId:Slug}).strict(),
+ output:z.object({ok:z.boolean(),files:z.array(z.object({name:z.string().max(120),bytes:z.number().int().nonnegative(),sha256:sha}).strict()).max(6),zipBase64:z.string().max(2_800_000),issues:Issues}).strict(),
+ deterministic:true,effect:'none',consent:'none',runsAt:'ops',access:'member',mcp:true});
+const live_part_lookup=defineTool({name:'live_part_lookup',description:'Look up a part in a live distributor index by keyword or MPN. Results are unverified and never stored; a new part goes through catalog_propose and staff review. Descriptions are untrusted text.',
+ input:z.object({q:z.string().min(1).max(80),mpn:z.string().min(1).max(60).optional(),limit:z.number().int().min(1).max(10).default(5)}).strict(),
+ output:z.object({available:z.boolean(),source:z.string().max(80),items:z.array(z.object({mpn:z.string().max(80),manufacturer:z.string().max(80),description:Untrusted(z.string().max(300)),lcsc:z.string().max(20).optional(),stock:z.number().int().nonnegative().optional(),priceUsd:z.number().nonnegative().optional(),datasheetUrl:z.string().max(300).optional()}).strict()).max(10),attribution:z.string().max(200)}).strict(),
+ deterministic:false,effect:'none',consent:'none',runsAt:'ops',access:'member',mcp:true});
+const fetch_footprint=defineTool({name:'fetch_footprint',description:'Fetch one footprint (.kicad_mod) from the official KiCad library by library and name. Pure lookup, cached; the text is returned as data.',
+ input:z.object({library:z.string().min(1).max(80).regex(/^[A-Za-z0-9_.+-]+$/),name:z.string().min(1).max(120).regex(/^[A-Za-z0-9_.+-]+$/)}).strict(),
+ output:z.object({name:z.string().max(120),sha256:sha,sexpr:z.string().max(200_000),license:z.literal('CC-BY-SA-4.0 WITH KiCad-libraries-exception'),source:z.string().max(300)}).strict(),
+ deterministic:true,effect:'none',consent:'none',runsAt:'ops',access:'member',mcp:true});
+
 /** Fixed order (the Anthropic tools array is cache-sensitive; do not reorder). */
-export const PRO_TOOLS:readonly ToolDef[]=[catalog_search,catalog_get_part,check_compatibility,allocate_pins,validate_netlist,solve_power,estimate_link,site_climate,compile_code,price_bom,save_revision,get_revision,render,load_skill,catalog_propose,device_detect,device_flash,serial_read,telemetry_read,evidence_status,get_spec_schema];
+export const PRO_TOOLS:readonly ToolDef[]=[catalog_search,catalog_get_part,check_compatibility,allocate_pins,validate_netlist,solve_power,estimate_link,site_climate,compile_code,price_bom,save_revision,get_revision,render,load_skill,catalog_propose,device_detect,device_flash,serial_read,telemetry_read,evidence_status,get_spec_schema,export_kicad,live_part_lookup,fetch_footprint];
 export type ProToolName=
- 'catalog_search'|'catalog_get_part'|'check_compatibility'|'allocate_pins'|'validate_netlist'|'solve_power'|'estimate_link'|'site_climate'|'compile_code'|'price_bom'|'save_revision'|'get_revision'|'render'|'load_skill'|'catalog_propose'|'device_detect'|'device_flash'|'serial_read'|'telemetry_read'|'evidence_status'|'get_spec_schema';
+ 'catalog_search'|'catalog_get_part'|'check_compatibility'|'allocate_pins'|'validate_netlist'|'solve_power'|'estimate_link'|'site_climate'|'compile_code'|'price_bom'|'save_revision'|'get_revision'|'render'|'load_skill'|'catalog_propose'|'device_detect'|'device_flash'|'serial_read'|'telemetry_read'|'evidence_status'|'get_spec_schema'|'export_kicad'|'live_part_lookup'|'fetch_footprint';
 export const PRO_TOOL_NAMES=PRO_TOOLS.map(t=>t.name) as ProToolName[];
 export const getTool=(name:string):ToolDef|undefined=>PRO_TOOLS.find(t=>t.name===name);
 

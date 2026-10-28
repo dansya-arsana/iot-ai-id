@@ -48,7 +48,7 @@ test('fixture farm turn: replayed offline, >=8 distinct tools, gated r1 saved, u
  const first=log[0]!;
  assert.equal(first.model,'claude-sonnet-5-5');assert.equal(first.stream,true);
  assert.equal(first.system[0]!.cache_control?.type,'ephemeral');assert.match(first.system[0]!.text,/lora-as923-id: LoRa 920-923 MHz notes/);assert.match(first.system[0]!.text,/untrusted/);
- assert.equal((first.tools as any[]).length,17);assert.equal((first.tools as any[]).at(-1).cache_control.type,'ephemeral');
+ assert.equal((first.tools as any[]).length,20);assert.equal((first.tools as any[]).at(-1).cache_control.type,'ephemeral');
  assert.ok(!(first.tools as any[]).some(t=>t.name==='device_flash'));
  assert.equal(first.thinking?.type,'enabled');assert.ok(first.max_tokens>first.thinking!.budget_tokens);
  assert.ok(!JSON.stringify(first.messages).includes('"__PID__"'));
@@ -164,7 +164,7 @@ test('client tool round trip: request event, result POST, schema-validated outpu
  let r:R;do{r=await h.call('GET',`projects/${h.pid}/turns/${tid}/poll/-1`,undefined,{staff:h.staff});}while(!r.data.done);
  const tr=(r.data.events as AgentEvent[]).find(e=>e.type==='tool_result') as any;
  assert.equal(tr.ok,true);assert.equal(tr.output.boards[0].family,'esp32');
- assert.equal((log[0]!.tools as any[]).length,18,'device_detect offered only because the turn declared it');
+ assert.equal((log[0]!.tools as any[]).length,21,'device_detect offered only because the turn declared it');
  assert.deepEqual((log[1]!.messages.at(-1) as any).content[0].content&&JSON.parse((log[1]!.messages.at(-1) as any).content[0].content).boards.length,1);
 });
 

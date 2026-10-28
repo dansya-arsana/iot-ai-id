@@ -189,5 +189,22 @@
     }
    }
   ]
+ },
+ "footprint": {
+  "v": {
+   "kind": "board-edge",
+   "outlineMm": {
+    "w": 200,
+    "h": 75
+   },
+   "rows": [],
+   "holes": []
+  },
+  "p": {
+   "source": "apps/web/src/lab/scene/parts/enclosure-ip65.ts",
+   "verifiedBy": "import",
+   "at": "2026-10-23",
+   "confidence": "medium"
+  }
  }
 }
