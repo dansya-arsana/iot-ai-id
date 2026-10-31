@@ -20,3 +20,11 @@ Arduino CLI and its board toolchains run as separate local tools. On Apple Silic
 Deployment includes the MIT-licensed Jev harness decision scripts, with its license retained at `deploy/jev/LICENSE`. These scripts are a typed routing layer; they do not execute the product hardware workflow themselves.
 
 Arduino lab firmware (`apps/web/src/lab/firmware/generated.ts`): the precompiled images contain object code from ArduinoCore-avr (LGPL-2.1, https://github.com/arduino/ArduinoCore-avr) and the Arduino Servo library (LGPL-2.1, https://github.com/arduino-libraries/Servo). They are shipped as data. The sketch sources are in `apps/web/src/lab/firmware/sketches/` and the build script is `scripts/build-lab-firmware.ts`, so anyone can rebuild them (see docs/lab-firmware.md). arduino-cli and avr-gcc are build-time tools only and are not part of the web bundle. The /lab lessons are our own work; the public Learn Arduino site was studied for look and flow only and none of its code, models, text or images is used.
+
+Landing scenario photos (`apps/web/public/assets/landing/sc-01.jpg` to `sc-06.jpg`) are cropped from Wikimedia Commons images. The cropped versions keep each source's licence, and the robots' makers are not partners and do not endorse AIoT:
+- sc-01: "XAG drone, Agritechnica 2023, Hanover (P1160326).jpg" by MB-one, CC BY-SA 4.0
+- sc-02: "DJI Agras T50 in flight.jpg" by Blervis, CC0
+- sc-03: "Food delivery bot at Yangfang Shengli Original Restaurant (20200111163318).jpg" by N509FZ, CC BY-SA 4.0
+- sc-04: "Unitree G1.jpg" by Sayanesy, CC0
+- sc-05: "Robot de serveis Pudu 2022.jpg" by Marc Auledas-Noguera, CC BY-SA 4.0
+- sc-06: "Unitree Go2 of Salvamont side view.jpg" by HotNews Romania (Adi Iacob, Ovidiu Popica), CC BY 3.0

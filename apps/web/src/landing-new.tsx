@@ -19,7 +19,7 @@ const copy={
   gapTitle:['AI can write firmware.','It has never felt','a monsoon.'],gapMetrics:[['70–90%','RELATIVE HUMIDITY'],['25–35°C','AMBIENT HEAT'],['17,000+','ISLANDS TO REACH']],gapNote:'Typical Indonesian conditions, not test results.',
   atlasEyebrow:'/ 02 SCENARIO ATLAS',atlasTitle:'Real places. Real failure modes.',atlasText:'Indonesian field environments, each described by its conditions and the failures it tends to produce.',
   scenarios:[['Aquaculture ponds','Water quality telemetry over brackish water.',['Humidity','Corrosion','Remote power']],['Greenhouses & plantations','Soil and climate sensing under tropical heat.',['Sensor drift','Heat','Intermittent network']],['Cold-chain & warehouses','Temperature logging across loading and transit.',['Condensation','Door cycles','Battery life']],['Factory floors','Industrial buses and actuators near heavy machinery.',['RS485 noise','Modbus quirks','EMI']],['Smart buildings','Air quality and occupancy in mixed-use spaces.',['Power outages','Firmware crashes','Wi-Fi contention']],['Remote telemetry','Unattended nodes far from the nearest technician.',['Signal loss','Solar power','Physical access']]],
-  prev:'Previous scenarios',next:'Next scenarios',
+  prev:'Previous scenarios',next:'Next scenarios',robotNote:'Real Chinese-made robots shown as reference units. Photos from Wikimedia Commons under the licences shown; the makers are not partners and do not endorse AIoT.',
   statsEyebrow:'WHERE WE ARE TODAY',statsTitle:'Built on a real catalog, a defined loop and a growing network.',stats:[['56','Hardware references catalogued'],['6','Field environments mapped'],['4','Steps in every verification'],['3','Planned lab cities']],
   verifyTitle:'Every test leaves evidence behind.',verifyLead:'Hardware, behaviour and environment are written as a machine-checkable contract. Operators install it, the agent runs it, and the outcome is stored, including failures.',
   verifySpec:[['INPUTS','Hardware contract','Pin map','Target environment'],['CAPTURED','Serial output','Measurements','Camera evidence'],['OUTCOMES','Verified','Failed with cause','Recovery history']],
@@ -41,7 +41,7 @@ const copy={
   gapTitle:['AI bisa menulis firmware.','Tapi belum pernah','kena musim hujan.'],gapMetrics:[['70–90%','KELEMBAPAN RELATIF'],['25–35°C','SUHU LINGKUNGAN'],['17.000+','PULAU UNTUK DIJANGKAU']],gapNote:'Kondisi umum di Indonesia, bukan hasil uji.',
   atlasEyebrow:'/ 02 ATLAS SKENARIO',atlasTitle:'Tempat nyata. Mode kegagalan nyata.',atlasText:'Lingkungan lapangan di Indonesia, masing-masing dengan kondisi dan kegagalan yang biasa muncul.',
   scenarios:[['Tambak','Telemetri kualitas air payau.',['Lembap','Korosi','Daya jarak jauh']],['Greenhouse & perkebunan','Sensor tanah dan iklim di panas tropis.',['Drift sensor','Panas','Jaringan putus-putus']],['Cold-chain & gudang','Pencatatan suhu saat bongkar muat dan distribusi.',['Kondensasi','Buka-tutup pintu','Umur baterai']],['Lantai pabrik','Bus industri dan aktuator di dekat mesin berat.',['Noise RS485','Keanehan Modbus','EMI']],['Smart building','Kualitas udara dan okupansi di gedung campuran.',['Listrik padam','Firmware crash','Wi-Fi padat']],['Telemetri jarak jauh','Node tanpa pengawasan, jauh dari teknisi.',['Sinyal hilang','Tenaga surya','Akses fisik']]],
-  prev:'Skenario sebelumnya',next:'Skenario berikutnya',
+  prev:'Skenario sebelumnya',next:'Skenario berikutnya',robotNote:'Robot buatan China asli sebagai unit referensi. Foto dari Wikimedia Commons dengan lisensi yang tertera; pembuatnya bukan partner dan tidak mendukung AIoT.',
   statsEyebrow:'POSISI KAMI HARI INI',statsTitle:'Dibangun di atas katalog nyata, loop yang jelas, dan jaringan yang tumbuh.',stats:[['56','Referensi hardware terkatalog'],['6','Lingkungan lapangan dipetakan'],['4','Langkah di setiap verifikasi'],['3','Kota lab yang direncanakan']],
   verifyTitle:'Setiap uji meninggalkan bukti.',verifyLead:'Hardware, perilaku, dan lingkungan ditulis sebagai kontrak yang bisa dicek mesin. Operator memasang, agent menjalankan, dan hasilnya disimpan, termasuk kegagalan.',
   verifySpec:[['INPUT','Kontrak hardware','Peta pin','Lingkungan target'],['DIREKAM','Output serial','Pengukuran','Bukti kamera'],['HASIL','Terverifikasi','Gagal beserta penyebab','Riwayat pemulihan']],
@@ -55,6 +55,15 @@ const copy={
   footer:'Verifikasi hardware di dunia nyata, dari Indonesia.',links:['Hardware library','Dokumentasi','Desktop','GitHub'],bottom:'INDONESIA · DIUJI DI TEMPAT YANG PENTING.'
  }
 };
+/** Scenario card photos: real Chinese-made robots, CC-licensed photos from Wikimedia Commons (cropped to 4:5). Reference units only, not partners. */
+const ROBOTS:{name:string;credit:string;license:string;src:string}[]=[
+ {name:'XAG agricultural drone',credit:'MB-one',license:'CC BY-SA 4.0',src:'https://commons.wikimedia.org/wiki/File:XAG_drone,_Agritechnica_2023,_Hanover_(P1160326).jpg'},
+ {name:'DJI Agras T50',credit:'Blervis',license:'CC0',src:'https://commons.wikimedia.org/wiki/File:DJI_Agras_T50_in_flight.jpg'},
+ {name:'Keenon delivery robot',credit:'N509FZ',license:'CC BY-SA 4.0',src:'https://commons.wikimedia.org/wiki/File:Food_delivery_bot_at_Yangfang_Shengli_Original_Restaurant_(20200111163318).jpg'},
+ {name:'Unitree G1 humanoid',credit:'Sayanesy',license:'CC0',src:'https://commons.wikimedia.org/wiki/File:Unitree_G1.jpg'},
+ {name:'Pudu BellaBot',credit:'Marc Auledas-Noguera',license:'CC BY-SA 4.0',src:'https://commons.wikimedia.org/wiki/File:Robot_de_serveis_Pudu_2022.jpg'},
+ {name:'Unitree Go2 quadruped',credit:'HotNews Romania (Adi Iacob, Ovidiu Popica)',license:'CC BY 3.0',src:'https://commons.wikimedia.org/wiki/File:Unitree_Go2_of_Salvamont_side_view.jpg'},
+];
 const record=`RECORD   HW-3921 · soil moisture (generic)
 BOARD    ESP32 DevKit V1 · ADC GPIO34
 SITE     SC-02 · greenhouse bench
@@ -100,7 +109,7 @@ export function Landing(){
    {lang==='en'&&<EntryPath/>}
 
    {/* composition: vexon-showcase — label left, statement right, over tall bracketed cards */}
-   <section id="scenarios" className="rl-section rl-atlas"><div className="rl-showcase-head" data-reveal><p className="rl-eyebrow">{t.atlasEyebrow}</p><div><h2>{t.atlasTitle}</h2><p>{t.atlasText}</p></div></div><div className="rl-rail-controls"><button onClick={()=>slide(-1)} aria-label={t.prev}><ArrowLeftIcon size={18}/></button><button onClick={()=>slide(1)} aria-label={t.next}><ArrowRightIcon size={18}/></button></div><div ref={rail} className="rl-rail" tabIndex={0} aria-label={t.atlasTitle}>{t.scenarios.map(([name,desc,tags],i)=><article className="rl-scenario rl-brackets" key={i}><span className="rl-tag">SC-0{i+1}</span><img src={`/assets/landing/sc-0${i+1}.jpg`} alt="" width="768" height="1024" loading="lazy"/><div><h3>{name as string}</h3><p>{desc as string}</p><ul>{(tags as string[]).map(tag=><li key={tag}>{tag}</li>)}</ul></div></article>)}</div></section>
+   <section id="scenarios" className="rl-section rl-atlas"><div className="rl-showcase-head" data-reveal><p className="rl-eyebrow">{t.atlasEyebrow}</p><div><h2>{t.atlasTitle}</h2><p>{t.atlasText}</p></div></div><div className="rl-rail-controls"><button onClick={()=>slide(-1)} aria-label={t.prev}><ArrowLeftIcon size={18}/></button><button onClick={()=>slide(1)} aria-label={t.next}><ArrowRightIcon size={18}/></button></div><div ref={rail} className="rl-rail" tabIndex={0} aria-label={t.atlasTitle}>{t.scenarios.map(([name,desc,tags],i)=><article className="rl-scenario rl-brackets" key={i}><span className="rl-tag">SC-0{i+1}</span><figure className="rl-robot"><img src={`/assets/landing/sc-0${i+1}.jpg`} alt={ROBOTS[i]?.name??''} width="880" height="1100" loading="lazy"/>{ROBOTS[i]&&<figcaption><b>{ROBOTS[i].name}</b><a href={ROBOTS[i].src} target="_blank" rel="noopener noreferrer">{ROBOTS[i].credit} · {ROBOTS[i].license}</a></figcaption>}</figure><div><h3>{name as string}</h3><p>{desc as string}</p><ul>{(tags as string[]).map(tag=><li key={tag}>{tag}</li>)}</ul></div></article>)}</div><p className="rl-robot-note">{t.robotNote}</p></section>
 
    {/* composition: lumora-stats — inset inverted panel, corner statement over four-up numerals */}
    <section className="rl-stats-wrap"><div className="rl-stats" data-reveal><p className="rl-eyebrow">• {t.statsEyebrow}</p><h2>{t.statsTitle}</h2><dl>{t.stats.map(([v,l])=><div key={l}><dt><CountUp value={v}/></dt><dd>{l}</dd></div>)}</dl></div></section>

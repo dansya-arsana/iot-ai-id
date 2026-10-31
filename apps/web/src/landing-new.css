@@ -154,3 +154,10 @@
 .rl-generate-box small{font-size:12px;line-height:1.6;color:var(--rl-muted)}
 @media(max-width:1050px){.rl-generate{grid-template-columns:1fr;gap:44px}}
 @media(max-width:767px){.rl-generate-box{padding:18px}.rl-generate-box textarea{min-height:112px}.rl-generate-row .rl-button{width:100%;justify-content:space-between}}
+
+/* Scenario cards: real robot photos (CC, Wikimedia Commons) with credit */
+.rl-robot{position:relative;margin:0;overflow:hidden}
+.rl-scenario .rl-robot img{mix-blend-mode:normal;height:auto}
+.rl-robot figcaption{position:absolute;left:10px;right:10px;bottom:10px;display:grid;gap:2px;padding:8px 10px;background:color-mix(in srgb,var(--rl-bg) 88%,transparent);font:10px/1.4 'IBM Plex Mono',monospace;color:var(--rl-muted)}
+.rl-robot figcaption b{font-weight:500;color:var(--rl-ink)}.rl-robot figcaption a{text-decoration:underline;text-underline-offset:2px}
+.rl-robot-note{margin-top:18px;font-size:12px;line-height:1.6;color:var(--rl-muted);max-width:640px}
